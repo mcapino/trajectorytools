@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools;
+package cz.agents.alite.trajectorytools.graph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,11 +9,11 @@ import javax.vecmath.Matrix3d;
 import org.jgrapht.alg.DirectedNeighborIndex;
 import org.jgrapht.graph.ListenableDirectedWeightedGraph;
 
-import cz.agents.alite.trajectorytools.utils.BoundedInteger;
-import cz.agents.alite.trajectorytools.utils.ManeuverEdge;
-import cz.agents.alite.trajectorytools.utils.OrientedPoint;
-import cz.agents.alite.trajectorytools.utils.Point;
-import cz.agents.alite.trajectorytools.utils.Vector;
+import cz.agents.alite.trajectorytools.util.BoundedInteger;
+import cz.agents.alite.trajectorytools.util.ManeuverEdge;
+import cz.agents.alite.trajectorytools.util.OrientedPoint;
+import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Vector;
 
 public class AirplaneManeuverGraph extends ListenableDirectedWeightedGraph<OrientedPoint, ManeuverEdge> {
 

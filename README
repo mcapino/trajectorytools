@@ -2,8 +2,12 @@
 Alite Trajectory Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*TODO(short description)*
-
+Alite trajectory toolkit is a bundle of classes facilitating tasks connected with 
+(multi-agent) trajectory planning in synthetic environments. It contains an A* 
+planner on general graphs and a set of special-purpose graph generators such 
+grid-graphs, space-time grid-graphs, meneuver graphs etc. 
+Further it contains facilities such as trajectory approximators, conflict detectors, 
+visualization components etc. 
 
 For more information about this subproject see:
 

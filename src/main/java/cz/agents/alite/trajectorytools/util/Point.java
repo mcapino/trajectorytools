@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.utils;
+package cz.agents.alite.trajectorytools.util;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
