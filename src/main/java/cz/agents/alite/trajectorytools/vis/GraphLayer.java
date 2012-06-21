@@ -22,7 +22,7 @@ public class GraphLayer extends AbstractLayer {
     GraphLayer() {
     }
 
-    static VisLayer create(final Graph<? extends Point, DefaultWeightedEdge> graph, final Color edgeColor, final Color vertexColor,
+    static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
@@ -32,7 +32,7 @@ public class GraphLayer extends AbstractLayer {
             @Override
             public Iterable<Line> getLines() {
                 LinkedList<Line> lines = new LinkedList<Line>();
-                for (DefaultWeightedEdge edge : graph.edgeSet()) {
+                for (E edge : graph.edgeSet()) {
                     lines.add(new LineImpl(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
                 }
                 return lines;
