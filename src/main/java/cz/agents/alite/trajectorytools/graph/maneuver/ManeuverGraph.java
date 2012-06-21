@@ -3,8 +3,8 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import cz.agents.deconfliction.waypointgraph.Waypoint;
-import cz.agents.deconfliction.waypointgraph.WaypointGraph;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.WaypointGraph;
 
 @SuppressWarnings("serial")
 public class ManeuverGraph extends WaypointGraph<Maneuver> {
@@ -16,7 +16,7 @@ public class ManeuverGraph extends WaypointGraph<Maneuver> {
         this.maxSpeed = maxSpeed;
     }
     
-    public ManeuverGraph(double maxSpeed, EdgeFactory<Waypoint, Maneuver> edgeFactory) {
+    public ManeuverGraph(double maxSpeed, EdgeFactory<SpatialWaypoint, Maneuver> edgeFactory) {
         super(edgeFactory);
         this.maxSpeed = maxSpeed;
     }

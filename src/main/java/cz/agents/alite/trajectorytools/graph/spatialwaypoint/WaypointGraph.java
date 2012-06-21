@@ -1,4 +1,4 @@
-package cz.agents.deconfliction.waypointgraph;
+package cz.agents.alite.trajectorytools.graph.spatialwaypoint;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,21 +11,21 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import cz.agents.deconfliction.util.Point;
+import cz.agents.alite.trajectorytools.util.Point;
 
 @SuppressWarnings("serial")
-public class WaypointGraph<E> extends DirectedWeightedMultigraph<Waypoint,E> {
+public class WaypointGraph<E> extends DirectedWeightedMultigraph<SpatialWaypoint,E> {
 
 
     public WaypointGraph(Class<? extends E> edgeClass) {
         super(edgeClass);
     }
 
-    public WaypointGraph(EdgeFactory<Waypoint, E> ef) {
+    public WaypointGraph(EdgeFactory<SpatialWaypoint, E> ef) {
         super(ef);
     }
 
-    public Waypoint getEdgeNeighbor(E edge, Waypoint waypoint) {
+    public SpatialWaypoint getEdgeNeighbor(E edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
         if (getEdgeTarget(edge) == waypoint)
@@ -34,10 +34,10 @@ public class WaypointGraph<E> extends DirectedWeightedMultigraph<Waypoint,E> {
         return null;
     }
 
-    public Waypoint getNearestWaypoint(Point pos) {
-        Waypoint nearestWaypoint = null;
+    public SpatialWaypoint getNearestWaypoint(Point pos) {
+        SpatialWaypoint nearestWaypoint = null;
         double nearestDistance = Double.POSITIVE_INFINITY;
-        for (Waypoint currentWaypoint : vertexSet()) {
+        for (SpatialWaypoint currentWaypoint : vertexSet()) {
             double distance = currentWaypoint.distance(pos);
             if (distance < nearestDistance || nearestWaypoint == null) {
                 nearestWaypoint = currentWaypoint;
@@ -49,9 +49,9 @@ public class WaypointGraph<E> extends DirectedWeightedMultigraph<Waypoint,E> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Waypoint> getOrderedNeighbors(Waypoint wp) {
+    public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
         Set<E> edges = edgesOf(wp);
-        List<Waypoint> neighbors = new LinkedList<Waypoint>();
+        List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
         for (E edge : edges) {
             neighbors.add(getEdgeNeighbor(edge, wp));
         }
@@ -59,8 +59,8 @@ public class WaypointGraph<E> extends DirectedWeightedMultigraph<Waypoint,E> {
         return neighbors;
     }
 
-    public Waypoint getRandomWaypoint(Random random) {
-        Waypoint[] waypoints = vertexSet().toArray(new Waypoint[0]);
+    public SpatialWaypoint getRandomWaypoint(Random random) {
+        SpatialWaypoint[] waypoints = vertexSet().toArray(new SpatialWaypoint[0]);
         if (waypoints.length > 0) {
             return waypoints[random.nextInt(waypoints.length)];
         } else {

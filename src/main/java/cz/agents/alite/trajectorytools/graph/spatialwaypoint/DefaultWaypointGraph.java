@@ -1,4 +1,4 @@
-package cz.agents.deconfliction.waypointgraph;
+package cz.agents.alite.trajectorytools.graph.spatialwaypoint;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 

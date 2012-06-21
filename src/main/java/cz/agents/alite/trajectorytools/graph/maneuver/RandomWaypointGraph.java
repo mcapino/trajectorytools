@@ -6,21 +6,21 @@ import java.util.Set;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import cz.agents.deconfliction.waypointgraph.Waypoint;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
 
 @SuppressWarnings("serial")
 public class RandomWaypointGraph extends ManeuverGraph {
-    Waypoint waypoints[];
+    SpatialWaypoint waypoints[];
     public RandomWaypointGraph(double sizeX, double sizeY, int nPoints, int branchFactor, int seed) {
         super(1.0);
-        waypoints = new Waypoint[nPoints];
+        waypoints = new SpatialWaypoint[nPoints];
         int waypointCounter = 0;
         Random random = new Random(seed);
 
         // Generate vertices
         for (int i=0; i < nPoints; i++) {
-                Waypoint w = new Waypoint(waypointCounter++, random.nextDouble()*sizeX, random.nextDouble()*sizeY);
+                SpatialWaypoint w = new SpatialWaypoint(waypointCounter++, random.nextDouble()*sizeX, random.nextDouble()*sizeY);
                 waypoints[i] = w;
                 addVertex(w);
         }
@@ -29,11 +29,11 @@ public class RandomWaypointGraph extends ManeuverGraph {
         for (int i=0; i < nPoints; i++) {
 
             // Find a given number of closest vertices
-            Set<Waypoint> neighbors = new HashSet<Waypoint>();
+            Set<SpatialWaypoint> neighbors = new HashSet<SpatialWaypoint>();
             for (int n=0; n < branchFactor; n++) {
 
                 // Find the closest point
-                Waypoint closestWaypoint = null;
+                SpatialWaypoint closestWaypoint = null;
                 Double closestDist = Double.MAX_VALUE;
 
                 for (int j = 0; j < nPoints; j++) {
@@ -48,7 +48,7 @@ public class RandomWaypointGraph extends ManeuverGraph {
                 neighbors.add(closestWaypoint);
             }
 
-            for (Waypoint neighbor : neighbors) {
+            for (SpatialWaypoint neighbor : neighbors) {
                 if (getEdge(waypoints[i], neighbor) == null) {
                     Maneuver maneuver = addEdge(waypoints[i], neighbor);
                     if (maneuver != null)

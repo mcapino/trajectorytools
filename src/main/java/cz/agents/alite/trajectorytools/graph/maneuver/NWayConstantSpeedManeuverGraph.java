@@ -1,15 +1,12 @@
 package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
-
-import sun.security.action.GetLongAction;
-
-import cz.agents.deconfliction.waypointgraph.DefaultWaypointGraph;
-import cz.agents.deconfliction.waypointgraph.Waypoint;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.DefaultWaypointGraph;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
 @SuppressWarnings("serial")
 public abstract class NWayConstantSpeedManeuverGraph extends ManeuverGraph {
-    Waypoint waypoints[][];
+    SpatialWaypoint waypoints[][];
     double speed;
 
     protected abstract int[][] getEdgePattern();
@@ -20,7 +17,7 @@ public abstract class NWayConstantSpeedManeuverGraph extends ManeuverGraph {
     
     public NWayConstantSpeedManeuverGraph(double sizeX, double sizeY, int gridX, int gridY, double speed) {
         super(speed, new ManeuverEdgeFactory(speed, (sizeX/gridX)/(speed*2)));
-        waypoints = new Waypoint[gridX+1][gridY+1];
+        waypoints = new SpatialWaypoint[gridX+1][gridY+1];
         int waypointCounter = 0;
 
         double xStep = sizeX/gridX;
@@ -31,7 +28,7 @@ public abstract class NWayConstantSpeedManeuverGraph extends ManeuverGraph {
         // Generate vertices
         for (int x=0; x <= gridX; x++) {
             for (int y=0; y <= gridY; y++) {
-                Waypoint w = new Waypoint(waypointCounter++, x*xStep, y*yStep);
+                SpatialWaypoint w = new SpatialWaypoint(waypointCounter++, x*xStep, y*yStep);
                 waypoints[x][y] = w;
                 addVertex(w);
                 if (allowWaitManeuver()) {
@@ -46,13 +43,13 @@ public abstract class NWayConstantSpeedManeuverGraph extends ManeuverGraph {
         // Generate edges
         for (int x=0; x <= gridX; x++) {
             for (int y=0; y <= gridY; y++) {
-                Waypoint v1 = waypoints[x][y];
+                SpatialWaypoint v1 = waypoints[x][y];
                      for (int[] edgeOffset : getEdgePattern()) {
                          int destX = x + edgeOffset[0];
                          int destY = y + edgeOffset[1];
 
                          if (destX >= 0 && destX <= gridX && destY >= 0 && destY <= gridY) {                                
-                        	    Waypoint v2 = waypoints[destX][destY];
+                        	    SpatialWaypoint v2 = waypoints[destX][destY];
                         	    
                         	    if (!containsEdge(v1, v2)) {                        	    
 	                                Maneuver maneuverForward = addEdge(v1, v2);

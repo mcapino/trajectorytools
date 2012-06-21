@@ -2,9 +2,9 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.EdgeFactory;
 
-import cz.agents.deconfliction.waypointgraph.Waypoint;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
-class ManeuverEdgeFactory implements EdgeFactory<Waypoint, Maneuver> {
+class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, Maneuver> {
     
 	double speed;
 	double waitManeuverDuration;	
@@ -17,7 +17,7 @@ class ManeuverEdgeFactory implements EdgeFactory<Waypoint, Maneuver> {
 	}
 
 	@Override
-    public Maneuver createEdge(Waypoint sourceVertex, Waypoint targetVertex) {
+    public Maneuver createEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
         if (sourceVertex.equals(targetVertex)) {
         	return new Maneuver(sourceVertex, targetVertex, waitManeuverDuration);
         } else {

@@ -2,27 +2,26 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import cz.agents.deconfliction.planner4d.State;
-import cz.agents.deconfliction.waypointgraph.Waypoint;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
 @SuppressWarnings("serial")
 public class Maneuver extends DefaultWeightedEdge {
-    Waypoint source;
-    Waypoint target;
+    SpatialWaypoint source;
+    SpatialWaypoint target;
     double duration;
 
-    public Maneuver(Waypoint source, Waypoint target, double duration) {
+    public Maneuver(SpatialWaypoint source, SpatialWaypoint target, double duration) {
         super();
         this.source = source;
         this.target = target;
         this.duration = duration;
     }
 
-    public Waypoint getSource() {
+    public SpatialWaypoint getSource() {
         return source;
     }
 
-    public Waypoint getTarget() {
+    public SpatialWaypoint getTarget() {
         return target;
     }
 
@@ -30,8 +29,8 @@ public class Maneuver extends DefaultWeightedEdge {
         return duration;
     }
 
-    public Waypoint getOtherWaypoint(Waypoint waypoint) {
-        //assert waypoint == source || waypoint == target;
+    public SpatialWaypoint getOtherWaypoint(SpatialWaypoint waypoint) {
+        assert waypoint == source || waypoint == target;
 
         if (source == waypoint)
             return target;

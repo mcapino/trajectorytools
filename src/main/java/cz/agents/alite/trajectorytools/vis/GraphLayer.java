@@ -22,7 +22,7 @@ public class GraphLayer extends AbstractLayer {
     GraphLayer() {
     }
 
-    static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
+    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
