@@ -8,14 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.vecmath.Point3d;
-
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
+import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.vis.VisManager;
@@ -29,9 +29,18 @@ import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
 public class Demo1Creator implements Creator {
 
+	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
+	private static final Color VERTEX_COLOR_INACTIVE = new Color(250, 250, 250);
+	private static final Color EDGE_COLOR = new Color(220, 220, 220);
+	private static final Color EDGE_COLOR_INACTIVE = new Color(240, 240, 240);
+
 	private static final Color OBSTACLE_COLOR = Color.ORANGE;
     private static final double OBSTACLE_RADIUS = 0.3;
+
+    private ManeuverGraph originalGraph;
 	private ManeuverGraph graph;
+
+	private Set<Point> obstacles = new HashSet<Point>();
 
     @Override
     public void init(String[] args) {
@@ -39,6 +48,7 @@ public class Demo1Creator implements Creator {
 
     @Override
     public void create() {
+        originalGraph = new FourWayConstantSpeedGridGraph(10, 10, 10, 10, 1.0);
         graph = new FourWayConstantSpeedGridGraph(10, 10, 10, 10, 1.0);
 
         createVisualization();
@@ -53,31 +63,37 @@ public class Demo1Creator implements Creator {
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
         // static
-        VisManager.registerLayer(GraphLayer.create(graph, new Color(220, 220, 220), new Color(240, 240, 240), 1, 4));
+        VisManager.registerLayer(GraphLayer.create(originalGraph, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
+        VisManager.registerLayer(GraphLayer.create(graph, EDGE_COLOR, VERTEX_COLOR, 1, 4));
 
         // clickable obstacles
-        final Set<Point> obstacles = new HashSet<Point>();
-        
+
         // interaction
         VisManager.registerLayer(VisualInteractionLayer.create(new VisualInteractionProvidingEntity() {
 			
 			@Override
 			public void interactVisually(double x, double y, MouseEvent e) {
 				// find the closest point of the Graph
-				double minDist = Double.MAX_VALUE;
-				Point minPoint = null; 
-				for (Point point : graph.vertexSet()) {
-					double dist = point.distance(new Point3d(x, y, 0));
-					if (dist < minDist) {
-						minDist = dist;
-						minPoint = point;
-					}
-				}
+				SpatialWaypoint point = originalGraph.getNearestWaypoint(new Point(x, y, 0));
 
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					obstacles.add(minPoint);
+					graph.removeVertex( point );
+					obstacles.add(point);
 				} else if (e.getButton() == MouseEvent.BUTTON3) {
-					obstacles.remove(minPoint);					
+					if ( obstacles.contains(point) ) {
+						graph.addVertex(point);
+						for (Maneuver edge : originalGraph.edgesOf(point)) {
+							SpatialWaypoint source = edge.getSource();
+							SpatialWaypoint target = edge.getTarget();
+							if (graph.containsVertex(source) && graph.containsVertex(target)) {
+								graph.addEdge(source, target, edge);
+							}
+						}
+						
+						obstacles.remove(point);					
+					}
+				} else {
+					return;
 				}
 			}
 			
