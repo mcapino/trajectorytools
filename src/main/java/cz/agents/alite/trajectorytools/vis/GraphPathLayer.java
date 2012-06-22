@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.LinkedList;
 
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.vis.element.Line;
@@ -16,12 +17,12 @@ import cz.agents.alite.vis.layer.VisLayer;
 import cz.agents.alite.vis.layer.terminal.LineLayer;
 import cz.agents.alite.vis.layer.terminal.PointLayer;
 
-public class GraphLayer extends AbstractLayer {
+public class GraphPathLayer extends AbstractLayer {
 
-    GraphLayer() {
+    GraphPathLayer() {
     }
 
-    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
+    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final PathHolder<V, E> pathHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
@@ -31,8 +32,11 @@ public class GraphLayer extends AbstractLayer {
             @Override
             public Iterable<Line> getLines() {
                 LinkedList<Line> lines = new LinkedList<Line>();
-                for (E edge : graph.edgeSet()) {
-                    lines.add(new LineImpl(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+                GraphPath<V,E> path = pathHolder.graphPath;
+                if (path != null) {
+	                for (E edge : path.getEdgeList()) {
+	                    lines.add(new LineImpl(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+	                }
                 }
                 return lines;
             }
@@ -55,8 +59,12 @@ public class GraphLayer extends AbstractLayer {
             @Override
             public Iterable<Point> getPoints() {
                 LinkedList<Point> points = new LinkedList<Point>();
-                for (Point vertex : graph.vertexSet()) {
-                    points.add(vertex);
+                GraphPath<V,E> path = pathHolder.graphPath;
+                if (path != null) {
+	                for (E edge : path.getEdgeList()) {
+	                    points.add(graph.getEdgeSource(edge));
+	                }
+	                points.add(path.getEndVertex());
                 }
                 return points;
             }

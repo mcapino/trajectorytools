@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.AStarShortestPath;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
@@ -18,6 +21,9 @@ import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
+import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
+import cz.agents.alite.trajectorytools.vis.PathHolder;
+import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.element.FilledStyledCircle;
 import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
@@ -39,7 +45,8 @@ public class Demo1Creator implements Creator {
 
     private ManeuverGraph originalGraph;
 	private ManeuverGraph graph;
-
+	private PathHolder<SpatialWaypoint, Maneuver> path = new PathHolder<SpatialWaypoint, Maneuver>();
+	
 	private Set<Point> obstacles = new HashSet<Point>();
 
     @Override
@@ -58,6 +65,8 @@ public class Demo1Creator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 20, 20);
         VisManager.setPanningBounds(new Rectangle(-500, -500, 1600, 1600));
         VisManager.init();
+        
+        Vis.setPosition(50, 50, 1);
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
@@ -65,6 +74,9 @@ public class Demo1Creator implements Creator {
         // static
         VisManager.registerLayer(GraphLayer.create(originalGraph, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
         VisManager.registerLayer(GraphLayer.create(graph, EDGE_COLOR, VERTEX_COLOR, 1, 4));
+
+        // draw the shortest path
+        VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
 
         // clickable obstacles
 
@@ -95,8 +107,10 @@ public class Demo1Creator implements Creator {
 				} else {
 					return;
 				}
-			}
-			
+
+				replan();
+			}			
+		
 			@Override
 			public String getName() {
 				return "Obstacles layer : ClickableObstaclesLayer";
@@ -140,4 +154,24 @@ public class Demo1Creator implements Creator {
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
     }
+
+	protected void replan() {
+		try {
+			AStarShortestPath<SpatialWaypoint, Maneuver> aStar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+					graph, 
+					originalGraph.getNearestWaypoint(new Point(0, 0, 0)),
+					originalGraph.getNearestWaypoint(new Point(10, 10, 0)),
+	                new AStarShortestPath.Heuristic<SpatialWaypoint>() {
+						@Override
+						public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
+							return 0;
+						}
+					});
+			GraphPath<SpatialWaypoint, Maneuver> path2 = aStar.getPath();
+			path.graphPath = path2;
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+			path.graphPath = null;
+		}
+	}
 }
