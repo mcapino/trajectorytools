@@ -164,7 +164,7 @@ public class Demo1Creator implements Creator {
 	                new AStarShortestPath.Heuristic<SpatialWaypoint>() {
 						@Override
 						public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
-							return 0;
+							return current.distance(goal);
 						}
 					});
 			GraphPath<SpatialWaypoint, Maneuver> path2 = aStar.getPath();
