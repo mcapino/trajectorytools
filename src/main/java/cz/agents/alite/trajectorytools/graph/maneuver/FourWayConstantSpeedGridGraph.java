@@ -1,21 +1,16 @@
 package cz.agents.alite.trajectorytools.graph.maneuver;
 
+public class FourWayConstantSpeedGridGraph {
 
-@SuppressWarnings("serial")
-public class FourWayConstantSpeedGridGraph extends NWayConstantSpeedManeuverGraph {
+    private static final int[][] EDGE_PATTERN = {         {0,-1},
+    												{-1, 0},         { 1, 0},
+    														 {0, 1},          };
 
-    public FourWayConstantSpeedGridGraph(double sizeX, double sizeY, int gridX,
+    
+    private FourWayConstantSpeedGridGraph() {}
+    
+	static public ManeuverGraph create(double sizeX, double sizeY, int gridX,
             int gridY, double speed) {
-        super(sizeX, sizeY, gridX, gridY, speed);
+    	return NWayConstantSpeedManeuverGraph.create(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN);
     }
-
-    @Override
-    protected int[][] getEdgePattern() {
-        int[][] edgePattern =
-               {         {0,-1},
-                {-1, 0},         { 1, 0},
-                         {0, 1},          };
-        return edgePattern;
-    }
-
 }

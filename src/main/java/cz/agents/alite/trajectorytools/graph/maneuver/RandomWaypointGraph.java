@@ -4,17 +4,16 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
-
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
+public class RandomWaypointGraph {
 
-@SuppressWarnings("serial")
-public class RandomWaypointGraph extends ManeuverGraph {
-    SpatialWaypoint waypoints[];
-    public RandomWaypointGraph(double sizeX, double sizeY, int nPoints, int branchFactor, int seed) {
-        super(1.0);
-        waypoints = new SpatialWaypoint[nPoints];
+    private RandomWaypointGraph() {}
+    
+    public static ManeuverGraph create(double sizeX, double sizeY, int nPoints, int branchFactor, int seed) {
+        ManeuverGraph graph = new ManeuverGraph(1.0);
+
+        SpatialWaypoint waypoints[] = new SpatialWaypoint[nPoints];
         int waypointCounter = 0;
         Random random = new Random(seed);
 
@@ -22,7 +21,7 @@ public class RandomWaypointGraph extends ManeuverGraph {
         for (int i=0; i < nPoints; i++) {
                 SpatialWaypoint w = new SpatialWaypoint(waypointCounter++, random.nextDouble()*sizeX, random.nextDouble()*sizeY);
                 waypoints[i] = w;
-                addVertex(w);
+                graph.addVertex(w);
         }
 
         // Generate edges
@@ -49,12 +48,13 @@ public class RandomWaypointGraph extends ManeuverGraph {
             }
 
             for (SpatialWaypoint neighbor : neighbors) {
-                if (getEdge(waypoints[i], neighbor) == null) {
-                    Maneuver maneuver = addEdge(waypoints[i], neighbor);
+                if (graph.getEdge(waypoints[i], neighbor) == null) {
+                    Maneuver maneuver = graph.addEdge(waypoints[i], neighbor);
                     if (maneuver != null)
-                        setEdgeWeight(maneuver, maneuver.getDuration());
+                        graph.setEdgeWeight(maneuver, maneuver.getDuration());
                 }
             }
         }
+        return graph;
     }
 }

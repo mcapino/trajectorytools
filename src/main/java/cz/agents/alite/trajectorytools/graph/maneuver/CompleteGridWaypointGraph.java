@@ -5,13 +5,13 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.DefaultWaypointGraph;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
-
-@SuppressWarnings("serial")
-public class CompleteGridWaypointGraph extends DefaultWaypointGraph {
-    SpatialWaypoint waypoints[][];
-    public CompleteGridWaypointGraph(double sizeX, double sizeY, int gridX, int gridY) {
-        super();
-        waypoints = new SpatialWaypoint[gridX+1][gridY+1];
+public class CompleteGridWaypointGraph {
+    
+    private CompleteGridWaypointGraph() {}
+    
+    static public DefaultWaypointGraph create(double sizeX, double sizeY, int gridX, int gridY) {
+        DefaultWaypointGraph graph = new DefaultWaypointGraph();
+        SpatialWaypoint waypoints[][] = new SpatialWaypoint[gridX+1][gridY+1];
         int waypointCounter = 0;
 
         double xStep = sizeX/gridX;
@@ -22,7 +22,7 @@ public class CompleteGridWaypointGraph extends DefaultWaypointGraph {
             for (int y=0; y <= gridX; y++) {
                 SpatialWaypoint w = new SpatialWaypoint(waypointCounter++,x*xStep, y*yStep);
                 waypoints[x][y] = w;
-                addVertex(w);
+                graph.addVertex(w);
             }
         }
 
@@ -35,15 +35,15 @@ public class CompleteGridWaypointGraph extends DefaultWaypointGraph {
                     for (int y2=starty; y2 <= gridY; y2++) {
                         SpatialWaypoint v2 = waypoints[x2][y2];
                         if (v1 != v2) {
-                            DefaultWeightedEdge edge = addEdge(v1, v2);
-                            setEdgeWeight(edge, v1.distance(v2));
+                            DefaultWeightedEdge edge = graph.addEdge(v1, v2);
+                            graph.setEdgeWeight(edge, v1.distance(v2));
                         }
                     }
                     starty = 0;
                 }
             }
         }
-
-
+        
+        return graph;
     }
 }

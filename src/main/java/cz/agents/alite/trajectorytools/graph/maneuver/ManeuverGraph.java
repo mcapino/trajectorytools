@@ -1,7 +1,6 @@
 package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.EdgeFactory;
-import org.jgrapht.graph.SimpleWeightedGraph;
 
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.WaypointGraph;
@@ -21,6 +20,11 @@ public class ManeuverGraph extends WaypointGraph<Maneuver> {
         this.maxSpeed = maxSpeed;
     }
 
+    public ManeuverGraph(ManeuverGraph graph) {
+    	super(new ManeuverEdgeFactory(graph.maxSpeed, graph.maxSpeed));
+		maxSpeed = graph.maxSpeed;
+	}
+    
     public double getDuration(Maneuver m) {
         return getEdgeWeight(m);
     }

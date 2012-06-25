@@ -55,9 +55,9 @@ public class Demo1Creator implements Creator {
 
     @Override
     public void create() {
-        originalGraph = new FourWayConstantSpeedGridGraph(10, 10, 10, 10, 1.0);
-        graph = new FourWayConstantSpeedGridGraph(10, 10, 10, 10, 1.0);
-
+        originalGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0);
+        graph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0);
+        
         createVisualization();
     }
 
@@ -108,7 +108,7 @@ public class Demo1Creator implements Creator {
 					return;
 				}
 
-				replan();
+//				replan();
 			}			
 		
 			@Override
@@ -171,6 +171,7 @@ public class Demo1Creator implements Creator {
 			path.graphPath = path2;
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
+			e.printStackTrace();
 			path.graphPath = null;
 		}
 	}

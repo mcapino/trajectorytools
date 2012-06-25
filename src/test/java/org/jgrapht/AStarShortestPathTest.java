@@ -1,12 +1,8 @@
 package org.jgrapht;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.*;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.junit.BeforeClass;
+import org.jgrapht.alg.AStarShortestPath;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.junit.Test;
 
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
@@ -20,7 +16,7 @@ public class AStarShortestPathTest {
 
     @Test
     public void test() {
-        ManeuverGraph graph = new FourWayConstantSpeedGridGraph(5, 5, 2, 2, 1.0);
+        ManeuverGraph graph = FourWayConstantSpeedGridGraph.create(5, 5, 2, 2, 1.0);
         SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
         SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
 
@@ -41,7 +37,7 @@ public class AStarShortestPathTest {
 
     @Test
     public void testAgainstDijkstra() {
-        ManeuverGraph graph = new FourWayConstantSpeedGridGraph(5, 5, 2, 2, 1.0);
+        ManeuverGraph graph = FourWayConstantSpeedGridGraph.create(5, 5, 2, 2, 1.0);
         SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
         SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
 
@@ -90,7 +86,7 @@ public class AStarShortestPathTest {
 
         for (int seed=0; seed<N; seed++) {
 
-            ManeuverGraph graph = new RandomWaypointGraph(5, 5, 350, 6, seed);
+            ManeuverGraph graph = RandomWaypointGraph.create(5, 5, 350, 6, seed);
             SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
             SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
 
