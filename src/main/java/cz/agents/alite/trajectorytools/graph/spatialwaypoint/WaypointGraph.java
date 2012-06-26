@@ -7,9 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
-import org.jgrapht.graph.SimpleWeightedGraph;
 
 import cz.agents.alite.trajectorytools.util.Point;
 
@@ -48,7 +46,6 @@ public class WaypointGraph<E> extends DirectedWeightedMultigraph<SpatialWaypoint
         return nearestWaypoint;
     }
 
-    @SuppressWarnings("unchecked")
     public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
         Set<E> edges = edgesOf(wp);
         List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();

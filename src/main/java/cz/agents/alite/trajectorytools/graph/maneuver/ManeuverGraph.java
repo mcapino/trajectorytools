@@ -6,7 +6,7 @@ import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.WaypointGraph;
 
 @SuppressWarnings("serial")
-public class ManeuverGraph extends WaypointGraph<Maneuver> {
+public class ManeuverGraph extends WaypointGraph<Maneuver> implements ManeuverGraphInterface {
 
 	double maxSpeed;
 	
@@ -20,9 +20,9 @@ public class ManeuverGraph extends WaypointGraph<Maneuver> {
         this.maxSpeed = maxSpeed;
     }
 
-    public ManeuverGraph(ManeuverGraph graph) {
-    	super(new ManeuverEdgeFactory(graph.maxSpeed, graph.maxSpeed));
-		maxSpeed = graph.maxSpeed;
+    public ManeuverGraph(ManeuverGraphInterface graph) {
+    	super(new ManeuverEdgeFactory(graph.getMaxSpeed(), graph.getMaxSpeed()));
+		maxSpeed = graph.getMaxSpeed();
 	}
     
     public double getDuration(Maneuver m) {

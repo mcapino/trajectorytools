@@ -6,8 +6,8 @@ import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
 class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, Maneuver> {
     
-	double speed;
-	double waitManeuverDuration;	
+	final double speed;
+	final double waitManeuverDuration;	
 	
 	
 	public ManeuverEdgeFactory(double speed, double waitManeuverDuration) {
