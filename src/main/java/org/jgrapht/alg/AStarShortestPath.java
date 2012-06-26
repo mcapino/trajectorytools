@@ -13,7 +13,7 @@ import org.jgrapht.graph.*;
  * @author Michal Cap
  * @since Apr 16, 2012
  */
-public final class AStarShortestPath<V, E>
+public final class AStarShortestPath<V, E> implements PathPlanner<V, E>
 {
     public static interface Heuristic<V> {
         double getHeuristicEstimate(V current, V goal);
@@ -41,16 +41,11 @@ public final class AStarShortestPath<V, E>
 
     //~ Constructors -----------------------------------------------------------
 
-    /**
-     * Creates and executes a new AStarShortestPath algorithm instance. An
-     * instance is only good for a single search; after construction, it can be
-     * accessed to retrieve information about the path found.
-     *
-     * @param graph the graph to be searched
-     * @param startVertex the vertex at which the path should start
-     * @param endVertex the vertex at which the path should end
+    /* (non-Javadoc)
+     * @see org.jgrapht.alg.PathPlanner#planPath(org.jgrapht.Graph, V, V, org.jgrapht.alg.AStarShortestPath.Heuristic)
      */
-    public AStarShortestPath(Graph<V, E> graph, V startVertex,
+    @Override
+    public boolean planPath(Graph<V, E> graph, V startVertex,
                                    V endVertex, Heuristic<V> h) {
         this.graph = graph;
 
@@ -86,7 +81,7 @@ public final class AStarShortestPath<V, E>
                     length);
 
 
-                return;
+                return true;
             }
 
             closed.add(current);
@@ -122,6 +117,8 @@ public final class AStarShortestPath<V, E>
                 }
             }
         }
+        
+        return false;
     }
 
     private List<E> reconstructEdgeList(V vertex) {
@@ -145,11 +142,10 @@ public final class AStarShortestPath<V, E>
 
     //~ Methods ----------------------------------------------------------------
 
-    /**
-     * Return the edges making up the path found.
-     *
-     * @return List of Edges, or null if no path exists
+    /* (non-Javadoc)
+     * @see org.jgrapht.alg.PathPlanner#getPathEdgeList()
      */
+    @Override
     public List<E> getPathEdgeList()
     {
         if (path == null) {
@@ -159,21 +155,19 @@ public final class AStarShortestPath<V, E>
         }
     }
 
-    /**
-     * Return the path found.
-     *
-     * @return path representation, or null if no path exists
+    /* (non-Javadoc)
+     * @see org.jgrapht.alg.PathPlanner#getPath()
      */
+    @Override
     public GraphPath<V, E> getPath()
     {
         return path;
     }
 
-    /**
-     * Return the length of the path found.
-     *
-     * @return path length, or Double.POSITIVE_INFINITY if no path exists
+    /* (non-Javadoc)
+     * @see org.jgrapht.alg.PathPlanner#getPathLength()
      */
+    @Override
     public double getPathLength()
     {
         if (path == null) {

@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPath;
+import org.jgrapht.alg.PathPlanner;
 import org.jgrapht.event.GraphEdgeChangeEvent;
 import org.jgrapht.event.GraphListener;
 import org.jgrapht.event.GraphVertexChangeEvent;
@@ -87,7 +88,8 @@ public class Demo1Creator implements Creator {
 
 	protected void replan() {
 		try {
-			AStarShortestPath<SpatialWaypoint, Maneuver> aStar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+		    PathPlanner<SpatialWaypoint, Maneuver> aStar = new AStarShortestPath<SpatialWaypoint, Maneuver>();
+			aStar.planPath(
 					graph, 
 					graph.getNearestWaypoint(new Point(0, 0, 0)),
 					graph.getNearestWaypoint(new Point(10, 10, 0)),
