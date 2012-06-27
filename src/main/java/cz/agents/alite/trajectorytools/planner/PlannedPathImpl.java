@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.planner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -46,5 +48,24 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
     public double getPathLength()
     {
         return getPath().getWeight();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PlannedPath<?, ?>) {
+            PlannedPath<?, ?> path = (PlannedPath<?, ?>) obj;
+            if (getPathLength() != path.getPathLength()) {
+                return false;
+            } else {
+                return Arrays.equals(new ArrayList<E>(getEdgeList()).toArray(), new ArrayList<E>(getEdgeList()).toArray());
+            }
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

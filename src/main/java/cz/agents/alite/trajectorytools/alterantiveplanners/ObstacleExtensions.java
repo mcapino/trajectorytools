@@ -1,11 +1,11 @@
 package cz.agents.alite.trajectorytools.alterantiveplanners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
@@ -31,37 +31,20 @@ public class ObstacleExtensions {
     public ObstacleExtensions(PathPlanner<SpatialWaypoint, Maneuver> planner) {
         this.planner = planner;
     }
-        
+
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>();
+        final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
         for (ManeuverGraph graph : obstacleExtender) {
             PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
-            if ( path != null && !contains(paths, path) ) {
+            if ( path != null ) {
                 paths.add( path );
             }
         }
             
         return paths;
-    }
-
-    private boolean contains(Collection<PlannedPath<SpatialWaypoint,Maneuver>> paths, PlannedPath<SpatialWaypoint,Maneuver> path) {
-        for (PlannedPath<SpatialWaypoint, Maneuver> curPath : paths) {
-            if ( equalsPath(path, curPath) ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean equalsPath(PlannedPath<SpatialWaypoint, Maneuver> path1, PlannedPath<SpatialWaypoint, Maneuver> path2) {
-        if (path1.getPathLength() != path2.getPathLength()) {
-            return false;
-        } else {
-            return Arrays.equals(new ArrayList<Maneuver>(path1.getEdgeList()).toArray(new Maneuver[0]), new ArrayList<Maneuver>(path2.getEdgeList()).toArray(new Maneuver[0]));
-        }
     }
 
     static class ObstacleExtender implements Iterable<ManeuverGraph>{
