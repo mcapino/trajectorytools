@@ -20,6 +20,7 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return List of Edges, or null if no path exists
      */
+    @Override
     public List<E> getPathEdgeList()
     {
         return getEdgeList();
@@ -30,6 +31,7 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return path representation, or null if no path exists
      */
+    @Override
     public GraphPath<V, E> getPath()
     {
         return this;
@@ -40,6 +42,7 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return path length, or Double.POSITIVE_INFINITY if no path exists
      */
+    @Override
     public double getPathLength()
     {
         return getPath().getWeight();

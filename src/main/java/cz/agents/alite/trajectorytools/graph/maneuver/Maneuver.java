@@ -17,10 +17,12 @@ public class Maneuver extends DefaultWeightedEdge {
         this.duration = duration;
     }
 
+    @Override
     public SpatialWaypoint getSource() {
         return source;
     }
 
+    @Override
     public SpatialWaypoint getTarget() {
         return target;
     }
@@ -40,6 +42,7 @@ public class Maneuver extends DefaultWeightedEdge {
         return null;
     }
 
+    @Override
     public String toString()
     {
         return "(" + source + " : " + target + ")";

@@ -26,7 +26,7 @@ public class AirplaneManeuverGraph extends ListenableDirectedWeightedGraph<Orien
     private static double CENTER_Y = 750;
 
     private DirectedNeighborIndex<OrientedPoint, ManeuverEdge> neighborIndex;
-    private OrientedPoint[][][] vertices = new OrientedPoint[ROTATIONAL_STEPS][2 * SPATIAL_STEPS + 1][2 * SPATIAL_STEPS + 1];;
+    private OrientedPoint[][][] vertices = new OrientedPoint[ROTATIONAL_STEPS][2 * SPATIAL_STEPS + 1][2 * SPATIAL_STEPS + 1];
     private double alpha;
     private double length;
     private Matrix3d rotation;

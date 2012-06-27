@@ -29,9 +29,10 @@ public final class AStarShortestPath<V, E>
 
     PriorityQueue<V> open = new PriorityQueue<V>(100,new Comparator<V>() {
 
+        @Override
         public int compare(V o1, V o2) {
             return (int) Math.signum(fScores.get(o1) - fScores.get(o2));
-        };
+        }
     });
 
     Map<V,E> cameFrom = new HashMap<V,E>();

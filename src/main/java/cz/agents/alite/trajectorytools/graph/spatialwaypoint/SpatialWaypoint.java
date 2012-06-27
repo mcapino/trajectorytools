@@ -16,6 +16,7 @@ public class SpatialWaypoint extends Point implements Comparable<SpatialWaypoint
         return order - other.order;
     }
 
+    @Override
     public String toString() {
         return "#" + order;
         //return "#" + order + " "+ super.toString();

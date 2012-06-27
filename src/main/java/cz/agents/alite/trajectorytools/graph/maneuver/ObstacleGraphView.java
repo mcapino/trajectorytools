@@ -132,6 +132,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         }));
 	}
 
+    @Override
     public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
@@ -141,6 +142,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         return null;
     }
 
+    @Override
     public SpatialWaypoint getNearestWaypoint(Point pos) {
         SpatialWaypoint nearestWaypoint = null;
         double nearestDistance = Double.POSITIVE_INFINITY;
@@ -155,6 +157,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         return nearestWaypoint;
     }
 
+    @Override
     public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
         Set<Maneuver> edges = edgesOf(wp);
         List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
@@ -165,6 +168,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         return neighbors;
     }
 
+    @Override
     public SpatialWaypoint getRandomWaypoint(Random random) {
         SpatialWaypoint[] waypoints = vertexSet().toArray(new SpatialWaypoint[0]);
         if (waypoints.length > 0) {
@@ -174,10 +178,12 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         }
     }
     
+    @Override
     public double getDuration(Maneuver m) {
         return getEdgeWeight(m);
     }
     
+    @Override
     public double getMaxSpeed() {
         return originalGraph.maxSpeed;
     }

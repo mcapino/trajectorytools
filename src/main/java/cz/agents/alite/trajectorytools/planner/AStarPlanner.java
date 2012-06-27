@@ -58,10 +58,11 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
             this.functionG = functionG;
         }
         
+        @Override
         @SuppressWarnings("unchecked")
         public double getEdgeWeight(E e) {
             return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) e.getTarget());
-        };
+        }
         
     }
 }
