@@ -20,17 +20,21 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
     public PlannedPath<V, E> planPath(final Graph<V, E> graph, final V startVertex,
             final V endVertex) {
         GraphWithPenaltyFunction<V, E> penaltyGraph = new GraphWithPenaltyFunction<V, E>(graph, functionG);
-        AStarShortestPath<V, E> aStar = new AStarShortestPath<V, E>(penaltyGraph, startVertex, endVertex, new AStarShortestPath.Heuristic<V>() {
-            @Override
-            public double getHeuristicEstimate(V current, V goal) {
-                return functionH.getHeuristicEstimate(current, goal);
+        try {
+            AStarShortestPath<V, E> aStar = new AStarShortestPath<V, E>(penaltyGraph, startVertex, endVertex, new AStarShortestPath.Heuristic<V>() {
+                @Override
+                public double getHeuristicEstimate(V current, V goal) {
+                    return functionH.getHeuristicEstimate(current, goal);
+                }
+            });
+
+            List<E> pathEdgeList = aStar.getPathEdgeList();
+            if (pathEdgeList != null) {
+                return new PlannedPathImpl<V, E>(graph, startVertex, endVertex, pathEdgeList, aStar.getPathLength());
+            } else {
+                return null;
             }
-        });
-        
-        List<E> pathEdgeList = aStar.getPathEdgeList();
-        if (pathEdgeList != null) {
-            return new PlannedPathImpl<V, E>(graph, startVertex, endVertex, pathEdgeList, aStar.getPathLength());
-        } else {
+        } catch (Exception e) {
             return null;
         }
     }
