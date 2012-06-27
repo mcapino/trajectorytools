@@ -29,6 +29,7 @@ public class ManeuverGraph extends WaypointGraph<Maneuver> implements ManeuverGr
         return getEdgeWeight(m);
     }
     
+    @Override
     public double getMaxSpeed() {
 		return maxSpeed;
 	}
