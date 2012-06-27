@@ -13,7 +13,7 @@ public class CopyManeuverGraph {
             graph.addVertex(vertex);
         }
         
-        for (Maneuver edge : other.edgeSet()) {
+        for (DefaultManeuver edge : other.edgeSet()) {
             graph.addEdge(edge.source, edge.target);
         }
         

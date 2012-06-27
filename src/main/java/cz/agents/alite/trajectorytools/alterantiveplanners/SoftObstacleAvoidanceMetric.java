@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.jgrapht.Graph;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
 
@@ -18,7 +18,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
  * @author honza
  *
  */
-public class SoftObstacleAvoidanceMetric<V, E extends Maneuver> implements AlternativePathPlanner<V, E> {
+public class SoftObstacleAvoidanceMetric<V, E extends DefaultManeuver> implements AlternativePathPlanner<V, E> {
 
     public SoftObstacleAvoidanceMetric() {
     }

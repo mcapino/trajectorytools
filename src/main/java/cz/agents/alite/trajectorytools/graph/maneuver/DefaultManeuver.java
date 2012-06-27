@@ -3,14 +3,16 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 
 @SuppressWarnings("serial")
-public class Maneuver extends DefaultWeightedEdge {
+public class DefaultManeuver extends DefaultWeightedEdge {
     SpatialWaypoint source;
     SpatialWaypoint target;
     double duration;
+    double distance;
 
-    public Maneuver(SpatialWaypoint source, SpatialWaypoint target, double duration) {
+    public DefaultManeuver(SpatialWaypoint source, SpatialWaypoint target, double duration) {
         super();
         this.source = source;
         this.target = target;
@@ -28,16 +30,14 @@ public class Maneuver extends DefaultWeightedEdge {
     public double getDuration() {
         return duration;
     }
-
-    public SpatialWaypoint getOtherWaypoint(SpatialWaypoint waypoint) {
-        assert waypoint == source || waypoint == target;
-
-        if (source == waypoint)
-            return target;
-        if (target == waypoint)
-            return source;
-
-        return null;
+    
+    public double getDistance() {
+        return duration;
+    }
+    
+    public Trajectory getTrajectory(double time) {
+    	// TODO
+    	return null;
     }
 
     public String toString()
@@ -47,8 +47,8 @@ public class Maneuver extends DefaultWeightedEdge {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Maneuver) {
-            Maneuver other = (Maneuver) obj;
+        if (obj instanceof DefaultManeuver) {
+            DefaultManeuver other = (DefaultManeuver) obj;
             return source.equals(other.source) && target.equals(other.target) && duration == other.duration;
         } else {
             return false;

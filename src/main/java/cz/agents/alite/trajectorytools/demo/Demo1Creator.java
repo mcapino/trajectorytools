@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
@@ -25,7 +25,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class Demo1Creator implements Creator {
 
 	private ObstacleGraphView graph;
-	   private PathHolder<SpatialWaypoint, Maneuver> path = new PathHolder<SpatialWaypoint, Maneuver>();
+	   private PathHolder<SpatialWaypoint, DefaultManeuver> path = new PathHolder<SpatialWaypoint, DefaultManeuver>();
 
     @Override
     public void init(String[] args) {
@@ -68,7 +68,7 @@ public class Demo1Creator implements Creator {
 	protected void replan() {
 
         try {
-            PathPlanner<SpatialWaypoint, Maneuver> aStar = new AStarPlanner<SpatialWaypoint, Maneuver>();
+            PathPlanner<SpatialWaypoint, DefaultManeuver> aStar = new AStarPlanner<SpatialWaypoint, DefaultManeuver>();
 
             aStar.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
             @Override

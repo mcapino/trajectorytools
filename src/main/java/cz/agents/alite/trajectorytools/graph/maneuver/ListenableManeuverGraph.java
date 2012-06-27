@@ -11,7 +11,7 @@ import org.jgrapht.graph.DefaultListenableGraph;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class ListenableManeuverGraph extends DefaultListenableGraph<SpatialWaypoint, Maneuver> implements ManeuverGraphInterface {
+public class ListenableManeuverGraph extends DefaultListenableGraph<SpatialWaypoint, DefaultManeuver> implements ManeuverGraphInterface {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	double maxSpeed;
@@ -28,7 +28,7 @@ public class ListenableManeuverGraph extends DefaultListenableGraph<SpatialWaypo
      * @see cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface#getDuration(cz.agents.alite.trajectorytools.graph.maneuver.Maneuver)
      */
     @Override
-    public double getDuration(Maneuver m) {
+    public double getDuration(DefaultManeuver m) {
         return getEdgeWeight(m);
     }
     
@@ -47,7 +47,7 @@ public class ListenableManeuverGraph extends DefaultListenableGraph<SpatialWaypo
      * @see cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface#getEdgeNeighbor(cz.agents.alite.trajectorytools.graph.maneuver.Maneuver, cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint)
      */
     @Override
-    public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint) {
+    public SpatialWaypoint getEdgeNeighbor(DefaultManeuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
         if (getEdgeTarget(edge) == waypoint)
@@ -79,9 +79,9 @@ public class ListenableManeuverGraph extends DefaultListenableGraph<SpatialWaypo
      */
     @Override
     public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
-        Set<Maneuver> edges = edgesOf(wp);
+        Set<DefaultManeuver> edges = edgesOf(wp);
         List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
-        for (Maneuver edge : edges) {
+        for (DefaultManeuver edge : edges) {
             neighbors.add(getEdgeNeighbor(edge, wp));
         }
         Collections.sort(neighbors);

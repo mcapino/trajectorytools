@@ -4,7 +4,7 @@ import org.jgrapht.EdgeFactory;
 
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
-class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, Maneuver> {
+class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, DefaultManeuver> {
     
 	final double speed;
 	final double waitManeuverDuration;	
@@ -17,11 +17,11 @@ class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, Maneuver> {
 	}
 
 	@Override
-    public Maneuver createEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
+    public DefaultManeuver createEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
         if (sourceVertex.equals(targetVertex)) {
-        	return new Maneuver(waitManeuverDuration);
+        	return new DefaultManeuver(sourceVertex, targetVertex, waitManeuverDuration);
         } else {
-        	return new Maneuver(sourceVertex.distance(targetVertex) / speed);
+        	return new DefaultManeuver(sourceVertex, targetVertex, sourceVertex.distance(targetVertex) / speed);
         }
     }
 }

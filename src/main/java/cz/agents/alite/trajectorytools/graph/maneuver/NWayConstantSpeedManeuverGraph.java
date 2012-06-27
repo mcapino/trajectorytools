@@ -25,7 +25,7 @@ public class NWayConstantSpeedManeuverGraph {
                 waypoints[x][y] = w;
                 graph.addVertex(w);
                 if (allowWaitManeuver) {
-                    Maneuver maneuver = graph.addEdge(w, w);
+                    DefaultManeuver maneuver = graph.addEdge(w, w);
                     if (maneuver != null)
                         graph.setEdgeWeight(maneuver, maneuver.getDuration());
                 }
@@ -45,13 +45,13 @@ public class NWayConstantSpeedManeuverGraph {
                         	    SpatialWaypoint v2 = waypoints[destX][destY];
                         	    
                         	    if (!graph.containsEdge(v1, v2)) {                        	    
-	                                Maneuver maneuverForward = graph.addEdge(v1, v2);
+	                                DefaultManeuver maneuverForward = graph.addEdge(v1, v2);
 	                                if (maneuverForward != null)
 	                                    graph.setEdgeWeight(maneuverForward, maneuverForward.getDuration());
                         	    }
                         	    
                         	    if (!graph.containsEdge(v2, v1)) {                                
-	                                Maneuver maneuverBack = graph.addEdge(v2, v1);
+	                                DefaultManeuver maneuverBack = graph.addEdge(v2, v1);
 	                                if (maneuverBack != null)
 	                                    graph.setEdgeWeight(maneuverBack, maneuverBack.getDuration());
                         	    }

@@ -49,7 +49,7 @@ public class RandomWaypointGraph {
 
             for (SpatialWaypoint neighbor : neighbors) {
                 if (graph.getEdge(waypoints[i], neighbor) == null) {
-                    Maneuver maneuver = graph.addEdge(waypoints[i], neighbor);
+                    DefaultManeuver maneuver = graph.addEdge(waypoints[i], neighbor);
                     if (maneuver != null)
                         graph.setEdgeWeight(maneuver, maneuver.getDuration());
                 }

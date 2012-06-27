@@ -14,7 +14,7 @@ import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
 import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
@@ -26,19 +26,19 @@ public class ObstacleExtensions {
 
     private static final int DIRECTIONS = 4;
 
-    private final PathPlanner<SpatialWaypoint, Maneuver> planner;
+    private final PathPlanner<SpatialWaypoint, DefaultManeuver> planner;
     
-    public ObstacleExtensions(PathPlanner<SpatialWaypoint, Maneuver> planner) {
+    public ObstacleExtensions(PathPlanner<SpatialWaypoint, DefaultManeuver> planner) {
         this.planner = planner;
     }
         
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>();
+    public Collection<PlannedPath<SpatialWaypoint, DefaultManeuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+        final List<PlannedPath<SpatialWaypoint, DefaultManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, DefaultManeuver>>();
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
         for (ManeuverGraph graph : obstacleExtender) {
-            PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
+            PlannedPath<SpatialWaypoint, DefaultManeuver> path = planner.planPath(graph, startVertex, endVertex);
             if ( path != null && !contains(paths, path) ) {
                 paths.add( path );
             }
@@ -47,8 +47,8 @@ public class ObstacleExtensions {
         return paths;
     }
 
-    private boolean contains(Collection<PlannedPath<SpatialWaypoint,Maneuver>> paths, PlannedPath<SpatialWaypoint,Maneuver> path) {
-        for (PlannedPath<SpatialWaypoint, Maneuver> curPath : paths) {
+    private boolean contains(Collection<PlannedPath<SpatialWaypoint,DefaultManeuver>> paths, PlannedPath<SpatialWaypoint,DefaultManeuver> path) {
+        for (PlannedPath<SpatialWaypoint, DefaultManeuver> curPath : paths) {
             if ( equalsPath(path, curPath) ) {
                 return true;
             }
@@ -56,11 +56,11 @@ public class ObstacleExtensions {
         return false;
     }
 
-    private boolean equalsPath(PlannedPath<SpatialWaypoint, Maneuver> path1, PlannedPath<SpatialWaypoint, Maneuver> path2) {
+    private boolean equalsPath(PlannedPath<SpatialWaypoint, DefaultManeuver> path1, PlannedPath<SpatialWaypoint, DefaultManeuver> path2) {
         if (path1.getPathLength() != path2.getPathLength()) {
             return false;
         } else {
-            return Arrays.equals(new ArrayList<Maneuver>(path1.getEdgeList()).toArray(new Maneuver[0]), new ArrayList<Maneuver>(path2.getEdgeList()).toArray(new Maneuver[0]));
+            return Arrays.equals(new ArrayList<DefaultManeuver>(path1.getEdgeList()).toArray(new DefaultManeuver[0]), new ArrayList<DefaultManeuver>(path2.getEdgeList()).toArray(new DefaultManeuver[0]));
         }
     }
 
@@ -128,7 +128,7 @@ public class ObstacleExtensions {
                         }
                     }
 
-                    for (Maneuver edge : new ArrayList<Maneuver>(graph.edgeSet())) {
+                    for (DefaultManeuver edge : new ArrayList<DefaultManeuver>(graph.edgeSet())) {
                         if ( zone.testLine(edge.getSource(), edge.getTarget(), null) ) {
                             graph.removeEdge(edge);
                         }

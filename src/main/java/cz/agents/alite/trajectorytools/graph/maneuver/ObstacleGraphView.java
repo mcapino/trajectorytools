@@ -24,7 +24,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver> implements ManeuverGraphInterface {
+public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, DefaultManeuver> implements ManeuverGraphInterface {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -72,7 +72,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     if ( obstacles.contains(point) ) {
                         addVertex(point);
-                        for (Maneuver edge : originalGraph.edgesOf(point)) {
+                        for (DefaultManeuver edge : originalGraph.edgesOf(point)) {
                             SpatialWaypoint source = edge.getSource();
                             SpatialWaypoint target = edge.getTarget();
                             if (containsVertex(source) && containsVertex(target)) {
@@ -132,7 +132,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         }));
 	}
 
-    public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint) {
+    public SpatialWaypoint getEdgeNeighbor(DefaultManeuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
         if (getEdgeTarget(edge) == waypoint)
@@ -156,9 +156,9 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
     }
 
     public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
-        Set<Maneuver> edges = edgesOf(wp);
+        Set<DefaultManeuver> edges = edgesOf(wp);
         List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
-        for (Maneuver edge : edges) {
+        for (DefaultManeuver edge : edges) {
             neighbors.add(getEdgeNeighbor(edge, wp));
         }
         Collections.sort(neighbors);
@@ -174,7 +174,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         }
     }
     
-    public double getDuration(Maneuver m) {
+    public double getDuration(DefaultManeuver m) {
         return getEdgeWeight(m);
     }
     

@@ -8,7 +8,7 @@ import java.util.List;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
@@ -26,9 +26,9 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class DemoAlternative1Creator implements Creator {
 
     private ObstacleGraphView graph;
-    private List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
+    private List<PlannedPath<SpatialWaypoint, DefaultManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,DefaultManeuver>>();
 
-    private static final AStarPlanner<SpatialWaypoint, Maneuver> planner = new AStarPlanner<SpatialWaypoint, Maneuver>();
+    private static final AStarPlanner<SpatialWaypoint, DefaultManeuver> planner = new AStarPlanner<SpatialWaypoint, DefaultManeuver>();
     {
         planner.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
         @Override

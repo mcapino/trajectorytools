@@ -6,12 +6,12 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.graph.GraphDelegator;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/A*_search_algorithm">A* search algorithm</a>.
  */
-public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V, E>
+public final class AStarPlanner<V, E extends DefaultManeuver> implements PathPlanner<V, E>
 {
     private HeuristicFunction<V> functionH = new NullHeuristicFunction<V>();
     private GoalPenaltyFunction<V> functionG = new NullGoalPenaltyFunction<V>();
@@ -49,7 +49,7 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
         this.functionH = functionH;
     }
     
-    static class GraphWithPenaltyFunction<V, E extends Maneuver> extends GraphDelegator<V, E> {
+    static class GraphWithPenaltyFunction<V, E extends DefaultManeuver> extends GraphDelegator<V, E> {
         private static final long serialVersionUID = -3985698807336517743L;
         private final GoalPenaltyFunction<V> functionG;
 

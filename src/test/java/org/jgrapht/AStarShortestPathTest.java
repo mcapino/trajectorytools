@@ -6,7 +6,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import org.junit.Test;
 
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.RandomWaypointGraph;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
@@ -27,10 +27,10 @@ public class AStarShortestPathTest {
             }
         };
 
-        AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+        AStarShortestPath<SpatialWaypoint, DefaultManeuver> astar = new AStarShortestPath<SpatialWaypoint, DefaultManeuver>(
                 graph, start, end, heuristic);
 
-        GraphPath<SpatialWaypoint, Maneuver> path = astar.getPath();
+        GraphPath<SpatialWaypoint, DefaultManeuver> path = astar.getPath();
         System.out.println("Found path:");
         printPath(path);
     }
@@ -49,10 +49,10 @@ public class AStarShortestPathTest {
         };
 
         long startTime = System.nanoTime();
-        AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+        AStarShortestPath<SpatialWaypoint, DefaultManeuver> astar = new AStarShortestPath<SpatialWaypoint, DefaultManeuver>(
                 graph, start, end, heuristic);
 
-        GraphPath<SpatialWaypoint, Maneuver> astarPath = astar.getPath();
+        GraphPath<SpatialWaypoint, DefaultManeuver> astarPath = astar.getPath();
         System.out.println("A* search");
         printPath(astarPath);
         System.out.println("time:" + (System.nanoTime() - startTime)/1000000 + " ms. Length:" + astarPath.getWeight());
@@ -60,10 +60,10 @@ public class AStarShortestPathTest {
         System.out.println();
 
         startTime = System.nanoTime();
-        DijkstraShortestPath<SpatialWaypoint, Maneuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, Maneuver>(
+        DijkstraShortestPath<SpatialWaypoint, DefaultManeuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, DefaultManeuver>(
                 graph, start, end);
 
-        GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra
+        GraphPath<SpatialWaypoint, DefaultManeuver> dijkstraPath = dijkstra
                 .getPath();
         System.out.println("Dijkstra");
         printPath(dijkstraPath);
@@ -98,20 +98,20 @@ public class AStarShortestPathTest {
             };
 
             long startTime = System.nanoTime();
-            AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+            AStarShortestPath<SpatialWaypoint, DefaultManeuver> astar = new AStarShortestPath<SpatialWaypoint, DefaultManeuver>(
                     graph, start, end, heuristic);
 
-            GraphPath<SpatialWaypoint, Maneuver> astarPath = astar.getPath();
+            GraphPath<SpatialWaypoint, DefaultManeuver> astarPath = astar.getPath();
 
             astarTime += System.nanoTime()-startTime;
 
 
 
             startTime = System.nanoTime();
-            DijkstraShortestPath<SpatialWaypoint, Maneuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, Maneuver>(
+            DijkstraShortestPath<SpatialWaypoint, DefaultManeuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, DefaultManeuver>(
                     graph, start, end);
 
-            GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra
+            GraphPath<SpatialWaypoint, DefaultManeuver> dijkstraPath = dijkstra
                     .getPath();
 
             dijkstraTime += System.nanoTime()-startTime;
@@ -139,13 +139,13 @@ public class AStarShortestPathTest {
         System.out.println("Examined " + N + " random graphs. Dijkstra avg. time: " + dijkstraTime/(1000*N) + "ms" + ". A* avg. time: " + astarTime/(1000*N)+"ms.");
     }
 
-    private void printPath(GraphPath<SpatialWaypoint, Maneuver> path) {
+    private void printPath(GraphPath<SpatialWaypoint, DefaultManeuver> path) {
          if (path == null) {
              System.out.println("no path found");
              return;
          }
          System.out.print(path.getStartVertex() + ", ");
-         for (Maneuver edge : path.getEdgeList()) {
+         for (DefaultManeuver edge : path.getEdgeList()) {
              if (edge == null) {
                  System.out.println("Edge is null");
              }
