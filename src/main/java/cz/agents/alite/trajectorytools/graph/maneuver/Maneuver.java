@@ -44,4 +44,14 @@ public class Maneuver extends DefaultWeightedEdge {
     {
         return "(" + source + " : " + target + ")";
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Maneuver) {
+            Maneuver other = (Maneuver) obj;
+            return source.equals(other.source) && target.equals(other.target) && duration == other.duration;
+        } else {
+            return false;
+        }
+    }
 }

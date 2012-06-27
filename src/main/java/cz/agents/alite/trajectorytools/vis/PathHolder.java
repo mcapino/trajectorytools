@@ -1,7 +1,7 @@
 package cz.agents.alite.trajectorytools.vis;
 
-import org.jgrapht.GraphPath;
+import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
 public class PathHolder<V, E> {
-	public GraphPath<V, E> graphPath = null;
+	public PlannedPath<V, E> plannedPath = null;
 }

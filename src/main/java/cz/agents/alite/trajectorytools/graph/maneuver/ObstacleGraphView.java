@@ -38,11 +38,17 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
 
     private final ManeuverGraph originalGraph;
     
-    private Set<Point> obstacles = new HashSet<Point>();
+    private final Set<Point> obstacles = new HashSet<Point>();
 
+    private final ChangeListener changeListener;
 
-	public ObstacleGraphView(ManeuverGraphInterface originalGraph) {
+    public interface ChangeListener {
+        void graphChanged();
+    }
+
+	public ObstacleGraphView(ManeuverGraphInterface originalGraph, ChangeListener changeListener) {
 		super(originalGraph);
+        this.changeListener = changeListener;
         this.originalGraph = CopyManeuverGraph.create( originalGraph );      
 	}
 	
@@ -80,7 +86,9 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
                     return;
                 }
 
-//              replan();
+                if ( changeListener != null ) {
+                    changeListener.graphChanged();
+                }
             }           
         
             @Override
@@ -172,5 +180,9 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
     
     public double getMaxSpeed() {
         return originalGraph.maxSpeed;
+    }
+
+    public Set<Point> getObstacles() {
+        return obstacles;
     }
 }
