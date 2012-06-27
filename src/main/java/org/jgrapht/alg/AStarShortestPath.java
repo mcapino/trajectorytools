@@ -34,7 +34,7 @@ public final class AStarShortestPath<V, E>
         };
     });
 
-    Map<V,V> cameFrom = new HashMap<V,V>();
+    Map<V,E> cameFrom = new HashMap<V,E>();
 
     private Graph<V, E> graph;
     private GraphPath<V, E> path;
@@ -71,7 +71,7 @@ public final class AStarShortestPath<V, E>
             V current = open.poll();
 
             if (current.equals(endVertex)) {
-                List<E> edgeList = reconstructEdgeList(endVertex);
+                List<E> edgeList = reconstructEdgeList(startVertex, endVertex);
 
                 double length = 0.0;
                 for (E edge : edgeList) {
@@ -93,54 +93,49 @@ public final class AStarShortestPath<V, E>
 
             Set<E> neighborEdges = graph.edgesOf(current);
             for (E edge : neighborEdges) {
-
-                V neighbor = Graphs.getOppositeVertex(graph, edge, current);
-
-                if (closed.contains(neighbor)) {
-                    continue;
-                }
-
-                double tentativeGScore = gScores.get(current)
-                        + graph.getEdgeWeight(edge);
-
-                if (!open.contains(neighbor)) {
-                    hScores.put(neighbor, h.getHeuristicEstimate(neighbor, endVertex));
-
-                    cameFrom.put(neighbor, current);
-                    gScores.put(neighbor, tentativeGScore);
-                    fScores.put(neighbor, tentativeGScore + hScores.get(neighbor));
-
-                    open.add(neighbor);
-
-                } else if (tentativeGScore < gScores.get(neighbor)) {
-                    cameFrom.put(neighbor, current);
-                    gScores.put(neighbor, tentativeGScore);
-                    fScores.put(neighbor, tentativeGScore + hScores.get(neighbor));
-                    // Required to sort the open list again
-                    open.remove(neighbor);
-                    open.add(neighbor);
-                }
+            	if (graph.getEdgeSource(edge).equals(current)) {	
+	                V next = graph.getEdgeTarget(edge);
+	
+	                if (closed.contains(next)) {
+	                    continue;
+	                }
+	
+	                double tentativeGScore = gScores.get(current)
+	                        + graph.getEdgeWeight(edge);
+	
+	                if (!open.contains(next)) {
+	                    hScores.put(next, h.getHeuristicEstimate(next, endVertex));
+	
+	                    cameFrom.put(next, edge);
+	                    gScores.put(next, tentativeGScore);
+	                    fScores.put(next, tentativeGScore + hScores.get(next));
+	
+	                    open.add(next);
+	
+	                } else if (tentativeGScore < gScores.get(next)) {
+	                    cameFrom.put(next, edge);
+	                    gScores.put(next, tentativeGScore);
+	                    fScores.put(next, tentativeGScore + hScores.get(next));
+	                    // Required to sort the open list again
+	                    open.remove(next);
+	                    open.add(next);
+	                }
+            	}
             }
         }
     }
 
-    private List<E> reconstructEdgeList(V vertex) {
-        if (cameFrom.containsKey(vertex)) {
-            Set<E> edges = graph.getAllEdges(cameFrom.get(vertex), vertex);
-            E edge = Collections.min(edges, new Comparator<E>() {
-                @Override
-                public int compare(E o1, E o2) {
-                    return (int) Math.signum((graph.getEdgeWeight(o1) - graph.getEdgeWeight(o2))) ;
-                }
-            });
-
-            List<E> priorPath = reconstructEdgeList(cameFrom.get(vertex));
-            priorPath.add(edge);
-            return priorPath;
-
-        } else {
-            return new LinkedList<E>();
-        }
+    private List<E> reconstructEdgeList(V startVertex, V endVertex) {
+        LinkedList<E> edgeList = new LinkedList<E>();
+    	V current = endVertex; 
+    	
+    	while (!current.equals(startVertex)) {
+    		E edge = cameFrom.get(current);
+    		edgeList.addFirst(edge);
+    		current = graph.getEdgeSource(edge);
+    	}
+    	
+    	return edgeList;
     }
 
     //~ Methods ----------------------------------------------------------------

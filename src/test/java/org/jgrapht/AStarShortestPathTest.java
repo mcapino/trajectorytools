@@ -78,7 +78,7 @@ public class AStarShortestPathTest {
     }
 
     @Test
-    public void testRandomGraphsAgainstDijkstra() {
+    public void testRandomWaypointGraphsAgainstDijkstra() {
         final int N = 100;
 
         long astarTime = 0;
