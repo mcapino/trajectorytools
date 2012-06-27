@@ -19,9 +19,9 @@ class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, Maneuver> {
 	@Override
     public Maneuver createEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
         if (sourceVertex.equals(targetVertex)) {
-        	return new Maneuver(sourceVertex, targetVertex, waitManeuverDuration);
+        	return new Maneuver(waitManeuverDuration);
         } else {
-        	return new Maneuver(sourceVertex, targetVertex, sourceVertex.distance(targetVertex) / speed);
+        	return new Maneuver(sourceVertex.distance(targetVertex) / speed);
         }
     }
 }
