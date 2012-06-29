@@ -76,4 +76,62 @@ public class GraphLayer extends AbstractLayer {
         return group;
     }
 
+    public static <V extends Point,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
+            final int edgeStrokeWidth, final int vertexStrokeWidth) {
+        GroupLayer group = GroupLayer.create();
+
+        // edges
+        group.addSubLayer(LineLayer.create(new LineElements() {
+
+            @Override
+            public Iterable<Line> getLines() {
+                LinkedList<Line> lines = new LinkedList<Line>();
+                if (graphHolder.graph != null) {
+                    for (E edge : graphHolder.graph.edgeSet()) {
+                        lines.add(new LineImpl(graphHolder.graph.getEdgeSource(edge), graphHolder.graph.getEdgeTarget(edge)));
+                    }
+                } 
+                return lines;
+            }
+
+            @Override
+            public int getStrokeWidth() {
+                return edgeStrokeWidth;
+            }
+
+            @Override
+            public Color getColor() {
+                return edgeColor;
+            }
+
+        }));
+
+        // vertices
+        group.addSubLayer(PointLayer.create(new PointElements() {
+
+            @Override
+            public Iterable<Point> getPoints() {
+                LinkedList<Point> points = new LinkedList<Point>();
+                if (graphHolder.graph != null) {
+                    for (Point vertex : graphHolder.graph.vertexSet()) {
+                        points.add(vertex);
+                    }
+                }
+                return points;
+            }
+
+            @Override
+            public int getStrokeWidth() {
+                return vertexStrokeWidth;
+            }
+
+            @Override
+            public Color getColor() {
+                return vertexColor;
+            }
+
+        }));
+
+        return group;
+    }
 }
