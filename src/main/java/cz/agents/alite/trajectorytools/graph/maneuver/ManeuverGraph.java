@@ -2,11 +2,11 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.EdgeFactory;
 
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.WaypointGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.DefaultSpatialManeuverGraph;
 
 @SuppressWarnings("serial")
-public class ManeuverGraph extends WaypointGraph<DefaultManeuver> implements ManeuverGraphInterface {
+public class ManeuverGraph extends DefaultSpatialManeuverGraph<DefaultManeuver> implements ManeuverGraphInterface {
 
 	double maxSpeed;
 	

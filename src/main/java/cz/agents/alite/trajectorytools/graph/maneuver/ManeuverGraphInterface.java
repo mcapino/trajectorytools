@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.jgrapht.WeightedGraph;
 
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 
 public interface ManeuverGraphInterface extends WeightedGraph<SpatialWaypoint, DefaultManeuver> {

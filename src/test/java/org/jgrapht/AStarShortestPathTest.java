@@ -9,7 +9,7 @@ import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGr
 import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.RandomWaypointGraph;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 
 public class AStarShortestPathTest {

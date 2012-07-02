@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.spatialwaypoint;
+package cz.agents.alite.trajectorytools.graph.spatial;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -9,21 +9,18 @@ import java.util.Set;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
 
 @SuppressWarnings("serial")
-public class WaypointGraph<E> extends DirectedWeightedMultigraph<SpatialWaypoint,E> {
+public class DefaultSpatialManeuverGraph extends SpatialManeuverGraph {
 
 
-    public WaypointGraph(Class<? extends E> edgeClass) {
-        super(edgeClass);
+    public DefaultSpatialManeuverGraph() {
+        super(SpatialManeuver.class);
     }
 
-    public WaypointGraph(EdgeFactory<SpatialWaypoint, E> ef) {
-        super(ef);
-    }
-
-    public SpatialWaypoint getEdgeNeighbor(E edge, SpatialWaypoint waypoint) {
+    public SpatialWaypoint getEdgeNeighbor(SpatialManeuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
         if (getEdgeTarget(edge) == waypoint)
@@ -47,9 +44,9 @@ public class WaypointGraph<E> extends DirectedWeightedMultigraph<SpatialWaypoint
     }
 
     public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
-        Set<E> edges = edgesOf(wp);
+        Set<SpatialManeuver> edges = edgesOf(wp);
         List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
-        for (E edge : edges) {
+        for (SpatialManeuver edge : edges) {
             neighbors.add(getEdgeNeighbor(edge, wp));
         }
         Collections.sort(neighbors);

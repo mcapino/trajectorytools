@@ -10,7 +10,7 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;

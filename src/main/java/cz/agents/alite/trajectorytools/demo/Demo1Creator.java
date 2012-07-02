@@ -9,7 +9,10 @@ import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
@@ -25,7 +28,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class Demo1Creator implements Creator {
 
 	private ObstacleGraphView graph;
-	   private PathHolder<SpatialWaypoint, DefaultManeuver> path = new PathHolder<SpatialWaypoint, DefaultManeuver>();
+	private PathHolder<SpatialWaypoint, DefaultManeuver> path = new PathHolder<SpatialWaypoint, DefaultManeuver>();
 
     @Override
     public void init(String[] args) {
@@ -33,9 +36,9 @@ public class Demo1Creator implements Creator {
 
     @Override
     public void create() {
-        ManeuverGraphInterface listenableGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0); 
+        SpatialManeuverGraph listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
 
-        graph = new ObstacleGraphView( listenableGraph, new ChangeListener() {
+        graph = new ObstacleGraphView(listenableGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
                 replan();
@@ -79,8 +82,8 @@ public class Demo1Creator implements Creator {
            
             path.plannedPath = aStar.planPath(
                     graph, 
-                    graph.getNearestWaypoint(new Point(0, 0, 0)),
-                    graph.getNearestWaypoint(new Point(10, 10, 0))
+                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
+                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

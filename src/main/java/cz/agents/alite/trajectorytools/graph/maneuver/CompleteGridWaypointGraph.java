@@ -2,8 +2,8 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.DefaultWaypointGraph;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.DefaultWaypointGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 
 public class CompleteGridWaypointGraph {
     

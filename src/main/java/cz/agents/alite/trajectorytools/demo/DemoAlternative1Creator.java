@@ -12,7 +12,7 @@ import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;

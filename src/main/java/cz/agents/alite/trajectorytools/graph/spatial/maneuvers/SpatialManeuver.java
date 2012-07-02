@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.maneuver;
+package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 
@@ -17,8 +17,4 @@ public interface SpatialManeuver {
 	 * @return the duration of the maneuver in seconds
 	 */
 	double getDuration();
-	/**
-	 * @return the cost of the maneuver (the optimization criteria)
-	 */
-	double getCost();	
 }

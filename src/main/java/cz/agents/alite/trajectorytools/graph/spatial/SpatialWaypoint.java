@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.spatialwaypoint;
+package cz.agents.alite.trajectorytools.graph.spatial;
 
 import cz.agents.alite.trajectorytools.util.Point;
 

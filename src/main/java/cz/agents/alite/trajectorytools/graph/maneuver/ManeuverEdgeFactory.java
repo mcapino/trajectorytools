@@ -2,7 +2,7 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import org.jgrapht.EdgeFactory;
 
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 
 class ManeuverEdgeFactory implements EdgeFactory<SpatialWaypoint, DefaultManeuver> {
     
