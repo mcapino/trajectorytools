@@ -29,9 +29,10 @@ public final class AStarShortestPath<V, E>
 
     PriorityQueue<V> open = new PriorityQueue<V>(100,new Comparator<V>() {
 
+        @Override
         public int compare(V o1, V o2) {
             return (int) Math.signum(fScores.get(o1) - fScores.get(o2));
-        };
+        }
     });
 
     Map<V,E> cameFrom = new HashMap<V,E>();
@@ -93,35 +94,40 @@ public final class AStarShortestPath<V, E>
 
             Set<E> neighborEdges = graph.edgesOf(current);
             for (E edge : neighborEdges) {
-            	if (graph.getEdgeSource(edge).equals(current)) {	
-	                V next = graph.getEdgeTarget(edge);
+                V next;
+                if (graph.getEdgeSource(edge).equals(current)) {    
+                    next = graph.getEdgeTarget(edge);
+                } else if (graph.getEdgeTarget(edge).equals(current)) {
+                    next = graph.getEdgeSource(edge);
+                } else {
+                    throw new Error("Should not happen!!!");
+                }
+
+                if (closed.contains(next)) {
+                    continue;
+                }
 	
-	                if (closed.contains(next)) {
-	                    continue;
-	                }
-	
-	                double tentativeGScore = gScores.get(current)
-	                        + graph.getEdgeWeight(edge);
-	
-	                if (!open.contains(next)) {
-	                    hScores.put(next, h.getHeuristicEstimate(next, endVertex));
-	
-	                    cameFrom.put(next, edge);
-	                    gScores.put(next, tentativeGScore);
-	                    fScores.put(next, tentativeGScore + hScores.get(next));
-	
-	                    open.add(next);
-	
-	                } else if (tentativeGScore < gScores.get(next)) {
-	                    cameFrom.put(next, edge);
-	                    gScores.put(next, tentativeGScore);
-	                    fScores.put(next, tentativeGScore + hScores.get(next));
-	                    // Required to sort the open list again
-	                    open.remove(next);
-	                    open.add(next);
-	                }
-            	}
-            }
+                double tentativeGScore = gScores.get(current)
+                        + graph.getEdgeWeight(edge);
+
+                if (!open.contains(next)) {
+                    hScores.put(next, h.getHeuristicEstimate(next, endVertex));
+
+                    cameFrom.put(next, edge);
+                    gScores.put(next, tentativeGScore);
+                    fScores.put(next, tentativeGScore + hScores.get(next));
+
+                    open.add(next);
+
+                } else if (tentativeGScore < gScores.get(next)) {
+                    cameFrom.put(next, edge);
+                    gScores.put(next, tentativeGScore);
+                    fScores.put(next, tentativeGScore + hScores.get(next));
+                    // Required to sort the open list again
+                    open.remove(next);
+                    open.add(next);
+                }
+        	}
         }
     }
 
@@ -132,7 +138,13 @@ public final class AStarShortestPath<V, E>
     	while (!current.equals(startVertex)) {
     		E edge = cameFrom.get(current);
     		edgeList.addFirst(edge);
-    		current = graph.getEdgeSource(edge);
+    		if (current.equals(graph.getEdgeTarget(edge))) {
+    		    current = graph.getEdgeSource(edge);
+    		} else if (current.equals(graph.getEdgeSource(edge))) {
+    		    current = graph.getEdgeTarget(edge);
+    		} else {
+    		    throw new Error("!!!");
+    		}
     	}
     	
     	return edgeList;
