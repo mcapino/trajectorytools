@@ -1,5 +1,5 @@
 package org.jgrapht;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Assert;
 
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.alg.DijkstraShortestPath;
@@ -74,7 +74,7 @@ public class AStarShortestPathTest {
             System.out.println("Both methods found identical paths.");
         }
 
-        assertTrue(Math.abs(dijkstraPath.getWeight() - astarPath.getWeight()) < 0.001 );
+        Assert.assertEquals(dijkstraPath.getWeight() + " vs. " + astarPath.getWeight(), dijkstraPath.getWeight(), astarPath.getWeight(), 0.001 );
     }
 
     @Test
@@ -111,8 +111,7 @@ public class AStarShortestPathTest {
             DijkstraShortestPath<SpatialWaypoint, Maneuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, Maneuver>(
                     graph, start, end);
 
-            GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra
-                    .getPath();
+            GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra.getPath();
 
             dijkstraTime += System.nanoTime()-startTime;
 
@@ -133,7 +132,7 @@ public class AStarShortestPathTest {
             }
 
             if (dijkstraPath != null)
-                assertTrue(Math.abs(dijkstraPath.getWeight() - astarPath.getWeight()) < 0.001 );
+                Assert.assertEquals(dijkstraPath.getWeight() + " vs. " + astarPath.getWeight(), dijkstraPath.getWeight(), astarPath.getWeight(), 0.001 );
         }
 
         System.out.println("Examined " + N + " random graphs. Dijkstra avg. time: " + dijkstraTime/(1000*N) + "ms" + ". A* avg. time: " + astarTime/(1000*N)+"ms.");
