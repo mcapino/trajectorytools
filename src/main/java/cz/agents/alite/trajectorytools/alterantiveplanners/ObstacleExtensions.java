@@ -31,37 +31,16 @@ public class ObstacleExtensions {
     public ObstacleExtensions(PathPlanner<SpatialWaypoint, Maneuver> planner) {
         this.planner = planner;
     }
-<<<<<<< local
-        
-<<<<<<< local
-=======
-    public Collection<PlannedPath<SpatialWaypoint, DefaultManeuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        final List<PlannedPath<SpatialWaypoint, DefaultManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, DefaultManeuver>>();
-=======
 
->>>>>>> other
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-<<<<<<< local
-        final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>();
-=======
         final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
->>>>>>> other
->>>>>>> other
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
         for (ManeuverGraph graph : obstacleExtender) {
-<<<<<<< local
             PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
-=======
-<<<<<<< local
-            PlannedPath<SpatialWaypoint, DefaultManeuver> path = planner.planPath(graph, startVertex, endVertex);
->>>>>>> other
-            if ( path != null && !contains(paths, path) ) {
-=======
-            PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
+
             if ( path != null ) {
->>>>>>> other
                 paths.add( path );
             }
         }
@@ -69,31 +48,6 @@ public class ObstacleExtensions {
         return paths;
     }
 
-<<<<<<< local
-    private boolean contains(Collection<PlannedPath<SpatialWaypoint,Maneuver>> paths, PlannedPath<SpatialWaypoint,Maneuver> path) {
-        for (PlannedPath<SpatialWaypoint, Maneuver> curPath : paths) {
-=======
-<<<<<<< local
-    private boolean contains(Collection<PlannedPath<SpatialWaypoint,DefaultManeuver>> paths, PlannedPath<SpatialWaypoint,DefaultManeuver> path) {
-        for (PlannedPath<SpatialWaypoint, DefaultManeuver> curPath : paths) {
->>>>>>> other
-            if ( equalsPath(path, curPath) ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean equalsPath(PlannedPath<SpatialWaypoint, Maneuver> path1, PlannedPath<SpatialWaypoint, Maneuver> path2) {
-        if (path1.getPathLength() != path2.getPathLength()) {
-            return false;
-        } else {
-            return Arrays.equals(new ArrayList<Maneuver>(path1.getEdgeList()).toArray(new Maneuver[0]), new ArrayList<Maneuver>(path2.getEdgeList()).toArray(new Maneuver[0]));
-        }
-    }
-
-=======
->>>>>>> other
     static class ObstacleExtender implements Iterable<ManeuverGraph>{
 
         int[] directions;

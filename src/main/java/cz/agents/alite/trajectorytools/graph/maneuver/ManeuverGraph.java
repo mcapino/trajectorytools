@@ -25,6 +25,7 @@ public class ManeuverGraph extends WaypointGraph<Maneuver> implements ManeuverGr
 		maxSpeed = graph.getMaxSpeed();
 	}
     
+    @Override
     public double getDuration(Maneuver m) {
         return getEdgeWeight(m);
     }

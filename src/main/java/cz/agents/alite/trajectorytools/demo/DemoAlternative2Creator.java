@@ -3,12 +3,10 @@ package cz.agents.alite.trajectorytools.demo;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
-
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
@@ -34,8 +32,8 @@ public class DemoAlternative2Creator implements Creator {
     private List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
 
     VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
-    GraphHolder<SpatialWaypoint, DefaultWeightedEdge> voronoiGraph = new GraphHolder<SpatialWaypoint, DefaultWeightedEdge>();
-    GraphHolder<SpatialWaypoint, DefaultWeightedEdge> delaunayGraph = new GraphHolder<SpatialWaypoint, DefaultWeightedEdge>();
+    GraphHolder<SpatialWaypoint, Maneuver> voronoiGraph = new GraphHolder<SpatialWaypoint, Maneuver>();
+    GraphHolder<SpatialWaypoint, Maneuver> delaunayGraph = new GraphHolder<SpatialWaypoint, Maneuver>();
     
     private static final AStarPlanner<SpatialWaypoint, Maneuver> planner = new AStarPlanner<SpatialWaypoint, Maneuver>();
     {
@@ -47,7 +45,8 @@ public class DemoAlternative2Creator implements Creator {
         });
     }
 
-    private static final ObstacleExtensions alternativePlanner = new ObstacleExtensions(planner);
+//    private static final ObstacleExtensions alternativePlanner = new ObstacleExtensions(planner);
+    private List<SpatialWaypoint> border;
 
 //    private static final AlternativePathPlanner<SpatialWaypoint, Maneuver> alternativePlanner = new TrajectoryDistanceMetric<SpatialWaypoint, Maneuver>( planner );
 //    private static final AlternativePathPlanner<SpatialWaypoint, Maneuver> alternativePlanner = new DifferentStateMetric<SpatialWaypoint, Maneuver>( planner );
@@ -61,6 +60,14 @@ public class DemoAlternative2Creator implements Creator {
     public void create() {
         ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0); 
 
+        border = Arrays.asList(new SpatialWaypoint[] {
+                originalGraph.getNearestWaypoint(new Point( 0,  0, 0)),
+                originalGraph.getNearestWaypoint(new Point( 0, 10, 0)),
+                originalGraph.getNearestWaypoint(new Point(10, 10, 0)),
+                originalGraph.getNearestWaypoint(new Point(10,  0, 0))
+        });
+
+        
         graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
@@ -84,11 +91,12 @@ public class DemoAlternative2Creator implements Creator {
         // graph with obstacles
         graph.createVisualization();
         
-        // draw the shortest path
-        VisManager.registerLayer(GraphPathLayer.create(graph, paths, 2, 4));
 
         VisManager.registerLayer(GraphLayer.create(voronoiGraph, Color.GREEN, Color.GREEN, 1, 4));
-        VisManager.registerLayer(GraphLayer.create(delaunayGraph, Color.BLUE, Color.BLUE, 1, 4));
+        VisManager.registerLayer(GraphLayer.create(delaunayGraph, Color.BLUE, Color.BLUE, 1, 4, 0.02));
+
+        // draw the shortest path
+        VisManager.registerLayer(GraphPathLayer.create(voronoiGraph, paths, 2, 4));
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
@@ -100,12 +108,31 @@ public class DemoAlternative2Creator implements Creator {
 //                graph.getNearestWaypoint(new Point(0, 0, 0)),
 //                graph.getNearestWaypoint(new Point(10, 10, 0))
 //	            );
-        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph();
-        voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(
-//                graph.getNearestWaypoint(new Point( 0,  0, 0)),
-//                graph.getNearestWaypoint(new Point( 0, 10, 0)),
-//                graph.getNearestWaypoint(new Point(10, 10, 0)),
-//                graph.getNearestWaypoint(new Point(10,  0, 0))
-                );
+	    
+//        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
+        
+        voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(border);
+
+        paths.clear();
+        
+        System.out.println(voronoiGraph.graph);
+        
+        PlannedPath<SpatialWaypoint, Maneuver> planPath = planner.planPath(voronoiGraph.graph,
+                    graph.getNearestWaypoint(new Point(0, 0, 0)),
+                    graph.getNearestWaypoint(new Point(10, 10, 0))
+                    );
+        if (planPath != null) {
+            System.out.println("planPath: " + planPath.getWeight());
+            paths.add(planPath);
+        } else {
+            System.out.println("Path not found!!!");
+        }
+        for (SpatialWaypoint vertex : voronoiGraph.graph.vertexSet()) {
+            System.out.println("vertex: " + vertex);
+        }
+        for (Maneuver edge : voronoiGraph.graph.edgeSet()) {
+            System.out.println("edge: " + edge + " -- " + voronoiGraph.graph.getEdgeWeight(edge));
+        }
+//        delaunayGraph.graph = voronoiGraphAlg.getVoronoiGraph();
 	}
 }

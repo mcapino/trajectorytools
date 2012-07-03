@@ -102,6 +102,10 @@ public class GraphPathLayer extends AbstractLayer {
 
     public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Iterable<PlannedPath<V, E>> paths,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
+        return create(new GraphHolder<V, E>(graph), paths, edgeStrokeWidth, vertexStrokeWidth);
+    }
+    public static <V extends Point,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Iterable<PlannedPath<V, E>> paths,
+            final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
         // edges
@@ -115,9 +119,9 @@ public class GraphPathLayer extends AbstractLayer {
                     Color color = pathColors[ curPath++ % pathColors.length];
                     Vector3d transition = new Vector3d(curPath * PATH_OFFSET,curPath * PATH_OFFSET, 0);
                     for (E edge : path.getEdgeList()) {
-                        Point3d source = new Point3d( graph.getEdgeSource(edge) );
+                        Point3d source = new Point3d( graphHolder.graph.getEdgeSource(edge) );
                         source.add(transition);
-                        Point3d target = new Point3d( graph.getEdgeTarget(edge) );
+                        Point3d target = new Point3d( graphHolder.graph.getEdgeTarget(edge) );
                         target.add(transition);
                         lines.add(new StyledLineImpl(
                                 source, 
@@ -141,7 +145,7 @@ public class GraphPathLayer extends AbstractLayer {
                     Color color = pathColors[ curPath++ % pathColors.length];
                     Vector3d transition = new Vector3d(curPath * PATH_OFFSET,curPath * PATH_OFFSET, 0);
                     for (E edge : path.getEdgeList()) {
-                        Point3d source = new Point3d( graph.getEdgeSource(edge) );
+                        Point3d source = new Point3d( graphHolder.graph.getEdgeSource(edge) );
                         source.add(transition);
                         points.add(new StyledPointImpl(source, color, vertexStrokeWidth));
                     }
