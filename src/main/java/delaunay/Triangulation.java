@@ -123,10 +123,6 @@ public class Triangulation extends AbstractSet<Triangle> {
         if (!triangle.contains(site))
             throw new IllegalArgumentException("Bad vertex; not in triangle");
         for (Triangle neighbor: neighbors(triangle)) {
-            System.out.println(site + " -- neighbor: " + neighbor);
-            for (Pnt pnt : neighbor) {
-                System.out.println("pnt: " + pnt);
-            }
             if (!neighbor.contains(site)) return neighbor;
         }
         return null;
@@ -148,8 +144,6 @@ public class Triangulation extends AbstractSet<Triangle> {
 //                throw new RuntimeException("!!!");
             }
         }
-        System.out.println(triangle + ": neighbors: " + neighbors);
-        
         return  neighbors;
     }
 
