@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jgrapht.alg.AllPathsIterator;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
@@ -105,29 +107,33 @@ public class DemoAlternative2Creator implements Creator {
 	protected void replan() {
 	    voronoiGraphAlg.setObstacles(graph.getObstacles());
 	    
-        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
+	    delaunayGraph.graph = null;
+//        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
         
         voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(border);
 
+        AllPathsIterator<SpatialWaypoint, Maneuver> pathsIt = new AllPathsIterator<SpatialWaypoint, Maneuver>(voronoiGraph.graph,
+                graph.getNearestWaypoint(new Point(0, 0, 0)),
+                graph.getNearestWaypoint(new Point(10, 10, 0))
+                );
+
         paths.clear();
         
-        System.out.println(voronoiGraph.graph);
+        while (pathsIt.hasNext()) {
+            paths.add(pathsIt.next());
+        }
+
+        System.out.println("paths.size(): " + paths.size());
         
-        PlannedPath<SpatialWaypoint, Maneuver> planPath = planner.planPath(voronoiGraph.graph,
-                    graph.getNearestWaypoint(new Point(0, 0, 0)),
-                    graph.getNearestWaypoint(new Point(10, 10, 0))
-                    );
-        if (planPath != null) {
-            System.out.println("planPath: " + planPath.getWeight());
-            paths.add(planPath);
-        } else {
-            System.out.println("Path not found!!!");
-        }
-        for (SpatialWaypoint vertex : voronoiGraph.graph.vertexSet()) {
-            System.out.println("vertex: " + vertex);
-        }
-        for (Maneuver edge : voronoiGraph.graph.edgeSet()) {
-            System.out.println("edge: " + edge + " -- " + voronoiGraph.graph.getEdgeWeight(edge));
-        }
+//        PlannedPath<SpatialWaypoint, Maneuver> planPath = planner.planPath(voronoiGraph.graph,
+//                    graph.getNearestWaypoint(new Point(0, 0, 0)),
+//                    graph.getNearestWaypoint(new Point(10, 10, 0))
+//                    );
+//        if (planPath != null) {
+//            System.out.println("planPath: " + planPath.getWeight());
+//            paths.add(planPath);
+//        } else {
+//            System.out.println("Path not found!!!");
+//        }
 	}
 }
