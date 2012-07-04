@@ -23,6 +23,11 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
 
     @Override
     public E addEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
+        addLine(sourceVertex, targetVertex);
+        return null;
+    }
+
+    public List<SpatialWaypoint> addLine(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
         List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(sourceVertex, targetVertex));
 
         //
@@ -68,7 +73,39 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             last = vertex;
         }
 
-        return null; // multiple edges could be added
+        return line;
+    }
+    
+    public int countCrossingEdges(Point point1, Point point2) {
+        int counter = 0;
+        for (E edge : edgeSet()) {
+
+            SpatialWaypoint edgeSource = getEdgeSource(edge);
+            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
+            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+
+            if (intersection != null) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    
+    public void removeCrossingEdges(Point point1, Point point2) {
+        List<E> toRemove = new ArrayList<E>();
+        for (E edge : edgeSet()) {
+
+            SpatialWaypoint edgeSource = getEdgeSource(edge);
+            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
+            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+
+            if (intersection != null) {
+                toRemove.add(edge);
+            }
+        }
+        
+        removeAllEdges(toRemove);
     }
 
     static SpatialWaypoint addLineIntersection(SpatialWaypoint point1, SpatialWaypoint point2, List<SpatialWaypoint> border) {

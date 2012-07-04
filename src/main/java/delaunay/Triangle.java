@@ -47,7 +47,7 @@ public class Triangle extends ArraySet<Pnt> {
     private Pnt circumcenter = null;        // The triangle's circumcenter
 
     private static int idGenerator = 0;     // Used to create id numbers
-    public static boolean moreInfo = false; // True iff more info in toString
+    public static boolean moreInfo = true; // True iff more info in toString
 
     /**
      * @param vertices the vertices of the Triangle.

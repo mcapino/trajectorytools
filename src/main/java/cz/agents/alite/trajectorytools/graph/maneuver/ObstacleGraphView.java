@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.jgrapht.graph.GraphDelegator;
-
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
@@ -24,7 +22,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver> implements ManeuverGraphInterface {
+public class ObstacleGraphView extends PlanarGraph<Maneuver> implements ManeuverGraphInterface {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -38,7 +36,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
 
     private final ManeuverGraph originalGraph;
     
-    private final Set<Point> obstacles = new HashSet<Point>();
+    private final Set<SpatialWaypoint> obstacles = new HashSet<SpatialWaypoint>();
 
     private final ChangeListener changeListener;
 
@@ -132,6 +130,22 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         }));
 	}
 
+    public void refresh() {
+        removeAllVertices(new ArrayList<SpatialWaypoint>(vertexSet()));
+        
+        for (SpatialWaypoint vertex : originalGraph.vertexSet()) {
+            addVertex(vertex);
+        }
+        
+        for (Maneuver edge : originalGraph.edgeSet()) {
+            addEdge(edge.source, edge.target);
+        }
+
+        for (SpatialWaypoint obstacle : obstacles) {
+            removeVertex( obstacle );
+        }
+    }
+
     @Override
     public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
@@ -188,7 +202,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
         return originalGraph.maxSpeed;
     }
 
-    public Set<Point> getObstacles() {
+    public Set<SpatialWaypoint> getObstacles() {
         return obstacles;
     }
 }

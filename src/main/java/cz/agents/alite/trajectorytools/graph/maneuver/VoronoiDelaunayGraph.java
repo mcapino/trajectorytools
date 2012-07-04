@@ -29,13 +29,19 @@ public class VoronoiDelaunayGraph {
 
     private static int order = 1000;
 
-    private Set<Point> obstacles;
+    private Set<SpatialWaypoint> obstacles;
 
+    private Graph<SpatialWaypoint, Maneuver> voronoiGraph = null;
+    private Map<Maneuver, VoronoiEdge> voronoiEdges = new HashMap<Maneuver, VoronoiEdge>();
+
+    private List<SpatialWaypoint> voronoiBorder = new ArrayList<SpatialWaypoint>();
+
+    private Map<Pnt, SpatialWaypoint> delaunayVertexes = new HashMap<Pnt, SpatialWaypoint>();
 
     public VoronoiDelaunayGraph() {       
     }
     
-    public void setObstacles(Set<Point> obstacles) {
+    public void setObstacles(Set<SpatialWaypoint> obstacles) {
         this.obstacles = obstacles;
         dt = new Triangulation(initialTriangle);
 
@@ -60,23 +66,28 @@ public class VoronoiDelaunayGraph {
             graph.addVertex( vertex );
         }
         
+        voronoiEdges.clear();
+        
         for (Triangle triangle : dt) {
             for (Triangle tri: dt.neighbors(triangle)) {
                 SpatialWaypoint sourceVertex = vertexes.get(triangle);
                 SpatialWaypoint targetVertex = vertexes.get(tri);
 
                 if (!sourceVertex.equals(targetVertex)) {
-                    graph.addEdge(sourceVertex, targetVertex);
+                    Maneuver edge = graph.addEdge(sourceVertex, targetVertex);
+                    voronoiEdges.put(edge, new VoronoiEdge(triangle, tri));
                 }
             }
         }       
 
+        voronoiBorder.clear();
         clipVoronoiGraph(graph, border);
         
         // remove edges of Voronoi graph crossing any obstacle
         removeObstaclesFromGraph(graph);
         
-        return graph;
+        voronoiGraph = graph;
+        return voronoiGraph;
     }
 
     private void removeObstaclesFromGraph(Graph<SpatialWaypoint, Maneuver> graph) {
@@ -94,29 +105,54 @@ public class VoronoiDelaunayGraph {
     }
 
     public Graph<SpatialWaypoint, Maneuver> getDelaunayGraph(List<SpatialWaypoint> border) {
+        
+        if (voronoiGraph == null) {
+            getVoronoiGraph(border);
+        }
+        
         Graph<SpatialWaypoint, Maneuver> graph = new SimpleGraph<SpatialWaypoint, Maneuver>(new ManeuverEdgeFactory(1.0, 1.0));
 
         order = 0;
-        Map<Pnt, SpatialWaypoint> vertexes = new HashMap<Pnt, SpatialWaypoint>(); 
+        delaunayVertexes.clear(); 
         for (Triangle triangle : dt) {
             for (Pnt pnt : triangle) {
                 SpatialWaypoint vertex = new SpatialWaypoint(order++, pnt.coord(0), pnt.coord(1));
                 graph.addVertex(vertex);
-                vertexes.put(pnt, vertex);
+                delaunayVertexes.put(pnt, vertex);
             }
         }
         for (Triangle triangle : dt) {
-            SpatialWaypoint v0 = vertexes.get(triangle.get(0));
-            SpatialWaypoint v1 = vertexes.get(triangle.get(1));
-            SpatialWaypoint v2 = vertexes.get(triangle.get(2));
+            SpatialWaypoint v0 = delaunayVertexes.get(triangle.get(0));
+            SpatialWaypoint v1 = delaunayVertexes.get(triangle.get(1));
+            SpatialWaypoint v2 = delaunayVertexes.get(triangle.get(2));
             
             graph.addEdge(v0, v1);
             graph.addEdge(v1, v2);
             graph.addEdge(v2, v0);
         }
-        clipDelaunayGraph(graph, border);
+        clipDelaunayGraph2(graph, voronoiBorder);
 
         return graph;
+    }
+    
+    public Maneuver getDualEdgeToVoronoi(Maneuver edge) {
+        VoronoiEdge voronoiEdge = voronoiEdges.get(edge);
+        if (voronoiEdge == null) {
+            //TODO 
+            return null;
+        }
+        
+        ArrayList<Pnt> tmpCol = new ArrayList<Pnt>(voronoiEdge.source);
+        tmpCol.retainAll(voronoiEdge.target);
+        
+        if (tmpCol.size() != 2) {
+            throw new Error(voronoiEdge.source + " x " + voronoiEdge.target + " = " + tmpCol);
+        }
+        
+        SpatialWaypoint source = delaunayVertexes.get(tmpCol.get(0));
+        SpatialWaypoint target = delaunayVertexes.get(tmpCol.get(1));
+
+        return new ManeuverEdgeFactory(1.0, 1.0).createEdge(source, target);
     }
 
     static public void clipDelaunayGraph(Graph<SpatialWaypoint, Maneuver> graph, List<SpatialWaypoint> originalBorder) {
@@ -156,22 +192,57 @@ public class VoronoiDelaunayGraph {
         addBorderToGraph(graph, border);
     }
 
-    static public <E> void clipVoronoiGraph(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
-        Graph<SpatialWaypoint, E> planarGraph = new PlanarGraph<E>(graph);
+    public <E> void clipDelaunayGraph2(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
+        PlanarGraph<Maneuver> voronoiPlanarGraph = new PlanarGraph<Maneuver>(voronoiGraph);
+        SpatialWaypoint last = null;
+        for (SpatialWaypoint vertex : border) {
+            if (last != null) {
+                clipDelaunayGraphSegment(graph, voronoiPlanarGraph, last, vertex);                
+            }
+            last = vertex;
+        }
+        clipDelaunayGraphSegment(graph, voronoiPlanarGraph, last, border.get(0));                
+
+        graph.removeAllVertices(getOutsideVertices(graph, border));
+
+        addBorderToGraph(graph, border);
+    }
+
+    private <E> void clipDelaunayGraphSegment(Graph<SpatialWaypoint, E> graph, PlanarGraph<Maneuver> voronoiPlanarGraph,
+            SpatialWaypoint point1, SpatialWaypoint point2) {
+        SpatialWaypoint center = new SpatialWaypoint(
+                (point1.x + point2.x ) / 2.0, 
+                (point1.y + point2.y ) / 2.0 
+                );
+        graph.addVertex(center);
+        
+        for (SpatialWaypoint obstacle : obstacles) {
+            if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
+                graph.addEdge(center, obstacle);
+            }
+        }
+    }
+
+    public <E> void clipVoronoiGraph(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
+        PlanarGraph<E> planarGraph = new PlanarGraph<E>(graph);
         
         SpatialWaypoint last = null;
         for (SpatialWaypoint vertex : border) {
             if (last != null) {
-                planarGraph.addEdge(last, vertex);
+                voronoiBorder.addAll(
+                    planarGraph.addLine(last, vertex)
+                    );
             }
             last = vertex;
         }
-        planarGraph.addEdge(last, border.get(0));
+        voronoiBorder.addAll(
+                planarGraph.addLine(last, border.get(0))
+                );
             
         removeOutsideVertices(graph, border);
     }
 
-    private static void addBorderToGraph(Graph<SpatialWaypoint, Maneuver> graph,
+    private static <E> void addBorderToGraph(Graph<SpatialWaypoint, E> graph,
             List<SpatialWaypoint> border) {
         SpatialWaypoint last = null;
         for (SpatialWaypoint vertex : border) {
@@ -179,11 +250,15 @@ public class VoronoiDelaunayGraph {
                 graph.addVertex(vertex);
             } 
             if (last != null) {
-                graph.addEdge(last, vertex);
+                if (!last.equals(vertex)) {
+                    graph.addEdge(last, vertex);
+                }                            
             }
             last = vertex;
         }
-        graph.addEdge(last, border.get(0));
+        if (!last.equals(border.get(0))) {
+            graph.addEdge(last, border.get(0));
+        }
     }
 
     private static <E> void removeOutsideVertices(Graph<SpatialWaypoint, E> graph,
@@ -364,5 +439,15 @@ public class VoronoiDelaunayGraph {
 
     static boolean same_sign(double a, double b){
         return (( a * b) >= 0);
+    }
+    
+    private static class VoronoiEdge {
+        Triangle source;
+        Triangle target;
+
+        public VoronoiEdge(Triangle source, Triangle target) {
+            this.source = source;
+            this.target = target;
+        }
     }
 }

@@ -53,11 +53,12 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PlannedPath<?, ?>) {
-            PlannedPath<?, ?> path = (PlannedPath<?, ?>) obj;
+            @SuppressWarnings("unchecked")
+            PlannedPath<V, E> path = (PlannedPath<V, E>) obj;
             if (getPathLength() != path.getPathLength()) {
                 return false;
             } else {
-                return Arrays.equals(new ArrayList<E>(getEdgeList()).toArray(), new ArrayList<E>(getEdgeList()).toArray());
+                return Arrays.equals(new ArrayList<E>(path.getEdgeList()).toArray(), new ArrayList<E>(getEdgeList()).toArray());
             }
         } else {
             return false;
