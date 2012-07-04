@@ -104,12 +104,8 @@ public class DemoAlternative2Creator implements Creator {
 
 	protected void replan() {
 	    voronoiGraphAlg.setObstacles(graph.getObstacles());
-//	    voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(
-//                graph.getNearestWaypoint(new Point(0, 0, 0)),
-//                graph.getNearestWaypoint(new Point(10, 10, 0))
-//	            );
 	    
-//        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
+        delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
         
         voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(border);
 
@@ -133,6 +129,5 @@ public class DemoAlternative2Creator implements Creator {
         for (Maneuver edge : voronoiGraph.graph.edgeSet()) {
             System.out.println("edge: " + edge + " -- " + voronoiGraph.graph.getEdgeWeight(edge));
         }
-//        delaunayGraph.graph = voronoiGraphAlg.getVoronoiGraph();
 	}
 }

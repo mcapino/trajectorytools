@@ -29,11 +29,14 @@ public class VoronoiDelaunayGraph {
 
     private static int order = 1000;
 
+    private Set<Point> obstacles;
+
 
     public VoronoiDelaunayGraph() {       
     }
     
     public void setObstacles(Set<Point> obstacles) {
+        this.obstacles = obstacles;
         dt = new Triangulation(initialTriangle);
 
         for (Point point : obstacles) {
@@ -62,13 +65,32 @@ public class VoronoiDelaunayGraph {
                 SpatialWaypoint sourceVertex = vertexes.get(triangle);
                 SpatialWaypoint targetVertex = vertexes.get(tri);
 
-                graph.addEdge(sourceVertex, targetVertex);
+                if (!sourceVertex.equals(targetVertex)) {
+                    graph.addEdge(sourceVertex, targetVertex);
+                }
             }
         }       
 
         clipVoronoiGraph(graph, border);
         
+        // remove edges of Voronoi graph crossing any obstacle
+        removeObstaclesFromGraph(graph);
+        
         return graph;
+    }
+
+    private void removeObstaclesFromGraph(Graph<SpatialWaypoint, Maneuver> graph) {
+        List<Maneuver> toRemove = new LinkedList<Maneuver>();
+        for (Point obstacle : obstacles) {
+            for (Maneuver edge : graph.edgeSet()) {
+                // is the edge crossing the obstacle?
+                Point point = getClosestIntersection(obstacle, graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+                if (point.distance(obstacle) < 0.001) {
+                    toRemove.add(edge);
+                }
+            }
+        }
+        graph.removeAllEdges(toRemove);
     }
 
     public Graph<SpatialWaypoint, Maneuver> getDelaunayGraph(List<SpatialWaypoint> border) {
@@ -120,18 +142,16 @@ public class VoronoiDelaunayGraph {
 
         for (SpatialWaypoint insideVertex : insideVertices) {
             // find the closest border line, split it and add an edge to it
-            System.out.println("insideVertex: " + insideVertex);
             SpatialWaypoint intersection = addClosestBorderIntersection(insideVertex, border);
-            System.out.println("intersection: " + intersection);
             if (!graph.containsVertex(intersection)) {
                 graph.addVertex(intersection);
             }
-            graph.addEdge(insideVertex, intersection);
+            if (!insideVertex.equals(intersection)) {
+                graph.addEdge(insideVertex, intersection);
+            }
         }
 
         graph.removeAllVertices(outsideVertices);
-
-        System.out.println("border: " + border);
         
         addBorderToGraph(graph, border);
     }
@@ -148,59 +168,6 @@ public class VoronoiDelaunayGraph {
         }
         planarGraph.addEdge(last, border.get(0));
             
-//        List<SpatialWaypoint> border = new LinkedList<SpatialWaypoint>(originalBorder);
-////        List<SpatialWaypoint> border = new LinkedList<SpatialWaypoint>(Arrays.asList(borderPoints));
-//        
-//        order  = 10000;
-//        
-//        //
-//        // Firstly find intersections of edges with the border,
-//        // add there new points and split the edges. Then remove
-//        // all the vertexes outside the border.
-//        //
-//        // Note, that one edge can cross the border several times 
-//        // (max. twice for convex borders, which we assume).  
-//        //
-//        
-//        List<Maneuver> toRemove = new ArrayList<Maneuver>();
-//        List<Maneuver> toAdd = new ArrayList<Maneuver>();
-//        for (Maneuver edge : graph.edgeSet()) {
-//            
-//            Point intersectionPoint = addBorderIntersection(edge.getSource(), edge.getTarget(), border);
-//            if (intersectionPoint != null) {
-//                toRemove.add(edge);
-//                
-//                SpatialWaypoint intersection = new SpatialWaypoint(order ++, intersectionPoint.x, intersectionPoint.y);               
-//                graph.addVertex(intersection);
-//
-//                Point intersectionPoint2 = addBorderIntersection(edge.source, intersection, border);
-//                if (intersectionPoint2 != null) {
-//                    SpatialWaypoint intersection2 = new SpatialWaypoint(order ++, intersectionPoint2.x, intersectionPoint2.y);
-//                    graph.addVertex(intersection2);
-//                    toAdd.add( graph.getEdgeFactory().createEdge(edge.source, intersection2) );
-//                    toAdd.add( graph.getEdgeFactory().createEdge(intersection2, intersection) );
-//                } else {
-//                    toAdd.add( graph.getEdgeFactory().createEdge(edge.source, intersection) );
-//                }
-//
-//                intersectionPoint2 = addBorderIntersection(intersection, edge.target, border);
-//                if (intersectionPoint2 != null) {
-//                    SpatialWaypoint intersection2 = new SpatialWaypoint(order ++, intersectionPoint2.x, intersectionPoint2.y);
-//                    graph.addVertex(intersection2);
-//                    toAdd.add( graph.getEdgeFactory().createEdge(intersection, intersection2) );
-//                    toAdd.add( graph.getEdgeFactory().createEdge(intersection2, edge.target) );
-//                } else {
-//                    toAdd.add( graph.getEdgeFactory().createEdge(intersection, edge.target) );
-//                }
-//            }
-//        }
-//        graph.removeAllEdges(toRemove);
-//        for (Maneuver maneuver : toAdd) {
-//            graph.addEdge(maneuver.source, maneuver.target);
-//        }
-//System.out.println("borderV: " + border);
-//        addBorderToGraph(graph, border);
-
         removeOutsideVertices(graph, border);
     }
 
@@ -256,8 +223,6 @@ public class VoronoiDelaunayGraph {
             if (last != null) {
                 Point intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null && !intersection.epsilonEquals(point1, 0.001) && !intersection.epsilonEquals(point2, 0.001)) {
-//                    System.out.println(point1 + ", " + point2 + " x " + last + ", " + vertex);
-//                    System.out.println("intersection: " + intersection);
                     return intersection;
                 }
             }
@@ -273,8 +238,6 @@ public class VoronoiDelaunayGraph {
             if (last != null) {
                 SpatialWaypoint intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null && !intersection.epsilonEquals(point1, 0.001) && !intersection.epsilonEquals(point2, 0.001)) {
-//                    System.out.println(point1 + ", " + point2 + " x " + last + ", " + vertex);
-//                    System.out.println("intersection: " + intersection);
                     border.add(index, intersection);
                     return intersection;
                 }
@@ -329,9 +292,8 @@ public class VoronoiDelaunayGraph {
         return minPoint;
     }
 
-    private static SpatialWaypoint getClosestIntersection(SpatialWaypoint point, SpatialWaypoint point1, SpatialWaypoint point2) {
+    private static SpatialWaypoint getClosestIntersection(Point point, SpatialWaypoint point1, SpatialWaypoint point2) {
         double u = ((point.x - point1.x) * (point2.x - point1.x) + (point.y - point1.y) * (point2.y - point1.y)) / point1.distanceSquared(point2);
-        System.out.println("u: " + u);
         if (u < 0) {
             return point1;
         } else if (u > 1) {
@@ -340,7 +302,7 @@ public class VoronoiDelaunayGraph {
             double x = point1.x + u * ( point2.x - point1.x );
             double y = point1.y + u * ( point2.y - point1.y );
 
-            return new SpatialWaypoint(order++, x, y);
+            return new SpatialWaypoint(x, y);
         }
     }
 
@@ -398,19 +360,9 @@ public class VoronoiDelaunayGraph {
         }
 
         return new SpatialWaypoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
-      }
-
-      static boolean same_sign(double a, double b){
-        return (( a * b) >= 0);
-      }
-      
-      public static void main(String[] args) {
-        System.out.println(getIntersection(
-                new Point(0, 0, 0),
-                new Point(0, 10, 0),
-                new Point(0, 0, 0),
-                new Point(0, 10, 0)
-                ));
     }
-      
+
+    static boolean same_sign(double a, double b){
+        return (( a * b) >= 0);
+    }
 }
