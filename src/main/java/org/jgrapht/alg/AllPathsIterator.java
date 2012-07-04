@@ -64,8 +64,6 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
         Queue<E> edges = new LinkedList<E>( specifics.edgesOf(vertex) );
         seen.put(vertex, edges);
         
-        System.out.println("added to seen: " + vertex);
-        
         while (!edges.isEmpty()) {
             E edge = edges.poll();
             
@@ -96,8 +94,6 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
             
             Queue<E> edges = seen.get(lastVertex);
 
-            System.out.println("Last: " + lastVertex + ": edges: " + edges);
-            
             while (!edges.isEmpty()) {
                 E edge = edges.poll();
                 
@@ -119,7 +115,6 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
     public boolean hasNext() {
         if (isCurrentPathUsed) {
             findNextPath();
-            System.out.println("currentPathV: " + currentPathV);
             isCurrentPathUsed = false;
         }
         return currentPath != null;
