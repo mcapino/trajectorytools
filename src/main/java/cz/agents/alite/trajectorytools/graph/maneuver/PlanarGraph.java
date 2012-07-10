@@ -23,11 +23,12 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
 
     @Override
     public E addEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
-        addLine(sourceVertex, targetVertex);
+        addLine(sourceVertex, targetVertex, null);
         return null;
     }
 
-    public List<SpatialWaypoint> addLine(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<SpatialWaypoint> addLine(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex, Map edgeMap) {
         List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(sourceVertex, targetVertex));
 
         //
@@ -57,8 +58,16 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         removeAllEdges(toRemove);
 
         for (Entry<E, SpatialWaypoint> entry : toAdd.entrySet()) {
-            super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
-            super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
+            E edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
+            E edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
+            
+            if (edgeMap != null) {
+                Object edgeInfo = edgeMap.get(entry.getKey());
+                if (edgeInfo != null) {
+                    edgeMap.put(edge1, edgeInfo);
+                    edgeMap.put(edge2, edgeInfo);
+                }
+            }
         }
 
         SpatialWaypoint last = null;

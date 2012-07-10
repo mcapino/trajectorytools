@@ -20,6 +20,10 @@ public class SpatialWaypoint extends Point implements Comparable<SpatialWaypoint
         this(curOrder, x, y);
     }
 
+    public SpatialWaypoint(Point point) {
+        this(curOrder, point.x, point.y);
+    }
+
     @Override
     public int compareTo(SpatialWaypoint other) {
         return order - other.order;

@@ -2,7 +2,6 @@ package cz.agents.alite.trajectorytools.graph.maneuver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,8 @@ public class VoronoiDelaunayGraph {
     
     private static int INITIAL_SIZE = 10000;     // Size of initial triangle
 
+    private static boolean USE_STRAIGHT_DELAUNAY_EDGES_ONLY = false;
+
     private Triangle initialTriangle = new Triangle(
             new Pnt(-INITIAL_SIZE, -INITIAL_SIZE),
             new Pnt( INITIAL_SIZE, -INITIAL_SIZE),
@@ -37,6 +38,8 @@ public class VoronoiDelaunayGraph {
     private List<SpatialWaypoint> voronoiBorder = new ArrayList<SpatialWaypoint>();
 
     private Map<Pnt, SpatialWaypoint> delaunayVertexes = new HashMap<Pnt, SpatialWaypoint>();
+
+    private Map<Maneuver, List<Maneuver>> dualEdges = new HashMap<Maneuver, List<Maneuver>>();
 
     public VoronoiDelaunayGraph() {       
     }
@@ -60,7 +63,6 @@ public class VoronoiDelaunayGraph {
         for (Triangle triangle : dt) {
             Pnt circumcenter = triangle.getCircumcenter();
             
-            // is vertex inside the border?
             SpatialWaypoint vertex = new SpatialWaypoint(order++, circumcenter.coord(0), circumcenter.coord(1));
             vertexes.put(triangle, vertex);
             graph.addVertex( vertex );
@@ -121,144 +123,89 @@ public class VoronoiDelaunayGraph {
                 delaunayVertexes.put(pnt, vertex);
             }
         }
-        for (Triangle triangle : dt) {
-            SpatialWaypoint v0 = delaunayVertexes.get(triangle.get(0));
-            SpatialWaypoint v1 = delaunayVertexes.get(triangle.get(1));
-            SpatialWaypoint v2 = delaunayVertexes.get(triangle.get(2));
-            
-            graph.addEdge(v0, v1);
-            graph.addEdge(v1, v2);
-            graph.addEdge(v2, v0);
+
+        PlanarGraph<Maneuver> voronoiPlanarGraph = new PlanarGraph<Maneuver>(voronoiGraph);
+
+        for (Maneuver edge : voronoiGraph.edgeSet()) {
+            List<Maneuver> edges = addDelaunayEdges(graph, voronoiPlanarGraph, edge);
+            dualEdges.put(edge, edges);
         }
-        clipDelaunayGraph2(graph, voronoiBorder);
 
         return graph;
     }
-    
-    public Maneuver getDualEdgeToVoronoi(Maneuver edge) {
-        VoronoiEdge voronoiEdge = voronoiEdges.get(edge);
-        if (voronoiEdge == null) {
-            //TODO 
-            return null;
-        }
-        
-        ArrayList<Pnt> tmpCol = new ArrayList<Pnt>(voronoiEdge.source);
-        tmpCol.retainAll(voronoiEdge.target);
-        
-        if (tmpCol.size() != 2) {
-            throw new Error(voronoiEdge.source + " x " + voronoiEdge.target + " = " + tmpCol);
-        }
-        
-        SpatialWaypoint source = delaunayVertexes.get(tmpCol.get(0));
-        SpatialWaypoint target = delaunayVertexes.get(tmpCol.get(1));
 
-        return new ManeuverEdgeFactory(1.0, 1.0).createEdge(source, target);
+    public void removeDualEdges(Graph<SpatialWaypoint, Maneuver> graph, List<Maneuver> edgeList) {
+        for (Maneuver maneuver : edgeList) {
+            for (Maneuver edge : dualEdges.get(maneuver)) {
+                graph.removeEdge(edge);
+            }
+        }
     }
+    
+    private <E> List<E> addDelaunayEdges(Graph<SpatialWaypoint, E> graph, PlanarGraph<Maneuver> voronoiPlanarGraph, Maneuver edge) {
 
-    static public void clipDelaunayGraph(Graph<SpatialWaypoint, Maneuver> graph, List<SpatialWaypoint> originalBorder) {
-        List<SpatialWaypoint> border = new LinkedList<SpatialWaypoint>(originalBorder);
-        List<SpatialWaypoint> outsideVertices = getOutsideVertices(graph, border);
+        List<E> newEdges = new ArrayList<E>();
         
-        Set<SpatialWaypoint> insideVertices = new HashSet<SpatialWaypoint>();        
-        for (SpatialWaypoint outsideVertex : outsideVertices) {
-            for (Maneuver edge : graph.edgesOf(outsideVertex)) {
-                if (edge.source.equals(outsideVertex)) {
-                    if (!outsideVertices.contains(edge.target)) {
-                        insideVertices.add(edge.target);
-                    }
-                } else if (edge.target.equals(outsideVertex)) {
-                    if (!outsideVertices.contains(edge.source)) {
-                        insideVertices.add(edge.source);
-                    }
-                } else {
-                    throw new Error("Should not happen!!!");
+        Maneuver delaunayEdge = getDualEdgeToVoronoi( edge );
+
+        if (USE_STRAIGHT_DELAUNAY_EDGES_ONLY && delaunayEdge != null) {
+            newEdges.add( graph.addEdge(delaunayEdge.source, delaunayEdge.target) );
+        } else {
+            // it's a border edge
+            SpatialWaypoint center = new SpatialWaypoint(
+                    (edge.getSource().x + edge.getTarget().x ) / 2.0, 
+                    (edge.getSource().y + edge.getTarget().y ) / 2.0 
+                    );
+            graph.addVertex(center);
+
+            for (SpatialWaypoint obstacle : obstacles) {
+                if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
+                    newEdges.add( graph.addEdge(center, obstacle) );
                 }
             }
         }
-
-        for (SpatialWaypoint insideVertex : insideVertices) {
-            // find the closest border line, split it and add an edge to it
-            SpatialWaypoint intersection = addClosestBorderIntersection(insideVertex, border);
-            if (!graph.containsVertex(intersection)) {
-                graph.addVertex(intersection);
-            }
-            if (!insideVertex.equals(intersection)) {
-                graph.addEdge(insideVertex, intersection);
-            }
-        }
-
-        graph.removeAllVertices(outsideVertices);
         
-        addBorderToGraph(graph, border);
+        return newEdges;
     }
 
-    public <E> void clipDelaunayGraph2(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
-        PlanarGraph<Maneuver> voronoiPlanarGraph = new PlanarGraph<Maneuver>(voronoiGraph);
-        SpatialWaypoint last = null;
-        for (SpatialWaypoint vertex : border) {
-            if (last != null) {
-                clipDelaunayGraphSegment(graph, voronoiPlanarGraph, last, vertex);                
-            }
-            last = vertex;
-        }
-        clipDelaunayGraphSegment(graph, voronoiPlanarGraph, last, border.get(0));                
-
-        graph.removeAllVertices(getOutsideVertices(graph, border));
-
-        addBorderToGraph(graph, border);
-    }
-
-    private <E> void clipDelaunayGraphSegment(Graph<SpatialWaypoint, E> graph, PlanarGraph<Maneuver> voronoiPlanarGraph,
-            SpatialWaypoint point1, SpatialWaypoint point2) {
-        SpatialWaypoint center = new SpatialWaypoint(
-                (point1.x + point2.x ) / 2.0, 
-                (point1.y + point2.y ) / 2.0 
-                );
-        graph.addVertex(center);
+    private Maneuver getDualEdgeToVoronoi(Maneuver edge) {
+        VoronoiEdge voronoiEdge = voronoiEdges.get(edge);
+        if (voronoiEdge == null) {
+            return null;
+        } else {
         
-        for (SpatialWaypoint obstacle : obstacles) {
-            if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
-                graph.addEdge(center, obstacle);
+            ArrayList<Pnt> tmpCol = new ArrayList<Pnt>(voronoiEdge.source);
+            tmpCol.retainAll(voronoiEdge.target);
+            
+            if (tmpCol.size() != 2) {
+                throw new Error(voronoiEdge.source + " x " + voronoiEdge.target + " = " + tmpCol);
             }
+            
+            SpatialWaypoint source = delaunayVertexes.get(tmpCol.get(0));
+            SpatialWaypoint target = delaunayVertexes.get(tmpCol.get(1));
+    
+            return new ManeuverEdgeFactory(1.0, 1.0).createEdge(source, target);
         }
     }
 
-    public <E> void clipVoronoiGraph(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
+
+    private <E> void clipVoronoiGraph(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
         PlanarGraph<E> planarGraph = new PlanarGraph<E>(graph);
         
         SpatialWaypoint last = null;
         for (SpatialWaypoint vertex : border) {
             if (last != null) {
                 voronoiBorder.addAll(
-                    planarGraph.addLine(last, vertex)
+                    planarGraph.addLine(last, vertex, voronoiEdges)
                     );
             }
             last = vertex;
         }
         voronoiBorder.addAll(
-                planarGraph.addLine(last, border.get(0))
+                planarGraph.addLine(last, border.get(0), voronoiEdges)
                 );
             
         removeOutsideVertices(graph, border);
-    }
-
-    private static <E> void addBorderToGraph(Graph<SpatialWaypoint, E> graph,
-            List<SpatialWaypoint> border) {
-        SpatialWaypoint last = null;
-        for (SpatialWaypoint vertex : border) {
-            if (!graph.containsVertex(vertex)) {
-                graph.addVertex(vertex);
-            } 
-            if (last != null) {
-                if (!last.equals(vertex)) {
-                    graph.addEdge(last, vertex);
-                }                            
-            }
-            last = vertex;
-        }
-        if (!last.equals(border.get(0))) {
-            graph.addEdge(last, border.get(0));
-        }
     }
 
     private static <E> void removeOutsideVertices(Graph<SpatialWaypoint, E> graph,
@@ -292,7 +239,7 @@ public class VoronoiDelaunayGraph {
         return toRemove;
     }
     
-    static Point getBorderIntersection(Point point1, Point point2, List<SpatialWaypoint> border) {
+    private static Point getBorderIntersection(Point point1, Point point2, List<SpatialWaypoint> border) {
         Point last = null;
         for (Point vertex : border) {
             if (last != null) {
@@ -304,67 +251,6 @@ public class VoronoiDelaunayGraph {
             last = vertex;
         }
         return getIntersection(point1, point2, last, border.get(0));
-    }
-
-    static Point addBorderIntersection(Point point1, Point point2, List<SpatialWaypoint> border) {
-        Point last = null;
-        int index = 0;
-        for (Point vertex : border) {
-            if (last != null) {
-                SpatialWaypoint intersection = getIntersection(point1, point2, last, vertex);
-                if (intersection != null && !intersection.epsilonEquals(point1, 0.001) && !intersection.epsilonEquals(point2, 0.001)) {
-                    border.add(index, intersection);
-                    return intersection;
-                }
-            }
-            last = vertex;
-            index++;
-        }
-        SpatialWaypoint intersection = getIntersection(point1, point2, last, border.get(0));
-        if (intersection != null && !intersection.epsilonEquals(point1, 0.001) && !intersection.epsilonEquals(point2, 0.001)) {
-            return intersection;
-        } else {
-            return null;
-        }
-    }
-
-    static SpatialWaypoint addClosestBorderIntersection(SpatialWaypoint point, List<SpatialWaypoint> border) {
-        SpatialWaypoint last = null;
-        int index = 0;
-        SpatialWaypoint minPoint = null;
-        double minDist = Double.MAX_VALUE;
-        int minIndex = 0;
-        boolean addMin = false;
-        for (SpatialWaypoint vertex : border) {
-            if (last != null) {
-                SpatialWaypoint intersection = getClosestIntersection(point, last, vertex);
-                double dist = intersection.distance(point);
-
-                if (dist < minDist) {
-                    minDist = dist;
-                    minIndex = index;
-                    minPoint = intersection;
-
-                    addMin = !intersection.equals(last) && !intersection.equals(vertex);
-                }
-            }
-            last = vertex;
-            index++;
-        }
-
-        SpatialWaypoint intersection = getClosestIntersection(point, last, border.get(0));
-        double dist = intersection.distance(point);
-        if (dist < minDist) {
-            minDist = dist;
-            minPoint = intersection;
-            minIndex = index;
-            addMin = !intersection.equals(last) && !intersection.equals(border.get(0));
-        }
-        
-        if (addMin) {
-            border.add(minIndex, minPoint);
-        }
-        return minPoint;
     }
 
     private static SpatialWaypoint getClosestIntersection(Point point, SpatialWaypoint point1, SpatialWaypoint point2) {
@@ -390,7 +276,7 @@ public class VoronoiDelaunayGraph {
      * @param point4
      * @return
      */
-    static SpatialWaypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
+    private static SpatialWaypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -437,7 +323,7 @@ public class VoronoiDelaunayGraph {
         return new SpatialWaypoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
     }
 
-    static boolean same_sign(double a, double b){
+    private static boolean same_sign(double a, double b){
         return (( a * b) >= 0);
     }
     

@@ -22,6 +22,7 @@ import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
+import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
@@ -29,6 +30,9 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative2Creator implements Creator {
+
+    // shows one trajectory with voronoi and delaunay graphs
+    private static final boolean DEBUG_VIEW = true;
 
     private ObstacleGraphView graph;
     private List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
@@ -94,11 +98,12 @@ public class DemoAlternative2Creator implements Creator {
         // graph with obstacles
         graph.createVisualization();
         
-
-//        VisManager.registerLayer(GraphLayer.create(voronoiGraph, Color.GREEN, Color.GREEN, 1, 4));
-//        VisManager.registerLayer(GraphLayer.create(otherGraph, Color.MAGENTA, Color.MAGENTA, 1, 4, 0.02));
-//        VisManager.registerLayer(GraphLayer.create(delaunayGraph, Color.BLUE, Color.BLUE, 1, 4, 0.04));
-
+        if (DEBUG_VIEW) {
+            VisManager.registerLayer(GraphLayer.create(voronoiGraph, Color.GREEN, Color.GREEN, 1, 4));
+            VisManager.registerLayer(GraphLayer.create(otherGraph, Color.MAGENTA, Color.MAGENTA, 1, 4, 0.02));
+            VisManager.registerLayer(GraphLayer.create(delaunayGraph, Color.BLUE, Color.BLUE, 1, 4, 0.04));
+        }
+            
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(voronoiGraph, paths, 2, 4));
 
@@ -126,30 +131,38 @@ public class DemoAlternative2Creator implements Creator {
                 targetVertex
                 );
 
-//        if (pathsIt.hasNext()) pathsIt.next();
-//        if (pathsIt.hasNext()) pathsIt.next();
-//        if (pathsIt.hasNext()) pathsIt.next();
-//        if (pathsIt.hasNext()) {
         while (pathsIt.hasNext()) {
+            if (DEBUG_VIEW) {
+                if (pathsIt.hasNext()) pathsIt.next();
+                if (pathsIt.hasNext()) pathsIt.next();
+                if (pathsIt.hasNext()) pathsIt.next();
+                if (!pathsIt.hasNext()) {
+                    break;
+                }
+            }
             PlannedPath<SpatialWaypoint, Maneuver> planPath = pathsIt.next();
-//            paths.add(planPath);
+            if (DEBUG_VIEW) {
+                paths.add(planPath);
+            }
 
             delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
+            
+            voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
 
             PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
-
-            delaunayGraph.graph.removeVertex(startVertex);
-            delaunayGraph.graph.removeVertex(targetVertex);
-            
+//
+//            delaunayGraph.graph.removeVertex(startVertex);
+//            delaunayGraph.graph.removeVertex(targetVertex);
+//            
             for (Maneuver voronoiEdge: planPath.getEdgeList()) {
                 planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
             }
-    
+//    
             delaunayGraph.graph = planarGraphDelaunay;
         
             graph.refresh();
         
-            for (Maneuver edge : planarGraphDelaunay.edgeSet()) {
+            for (Maneuver edge : delaunayGraph.graph.edgeSet()) {
                 graph.removeCrossingEdges(edge.getSource(), edge.getTarget());
             }
     
@@ -164,6 +177,9 @@ public class DemoAlternative2Creator implements Creator {
 //                } else {
 //                    System.out.println("Path already found: " + planPath);
 //                }
+            }
+            if (DEBUG_VIEW) {
+                break;
             }
         }
         

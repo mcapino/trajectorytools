@@ -1,5 +1,7 @@
 package delaunay;
 
+import cz.agents.alite.trajectorytools.util.Point;
+
 /*
  * Copyright (c) 2005, 2007 by L. Paul Chew.
  *
@@ -466,5 +468,13 @@ public class Pnt {
                            v2.vsCircumcircle(vs));
         System.out.println("Circumcenter of " + toString(vs) + " is " +
                 circumcenter(vs));
+    }
+    
+    public Point toPoint() {
+        if (coordinates.length == 2) {
+            return new Point(coordinates[0], coordinates[1], 0.0);
+        } else {
+            return new Point(coordinates[0], coordinates[1], coordinates[2]);
+        }
     }
 }
