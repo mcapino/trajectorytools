@@ -117,7 +117,7 @@ public class GraphPathLayer extends AbstractLayer {
                 int curPath = 0;
                 for (PlannedPath<V, E> path : paths) {
                     Color color = pathColors[ curPath++ % pathColors.length];
-                    Vector3d transition = new Vector3d(curPath * PATH_OFFSET,curPath * PATH_OFFSET, 0);
+                    Vector3d transition = new Vector3d(0.75 * curPath * PATH_OFFSET,1.25 * curPath * PATH_OFFSET, 0);
                     for (E edge : path.getEdgeList()) {
                         Point3d source = new Point3d( graphHolder.graph.getEdgeSource(edge) );
                         source.add(transition);
@@ -143,7 +143,7 @@ public class GraphPathLayer extends AbstractLayer {
                 int curPath = 0;
                 for (PlannedPath<V, E> path : paths) {
                     Color color = pathColors[ curPath++ % pathColors.length];
-                    Vector3d transition = new Vector3d(curPath * PATH_OFFSET,curPath * PATH_OFFSET, 0);
+                    Vector3d transition = new Vector3d(0.75 * curPath * PATH_OFFSET,1.25 * curPath * PATH_OFFSET, 0);
                     for (E edge : path.getEdgeList()) {
                         Point3d source = new Point3d( graphHolder.graph.getEdgeSource(edge) );
                         source.add(transition);
