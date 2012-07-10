@@ -22,7 +22,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends PlanarGraph<Maneuver> implements ManeuverGraphInterface {
+public class ObstacleGraphView extends PlanarGraph<Maneuver> implements ManeuverGraphWithObstacles {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -202,6 +202,7 @@ public class ObstacleGraphView extends PlanarGraph<Maneuver> implements Maneuver
         return originalGraph.maxSpeed;
     }
 
+    @Override
     public Set<SpatialWaypoint> getObstacles() {
         return obstacles;
     }

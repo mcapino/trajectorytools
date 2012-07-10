@@ -2,11 +2,10 @@ package cz.agents.alite.trajectorytools.alterantiveplanners;
 
 import java.util.Collection;
 
-import org.jgrapht.Graph;
-
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
+import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-
 
 /**
  * Not working - cannot be planned by AStar type of planner!
@@ -18,13 +17,13 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
  * @author honza
  *
  */
-public class SoftObstacleAvoidanceMetric<V, E extends Maneuver> implements AlternativePathPlanner<V, E> {
+public class SoftObstacleAvoidanceMetric implements AlternativePathPlanner {
 
     public SoftObstacleAvoidanceMetric() {
     }
     
     @Override
-    public Collection<PlannedPath<V, E>> planPath(Graph<V, E> graph, V startVertex, V endVertex) {
+    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
         throw new UnsupportedOperationException("cannot be planned by AStar type of planner!");
     }
 }

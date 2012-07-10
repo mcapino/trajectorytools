@@ -16,13 +16,13 @@ import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
 import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class ObstacleExtensions {
+public class ObstacleExtensions implements AlternativePathPlanner {
 
     private static final int DIRECTIONS = 4;
 
@@ -32,7 +32,10 @@ public class ObstacleExtensions {
         this.planner = planner;
     }
 
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+    @Override
+    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
+            ManeuverGraphWithObstacles originalGraph,
+            SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
         final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
@@ -51,9 +54,9 @@ public class ObstacleExtensions {
     static class ObstacleExtender implements Iterable<ManeuverGraph>{
 
         int[] directions;
-        private final ObstacleGraphView originalGraph;
+        private final ManeuverGraphWithObstacles originalGraph;
 
-        public ObstacleExtender(ObstacleGraphView originalGraph) {
+        public ObstacleExtender(ManeuverGraphWithObstacles originalGraph) {
             this.originalGraph = originalGraph;
             
             directions = new int[originalGraph.getObstacles().size()];

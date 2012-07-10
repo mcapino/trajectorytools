@@ -4,39 +4,38 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.jgrapht.Graph;
-
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
-public class TrajectoryDistanceMetric<V extends SpatialWaypoint, E extends Maneuver> implements AlternativePathPlanner<V, E> {
+public class TrajectoryDistanceMetric implements AlternativePathPlanner {
 
     private static final int SOLUTION_COUNT = 5;
     private static final int ALPHA = 1;
     private static final int MAX_DIST = 2;
     
-    private final PathPlanner<V, E> planner;
+    private final PathPlanner<SpatialWaypoint, Maneuver> planner;
     
-    public TrajectoryDistanceMetric(PathPlanner<V, E> planner) {
+    public TrajectoryDistanceMetric(PathPlanner<SpatialWaypoint, Maneuver> planner) {
         this.planner = planner;
     }
     
     @Override
-    public Collection<PlannedPath<V, E>> planPath(Graph<V, E> graph, V startVertex, V endVertex) {
+    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
         
-        final List<PlannedPath<V, E>> paths = new ArrayList<PlannedPath<V, E>>(SOLUTION_COUNT);
+        final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>(SOLUTION_COUNT);
 
-        planner.setGoalPenaltyFunction(new GoalPenaltyFunction<V>() {
+        planner.setGoalPenaltyFunction(new GoalPenaltyFunction<SpatialWaypoint>() {
             @Override
-            public double getGoalPenalty(V vertex) {
+            public double getGoalPenalty(SpatialWaypoint vertex) {
                 double penalty = 0;
 
-                for (PlannedPath<V, E> path : paths) {
+                for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
                     double minDist = Double.MAX_VALUE; 
-                    for (E edge : path.getEdgeList()) {
+                    for (Maneuver edge : path.getEdgeList()) {
                         double distance = vertex.distance(edge.getTarget());
                         if (distance < minDist) {
                             minDist = distance;

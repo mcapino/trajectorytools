@@ -20,8 +20,7 @@ public interface ManeuverGraphInterface extends WeightedGraph<SpatialWaypoint, M
     //
     // From WaypointGraph
     //
-    public SpatialWaypoint getEdgeNeighbor(Maneuver edge,
-            SpatialWaypoint waypoint);
+    public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint);
 
     public SpatialWaypoint getNearestWaypoint(Point pos);
 
