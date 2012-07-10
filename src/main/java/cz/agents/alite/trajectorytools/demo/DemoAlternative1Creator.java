@@ -44,7 +44,6 @@ public class DemoAlternative1Creator implements Creator {
 //    private static final AlternativePathPlanner alternativePlanner = new DifferentStateMetric( planner );
     private static final AlternativePathPlanner alternativePlanner = new VoronoiDelaunayPlanner( planner );
 
-
     @Override
     public void init(String[] args) {
     }

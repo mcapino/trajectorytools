@@ -18,11 +18,12 @@ import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
 
 public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
+    private static int MAX_WORLD_SIZE = 10000;
 
     VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
     private final AStarPlanner<SpatialWaypoint, Maneuver> planner;
 
-    public VoronoiDelaunayPlanner( AStarPlanner<SpatialWaypoint, Maneuver> planner) {
+    public VoronoiDelaunayPlanner( AStarPlanner<SpatialWaypoint, Maneuver> planner ) {
         this.planner = planner;
     }
 
@@ -32,10 +33,10 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
             SpatialWaypoint endVertex) {
 
         List<SpatialWaypoint> border = Arrays.asList(new SpatialWaypoint[] {
-                graph.getNearestWaypoint(new Point( startVertex.x,  startVertex.y, 0)),
-                graph.getNearestWaypoint(new Point( endVertex.x,  startVertex.y, 0)),
-                graph.getNearestWaypoint(new Point( endVertex.x,  endVertex.y, 0)),
-                graph.getNearestWaypoint(new Point( startVertex.x,  endVertex.y, 0))
+                graph.getNearestWaypoint(new Point( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                graph.getNearestWaypoint(new Point( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                graph.getNearestWaypoint(new Point( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
+                graph.getNearestWaypoint(new Point( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
         });
 
         PlanarGraph<Maneuver> planarGraph = new PlanarGraph<Maneuver>(graph);
