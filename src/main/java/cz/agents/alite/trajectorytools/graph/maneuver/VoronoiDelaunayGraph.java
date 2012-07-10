@@ -20,7 +20,11 @@ public class VoronoiDelaunayGraph {
     
     private static int INITIAL_SIZE = 10000;     // Size of initial triangle
 
-    private static boolean USE_STRAIGHT_DELAUNAY_EDGES_ONLY = false;
+    /**
+     * there are two cases each of them is solved better with different value 
+     * (this is grid case problem only - use true for non grid cases)
+     */
+    private static boolean USE_STRAIGHT_DELAUNAY_EDGES_ONLY = true;
 
     private Triangle initialTriangle = new Triangle(
             new Pnt(-INITIAL_SIZE, -INITIAL_SIZE),
