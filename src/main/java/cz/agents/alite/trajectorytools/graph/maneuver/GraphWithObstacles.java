@@ -7,4 +7,6 @@ import org.jgrapht.Graph;
 public interface GraphWithObstacles<V, E> extends Graph<V, E> {
 
     public Set<V> getObstacles();
+
+    void refresh();
 }

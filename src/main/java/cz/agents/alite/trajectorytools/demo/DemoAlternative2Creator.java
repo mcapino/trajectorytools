@@ -162,8 +162,10 @@ public class DemoAlternative2Creator implements Creator {
         
             graph.refresh();
         
+            PlanarGraph<Maneuver> planarGraph = new PlanarGraph<Maneuver>(graph);
+
             for (Maneuver edge : delaunayGraph.graph.edgeSet()) {
-                graph.removeCrossingEdges(edge.getSource(), edge.getTarget());
+                planarGraph.removeCrossingEdges(edge.getSource(), edge.getTarget());
             }
     
             planPath = planner.planPath(graph,

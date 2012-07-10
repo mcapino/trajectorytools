@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
+import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanner;
+import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
@@ -38,10 +39,10 @@ public class DemoAlternative1Creator implements Creator {
         });
     }
 
-    private static final ObstacleExtensions alternativePlanner = new ObstacleExtensions(planner);
-
-//    private static final AlternativePathPlanner<SpatialWaypoint, Maneuver> alternativePlanner = new TrajectoryDistanceMetric<SpatialWaypoint, Maneuver>( planner );
-//    private static final AlternativePathPlanner<SpatialWaypoint, Maneuver> alternativePlanner = new DifferentStateMetric<SpatialWaypoint, Maneuver>( planner );
+//    private static final AlternativePathPlanner alternativePlanner = new ObstacleExtensions(planner);
+//    private static final AlternativePathPlanner alternativePlanner = new TrajectoryDistanceMetric( planner );
+//    private static final AlternativePathPlanner alternativePlanner = new DifferentStateMetric( planner );
+    private static final AlternativePathPlanner alternativePlanner = new VoronoiDelaunayPlanner( planner );
 
 
     @Override

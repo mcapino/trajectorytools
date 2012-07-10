@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.jgrapht.graph.GraphDelegator;
+
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
@@ -22,7 +24,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends PlanarGraph<Maneuver> implements ManeuverGraphWithObstacles {
+public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver> implements ManeuverGraphWithObstacles {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -130,6 +132,7 @@ public class ObstacleGraphView extends PlanarGraph<Maneuver> implements Maneuver
         }));
 	}
 
+    @Override
     public void refresh() {
         removeAllVertices(new ArrayList<SpatialWaypoint>(vertexSet()));
         
