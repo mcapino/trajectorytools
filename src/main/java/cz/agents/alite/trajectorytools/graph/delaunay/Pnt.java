@@ -1,4 +1,4 @@
-package delaunay;
+package cz.agents.alite.trajectorytools.graph.delaunay;
 
 import cz.agents.alite.trajectorytools.util.Point;
 
@@ -439,37 +439,6 @@ public class Pnt {
         return new Pnt(result);
     }
 
-    /**
-     * Main program (used for testing).
-     */
-    public static void main (String[] args) {
-        Pnt p = new Pnt(1, 2, 3);
-        System.out.println("Pnt created: " + p);
-        Pnt[] matrix1 = {new Pnt(1,2), new Pnt(3,4)};
-        Pnt[] matrix2 = {new Pnt(7,0,5), new Pnt(2,4,6), new Pnt(3,8,1)};
-        System.out.print("Results should be -2 and -288: ");
-        System.out.println(determinant(matrix1) + " " + determinant(matrix2));
-        Pnt p1 = new Pnt(1,1); Pnt p2 = new Pnt(-1,1);
-        System.out.println("Angle between " + p1 + " and " +
-                p2 + ": " + p1.angle(p2));
-        System.out.println(p1 + " subtract " + p2 + ": " + p1.subtract(p2));
-        Pnt v0 = new Pnt(0,0), v1 = new Pnt(1,1), v2 = new Pnt(2,2);
-        Pnt[] vs = {v0, new Pnt(0,1), new Pnt(1,0)};
-        Pnt vp = new Pnt(.1, .1);
-        System.out.println(vp + " isInside " + toString(vs) +
-                ": " + vp.isInside(vs));
-        System.out.println(v1 + " isInside " + toString(vs) +
-                ": " + v1.isInside(vs));
-        System.out.println(vp + " vsCircumcircle " + toString(vs) + ": " +
-                           vp.vsCircumcircle(vs));
-        System.out.println(v1 + " vsCircumcircle " + toString(vs) + ": " +
-                           v1.vsCircumcircle(vs));
-        System.out.println(v2 + " vsCircumcircle " + toString(vs) + ": " +
-                           v2.vsCircumcircle(vs));
-        System.out.println("Circumcenter of " + toString(vs) + " is " +
-                circumcenter(vs));
-    }
-    
     public Point toPoint() {
         if (coordinates.length == 2) {
             return new Point(coordinates[0], coordinates[1], 0.0);

@@ -1,4 +1,4 @@
-package delaunay;
+package cz.agents.alite.trajectorytools.graph.delaunay;
 
 /*
  * Copyright (c) 2007 by L. Paul Chew.
@@ -34,7 +34,7 @@ import java.util.Iterator;
  * Created December 2007.  For use with Voronoi/Delaunay applet.
  *
  */
-public class ArraySet<E> extends AbstractSet<E> {
+class ArraySet<E> extends AbstractSet<E> {
 
     private ArrayList<E> items;            // Items of the set
 

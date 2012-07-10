@@ -10,11 +10,11 @@ import java.util.Set;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleGraph;
 
+import cz.agents.alite.trajectorytools.graph.delaunay.Pnt;
+import cz.agents.alite.trajectorytools.graph.delaunay.Triangle;
+import cz.agents.alite.trajectorytools.graph.delaunay.Triangulation;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
-import delaunay.Pnt;
-import delaunay.Triangle;
-import delaunay.Triangulation;
 
 public class VoronoiDelaunayGraph {
     

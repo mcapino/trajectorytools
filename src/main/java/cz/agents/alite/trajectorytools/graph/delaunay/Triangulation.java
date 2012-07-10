@@ -1,4 +1,4 @@
-package delaunay;
+package cz.agents.alite.trajectorytools.graph.delaunay;
 
 /*
  * Copyright (c) 2005, 2007 by L. Paul Chew.
@@ -297,22 +297,5 @@ public class Triangulation extends AbstractSet<Triangle> {
 
         // Return one of the new triangles
         return newTriangles.iterator().next();
-    }
-
-    /**
-     * Main program; used for testing.
-     */
-    public static void main (String[] args) {
-        Triangle tri =
-            new Triangle(new Pnt(-10,10), new Pnt(10,10), new Pnt(0,-10));
-        System.out.println("Triangle created: " + tri);
-        Triangulation dt = new Triangulation(tri);
-        System.out.println("DelaunayTriangulation created: " + dt);
-        dt.delaunayPlace(new Pnt(0,0));
-        dt.delaunayPlace(new Pnt(1,0));
-        dt.delaunayPlace(new Pnt(0,1));
-        System.out.println("After adding 3 points, we have a " + dt);
-        Triangle.moreInfo = true;
-        System.out.println("Triangles: " + dt.triGraph.vertexSet());
     }
 }
