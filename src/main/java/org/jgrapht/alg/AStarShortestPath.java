@@ -3,6 +3,9 @@ package org.jgrapht.alg;
 import java.util.*;
 
 import org.jgrapht.*;
+import org.jgrapht.alg.specifics.DirectedSpecifics;
+import org.jgrapht.alg.specifics.Specifics;
+import org.jgrapht.alg.specifics.UndirectedSpecifics;
 import org.jgrapht.graph.*;
 
 
@@ -26,7 +29,9 @@ public final class AStarShortestPath<V, E>
     Map<V,Double> gScores = new HashMap<V,Double>();
     Map<V,Double> hScores = new HashMap<V,Double>();
     Map<V,Double> fScores = new HashMap<V,Double>();
-
+    
+    Specifics<V, E> specifics;
+    
     PriorityQueue<V> open = new PriorityQueue<V>(100,new Comparator<V>() {
 
         @Override
@@ -59,9 +64,10 @@ public final class AStarShortestPath<V, E>
             throw new IllegalArgumentException(
                     "graph must contain the end vertex");
         }
+        
+        specifics = createGraphSpecifics(graph);
 
         open.add(startVertex);
-
 
         double hScoreStart = h.getHeuristicEstimate(startVertex, endVertex);
         gScores.put(startVertex, 0.0);
@@ -86,13 +92,13 @@ public final class AStarShortestPath<V, E>
                     edgeList,
                     length);
 
-
                 return;
             }
 
             closed.add(current);
 
-            Set<E> neighborEdges = graph.edgesOf(current);
+            Set<? extends E> neighborEdges = specifics.edgesOf(current);
+            
             for (E edge : neighborEdges) {
                 V next;
                 if (graph.getEdgeSource(edge).equals(current)) {    
@@ -189,6 +195,40 @@ public final class AStarShortestPath<V, E>
             return getPath().getWeight();
         }
     }
+    
+    /**
+     * Convenience method to find the shortest path via a single static method
+     * call. If you need a more advanced search (e.g. limited by radius, or
+     * computation of the path length), use the constructor instead.
+     *
+     * @param graph the graph to be searched
+     * @param startVertex the vertex at which the path should start
+     * @param endVertex the vertex at which the path should end
+     *
+     * @return List of Edges, or null if no path exists
+     */
+    public static <V, E> List<E> findPathBetween(
+            Graph<V, E> graph,
+            V startVertex,
+            V endVertex,
+            Heuristic<V> heuristic)
+    {
+        AStarShortestPath<V, E> alg =
+            new AStarShortestPath<V, E>(
+                graph,
+                startVertex,
+                endVertex,
+                heuristic);
 
-
+        return alg.getPathEdgeList();
+    }
+    
+    static <V, E> Specifics<V, E> createGraphSpecifics(Graph<V, E> g)
+    {
+        if (g instanceof DirectedGraph<?, ?>) {
+            return new DirectedSpecifics<V, E>((DirectedGraph<V, E>) g);
+        } else {
+            return new UndirectedSpecifics<V, E>(g);
+        }
+    }
 }

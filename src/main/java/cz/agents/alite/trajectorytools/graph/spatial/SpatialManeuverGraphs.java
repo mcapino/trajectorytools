@@ -4,7 +4,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
 
 public class SpatialManeuverGraphs {
-	public SpatialWaypoint getNearestWaypoint(SpatialManeuverGraph graph, Point pos) {
+	public static SpatialWaypoint getNearestWaypoint(SpatialManeuverGraph graph, Point pos) {
         SpatialWaypoint nearestWaypoint = null;
         double nearestDistance = Double.POSITIVE_INFINITY;
         for (SpatialWaypoint currentWaypoint : graph.vertexSet()) {

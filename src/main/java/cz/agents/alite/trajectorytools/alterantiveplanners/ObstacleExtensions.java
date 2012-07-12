@@ -1,11 +1,11 @@
 package cz.agents.alite.trajectorytools.alterantiveplanners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
@@ -14,10 +14,10 @@ import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
 import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -26,42 +26,26 @@ public class ObstacleExtensions {
 
     private static final int DIRECTIONS = 4;
 
-    private final PathPlanner<SpatialWaypoint, DefaultManeuver> planner;
+    private final PathPlanner<SpatialWaypoint, SpatialManeuver> planner;
     
-    public ObstacleExtensions(PathPlanner<SpatialWaypoint, DefaultManeuver> planner) {
+    public ObstacleExtensions(PathPlanner<SpatialWaypoint, SpatialManeuver> planner) {
         this.planner = planner;
     }
-        
-    public Collection<PlannedPath<SpatialWaypoint, DefaultManeuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        final List<PlannedPath<SpatialWaypoint, DefaultManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, DefaultManeuver>>();
+
+    public Collection<PlannedPath<SpatialWaypoint, SpatialManeuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+        final Set<PlannedPath<SpatialWaypoint, SpatialManeuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, SpatialManeuver>>();
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
         for (ManeuverGraph graph : obstacleExtender) {
-            PlannedPath<SpatialWaypoint, DefaultManeuver> path = planner.planPath(graph, startVertex, endVertex);
-            if ( path != null && !contains(paths, path) ) {
+            PlannedPath<SpatialWaypoint, SpatialManeuver> path = planner.planPath(graph, startVertex, endVertex);
+
+            if ( path != null ) {
                 paths.add( path );
             }
         }
             
         return paths;
-    }
-
-    private boolean contains(Collection<PlannedPath<SpatialWaypoint,DefaultManeuver>> paths, PlannedPath<SpatialWaypoint,DefaultManeuver> path) {
-        for (PlannedPath<SpatialWaypoint, DefaultManeuver> curPath : paths) {
-            if ( equalsPath(path, curPath) ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean equalsPath(PlannedPath<SpatialWaypoint, DefaultManeuver> path1, PlannedPath<SpatialWaypoint, DefaultManeuver> path2) {
-        if (path1.getPathLength() != path2.getPathLength()) {
-            return false;
-        } else {
-            return Arrays.equals(new ArrayList<DefaultManeuver>(path1.getEdgeList()).toArray(new DefaultManeuver[0]), new ArrayList<DefaultManeuver>(path2.getEdgeList()).toArray(new DefaultManeuver[0]));
-        }
     }
 
     static class ObstacleExtender implements Iterable<ManeuverGraph>{
@@ -128,7 +112,7 @@ public class ObstacleExtensions {
                         }
                     }
 
-                    for (DefaultManeuver edge : new ArrayList<DefaultManeuver>(graph.edgeSet())) {
+                    for (Maneuver edge : new ArrayList<SpatialManeuver>(graph.edgeSet())) {
                         if ( zone.testLine(edge.getSource(), edge.getTarget(), null) ) {
                             graph.removeEdge(edge);
                         }

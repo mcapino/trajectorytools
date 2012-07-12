@@ -32,4 +32,14 @@ public class ManeuverGraph extends DefaultSpatialManeuverGraph<DefaultManeuver> 
     public double getMaxSpeed() {
 		return maxSpeed;
 	}
+
+    @Override
+    public double getDuration(Maneuver m) {
+        return getEdgeWeight(m);
+    }
+    
+    @Override
+    public double getMaxSpeed() {
+		return maxSpeed;
+	}
 }

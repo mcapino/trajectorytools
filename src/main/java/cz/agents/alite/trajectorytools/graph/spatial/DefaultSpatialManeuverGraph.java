@@ -13,13 +13,14 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
 
 @SuppressWarnings("serial")
-public class DefaultSpatialManeuverGraph extends SpatialManeuverGraph {
+public class DefaultSpatialManeuverGraph extends DirectedWeightedMultigraph<SpatialWaypoint, SpatialManeuver> implements SpatialManeuverGraph {
 
 
     public DefaultSpatialManeuverGraph() {
         super(SpatialManeuver.class);
-    }
-
+    }   
+    
+    /*
     public SpatialWaypoint getEdgeNeighbor(SpatialManeuver edge, SpatialWaypoint waypoint) {
         if (getEdgeSource(edge) == waypoint)
             return getEdgeTarget(edge);
@@ -60,5 +61,5 @@ public class DefaultSpatialManeuverGraph extends SpatialManeuverGraph {
         } else {
             return null;
         }
-    }
+    }*/
 }

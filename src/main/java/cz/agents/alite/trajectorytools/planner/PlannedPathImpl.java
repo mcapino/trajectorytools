@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.planner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -20,6 +22,7 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return List of Edges, or null if no path exists
      */
+    @Override
     public List<E> getPathEdgeList()
     {
         return getEdgeList();
@@ -30,6 +33,7 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return path representation, or null if no path exists
      */
+    @Override
     public GraphPath<V, E> getPath()
     {
         return this;
@@ -40,8 +44,29 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
      *
      * @return path length, or Double.POSITIVE_INFINITY if no path exists
      */
+    @Override
     public double getPathLength()
     {
         return getPath().getWeight();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PlannedPath<?, ?>) {
+            @SuppressWarnings("unchecked")
+            PlannedPath<V, E> path = (PlannedPath<V, E>) obj;
+            if (getPathLength() != path.getPathLength()) {
+                return false;
+            } else {
+                return Arrays.equals(new ArrayList<E>(path.getEdgeList()).toArray(), new ArrayList<E>(getEdgeList()).toArray());
+            }
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

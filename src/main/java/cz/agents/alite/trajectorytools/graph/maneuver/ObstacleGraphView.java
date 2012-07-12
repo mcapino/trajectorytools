@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.jgrapht.graph.GraphDelegator;
-
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -27,7 +24,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialManeuver> {
+public class ObstacleGraphView extends PlanarGraph<SpatialManeuver> implements ManeuverGraphInterface {
 	private static final long serialVersionUID = 3428956208593195747L;
 
 	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -41,7 +38,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialMa
 
     private final SpatialManeuverGraph originalGraph;
     
-    private final Set<Point> obstacles = new HashSet<Point>();
+    private final Set<SpatialWaypoint> obstacles = new HashSet<SpatialWaypoint>();
 
     private final ChangeListener changeListener;
 
@@ -49,10 +46,10 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialMa
         void graphChanged();
     }
 
-	public ObstacleGraphView(SpatialManeuverGraph originalGraph, ChangeListener changeListener) {
+	public ObstacleGraphView(ManeuverGraphInterface originalGraph, ChangeListener changeListener) {
 		super(originalGraph);
         this.changeListener = changeListener;
-        this.originalGraph = SpatialManeuverGraphs.clone(originalGraph);      
+        this.originalGraph = CopyManeuverGraph.create( originalGraph );      
 	}
 	
 	public void createVisualization() {
@@ -67,7 +64,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialMa
             @Override
             public void interactVisually(double x, double y, MouseEvent e) {
                 // find the closest point of the Graph
-                SpatialWaypoint point = SpatialManeuverGraphs.getNearestWaypoint(originalGraph, new Point(x, y, 0));
+                SpatialWaypoint point = originalGraph.getNearestWaypoint(new Point(x, y, 0));
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     removeVertex( point );
@@ -75,9 +72,9 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialMa
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     if ( obstacles.contains(point) ) {
                         addVertex(point);
-                        for (SpatialManeuver edge : originalGraph.edgesOf(point)) {
-                            SpatialWaypoint source = originalGraph.getEdgeSource(edge);
-                            SpatialWaypoint target = originalGraph.getEdgeTarget(edge);
+                        for (Maneuver edge : originalGraph.edgesOf(point)) {
+                            SpatialWaypoint source = edge.getSource();
+                            SpatialWaypoint target = edge.getTarget();
                             if (containsVertex(source) && containsVertex(target)) {
                                 addEdge(source, target, edge);
                             }
@@ -135,7 +132,79 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, SpatialMa
         }));
 	}
 
-    public Set<Point> getObstacles() {
+    public void refresh() {
+        removeAllVertices(new ArrayList<SpatialWaypoint>(vertexSet()));
+        
+        for (SpatialWaypoint vertex : originalGraph.vertexSet()) {
+            addVertex(vertex);
+        }
+        
+        for (Maneuver edge : originalGraph.edgeSet()) {
+            addEdge(edge.source, edge.target);
+        }
+
+        for (SpatialWaypoint obstacle : obstacles) {
+            removeVertex( obstacle );
+        }
+    }
+
+    @Override
+    public SpatialWaypoint getEdgeNeighbor(Maneuver edge, SpatialWaypoint waypoint) {
+        if (getEdgeSource(edge) == waypoint)
+            return getEdgeTarget(edge);
+        if (getEdgeTarget(edge) == waypoint)
+            return getEdgeSource(edge);
+
+        return null;
+    }
+
+    @Override
+    public SpatialWaypoint getNearestWaypoint(Point pos) {
+        SpatialWaypoint nearestWaypoint = null;
+        double nearestDistance = Double.POSITIVE_INFINITY;
+        for (SpatialWaypoint currentWaypoint : vertexSet()) {
+            double distance = currentWaypoint.distance(pos);
+            if (distance < nearestDistance || nearestWaypoint == null) {
+                nearestWaypoint = currentWaypoint;
+                nearestDistance = distance;
+            }
+        }
+
+        return nearestWaypoint;
+    }
+
+    @Override
+    public List<SpatialWaypoint> getOrderedNeighbors(SpatialWaypoint wp) {
+        Set<Maneuver> edges = edgesOf(wp);
+        List<SpatialWaypoint> neighbors = new LinkedList<SpatialWaypoint>();
+        for (Maneuver edge : edges) {
+            neighbors.add(getEdgeNeighbor(edge, wp));
+        }
+        Collections.sort(neighbors);
+        return neighbors;
+    }
+
+    @Override
+    public SpatialWaypoint getRandomWaypoint(Random random) {
+        SpatialWaypoint[] waypoints = vertexSet().toArray(new SpatialWaypoint[0]);
+        if (waypoints.length > 0) {
+            return waypoints[random.nextInt(waypoints.length)];
+        } else {
+            return null;
+        }
+    }
+    
+    @Override
+    public double getDuration(Maneuver m) {
+        return getEdgeWeight(m);
+    }
+    
+    @Override
+    public double getMaxSpeed() {
+        return originalGraph.maxSpeed;
+    }
+
+    public Set<SpatialWaypoint> getObstacles() {
         return obstacles;
     }
 }

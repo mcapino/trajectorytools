@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;

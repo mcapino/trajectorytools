@@ -6,7 +6,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Wait;
 
 public class SpatialGridFactory {
 	   public static SpatialManeuverGraph createNWayGrid(double sizeX, double sizeY, int gridX, int gridY, double speed, int[][] edgePattern, boolean allowWaitManeuver) {
-		    SpatialManeuverGraph graph 	= new DefaultSpatialManeuverGraph(); 
+		    SpatialManeuverGraph graph 	= new TimeWeightedSpatialManeuverGraph(); 
 	        SpatialWaypoint waypoints[][] = new SpatialWaypoint[gridX+1][gridY+1];
 	        int waypointCounter = 0;
 
@@ -22,7 +22,6 @@ public class SpatialGridFactory {
 	                if (allowWaitManeuver) {
 	                    SpatialManeuver wait = new Wait(w, xStep/speed);
 	                	graph.addEdge(w, w, wait);
-                        graph.setEdgeWeight(wait, wait.getDuration());
 	                }
 	                
 	            }
@@ -41,12 +40,12 @@ public class SpatialGridFactory {
 	                        	    
 	                        	    if (!graph.containsEdge(v1, v2)) {                        	    
 		                                SpatialManeuver maneuverForward = new Straight(v1, v2, speed);
-	                                    graph.setEdgeWeight(maneuverForward, maneuverForward.getDuration());
+		                                graph.addEdge(v1, v2, maneuverForward);
 	                        	    }
 	                        	    
 	                        	    if (!graph.containsEdge(v2, v1)) {                                
-		                                SpatialManeuver maneuverForward = new Straight(v2, v1, speed);
-	                                    graph.setEdgeWeight(maneuverForward, maneuverForward.getDuration());
+		                                SpatialManeuver maneuverBack = new Straight(v2, v1, speed);
+		                                graph.addEdge(v2, v1, maneuverBack);
 	                        	    }
 	                         }
 	                     }
