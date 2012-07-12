@@ -16,27 +16,6 @@ import cz.agents.alite.trajectorytools.util.Point;
 public class AStarShortestPathOnManeuverGraphTest {
 
     @Test
-    public void test() {
-        ManeuverGraph graph = FourWayConstantSpeedGridGraph.create(5, 5, 2, 2, 1.0);
-        SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
-        SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
-
-        AStarShortestPath.Heuristic<SpatialWaypoint> heuristic = new AStarShortestPath.Heuristic<SpatialWaypoint>() {
-            @Override
-            public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
-                return current.distance(goal);
-            }
-        };
-
-        AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
-                graph, start, end, heuristic);
-
-        GraphPath<SpatialWaypoint, Maneuver> path = astar.getPath();
-        System.out.println("Found path:");
-        printPath(path);
-    }
-
-    @Test
     public void testAgainstDijkstra() {
         ManeuverGraph graph = FourWayConstantSpeedGridGraph.create(5, 5, 2, 2, 1.0);
         SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
@@ -85,9 +64,9 @@ public class AStarShortestPathOnManeuverGraphTest {
         long astarTime = 0;
         long dijkstraTime = 0;
 
-        for (int seed=0; seed<N; seed++) {
+        for (int seed=1; seed<N; seed++) {
 
-            ManeuverGraph graph = RandomWaypointGraph.create(5, 5, 350, 6, seed);
+            ManeuverGraph graph = RandomWaypointGraph.create(5, 5, 6, 3, seed);
             SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
             SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
 
@@ -115,6 +94,9 @@ public class AStarShortestPathOnManeuverGraphTest {
             GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra.getPath();
 
             dijkstraTime += System.nanoTime()-startTime;
+            
+            Assert.assertFalse((dijkstraPath == null) && (astarPath != null));
+            Assert.assertFalse((dijkstraPath != null) && (astarPath == null));
 
             if (astarPath != dijkstraPath && !astarPath.getEdgeList().equals(dijkstraPath.getEdgeList())) {
                 System.out.println("The two methods found different paths.");

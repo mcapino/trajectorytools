@@ -8,12 +8,11 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-import org.jgrapht.traverse.CrossComponentIterator;
+import org.jgrapht.alg.specifics.*;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.PlannedPathImpl;
@@ -140,83 +139,6 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
             return new DirectedSpecifics<V, E>((DirectedGraph<V, E>) g);
         } else {
             return new UndirectedSpecifics<V, E>(g);
-        }
-    }
-
-    /**
-     * Provides unified interface for operations that are different in directed
-     * graphs and in undirected graphs.
-     */
-    abstract static class Specifics<VV, EE>
-    {
-        /**
-         * Returns the edges outgoing from the specified vertex in case of
-         * directed graph, and the edge touching the specified vertex in case of
-         * undirected graph.
-         *
-         * @param vertex the vertex whose outgoing edges are to be returned.
-         *
-         * @return the edges outgoing from the specified vertex in case of
-         * directed graph, and the edge touching the specified vertex in case of
-         * undirected graph.
-         */
-        public abstract Set<? extends EE> edgesOf(VV vertex);
-    }
-
-    /**
-     * An implementation of {@link Specifics} for a directed graph.
-     */
-    private static class DirectedSpecifics<VV, EE>
-        extends Specifics<VV, EE>
-    {
-        private DirectedGraph<VV, EE> graph;
-
-        /**
-         * Creates a new DirectedSpecifics object.
-         *
-         * @param g the graph for which this specifics object to be created.
-         */
-        public DirectedSpecifics(DirectedGraph<VV, EE> g)
-        {
-            graph = g;
-        }
-
-        /**
-         * @see CrossComponentIterator.Specifics#edgesOf(Object)
-         */
-        @Override
-        public Set<? extends EE> edgesOf(VV vertex)
-        {
-            return graph.outgoingEdgesOf(vertex);
-        }
-    }
-
-    /**
-     * An implementation of {@link Specifics} in which edge direction (if any)
-     * is ignored.
-     */
-    private static class UndirectedSpecifics<VV, EE>
-        extends Specifics<VV, EE>
-    {
-        private Graph<VV, EE> graph;
-
-        /**
-         * Creates a new UndirectedSpecifics object.
-         *
-         * @param g the graph for which this specifics object to be created.
-         */
-        public UndirectedSpecifics(Graph<VV, EE> g)
-        {
-            graph = g;
-        }
-
-        /**
-         * @see CrossComponentIterator.Specifics#edgesOf(Object)
-         */
-        @Override
-        public Set<EE> edgesOf(VV vertex)
-        {
-            return graph.edgesOf(vertex);
         }
     }
 }

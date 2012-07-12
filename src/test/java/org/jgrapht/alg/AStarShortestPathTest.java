@@ -55,10 +55,7 @@ public class AStarShortestPathTest
     extends ShortestPathTestCase
 {
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * .
-     */
+		
     public void testConstructor()
     {
         AStarShortestPath<String, DefaultWeightedEdge> path;
@@ -95,7 +92,13 @@ public class AStarShortestPathTest
         String src,
         String dest)
     {
-        return AStarShortestPath.findPathBetween(g, src, dest);
+        return AStarShortestPath.findPathBetween(g, src, dest, new Heuristic<String>() {
+
+			@Override
+			public double getHeuristicEstimate(String current, String goal) {
+				return 0;
+			}
+		});
     }
 }
 
