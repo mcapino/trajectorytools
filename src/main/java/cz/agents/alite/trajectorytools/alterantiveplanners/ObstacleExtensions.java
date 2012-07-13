@@ -168,4 +168,9 @@ public class ObstacleExtensions implements AlternativePathPlanner {
             }
         }
     }
+
+    @Override
+    public String getName() {
+        return "Obstacle Extension";
+    }
 }

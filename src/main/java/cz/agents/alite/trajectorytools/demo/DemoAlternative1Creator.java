@@ -8,7 +8,7 @@ import java.util.List;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
+import cz.agents.alite.trajectorytools.graph.maneuver.EightWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
@@ -26,6 +26,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative1Creator implements Creator {
 
+    private static final int WORLD_SIZE = 10;
     private ObstacleGraphView graph;
     private List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
 
@@ -50,7 +51,7 @@ public class DemoAlternative1Creator implements Creator {
 
     @Override
     public void create() {
-        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0); 
+        ManeuverGraphInterface originalGraph = EightWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0); 
 
         graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
             @Override
@@ -89,7 +90,7 @@ public class DemoAlternative1Creator implements Creator {
 	                alternativePlanner.planPath(
 	                    graph, 
 	                    graph.getNearestWaypoint(new Point(0, 0, 0)),
-	                    graph.getNearestWaypoint(new Point(10, 10, 0))
+	                    graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
 	                ) );
                 System.out.println("paths: " + paths.size());
 	        } catch (Exception e) {

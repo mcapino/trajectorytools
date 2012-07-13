@@ -17,13 +17,18 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
  * @author honza
  *
  */
-public class SoftObstacleAvoidanceMetric implements AlternativePathPlanner {
+public class SoftObstacleAvoidanceMetricPlanner implements AlternativePathPlanner {
 
-    public SoftObstacleAvoidanceMetric() {
+    public SoftObstacleAvoidanceMetricPlanner() {
     }
     
     @Override
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
         throw new UnsupportedOperationException("cannot be planned by AStar type of planner!");
+    }
+
+    @Override
+    public String getName() {
+        return "Soft Obstacle Avoidance";
     }
 }

@@ -163,7 +163,7 @@ public class VoronoiDelaunayGraph {
             graph.addVertex(center);
 
             for (SpatialWaypoint obstacle : obstacles) {
-                if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
+                if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 0) {
                     newEdges.add( graph.addEdge(center, obstacle) );
                 }
             }

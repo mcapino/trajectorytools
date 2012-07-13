@@ -63,25 +63,11 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
             
             @Override
             public void interactVisually(double x, double y, MouseEvent e) {
-                // find the closest point of the Graph
-                SpatialWaypoint point = originalGraph.getNearestWaypoint(new Point(x, y, 0));
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    removeVertex( point );
-                    obstacles.add(point);
+                    addObstacle(new Point(x, y, 0));
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    if ( obstacles.contains(point) ) {
-                        addVertex(point);
-                        for (Maneuver edge : originalGraph.edgesOf(point)) {
-                            SpatialWaypoint source = edge.getSource();
-                            SpatialWaypoint target = edge.getTarget();
-                            if (containsVertex(source) && containsVertex(target)) {
-                                addEdge(source, target, edge);
-                            }
-                        }
-                        
-                        obstacles.remove(point);                    
-                    }
+                    removeObstacle(new Point(x, y, 0));
                 } else {
                     return;
                 }
@@ -89,7 +75,7 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
                 if ( changeListener != null ) {
                     changeListener.graphChanged();
                 }
-            }           
+            }
         
             @Override
             public String getName() {
@@ -131,6 +117,28 @@ public class ObstacleGraphView extends GraphDelegator<SpatialWaypoint, Maneuver>
             }
         }));
 	}
+
+	public void removeObstacle(Point point) {
+        SpatialWaypoint vertex = originalGraph.getNearestWaypoint(point);
+        if ( obstacles.contains(vertex) ) {
+            addVertex(vertex);
+            for (Maneuver edge : originalGraph.edgesOf(vertex)) {
+                SpatialWaypoint source = edge.getSource();
+                SpatialWaypoint target = edge.getTarget();
+                if (containsVertex(source) && containsVertex(target)) {
+                    addEdge(source, target, edge);
+                }
+            }
+            
+            obstacles.remove(vertex);                    
+        }
+    }
+
+    public void addObstacle(Point point) {
+        SpatialWaypoint vertex = originalGraph.getNearestWaypoint(point);
+        removeVertex( vertex );
+        obstacles.add(vertex);
+    }           
 
     @Override
     public void refresh() {

@@ -93,7 +93,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             SpatialWaypoint edgeTarget = getEdgeTarget(edge);
             SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
-            if (intersection != null) {
+            if (intersection != null && !intersection.equals(point1) && !intersection.equals(point2)) {
                 counter++;
             }
         }

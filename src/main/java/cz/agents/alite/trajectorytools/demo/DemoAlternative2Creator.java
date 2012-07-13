@@ -31,8 +31,12 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative2Creator implements Creator {
 
+    private static final int NUM_OF_RANDOM_OBSTACLES = 8;
+
+    private static final int WORLD_SIZE = 10;
+
     // shows one trajectory with voronoi and delaunay graphs
-    private static final boolean DEBUG_VIEW = true;
+    private static final boolean DEBUG_VIEW = false;
 
     private ObstacleGraphView graph;
     private List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
@@ -65,13 +69,13 @@ public class DemoAlternative2Creator implements Creator {
 
     @Override
     public void create() {
-        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0); 
+        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0); 
 
         border = Arrays.asList(new SpatialWaypoint[] {
                 originalGraph.getNearestWaypoint(new Point( 0,  0, 0)),
-                originalGraph.getNearestWaypoint(new Point( 0, 10, 0)),
-                originalGraph.getNearestWaypoint(new Point(10, 10, 0)),
-                originalGraph.getNearestWaypoint(new Point(10,  0, 0))
+                originalGraph.getNearestWaypoint(new Point( 0, WORLD_SIZE, 0)),
+                originalGraph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0)),
+                originalGraph.getNearestWaypoint(new Point(WORLD_SIZE,  0, 0))
         });
 
         
@@ -83,6 +87,20 @@ public class DemoAlternative2Creator implements Creator {
         } );
                
         createVisualization();
+        
+        List<Point> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
+        for (Point obstacle : obstacles) {
+            graph.addObstacle(obstacle);
+        }
+    }
+
+    private List<Point> generateRandomObstacles(int number) {
+        List<Point> obstacles = new ArrayList<Point>(number);
+        for (int i=0; i<number; i++) {
+            obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
+        }
+                
+        return obstacles;
     }
 
     private void createVisualization() {
@@ -149,16 +167,16 @@ public class DemoAlternative2Creator implements Creator {
             
             voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
 
-            PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
+//            PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
 //
 //            delaunayGraph.graph.removeVertex(startVertex);
 //            delaunayGraph.graph.removeVertex(targetVertex);
 //            
-            for (Maneuver voronoiEdge: planPath.getEdgeList()) {
-                planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
-            }
+//            for (Maneuver voronoiEdge: planPath.getEdgeList()) {
+//                planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
+//            }
 //    
-            delaunayGraph.graph = planarGraphDelaunay;
+//            delaunayGraph.graph = planarGraphDelaunay;
         
             graph.refresh();
         

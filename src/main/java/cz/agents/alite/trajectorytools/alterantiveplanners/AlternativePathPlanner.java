@@ -10,4 +10,6 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 public interface AlternativePathPlanner {
 
     Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex);
+    
+    String getName();
 }

@@ -63,17 +63,19 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
             delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
             
             voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
+            
+//            System.out.println("delaunayGraph.graph.vertexSet(): " + delaunayGraph.graph.vertexSet());
 
-            PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
+//            PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
 //
 //            delaunayGraph.graph.removeVertex(startVertex);
 //            delaunayGraph.graph.removeVertex(targetVertex);
 //            
-            for (Maneuver voronoiEdge: planPath.getEdgeList()) {
-                planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
-            }
+//            for (Maneuver voronoiEdge: planPath.getEdgeList()) {
+//                planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
+//            }
 //    
-            delaunayGraph.graph = planarGraphDelaunay;
+//            delaunayGraph.graph = planarGraphDelaunay;
         
             graph.refresh();
         
@@ -96,6 +98,11 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
         }
         
         return paths;
+    }
+
+    @Override
+    public String getName() {
+        return "Voronoi-Delaunay";
     }
 
 }
