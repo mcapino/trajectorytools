@@ -30,7 +30,7 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
 
             List<E> pathEdgeList = aStar.getPathEdgeList();
             if (pathEdgeList != null) {
-                return new PlannedPathImpl<V, E>(graph, startVertex, endVertex, pathEdgeList, aStar.getPathLength());
+                return new PlannedPathImpl<V, E>(graph, pathEdgeList);
             } else {
                 return null;
             }
@@ -61,7 +61,7 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
         @Override
         @SuppressWarnings("unchecked")
         public double getEdgeWeight(E e) {
-            return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) e.getTarget());
+            return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) e.getSource()) + functionG.getGoalPenalty((V) e.getTarget());
         }
         
     }

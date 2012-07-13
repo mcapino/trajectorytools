@@ -17,6 +17,28 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
         super(graph, startVertex, endVertex, edgeList, weight);
     }
 
+    public PlannedPathImpl(Graph<V, E> graph, List<E> edges) {
+        this(graph, getStartVertex(graph, edges), getEndVertex(graph, edges), edges, getWeight(graph, edges));
+    }
+
+    private static <V, E> V getStartVertex(Graph<V, E> graph, List<E> edges) {
+        E edge = edges.get(0);
+        return graph.getEdgeSource(edge);
+    }
+
+    private static <V, E> V getEndVertex(Graph<V, E> graph, List<E> edges) {
+        E edge = edges.get(edges.size() - 1);
+        return graph.getEdgeTarget(edge);
+    }
+    
+    private static <V, E> double getWeight(Graph<V, E> graph, List<E> edges) {
+        double weight = 0;
+        for (E edge : edges) {
+            weight += graph.getEdgeWeight(edge);
+        }
+        return weight;
+    }
+
     /**
      * Return the edges making up the path found.
      *
