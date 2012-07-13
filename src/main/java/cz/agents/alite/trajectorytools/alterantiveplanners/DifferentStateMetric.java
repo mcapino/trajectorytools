@@ -6,12 +6,11 @@ import java.util.List;
 
 import org.jgrapht.Graph;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
-public class DifferentStateMetric<V, E extends DefaultManeuver> implements AlternativePathPlanner<V, E> {
+public class DifferentStateMetric<V, E> implements AlternativePathPlanner<V, E> {
 
     private static final int SOLUTION_COUNT = 5;
     private static final int ALPHA = 1;
@@ -34,7 +33,7 @@ public class DifferentStateMetric<V, E extends DefaultManeuver> implements Alter
 
                 for (PlannedPath<V, E> path : paths) {
                     for (E edge : path.getEdgeList()) {
-                        if ( vertex.equals(edge.getTarget()) ) {
+                        if ( vertex.equals(path.getGraph().getEdgeTarget(edge))) {
                             penalty++;
                             break;
                         }                            

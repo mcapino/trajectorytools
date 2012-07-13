@@ -6,13 +6,12 @@ import java.util.List;
 
 import org.jgrapht.Graph;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
-public class TrajectoryDistanceMetric<V extends SpatialWaypoint, E extends DefaultManeuver> implements AlternativePathPlanner<V, E> {
+public class TrajectoryDistanceMetric<V extends SpatialWaypoint, E> implements AlternativePathPlanner<V, E> {
 
     private static final int SOLUTION_COUNT = 5;
     private static final int ALPHA = 1;
@@ -37,7 +36,7 @@ public class TrajectoryDistanceMetric<V extends SpatialWaypoint, E extends Defau
                 for (PlannedPath<V, E> path : paths) {
                     double minDist = Double.MAX_VALUE; 
                     for (E edge : path.getEdgeList()) {
-                        double distance = vertex.distance(edge.getTarget());
+                        double distance = vertex.distance(path.getGraph().getEdgeTarget(edge));
                         if (distance < minDist) {
                             minDist = distance;
                         }

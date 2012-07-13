@@ -4,15 +4,13 @@ import java.awt.Color;
 import java.awt.Rectangle;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
@@ -28,7 +26,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class Demo1Creator implements Creator {
 
 	private ObstacleGraphView graph;
-	private PathHolder<SpatialWaypoint, DefaultManeuver> path = new PathHolder<SpatialWaypoint, DefaultManeuver>();
+	private PathHolder<SpatialWaypoint, SpatialManeuver> path = new PathHolder<SpatialWaypoint,SpatialManeuver>();
 
     @Override
     public void init(String[] args) {
@@ -71,7 +69,7 @@ public class Demo1Creator implements Creator {
 	protected void replan() {
 
         try {
-            PathPlanner<SpatialWaypoint, DefaultManeuver> aStar = new AStarPlanner<SpatialWaypoint, DefaultManeuver>();
+            PathPlanner<SpatialWaypoint, SpatialManeuver> aStar = new AStarPlanner<SpatialWaypoint, SpatialManeuver>();
 
             aStar.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
             @Override
@@ -82,8 +80,8 @@ public class Demo1Creator implements Creator {
            
             path.plannedPath = aStar.planPath(
                     graph, 
-                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
-                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
+                    SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

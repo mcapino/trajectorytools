@@ -7,7 +7,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.graph.GraphDelegator;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
 
 /**
  * An implementation of <a href="http://en.wikipedia.org/wiki/A*_search_algorithm">A* search algorithm</a>.

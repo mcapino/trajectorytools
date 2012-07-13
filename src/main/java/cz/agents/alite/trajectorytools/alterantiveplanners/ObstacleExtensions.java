@@ -13,9 +13,10 @@ import javax.vecmath.Vector3d;
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
@@ -37,7 +38,7 @@ public class ObstacleExtensions {
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
-        for (ManeuverGraph graph : obstacleExtender) {
+        for (SpatialManeuverGraph graph : obstacleExtender) {
             PlannedPath<SpatialWaypoint, SpatialManeuver> path = planner.planPath(graph, startVertex, endVertex);
 
             if ( path != null ) {
@@ -48,20 +49,20 @@ public class ObstacleExtensions {
         return paths;
     }
 
-    static class ObstacleExtender implements Iterable<ManeuverGraph>{
+    static class ObstacleExtender implements Iterable<SpatialManeuverGraph>{
 
         int[] directions;
-        private final ObstacleGraphView originalGraph;
+        private final ObstacleGraphView<SpatialManeuver> originalGraph;
 
-        public ObstacleExtender(ObstacleGraphView originalGraph) {
+        public ObstacleExtender(ObstacleGraphView<SpatialManeuver> originalGraph) {
             this.originalGraph = originalGraph;
             
             directions = new int[originalGraph.getObstacles().size()];
         }
 
         @Override
-        public Iterator<ManeuverGraph> iterator() {
-            return new Iterator<ManeuverGraph>() {
+        public Iterator<SpatialManeuverGraph> iterator() {
+            return new Iterator<SpatialManeuverGraph>() {
 
                 boolean firstCall = true;
 
@@ -76,7 +77,7 @@ public class ObstacleExtensions {
                 }
 
                 @Override
-                public ManeuverGraph next() {
+                public SpatialManeuverGraph next() {
                     if ( !hasNext() ) {
                         throw new NoSuchElementException("No next element!");
                     }
@@ -89,8 +90,8 @@ public class ObstacleExtensions {
                     return generateNextGraph();
                 }
 
-                protected ManeuverGraph generateNextGraph() {
-                    ManeuverGraph graph = CopyManeuverGraph.create( originalGraph );
+                protected SpatialManeuverGraph generateNextGraph() {
+                    SpatialManeuverGraph graph = (SpatialManeuverGraph) SpatialGraphs.clone(originalGraph);
 
                     int currObstacle = 0;
 
@@ -102,7 +103,7 @@ public class ObstacleExtensions {
                     
                 }
 
-                private void removeObstacleExtension(ManeuverGraph graph, Point obstacle, int direction) {
+                private void removeObstacleExtension(SpatialManeuverGraph graph, Point obstacle, int direction) {
 
                     Zone zone = createZone(obstacle, direction);
                     
@@ -112,8 +113,8 @@ public class ObstacleExtensions {
                         }
                     }
 
-                    for (Maneuver edge : new ArrayList<SpatialManeuver>(graph.edgeSet())) {
-                        if ( zone.testLine(edge.getSource(), edge.getTarget(), null) ) {
+                    for (SpatialManeuver edge : new ArrayList<SpatialManeuver>(graph.edgeSet())) {
+                        if ( zone.testLine(graph.getEdgeSource(edge), graph.getEdgeTarget(edge), null) ) {
                             graph.removeEdge(edge);
                         }
                     }

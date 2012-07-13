@@ -7,12 +7,13 @@ import java.util.List;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
@@ -26,9 +27,9 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class DemoAlternative1Creator implements Creator {
 
     private ObstacleGraphView graph;
-    private List<PlannedPath<SpatialWaypoint, DefaultManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,DefaultManeuver>>();
+    private List<PlannedPath<SpatialWaypoint, SpatialManeuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,SpatialManeuver>>();
 
-    private static final AStarPlanner<SpatialWaypoint, DefaultManeuver> planner = new AStarPlanner<SpatialWaypoint, DefaultManeuver>();
+    private static final AStarPlanner<SpatialWaypoint, SpatialManeuver> planner = new AStarPlanner<SpatialWaypoint, SpatialManeuver>();
     {
         planner.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
         @Override
@@ -50,7 +51,7 @@ public class DemoAlternative1Creator implements Creator {
 
     @Override
     public void create() {
-        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(10, 10, 10, 10, 1.0); 
+        SpatialManeuverGraph originalGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
 
         graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
             @Override
@@ -88,8 +89,8 @@ public class DemoAlternative1Creator implements Creator {
 	            paths.addAll(
 	                alternativePlanner.planPath(
 	                    graph, 
-	                    graph.getNearestWaypoint(new Point(0, 0, 0)),
-	                    graph.getNearestWaypoint(new Point(10, 10, 0))
+	                    SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
+	                    SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
 	                ) );
                 System.out.println("paths: " + paths.size());
 	        } catch (Exception e) {

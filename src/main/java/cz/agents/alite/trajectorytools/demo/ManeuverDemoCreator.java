@@ -3,17 +3,10 @@ package cz.agents.alite.trajectorytools.demo;
 import java.awt.Color;
 import java.awt.Rectangle;
 
-import javax.xml.ws.Holder;
-
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.DefaultManeuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
@@ -23,7 +16,6 @@ import cz.agents.alite.trajectorytools.trajectory.ManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
-import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryHolder;
@@ -45,7 +37,7 @@ public class ManeuverDemoCreator implements Creator {
 
     @Override
     public void create() {
-        graph = SpatialGridFactory.create8WayGrid(10, 10, 10, 10, 1.0); 
+        graph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
         
         replan();        
         trajectory =  new ManeuverTrajectory<SpatialWaypoint, SpatialManeuver>(0.0, path.plannedPath, false);
@@ -73,7 +65,7 @@ public class ManeuverDemoCreator implements Creator {
 
         TrajectoryHolder holder = new TrajectoryHolder();
         holder.trajectory = trajectory;
-        VisManager.registerLayer(TrajectoryLayer.create(holder, Color.BLUE, 0.5, 100.0, 0.1, 't')); 	
+        VisManager.registerLayer(TrajectoryLayer.create(holder, Color.BLUE, 0.1, 100.0, 0.1, 't')); 	
         
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
@@ -93,8 +85,8 @@ public class ManeuverDemoCreator implements Creator {
            
             path.plannedPath = aStar.planPath(
                     graph, 
-                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
-                    SpatialManeuverGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
+                    SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
