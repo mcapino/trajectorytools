@@ -7,15 +7,15 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 
 public class SingleVertexPlannedPath implements
         PlannedPath<SpatialWaypoint, Maneuver> {
-    private final ManeuverGraphWithObstacles graph;
+    private final ManeuverGraphInterface graph;
     private final SpatialWaypoint vertex;
 
-    public SingleVertexPlannedPath(ManeuverGraphWithObstacles graph,
+    public SingleVertexPlannedPath(ManeuverGraphInterface graph,
             SpatialWaypoint vertex) {
         this.graph = graph;
         this.vertex = vertex;

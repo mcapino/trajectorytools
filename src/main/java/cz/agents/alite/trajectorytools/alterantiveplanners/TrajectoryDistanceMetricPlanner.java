@@ -22,12 +22,15 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner {
     private final int pathSolutionLimit;
 
     ManeuverTrajectoryMetric metric;
+
+    private final double maxDistance;
     
-    public TrajectoryDistanceMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, int maxDistance) {
+    public TrajectoryDistanceMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, double maxDistance) {
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
+        this.maxDistance = maxDistance;
         
-        metric = new TrajectoryDistanceMetric(maxDistance);
+        metric = new TrajectoryDistanceMetric();
     }
     
     @Override
@@ -38,7 +41,12 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner {
         planner.setGoalPenaltyFunction(new GoalPenaltyFunction<SpatialWaypoint>() {
             @Override
             public double getGoalPenalty(final SpatialWaypoint vertex) {               
-                return ALPHA * metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                double distance = metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                if (distance < maxDistance) {
+                    return ALPHA * ( maxDistance - distance );
+                } else {
+                    return 0;
+                }
             }
         });
 

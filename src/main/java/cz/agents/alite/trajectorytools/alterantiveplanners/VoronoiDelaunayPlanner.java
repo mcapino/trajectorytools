@@ -88,12 +88,10 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
                     endVertex
                     );
 
-            if ( planPath!= null ) {
-//                if ( !paths.contains(planPath) ) {
+            if ( planPath != null ) {
+                if ( !paths.contains(planPath) ) {
                     paths.add(planPath);
-//                } else {
-//                    System.out.println("Path already found: " + planPath);
-//                }
+                }
             }
         }
         

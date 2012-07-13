@@ -32,8 +32,8 @@ import cz.agents.alite.trajectorytools.util.Point;
 
 public class AlternativePlanners1Creator implements Creator {
 
-    private static final int MIN_NUM_OF_OBSTACLES = 5;
-    private static final int MAX_NUM_OF_OBSTACLES = 10;
+    private static final int MIN_NUM_OF_OBSTACLES = 2;
+    private static final int MAX_NUM_OF_OBSTACLES = 5;
     private static final int NUM_OF_REPEATS = 3;
     
     private static final int NUM_OF_THREADS = 5;
@@ -54,7 +54,7 @@ public class AlternativePlanners1Creator implements Creator {
     }
 
     private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
-        new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
+        new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
         new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
         new ObstacleExtensions(planner),
         new VoronoiDelaunayPlanner( planner ),
@@ -63,8 +63,8 @@ public class AlternativePlanners1Creator implements Creator {
     };
 
     private static final ManeuverTrajectoryMetric[] trajectoryMetrics = new ManeuverTrajectoryMetric [] {
-        new DifferentStateMetric(WORLD_SIZE),
-        new TrajectoryDistanceMetric(WORLD_SIZE)
+        new DifferentStateMetric(),
+        new TrajectoryDistanceMetric()
     };
 
     @Override
@@ -84,7 +84,7 @@ public class AlternativePlanners1Creator implements Creator {
     
             out.write("WORLD_SIZE=" + WORLD_SIZE);
             out.newLine();
-            out.write( "numObstacles;planner;duration;num of paths;average path lenth" );
+            out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
             for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
                 out.write(";" + metric.getName());
             }
@@ -136,7 +136,7 @@ public class AlternativePlanners1Creator implements Creator {
 
                                 try {
                                     synchronized (out) {
-                                        out.write( numObst + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
+                                        out.write( numObst + ";" + planner.getName() + "-" + numObst + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
 
                                         for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
                                             out.write(";" + evaluateTrajectories(paths, metric));
@@ -157,6 +157,8 @@ public class AlternativePlanners1Creator implements Creator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        executor.shutdown();
     }
 
 	protected double evaluateTrajectories(

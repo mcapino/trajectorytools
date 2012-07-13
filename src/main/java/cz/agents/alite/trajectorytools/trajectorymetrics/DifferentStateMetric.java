@@ -8,9 +8,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
 public class DifferentStateMetric implements ManeuverTrajectoryMetric {
 
-    private final double maxDistance;
-    public DifferentStateMetric(double maxDistance) {
-        this.maxDistance = maxDistance;
+    public DifferentStateMetric() {
     }
 
     @Override
@@ -19,24 +17,33 @@ public class DifferentStateMetric implements ManeuverTrajectoryMetric {
         double penalty = 0;
 
         for (PlannedPath<SpatialWaypoint, Maneuver> other : otherPaths) {
-            for (Maneuver edge : path.getEdgeList()) {
-                double minDist = Double.MAX_VALUE; 
-                for (Maneuver otherEdge : other.getEdgeList()) {
-                    if ( edge.getTarget().equals(otherEdge.getTarget()) ) {
-                        penalty++;
-                        break;
-                    }                            
-                }
-                if (minDist < maxDistance) {
-                    penalty += maxDistance - minDist; 
-                }
+            if (pathContainsVertex(path.getStartVertex(), other)) {
+                penalty += 0.5;
             }
 
-            if (path.getStartVertex().equals(other.getStartVertex())) {
-                penalty ++; 
+            if (pathContainsVertex(path.getEndVertex(), other)) {
+                penalty += 0.5;
+            }
+
+            for (Maneuver edge : path.getEdgeList()) {
+                if (pathContainsVertex(edge.getSource(), other)) {
+                    penalty += 0.5;
+                }
+                if (pathContainsVertex(edge.getTarget(), other)) {
+                    penalty += 0.5;
+                }
             }
         }
         return penalty;
+    }
+
+    private boolean pathContainsVertex(SpatialWaypoint vertex, PlannedPath<SpatialWaypoint, Maneuver> path) {
+        for (Maneuver edge : path.getEdgeList()) {
+            if ( vertex.equals(edge.getSource()) || vertex.equals(edge.getTarget()) ) {
+                return true;
+            }                            
+        }
+        return false;
     }
 
     @Override

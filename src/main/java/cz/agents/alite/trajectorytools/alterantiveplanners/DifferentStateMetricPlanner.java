@@ -24,11 +24,11 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
     ManeuverTrajectoryMetric metric;
         
-    public DifferentStateMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, int maxDistance) {
+    public DifferentStateMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit) {
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
 
-        metric = new DifferentStateMetric(maxDistance);
+        metric = new DifferentStateMetric();
     }
 
     @Override
@@ -43,6 +43,7 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
         });
 
         for (int i = 0; i < pathSolutionLimit; i++) {
+            System.out.println("i: " + i);
             paths.add( planner.planPath(graph, startVertex, endVertex) );
         }
         
