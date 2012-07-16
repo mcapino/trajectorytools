@@ -79,7 +79,7 @@ public class DemoAlternative2Creator implements Creator {
 
     @Override
     public void create() {
-        SpatialManeuverGraph originalGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
+        Graph<SpatialWaypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
 
         border = Arrays.asList(new SpatialWaypoint[] {
         		SpatialGraphs.getNearestWaypoint(originalGraph, new Point( 0,  0, 0)),

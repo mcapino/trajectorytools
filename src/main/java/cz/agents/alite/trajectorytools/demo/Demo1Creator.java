@@ -34,7 +34,7 @@ public class Demo1Creator implements Creator {
 
     @Override
     public void create() {
-        SpatialManeuverGraph listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
+        Graph<SpatialWaypoint, SpatialManeuver> listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
 
         graph = new ObstacleGraphView(listenableGraph, new ChangeListener() {
             @Override

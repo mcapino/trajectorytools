@@ -77,7 +77,7 @@ public class ObstacleExtensions {
                 }
 
                 @Override
-                public SpatialManeuverGraph next() {
+                publicGraph<SpatialWaypoint, SpatialManeuver>next() {
                     if ( !hasNext() ) {
                         throw new NoSuchElementException("No next element!");
                     }
@@ -90,8 +90,8 @@ public class ObstacleExtensions {
                     return generateNextGraph();
                 }
 
-                protected SpatialManeuverGraph generateNextGraph() {
-                    SpatialManeuverGraph graph = (SpatialManeuverGraph) SpatialGraphs.clone(originalGraph);
+                protectedGraph<SpatialWaypoint, SpatialManeuver>generateNextGraph() {
+                   Graph<SpatialWaypoint, SpatialManeuver>graph = (SpatialManeuverGraph) SpatialGraphs.clone(originalGraph);
 
                     int currObstacle = 0;
 

@@ -4,15 +4,18 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Wait;
 
 public class SpatialGridFactory {
-	   public static SpatialManeuverGraph createNWayGrid(double sizeX, double sizeY, int gridX, int gridY, double speed, int[][] edgePattern, boolean allowWaitManeuver) {
-		    SpatialManeuverGraph graph 	= new TimeWeightedSpatialManeuverGraph(); 
+	   public static Graph<SpatialWaypoint, SpatialManeuver> createNWayGrid(double sizeX, double sizeY, int gridX, int gridY, double speed, int[][] edgePattern, boolean allowWaitManeuver) {
+		    Graph<SpatialWaypoint, SpatialManeuver> graph 	= new DirectedWeightedMultigraph<SpatialWaypoint, SpatialManeuver>((EdgeFactory)null); 
 	        SpatialWaypoint waypoints[][] = new SpatialWaypoint[gridX+1][gridY+1];
 	        int waypointCounter = 0;
 
@@ -63,7 +66,7 @@ public class SpatialGridFactory {
 
 
 
-	static public SpatialManeuverGraph create4WayGrid(double sizeX, double sizeY,
+	static public Graph<SpatialWaypoint, SpatialManeuver> create4WayGrid(double sizeX, double sizeY,
 			int gridX, int gridY, double speed) {
 		
 	    final int[][] EDGE_PATTERN = {           {0,-1},
@@ -74,7 +77,7 @@ public class SpatialGridFactory {
 		return createNWayGrid(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, true);
 	}
 	
-	static public SpatialManeuverGraph create8WayGrid(double sizeX, double sizeY,
+	static public Graph<SpatialWaypoint, SpatialManeuver> create8WayGrid(double sizeX, double sizeY,
 			int gridX, int gridY, double speed) {
 		
 	    final int[][] EDGE_PATTERN = {{-1,-1}, {0,-1}, { 1,-1},
@@ -86,8 +89,8 @@ public class SpatialGridFactory {
 	}
 	
     
-    static public SpatialManeuverGraph create(double sizeX, double sizeY, int gridX, int gridY, double speed) {
-        SpatialManeuverGraph graph = new TimeWeightedSpatialManeuverGraph();
+    static public Graph<SpatialWaypoint, SpatialManeuver> create(double sizeX, double sizeY, int gridX, int gridY, double speed) {
+        Graph<SpatialWaypoint, SpatialManeuver> graph = new TimeWeightedSpatialManeuverGraph();
         SpatialWaypoint waypoints[][] = new SpatialWaypoint[gridX+1][gridY+1];
         int waypointCounter = 0;
 
@@ -125,8 +128,8 @@ public class SpatialGridFactory {
     }
     
     
-    public static SpatialManeuverGraph createRandom(double sizeX, double sizeY, int nPoints, int branchFactor, int seed, double speed) {
-        SpatialManeuverGraph graph = new TimeWeightedSpatialManeuverGraph();
+    public static Graph<SpatialWaypoint, SpatialManeuver> createRandom(double sizeX, double sizeY, int nPoints, int branchFactor, int seed, double speed) {
+        Graph<SpatialWaypoint, SpatialManeuver> graph = new TimeWeightedSpatialManeuverGraph();
 
         SpatialWaypoint waypoints[] = new SpatialWaypoint[nPoints];
         int waypointCounter = 0;

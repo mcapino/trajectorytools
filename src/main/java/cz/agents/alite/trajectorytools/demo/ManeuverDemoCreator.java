@@ -27,7 +27,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class ManeuverDemoCreator implements Creator {
 
-	private SpatialManeuverGraph graph;
+	private Graph<SpatialWaypoint, SpatialManeuver> graph;
 	private Trajectory trajectory;
 	private PathHolder<SpatialWaypoint, SpatialManeuver> path = new PathHolder<SpatialWaypoint, SpatialManeuver>();
 

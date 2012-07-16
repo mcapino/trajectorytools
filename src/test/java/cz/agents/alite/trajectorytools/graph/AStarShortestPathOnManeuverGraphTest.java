@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.Graph<SpatialWaypoint, SpatialManeuver>;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -17,7 +17,7 @@ public class AStarShortestPathOnManeuverGraphTest {
 
     @Test
     public void testAgainstDijkstra() {
-        SpatialManeuverGraph graph = SpatialGridFactory.create4WayGrid(5, 5, 2, 2, 1.0);
+        Graph<SpatialWaypoint, SpatialManeuver> graph = SpatialGridFactory.create4WayGrid(5, 5, 2, 2, 1.0);
         SpatialWaypoint start = SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0));
         SpatialWaypoint end = SpatialGraphs.getNearestWaypoint(graph,new Point(5.0, 5.0, 0));
 
@@ -66,7 +66,7 @@ public class AStarShortestPathOnManeuverGraphTest {
 
         for (int seed=1; seed<N; seed++) {
 
-            SpatialManeuverGraph graph = SpatialGridFactory.createRandom(5, 5, 6, 3, seed, 1.0);
+            Graph<SpatialWaypoint, SpatialManeuver> graph = SpatialGridFactory.createRandom(5, 5, 6, 3, seed, 1.0);
             SpatialWaypoint start = SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0));
             SpatialWaypoint end = SpatialGraphs.getNearestWaypoint(graph, new Point(5.0, 5.0, 0));
 
