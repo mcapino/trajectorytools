@@ -19,6 +19,27 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
     @Override
     public PlannedPath<V, E> planPath(final Graph<V, E> graph, final V startVertex,
             final V endVertex) {
+        return planPath(graph, startVertex, endVertex, functionG, functionH);
+    }
+
+    @Override
+    public void setGoalPenaltyFunction(GoalPenaltyFunction<V> functionG) {
+        this.functionG = functionG;
+    }
+
+    @Override
+    public void setHeuristicFunction(HeuristicFunction<V> functionH) {
+        this.functionH = functionH;
+    }
+
+    @Override
+    public HeuristicFunction<V> getHeuristicFunction() {
+        return functionH;
+    }
+    
+    @Override
+    public PlannedPath<V, E> planPath(final Graph<V, E> graph, final V startVertex,
+            final V endVertex, final GoalPenaltyFunction<V> functionG, final HeuristicFunction<V> functionH) {
         GraphWithPenaltyFunction<V, E> penaltyGraph = new GraphWithPenaltyFunction<V, E>(graph, functionG);
         try {
             AStarShortestPath<V, E> aStar = new AStarShortestPath<V, E>(penaltyGraph, startVertex, endVertex, new AStarShortestPath.Heuristic<V>() {
@@ -39,16 +60,6 @@ public final class AStarPlanner<V, E extends Maneuver> implements PathPlanner<V,
         }
     }
 
-    @Override
-    public void setGoalPenaltyFunction(GoalPenaltyFunction<V> functionG) {
-        this.functionG = functionG;
-    }
-
-    @Override
-    public void setHeuristicFunction(HeuristicFunction<V> functionH) {
-        this.functionH = functionH;
-    }
-    
     static class GraphWithPenaltyFunction<V, E extends Maneuver> extends GraphDelegator<V, E> {
         private static final long serialVersionUID = -3985698807336517743L;
         private final GoalPenaltyFunction<V> functionG;

@@ -33,10 +33,10 @@ import cz.agents.alite.trajectorytools.util.Point;
 public class AlternativePlanners1Creator implements Creator {
 
     private static final int MIN_NUM_OF_OBSTACLES = 2;
-    private static final int MAX_NUM_OF_OBSTACLES = 5;
+    private static final int MAX_NUM_OF_OBSTACLES = 8;
     private static final int NUM_OF_REPEATS = 3;
     
-    private static final int NUM_OF_THREADS = 5;
+    private static final int NUM_OF_THREADS = 8;
     private static final ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREADS);
 
     private static final int PATH_SOLUTION_LIMIT = 5;
@@ -102,52 +102,10 @@ public class AlternativePlanners1Creator implements Creator {
                     for (final AlternativePathPlanner planner : alternativePlanners) {
                         System.out.println("planner.getName(): " + planner.getName());
 
-                        final int numObst = numObstacles; 
-                        
                         executor.execute(new Runnable() {
                             @Override
                             public void run() {
-                                ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0); 
-
-                                ObstacleGraphView graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
-                                    @Override
-                                    public void graphChanged() {
-                                    }
-                                } );
-
-                                for (Point obstacle : obstacles) {
-                                    graph.addObstacle(obstacle);
-                                }
-
-                                long startTime = System.currentTimeMillis();
-                                Collection<PlannedPath<SpatialWaypoint, Maneuver>> paths = 
-                                        planner.planPath(
-                                                graph, 
-                                                graph.getNearestWaypoint(new Point(0, 0, 0)),
-                                                graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
-                                                );
-                                long duration = System.currentTimeMillis() - startTime;
-
-                                double averageLength = 0;
-                                for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
-                                    averageLength += path.getWeight();
-                                }
-                                averageLength /= paths.size();
-
-                                try {
-                                    synchronized (out) {
-                                        out.write( numObst + ";" + planner.getName() + "-" + numObst + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
-
-                                        for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
-                                            out.write(";" + evaluateTrajectories(paths, metric));
-                                        }
-
-                                        out.newLine();
-                                    }
-                                    out.flush();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                                runExperiment(out, obstacles, planner);
                             }
                         });
                     }
@@ -181,5 +139,58 @@ public class AlternativePlanners1Creator implements Creator {
 	    }
 	            
         return obstacles;
+    }
+    
+    private void runExperiment(
+            final BufferedWriter out,
+            final List<Point> obstacles,
+            final AlternativePathPlanner planner) {
+        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0); 
+
+        ObstacleGraphView graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
+            @Override
+            public void graphChanged() {
+            }
+        } );
+
+        for (Point obstacle : obstacles) {
+            graph.addObstacle(obstacle);
+        }
+
+        long startTime = System.currentTimeMillis();
+        Collection<PlannedPath<SpatialWaypoint, Maneuver>> paths = 
+                planner.planPath(
+                        graph, 
+                        graph.getNearestWaypoint(new Point(0, 0, 0)),
+                        graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                        );
+        long duration = System.currentTimeMillis() - startTime;
+
+        double averageLength = 0;
+        for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
+            if (path == null) {
+                System.out.println("paths: " + paths);
+                System.out.println("graph.getObstacles(): "
+                        + graph.getObstacles());
+                System.out.println( obstacles.size() + ";" + planner.getName() + "-" + obstacles.size() + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
+            }
+            averageLength += path.getWeight();
+        }
+        averageLength /= paths.size();
+
+        try {
+            synchronized (out) {
+                out.write( obstacles.size() + ";" + planner.getName() + "-" + obstacles.size() + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
+
+                for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
+                    out.write(";" + evaluateTrajectories(paths, metric));
+                }
+
+                out.newLine();
+            }
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

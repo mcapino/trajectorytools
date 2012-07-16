@@ -22,7 +22,7 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
     private final int pathSolutionLimit;
 
-    ManeuverTrajectoryMetric metric;
+    private final ManeuverTrajectoryMetric metric;
         
     public DifferentStateMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit) {
         this.planner = planner;
@@ -35,16 +35,21 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(final ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
         final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>(pathSolutionLimit);
 
-        planner.setGoalPenaltyFunction(new GoalPenaltyFunction<SpatialWaypoint>() {
-            @Override
-            public double getGoalPenalty(SpatialWaypoint vertex) {
-                return ALPHA * metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
-            }
-        });
-
         for (int i = 0; i < pathSolutionLimit; i++) {
-            System.out.println("i: " + i);
-            paths.add( planner.planPath(graph, startVertex, endVertex) );
+            PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(
+                    graph, startVertex, endVertex, 
+                    new GoalPenaltyFunction<SpatialWaypoint>() {
+                        @Override
+                        public double getGoalPenalty(SpatialWaypoint vertex) {
+                            return ALPHA * metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                        }
+                    }, 
+                    planner.getHeuristicFunction()
+                    );
+            if (path == null) {
+                System.out.println("!!!!!! NULL !!!!!!!");
+            }
+            paths.add( path );
         }
         
         return paths;

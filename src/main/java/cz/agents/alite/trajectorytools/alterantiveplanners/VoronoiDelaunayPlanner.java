@@ -20,7 +20,6 @@ import cz.agents.alite.trajectorytools.vis.GraphHolder;
 public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
     private static int MAX_WORLD_SIZE = 10000;
 
-    VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
     private final AStarPlanner<SpatialWaypoint, Maneuver> planner;
 
     public VoronoiDelaunayPlanner( AStarPlanner<SpatialWaypoint, Maneuver> planner ) {
@@ -31,6 +30,8 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
             ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex,
             SpatialWaypoint endVertex) {
+
+        VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
 
         List<SpatialWaypoint> border = Arrays.asList(new SpatialWaypoint[] {
                 graph.getNearestWaypoint(new Point( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
