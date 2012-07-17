@@ -13,6 +13,7 @@ import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.trajectory.ManeuverTrajectory;
+import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Waypoint;
@@ -41,8 +42,8 @@ public class ManeuverDemoCreator implements Creator {
         graph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
 
         replan();
-        trajectory =  new ManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path.plannedPath, false);
-
+        trajectory =  new ManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path.plannedPath, path.plannedPath.getWeight());
+        trajectory =  new SampledTrajectory(trajectory, 0.9);
         createVisualization();
     }
 

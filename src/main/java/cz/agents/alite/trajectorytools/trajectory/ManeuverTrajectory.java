@@ -39,17 +39,14 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
     private double startTime;
     private double duration = Double.POSITIVE_INFINITY;
     
-    boolean stayAtLastPoint;
-
-    public ManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, boolean stayAtLastPoint) {
+    public ManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
         this.maneuvers = graphPath.getEdgeList();
 
         this.startTime = startTime;
-        this.duration = graphPath.getWeight();
+        this.duration = duration;
         this.graph = graphPath.getGraph();
-        this.stayAtLastPoint = stayAtLastPoint;
     }
 
     @Override
@@ -58,7 +55,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
         double currentWaypointTime = startTime;
         Vector currentDirection = new Vector(1,0,0);
 
-        if (t < startTime) {
+        if (t < startTime && t > startTime + duration) {
             return null;
         }
 
@@ -80,11 +77,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
             }
         }
         if (t >= currentWaypointTime) {
-            if (stayAtLastPoint) {
-            	return new OrientedPoint(currentWaypoint, currentDirection);
-            } else {
-            	return null;
-            }
+               	return new OrientedPoint(currentWaypoint, currentDirection);
         }
 
         return null;
@@ -141,10 +134,6 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
 
 	@Override
 	public double getMaxTime() {
-		if (stayAtLastPoint) {
-			return Double.POSITIVE_INFINITY;
-		} else {
-			return startTime + duration;
-		}
+		return startTime + duration;
 	}
 }
