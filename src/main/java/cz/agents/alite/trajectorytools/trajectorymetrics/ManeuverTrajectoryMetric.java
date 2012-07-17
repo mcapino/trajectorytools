@@ -1,8 +1,6 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
-
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.Maneuver;
 
 public interface ManeuverTrajectoryMetric extends TrajectoryMetric<SpatialWaypoint, Maneuver> {
 }

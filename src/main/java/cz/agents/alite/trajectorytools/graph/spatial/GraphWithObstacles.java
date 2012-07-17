@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.maneuver;
+package cz.agents.alite.trajectorytools.graph.spatial;
 
 import java.util.Set;
 
