@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.jgrapht.Graph;
 
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class TrajectoryDistanceMetric<V extends SpatialWaypoint, E> implements AlternativePathPlanner<V, E> {
+public class TrajectoryDistanceMetric<V extends Waypoint, E> implements AlternativePathPlanner<V, E> {
 
     private static final int SOLUTION_COUNT = 5;
     private static final int ALPHA = 1;

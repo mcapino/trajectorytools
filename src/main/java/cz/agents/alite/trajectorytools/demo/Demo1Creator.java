@@ -3,18 +3,19 @@ package cz.agents.alite.trajectorytools.demo;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import org.jgrapht.Graph;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.vis.Vis;
@@ -25,8 +26,8 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class Demo1Creator implements Creator {
 
-	private ObstacleGraphView graph;
-	private PathHolder<SpatialWaypoint, SpatialManeuver> path = new PathHolder<SpatialWaypoint,SpatialManeuver>();
+    private ObstacleGraphView graph;
+    private PathHolder<Waypoint, SpatialManeuver> path = new PathHolder<Waypoint,SpatialManeuver>();
 
     @Override
     public void init(String[] args) {
@@ -34,7 +35,7 @@ public class Demo1Creator implements Creator {
 
     @Override
     public void create() {
-        Graph<SpatialWaypoint, SpatialManeuver> listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0); 
+        Graph<Waypoint, SpatialManeuver> listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
 
         graph = new ObstacleGraphView(listenableGraph, new ChangeListener() {
             @Override
@@ -42,7 +43,7 @@ public class Demo1Creator implements Creator {
                 replan();
             }
         } );
-               
+
         createVisualization();
     }
 
@@ -50,7 +51,7 @@ public class Demo1Creator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 20, 20);
         VisManager.setPanningBounds(new Rectangle(-500, -500, 1600, 1600));
         VisManager.init();
-        
+
         Vis.setPosition(50, 50, 1);
 
         // background
@@ -58,7 +59,7 @@ public class Demo1Creator implements Creator {
 
         // graph with obstacles
         graph.createVisualization();
-        
+
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
 
@@ -66,20 +67,20 @@ public class Demo1Creator implements Creator {
         VisManager.registerLayer(VisInfoLayer.create());
     }
 
-	protected void replan() {
+    protected void replan() {
 
         try {
-            PathPlanner<SpatialWaypoint, SpatialManeuver> aStar = new AStarPlanner<SpatialWaypoint, SpatialManeuver>();
+            PathPlanner<Waypoint, SpatialManeuver> aStar = new AStarPlanner<Waypoint, SpatialManeuver>();
 
-            aStar.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
+            aStar.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
             @Override
-                public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
+                public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
                     return current.distance(goal);
                 }
             });
-           
+
             path.plannedPath = aStar.planPath(
-                    graph, 
+                    graph,
                     SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
                     SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
                     );
@@ -88,5 +89,5 @@ public class Demo1Creator implements Creator {
             e.printStackTrace();
             path.plannedPath = null;
         }
-	}
+    }
 }

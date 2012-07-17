@@ -2,32 +2,31 @@ package cz.agents.alite.trajectorytools.graph;
 
 import static org.junit.Assert.assertEquals;
 
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.DummyEdgeFactory;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.junit.Before;
 import org.junit.Test;
 
-import cz.agents.alite.trajectorytools.graph.PlanarGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.DefaultSpatialManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class PlanarGraphAddEdge {
 
     private PlanarGraph<SpatialManeuver> graph;
-    
-    private SpatialWaypoint point1 = new SpatialWaypoint(2, 0);
-    private SpatialWaypoint point2 = new SpatialWaypoint(0, 2);
-    private SpatialWaypoint point3 = new SpatialWaypoint(-2, 0);
-    private SpatialWaypoint point4 = new SpatialWaypoint(0, -2);
+
+    private Waypoint point1 = new Waypoint(2, 0);
+    private Waypoint point2 = new Waypoint(0, 2);
+    private Waypoint point3 = new Waypoint(-2, 0);
+    private Waypoint point4 = new Waypoint(0, -2);
 
     @Before
     public void setup() {
-        graph = new PlanarGraph<SpatialManeuver>(new DefaultSpatialManeuverGraph());
+        graph = new PlanarGraph<SpatialManeuver>(new DirectedWeightedMultigraph<Waypoint, SpatialManeuver>(new DummyEdgeFactory<Waypoint, SpatialManeuver>()));
         graph.addVertex( point1 );
         graph.addVertex( point2 );
         graph.addVertex( point3 );
         graph.addVertex( point4 );
-        
+
         graph.addEdge(point1, point2);
         graph.addEdge(point2, point3);
         graph.addEdge(point3, point4);
@@ -43,11 +42,11 @@ public class PlanarGraphAddEdge {
     // +  intersection
     @Test
     public void testAddEdge1() {
-        SpatialWaypoint start = new SpatialWaypoint(0, 0);
-        SpatialWaypoint target = new SpatialWaypoint(4, 4);
-        
+        Waypoint start = new Waypoint(0, 0);
+        Waypoint target = new Waypoint(4, 4);
+
         graph.addEdge(start, target);
-        
+
         assertEquals(graph.vertexSet().toString(), 7, graph.vertexSet().size());
         assertEquals(graph.edgeSet().toString(), 7, graph.edgeSet().size());
     }
@@ -55,11 +54,11 @@ public class PlanarGraphAddEdge {
     // ++  intersection
     @Test
     public void testAddEdge1a() {
-        SpatialWaypoint start = new SpatialWaypoint(-4, -4);
-        SpatialWaypoint target = new SpatialWaypoint(4, 4);
-        
+        Waypoint start = new Waypoint(-4, -4);
+        Waypoint target = new Waypoint(4, 4);
+
         graph.addEdge(start, target);
-        
+
         assertEquals(8, graph.vertexSet().size());
         assertEquals(9, graph.edgeSet().size());
     }
@@ -67,11 +66,11 @@ public class PlanarGraphAddEdge {
     // |<  intersection
     @Test
     public void testAddEdge2() {
-        SpatialWaypoint start = new SpatialWaypoint(-2, -4);
-        SpatialWaypoint target = new SpatialWaypoint(-2, 4);
-        
+        Waypoint start = new Waypoint(-2, -4);
+        Waypoint target = new Waypoint(-2, 4);
+
         graph.addEdge(start, target);
-        
+
         assertEquals(6, graph.vertexSet().size());
         assertEquals(6, graph.edgeSet().size());
     }
@@ -79,11 +78,11 @@ public class PlanarGraphAddEdge {
     // -< intersection
     @Test
     public void testAddEdge3() {
-        SpatialWaypoint start = new SpatialWaypoint(-4, 0);
-        SpatialWaypoint target = point3;
-        
+        Waypoint start = new Waypoint(-4, 0);
+        Waypoint target = point3;
+
         graph.addEdge(start, target);
-        
+
         assertEquals(5, graph.vertexSet().size());
         assertEquals(5, graph.edgeSet().size());
     }

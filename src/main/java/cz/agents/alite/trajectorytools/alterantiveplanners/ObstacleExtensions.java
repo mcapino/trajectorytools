@@ -10,59 +10,59 @@ import java.util.Set;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
+import org.jgrapht.Graph;
+
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraphs;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class ObstacleExtensions {
 
     private static final int DIRECTIONS = 4;
 
-    private final PathPlanner<SpatialWaypoint, SpatialManeuver> planner;
-    
-    public ObstacleExtensions(PathPlanner<SpatialWaypoint, SpatialManeuver> planner) {
+    private final PathPlanner<Waypoint, SpatialManeuver> planner;
+
+    public ObstacleExtensions(PathPlanner<Waypoint, SpatialManeuver> planner) {
         this.planner = planner;
     }
 
-    public Collection<PlannedPath<SpatialWaypoint, SpatialManeuver>> planPath(ObstacleGraphView originalGraph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        final Set<PlannedPath<SpatialWaypoint, SpatialManeuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, SpatialManeuver>>();
-        
+    public Collection<PlannedPath<Waypoint, SpatialManeuver>> planPath(ObstacleGraphView originalGraph, Waypoint startVertex, Waypoint endVertex) {
+        final Set<PlannedPath<Waypoint, SpatialManeuver>> paths = new HashSet<PlannedPath<Waypoint, SpatialManeuver>>();
+
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
-        for (SpatialManeuverGraph graph : obstacleExtender) {
-            PlannedPath<SpatialWaypoint, SpatialManeuver> path = planner.planPath(graph, startVertex, endVertex);
+        for (Graph<Waypoint, SpatialManeuver> graph : obstacleExtender) {
+            PlannedPath<Waypoint, SpatialManeuver> path = planner.planPath(graph, startVertex, endVertex);
 
             if ( path != null ) {
                 paths.add( path );
             }
         }
-            
+
         return paths;
     }
 
-    static class ObstacleExtender implements Iterable<SpatialManeuverGraph>{
+    static class ObstacleExtender implements Iterable<Graph<Waypoint, SpatialManeuver>>{
 
         int[] directions;
         private final ObstacleGraphView<SpatialManeuver> originalGraph;
 
         public ObstacleExtender(ObstacleGraphView<SpatialManeuver> originalGraph) {
             this.originalGraph = originalGraph;
-            
+
             directions = new int[originalGraph.getObstacles().size()];
         }
 
         @Override
-        public Iterator<SpatialManeuverGraph> iterator() {
-            return new Iterator<SpatialManeuverGraph>() {
+        public Iterator<Graph<Waypoint, SpatialManeuver>> iterator() {
+            return new Iterator<Graph<Waypoint, SpatialManeuver>>() {
 
                 boolean firstCall = true;
 
@@ -77,37 +77,37 @@ public class ObstacleExtensions {
                 }
 
                 @Override
-                publicGraph<SpatialWaypoint, SpatialManeuver>next() {
+                public Graph<Waypoint, SpatialManeuver> next() {
                     if ( !hasNext() ) {
                         throw new NoSuchElementException("No next element!");
                     }
-                    
+
                     if ( !firstCall ) {
                         incrementDirections();
                     }
                     firstCall = false;
-                   
+
                     return generateNextGraph();
                 }
 
-                protectedGraph<SpatialWaypoint, SpatialManeuver>generateNextGraph() {
-                   Graph<SpatialWaypoint, SpatialManeuver>graph = (SpatialManeuverGraph) SpatialGraphs.clone(originalGraph);
+                protected Graph<Waypoint, SpatialManeuver> generateNextGraph() {
+                   Graph<Waypoint, SpatialManeuver>graph = (Graph<Waypoint, SpatialManeuver>) SpatialGraphs.clone(originalGraph);
 
                     int currObstacle = 0;
 
                     for (Point obstacle : originalGraph.getObstacles()) {
                         removeObstacleExtension( graph, obstacle, directions[ currObstacle++ ] );
                     }
-                    
+
                     return graph;
-                    
+
                 }
 
-                private void removeObstacleExtension(SpatialManeuverGraph graph, Point obstacle, int direction) {
+                private void removeObstacleExtension(Graph<Waypoint, SpatialManeuver> graph, Point obstacle, int direction) {
 
                     Zone zone = createZone(obstacle, direction);
-                    
-                    for (SpatialWaypoint vertex : new ArrayList<SpatialWaypoint>(graph.vertexSet())) {
+
+                    for (Waypoint vertex : new ArrayList<Waypoint>(graph.vertexSet())) {
                         if ( zone.testPoint( vertex ) ) {
                             graph.removeVertex( vertex );
                         }

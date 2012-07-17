@@ -11,8 +11,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 import delaunay.Pnt;
 import delaunay.Triangle;
 import delaunay.Triangulation;
@@ -35,21 +35,21 @@ public class VoronoiDelaunayGraph {
 
     private static int order = 1000;
 
-    private Set<SpatialWaypoint> obstacles;
+    private Set<Waypoint> obstacles;
 
-    private Graph<SpatialWaypoint, DefaultWeightedEdge> voronoiGraph = null;
+    private Graph<Waypoint, DefaultWeightedEdge> voronoiGraph = null;
     private Map<DefaultWeightedEdge, VoronoiEdge> voronoiEdges = new HashMap<DefaultWeightedEdge, VoronoiEdge>();
 
-    private List<SpatialWaypoint> voronoiBorder = new ArrayList<SpatialWaypoint>();
+    private List<Waypoint> voronoiBorder = new ArrayList<Waypoint>();
 
-    private Map<Pnt, SpatialWaypoint> delaunayVertexes = new HashMap<Pnt, SpatialWaypoint>();
+    private Map<Pnt, Waypoint> delaunayVertexes = new HashMap<Pnt, Waypoint>();
 
     private Map<DefaultWeightedEdge, List<DefaultWeightedEdge>> dualEdges = new HashMap<DefaultWeightedEdge, List<DefaultWeightedEdge>>();
 
     public VoronoiDelaunayGraph() {       
     }
     
-    public void setObstacles(Set<SpatialWaypoint> obstacles) {
+    public void setObstacles(Set<Waypoint> obstacles) {
         this.obstacles = obstacles;
         dt = new Triangulation(initialTriangle);
 
@@ -58,17 +58,17 @@ public class VoronoiDelaunayGraph {
         }
     }
 
-    public Graph<SpatialWaypoint, DefaultWeightedEdge> getVoronoiGraph(List<SpatialWaypoint> border) {
-        Graph<SpatialWaypoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialWaypoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+    public Graph<Waypoint, DefaultWeightedEdge> getVoronoiGraph(List<Waypoint> border) {
+        Graph<Waypoint, DefaultWeightedEdge> graph = new SimpleGraph<Waypoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         order = 0;
 
-        Map<Triangle, SpatialWaypoint> vertexes = new HashMap<Triangle, SpatialWaypoint>(); 
+        Map<Triangle, Waypoint> vertexes = new HashMap<Triangle, Waypoint>(); 
         
         for (Triangle triangle : dt) {
             Pnt circumcenter = triangle.getCircumcenter();
             
-            SpatialWaypoint vertex = new SpatialWaypoint(order++, circumcenter.coord(0), circumcenter.coord(1));
+            Waypoint vertex = new Waypoint(order++, circumcenter.coord(0), circumcenter.coord(1));
             vertexes.put(triangle, vertex);
             graph.addVertex( vertex );
         }
@@ -77,8 +77,8 @@ public class VoronoiDelaunayGraph {
         
         for (Triangle triangle : dt) {
             for (Triangle tri: dt.neighbors(triangle)) {
-                SpatialWaypoint sourceVertex = vertexes.get(triangle);
-                SpatialWaypoint targetVertex = vertexes.get(tri);
+                Waypoint sourceVertex = vertexes.get(triangle);
+                Waypoint targetVertex = vertexes.get(tri);
 
                 if (!sourceVertex.equals(targetVertex)) {
                 	DefaultWeightedEdge edge = graph.addEdge(sourceVertex, targetVertex);
@@ -97,7 +97,7 @@ public class VoronoiDelaunayGraph {
         return voronoiGraph;
     }
 
-    private void removeObstaclesFromGraph(Graph<SpatialWaypoint, DefaultWeightedEdge> graph) {
+    private void removeObstaclesFromGraph(Graph<Waypoint, DefaultWeightedEdge> graph) {
         List<DefaultWeightedEdge> toRemove = new LinkedList<DefaultWeightedEdge>();
         for (Point obstacle : obstacles) {
             for (DefaultWeightedEdge edge : graph.edgeSet()) {
@@ -111,19 +111,19 @@ public class VoronoiDelaunayGraph {
         graph.removeAllEdges(toRemove);
     }
 
-    public Graph<SpatialWaypoint, DefaultWeightedEdge> getDelaunayGraph(List<SpatialWaypoint> border) {
+    public Graph<Waypoint, DefaultWeightedEdge> getDelaunayGraph(List<Waypoint> border) {
         
         if (voronoiGraph == null) {
             getVoronoiGraph(border);
         }
         
-        Graph<SpatialWaypoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialWaypoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        Graph<Waypoint, DefaultWeightedEdge> graph = new SimpleGraph<Waypoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         order = 0;
         delaunayVertexes.clear(); 
         for (Triangle triangle : dt) {
             for (Pnt pnt : triangle) {
-                SpatialWaypoint vertex = new SpatialWaypoint(order++, pnt.coord(0), pnt.coord(1));
+                Waypoint vertex = new Waypoint(order++, pnt.coord(0), pnt.coord(1));
                 graph.addVertex(vertex);
                 delaunayVertexes.put(pnt, vertex);
             }
@@ -139,7 +139,7 @@ public class VoronoiDelaunayGraph {
         return graph;
     }
 
-    public void removeDualEdges(Graph<SpatialWaypoint, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
+    public void removeDualEdges(Graph<Waypoint, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
         for (DefaultWeightedEdge maneuver : edgeList) {
             for (DefaultWeightedEdge edge : dualEdges.get(maneuver)) {
                 graph.removeEdge(edge);
@@ -147,7 +147,7 @@ public class VoronoiDelaunayGraph {
         }
     }
     
-    private <E> List<E> addDelaunayEdges(Graph<SpatialWaypoint, E> graph, PlanarGraph<DefaultWeightedEdge> voronoiPlanarGraph, DefaultWeightedEdge edge) {
+    private <E> List<E> addDelaunayEdges(Graph<Waypoint, E> graph, PlanarGraph<DefaultWeightedEdge> voronoiPlanarGraph, DefaultWeightedEdge edge) {
 
         List<E> newEdges = new ArrayList<E>();
         
@@ -157,13 +157,13 @@ public class VoronoiDelaunayGraph {
             newEdges.add( graph.addEdge(delaunayEdge.source, delaunayEdge.target) );
         } else {
             // it's a border edge
-            SpatialWaypoint center = new SpatialWaypoint(
+            Waypoint center = new Waypoint(
                     (graph.getEdgeSource((E) edge).x + graph.getEdgeTarget((E) edge).x / 2.0), 
                     (graph.getEdgeSource((E) edge).y + graph.getEdgeTarget((E) edge).y / 2.0)
                     );
             graph.addVertex(center);
 
-            for (SpatialWaypoint obstacle : obstacles) {
+            for (Waypoint obstacle : obstacles) {
                 if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
                     newEdges.add( graph.addEdge(center, obstacle) );
                 }
@@ -174,8 +174,8 @@ public class VoronoiDelaunayGraph {
     }
     
     private class TemporaryEdge {
-        SpatialWaypoint source;
-        SpatialWaypoint target;
+        Waypoint source;
+        Waypoint target;
     }
     
     private TemporaryEdge getDualEdgeToVoronoi(DefaultWeightedEdge edge) {
@@ -200,11 +200,11 @@ public class VoronoiDelaunayGraph {
     }
 
 
-    private <E> void clipVoronoiGraph(Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
+    private <E> void clipVoronoiGraph(Graph<Waypoint, E> graph, List<Waypoint> border) {
         PlanarGraph<E> planarGraph = new PlanarGraph<E>(graph);
         
-        SpatialWaypoint last = null;
-        for (SpatialWaypoint vertex : border) {
+        Waypoint last = null;
+        for (Waypoint vertex : border) {
             if (last != null) {
                 voronoiBorder.addAll(
                     planarGraph.addLine(last, vertex, voronoiEdges)
@@ -219,17 +219,17 @@ public class VoronoiDelaunayGraph {
         removeOutsideVertices(graph, border);
     }
 
-    private static <E> void removeOutsideVertices(Graph<SpatialWaypoint, E> graph,
-            List<SpatialWaypoint> border) {
+    private static <E> void removeOutsideVertices(Graph<Waypoint, E> graph,
+            List<Waypoint> border) {
         
-        List<SpatialWaypoint> toRemove = getOutsideVertices(graph, border);
+        List<Waypoint> toRemove = getOutsideVertices(graph, border);
         graph.removeAllVertices(toRemove);
     }
 
-    private static <E> List<SpatialWaypoint> getOutsideVertices(
-            Graph<SpatialWaypoint, E> graph, List<SpatialWaypoint> border) {
+    private static <E> List<Waypoint> getOutsideVertices(
+            Graph<Waypoint, E> graph, List<Waypoint> border) {
         Point center = new Point();
-        for (SpatialWaypoint point : border) {
+        for (Waypoint point : border) {
             center.x += point.x;
             center.y += point.y;
         }
@@ -238,8 +238,8 @@ public class VoronoiDelaunayGraph {
         center.y /= border.size();
         
 
-        List<SpatialWaypoint> toRemove = new ArrayList<SpatialWaypoint>();
-        for (SpatialWaypoint vertex : graph.vertexSet()) {
+        List<Waypoint> toRemove = new ArrayList<Waypoint>();
+        for (Waypoint vertex : graph.vertexSet()) {
             Point intersection = getBorderIntersection(center, vertex, border);
             if (intersection != null) {
                 if (!intersection.epsilonEquals(vertex, 0.01)) {
@@ -250,7 +250,7 @@ public class VoronoiDelaunayGraph {
         return toRemove;
     }
     
-    private static Point getBorderIntersection(Point point1, Point point2, List<SpatialWaypoint> border) {
+    private static Point getBorderIntersection(Point point1, Point point2, List<Waypoint> border) {
         Point last = null;
         for (Point vertex : border) {
             if (last != null) {
@@ -264,7 +264,7 @@ public class VoronoiDelaunayGraph {
         return getIntersection(point1, point2, last, border.get(0));
     }
 
-    private static SpatialWaypoint getClosestIntersection(Point point, SpatialWaypoint point1, SpatialWaypoint point2) {
+    private static Waypoint getClosestIntersection(Point point, Waypoint point1, Waypoint point2) {
         double u = ((point.x - point1.x) * (point2.x - point1.x) + (point.y - point1.y) * (point2.y - point1.y)) / point1.distanceSquared(point2);
         if (u < 0) {
             return point1;
@@ -274,7 +274,7 @@ public class VoronoiDelaunayGraph {
             double x = point1.x + u * ( point2.x - point1.x );
             double y = point1.y + u * ( point2.y - point1.y );
 
-            return new SpatialWaypoint(x, y);
+            return new Waypoint(x, y);
         }
     }
 
@@ -287,7 +287,7 @@ public class VoronoiDelaunayGraph {
      * @param point4
      * @return
      */
-    private static SpatialWaypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
+    private static Waypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -331,7 +331,7 @@ public class VoronoiDelaunayGraph {
           return null;
         }
 
-        return new SpatialWaypoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new Waypoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
     }
 
     private static boolean same_sign(double a, double b){

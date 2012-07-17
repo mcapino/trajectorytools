@@ -11,25 +11,25 @@ import java.util.Map.Entry;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.GraphDelegator;
 
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
+public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
     private static final long serialVersionUID = -7039093249594157867L;
 
-    public PlanarGraph(Graph<SpatialWaypoint, E> g) {
+    public PlanarGraph(Graph<Waypoint, E> g) {
         super(g);
     }
 
     @Override
-    public E addEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
+    public E addEdge(Waypoint sourceVertex, Waypoint targetVertex) {
         addLine(sourceVertex, targetVertex, null);
         return null;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<SpatialWaypoint> addLine(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex, Map edgeMap) {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(sourceVertex, targetVertex));
+    public List<Waypoint> addLine(Waypoint sourceVertex, Waypoint targetVertex, Map edgeMap) {
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(sourceVertex, targetVertex));
 
         //
         // Find intersections of edges with the line,
@@ -37,12 +37,12 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         //
 
         List<E> toRemove = new ArrayList<E>();
-        Map<E, SpatialWaypoint> toAdd = new HashMap<E, SpatialWaypoint>();
+        Map<E, Waypoint> toAdd = new HashMap<E, Waypoint>();
         for (E edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = addLineIntersection(edgeSource, edgeTarget, line);
+            Waypoint edgeSource = getEdgeSource(edge);
+            Waypoint edgeTarget = getEdgeTarget(edge);
+            Waypoint intersection = addLineIntersection(edgeSource, edgeTarget, line);
 
             if (intersection != null) {
                 if (intersection.equals(edgeSource) || intersection.equals(edgeTarget)) {
@@ -57,7 +57,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         
         removeAllEdges(toRemove);
 
-        for (Entry<E, SpatialWaypoint> entry : toAdd.entrySet()) {
+        for (Entry<E, Waypoint> entry : toAdd.entrySet()) {
             E edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
             E edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
             
@@ -70,8 +70,8 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             }
         }
 
-        SpatialWaypoint last = null;
-        for (SpatialWaypoint vertex : line) {
+        Waypoint last = null;
+        for (Waypoint vertex : line) {
             if (!containsVertex(vertex)) {
                 addVertex(vertex);
             } 
@@ -89,9 +89,9 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         int counter = 0;
         for (E edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            Waypoint edgeSource = getEdgeSource(edge);
+            Waypoint edgeTarget = getEdgeTarget(edge);
+            Waypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 counter++;
@@ -105,9 +105,9 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         List<E> toRemove = new ArrayList<E>();
         for (E edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            Waypoint edgeSource = getEdgeSource(edge);
+            Waypoint edgeTarget = getEdgeTarget(edge);
+            Waypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 toRemove.add(edge);
@@ -117,12 +117,12 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
         removeAllEdges(toRemove);
     }
 
-    static SpatialWaypoint addLineIntersection(SpatialWaypoint point1, SpatialWaypoint point2, List<SpatialWaypoint> border) {
-        SpatialWaypoint last = null;
+    static Waypoint addLineIntersection(Waypoint point1, Waypoint point2, List<Waypoint> border) {
+        Waypoint last = null;
         int index = 0;
-        for (SpatialWaypoint vertex : border) {
+        for (Waypoint vertex : border) {
             if (last != null) {
-                SpatialWaypoint intersection = getIntersection(point1, point2, last, vertex);
+                Waypoint intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null) {
                     if (intersection.epsilonEquals(last, 0.001)) {
                         return last;
@@ -155,7 +155,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
      * @param point4
      * @return
      */
-    static SpatialWaypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
+    static Waypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -199,7 +199,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             return null;
         }
 
-        return new SpatialWaypoint(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new Waypoint(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
     }
 
     static boolean same_sign(double a, double b){

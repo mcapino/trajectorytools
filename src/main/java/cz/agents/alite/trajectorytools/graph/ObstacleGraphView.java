@@ -3,24 +3,18 @@ package cz.agents.alite.trajectorytools.graph;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import cz.agents.alite.tactical.universe.world.map.UrbanMap;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
-import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.element.FilledStyledCircle;
@@ -40,9 +34,9 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
 	private static final double OBSTACLE_RADIUS = 0.3;
 
 
-    private final Graph<SpatialWaypoint, E> originalGraph;
+    private final Graph<Waypoint, E> originalGraph;
     
-    private final Set<SpatialWaypoint> obstacles = new HashSet<SpatialWaypoint>();
+    private final Set<Waypoint> obstacles = new HashSet<Waypoint>();
 
     private final ChangeListener changeListener;
 
@@ -50,7 +44,7 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
         void graphChanged();
     }
 
-	public ObstacleGraphView(Graph<SpatialWaypoint, E> originalGraph, ChangeListener changeListener) {
+	public ObstacleGraphView(Graph<Waypoint, E> originalGraph, ChangeListener changeListener) {
 		super(originalGraph);
         this.changeListener = changeListener;
        	
@@ -70,7 +64,7 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
             @Override
             public void interactVisually(double x, double y, MouseEvent e) {
                 // find the closest point of the Graph
-                SpatialWaypoint point = SpatialGraphs.getNearestWaypoint(originalGraph, new Point(x, y, 0));
+                Waypoint point = SpatialGraphs.getNearestWaypoint(originalGraph, new Point(x, y, 0));
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     removeVertex( point );
@@ -79,8 +73,8 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
                     if ( obstacles.contains(point) ) {
                         addVertex(point);
                         for (E edge : originalGraph.edgesOf(point)) {
-                            SpatialWaypoint source = originalGraph.getEdgeSource(edge);
-                            SpatialWaypoint target = originalGraph.getEdgeTarget(edge);
+                            Waypoint source = originalGraph.getEdgeSource(edge);
+                            Waypoint target = originalGraph.getEdgeTarget(edge);
                             if (containsVertex(source) && containsVertex(target)) {
                                 addEdge(source, target, edge);
                             }
@@ -139,9 +133,9 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
 	}
 
     public void refresh() {
-        removeAllVertices(new ArrayList<SpatialWaypoint>(vertexSet()));
+        removeAllVertices(new ArrayList<Waypoint>(vertexSet()));
         
-        for (SpatialWaypoint vertex : originalGraph.vertexSet()) {
+        for (Waypoint vertex : originalGraph.vertexSet()) {
             addVertex(vertex);
         }
         
@@ -149,12 +143,12 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
             addEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge));
         }
 
-        for (SpatialWaypoint obstacle : obstacles) {
+        for (Waypoint obstacle : obstacles) {
             removeVertex( obstacle );
         }
     }
     
-    public Set<SpatialWaypoint> getObstacles() {
+    public Set<Waypoint> getObstacles() {
 		return obstacles;
 	}
 }

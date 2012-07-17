@@ -47,5 +47,7 @@ public class Point extends Point3d implements cz.agents.alite.vis.element.Point 
     	((Tuple3d)result).interpolate(p1, p2, alpha);
     	return result;
     }
+    
+    
 
 }

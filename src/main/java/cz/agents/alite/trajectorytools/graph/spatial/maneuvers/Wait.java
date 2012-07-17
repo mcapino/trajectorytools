@@ -1,17 +1,17 @@
 package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class Wait implements SpatialManeuver {
 	
-	private SpatialWaypoint waypoint;
+	private Waypoint waypoint;
 	private double duration;
 	
-	public Wait(SpatialWaypoint waypoint, double duration) {
+	public Wait(Waypoint waypoint, double duration) {
 		super();
 		this.waypoint = waypoint;
 		this.duration = duration;

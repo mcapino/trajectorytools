@@ -10,11 +10,11 @@ import org.jgrapht.SingleEdgeGraphPath;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 /**
  * A wrapper that interprets a graph path as a trajectory.
@@ -27,12 +27,12 @@ import cz.agents.alite.trajectorytools.util.Vector;
  *
  */
 
-public class ManeuverTrajectory<V extends SpatialWaypoint, E extends SpatialManeuver> implements Trajectory {
+public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> implements Trajectory {
 
     private List<E> maneuvers = null;
 
-    private SpatialWaypoint startWaypoint;
-    private SpatialWaypoint endWaypoint;
+    private Waypoint startWaypoint;
+    private Waypoint endWaypoint;
     
     Graph<V,E> graph;
 
@@ -54,7 +54,7 @@ public class ManeuverTrajectory<V extends SpatialWaypoint, E extends SpatialMane
 
     @Override
     public OrientedPoint getPosition(double t) {
-        SpatialWaypoint currentWaypoint = startWaypoint;
+        Waypoint currentWaypoint = startWaypoint;
         double currentWaypointTime = startTime;
         Vector currentDirection = new Vector(1,0,0);
 
@@ -65,7 +65,7 @@ public class ManeuverTrajectory<V extends SpatialWaypoint, E extends SpatialMane
 
         if (maneuvers != null)  {
             for (E maneuver: maneuvers) {
-                SpatialWaypoint nextWaypoint = graph.getEdgeTarget(maneuver);
+                Waypoint nextWaypoint = graph.getEdgeTarget(maneuver);
                 double duration  = maneuver.getDuration(); 
                 double nextWaypointTime = currentWaypointTime + duration;
 

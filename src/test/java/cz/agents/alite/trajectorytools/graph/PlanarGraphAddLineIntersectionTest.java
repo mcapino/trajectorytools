@@ -11,25 +11,25 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cz.agents.alite.trajectorytools.graph.PlanarGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class PlanarGraphAddLineIntersectionTest {
 
-    private SpatialWaypoint point1;
-    private SpatialWaypoint point2;
+    private Waypoint point1;
+    private Waypoint point2;
 
     @Before
     public void setup() {
-        point1 = new SpatialWaypoint(0, 0);
-        point2 = new SpatialWaypoint(5, 0);
+        point1 = new Waypoint(0, 0);
+        point2 = new Waypoint(5, 0);
     }
     
     // +  intersection
     @Test
     public void testAddLineIntersection1() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(2, -2), new SpatialWaypoint(2, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(2, -2), new Waypoint(2, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -41,9 +41,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // T  intersection
     @Test
     public void testAddLineIntersection2() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(2, 0), new SpatialWaypoint(2, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(2, 0), new Waypoint(2, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(line.toString(), 2, line.size());
@@ -54,9 +54,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // |- intersection
     @Test
     public void testAddLineIntersection3() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(0, -2), new SpatialWaypoint(0, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(0, -2), new Waypoint(0, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -67,9 +67,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -| intersection
     @Test
     public void testAddLineIntersection3a() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(5, -2), new SpatialWaypoint(5, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(5, -2), new Waypoint(5, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -80,9 +80,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // ,- intersection
     @Test
     public void testAddLineIntersection4() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(point1, new SpatialWaypoint(0, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(point1, new Waypoint(0, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -92,9 +92,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -, intersection
     @Test
     public void testAddLineIntersection4a() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(point2, new SpatialWaypoint(5, 2)));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(point2, new Waypoint(5, 2)));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -104,9 +104,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // `- intersection
     @Test
     public void testAddLineIntersection4b() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(0, -2), point1));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(0, -2), point1));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -116,9 +116,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -, intersection
     @Test
     public void testAddLineIntersection4v() {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(new SpatialWaypoint(5, -2), point2));
+        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(new Waypoint(5, -2), point2));
         
-        SpatialWaypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        Waypoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
