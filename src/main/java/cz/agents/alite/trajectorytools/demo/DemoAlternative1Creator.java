@@ -66,7 +66,7 @@ public class DemoAlternative1Creator implements Creator {
         new TrajectoryDistanceMetric()
     };
 
-    private static final int CURRENT_PLANNER = 1;
+    private static final int CURRENT_PLANNER = 0;
     @Override
     public void init(String[] args) {
     }
@@ -108,15 +108,21 @@ public class DemoAlternative1Creator implements Creator {
 	protected void replan() {
 	       try {
 	            paths.clear();
+	            
+	            long startTime = System.currentTimeMillis();
+	            
 	            paths.addAll(
 	                alternativePlanners[CURRENT_PLANNER].planPath(
 	                    graph, 
 	                    graph.getNearestWaypoint(new Point(0, 0, 0)),
 	                    graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
 	                ) );
+	            
+	            System.out.println("Time: " + (System.currentTimeMillis() - startTime) + " ms");
+	            
                 System.out.println("paths: " + paths.size());
                 for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
-                    System.out.println("path.getWeight(): " + path.getPathLength());
+                    System.out.println("path.getWeight(): " + path.getWeight());
                 }
                 
                 for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
