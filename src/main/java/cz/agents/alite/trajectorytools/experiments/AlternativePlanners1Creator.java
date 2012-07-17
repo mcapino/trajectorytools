@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +27,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
 
 public class AlternativePlanners1Creator implements Creator {
@@ -119,19 +119,6 @@ public class AlternativePlanners1Creator implements Creator {
         executor.shutdown();
     }
 
-	protected double evaluateTrajectories(
-            Collection<PlannedPath<SpatialWaypoint, Maneuver>> paths,
-            ManeuverTrajectoryMetric metric) {
-	    double value = 0;
-	    for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
-            Collection<PlannedPath<SpatialWaypoint, Maneuver>> tmpPaths = new LinkedList<PlannedPath<SpatialWaypoint,Maneuver>>(paths);
-            tmpPaths.remove(path);
-            
-            value += metric.getTrajectoryValue(path, tmpPaths);
-        }
-        return value / paths.size();
-    }
-
     private List<Point> generateRandomObstacles(int number) {
 	    List<Point> obstacles = new ArrayList<Point>(number);
 	    for (int i=0; i<number; i++) {
@@ -183,7 +170,7 @@ public class AlternativePlanners1Creator implements Creator {
                 out.write( obstacles.size() + ";" + planner.getName() + "-" + obstacles.size() + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
 
                 for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
-                    out.write(";" + evaluateTrajectories(paths, metric));
+                    out.write(";" + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 
                 out.newLine();

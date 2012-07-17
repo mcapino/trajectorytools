@@ -2,7 +2,6 @@ package cz.agents.alite.trajectorytools.trajectorymetrics;
 
 import static junit.framework.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class TrajecotryDistanceMetricTest {
 
     private static final int WORLD_SIZE = 10;
     private ManeuverGraphInterface graph;
-    private List<PlannedPath<SpatialWaypoint, Maneuver>> paths;
+    private PlannedPath<SpatialWaypoint, Maneuver> path;
     private SpatialWaypoint startVertex;
     private SpatialWaypoint endVertex;
     private ManeuverTrajectoryMetric metric;
@@ -59,101 +58,45 @@ public class TrajecotryDistanceMetricTest {
                         endVertex
                         )
                 );
-        paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
-        paths.add(new PlannedPathImpl<SpatialWaypoint, Maneuver>(graph, edges));
+        path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(graph, edges);
         
         metric = new TrajectoryDistanceMetric();
     }
     
     @Test
     public void testSetup() {
-        assertEquals(6.0, paths.get(0).getWeight(), 0.001);
-        assertEquals(6.0, paths.get(0).getPathLength(), 0.001);
+        assertEquals(6.0, path.getWeight(), 0.001);
+        assertEquals(6.0, path.getPathLength(), 0.001);
+    }
+
+    @Test
+    public void testZeroDistance() {
+        assertEquals(0.0, metric.getTrajectoryDistance(path, path), 0.001);
     }
 
     @Test
     public void testSingleVertexPathStart() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph, startVertex);
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph, startVertex);
         
-        assertEquals(0, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
     public void testSingleVertexPathMid() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph,
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph,
                 graph.getNearestWaypoint(new Point(5, 2, 0))
                 );
         
-        assertEquals(0, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
     
     @Test
     public void testSingleVertexPathEnd() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph, endVertex);
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph, endVertex);
         
-        assertEquals(0, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
-    
-    @Test
-    public void testSingleVertexTwoPaths() {
-        List<Maneuver> edges = Arrays.asList(
-                graph.getEdge(
-                        graph.getNearestWaypoint(new Point(3, 5, 0)),
-                        graph.getNearestWaypoint(new Point(4, 5, 0))
-                        ),
-                graph.getEdge(
-                        graph.getNearestWaypoint(new Point(4, 5, 0)),
-                        graph.getNearestWaypoint(new Point(5, 5, 0))
-                        )
-                );
-        paths.add(new PlannedPathImpl<SpatialWaypoint, Maneuver>(graph, edges));
-
-        assertEquals(
-                0, 
-                metric.getTrajectoryValue(
-                        new SingleVertexPlannedPath(
-                                graph, 
-                                graph.getNearestWaypoint(new Point(4, 5, 0))
-                                ), 
-                        paths), 
-                0.001
-                );
-
-        assertEquals(
-                1, 
-                metric.getTrajectoryValue(
-                        new SingleVertexPlannedPath(
-                                graph, 
-                                graph.getNearestWaypoint(new Point(3, 3, 0))
-                                ), 
-                        paths), 
-                0.001
-                );
-
-        assertEquals(
-                1, 
-                metric.getTrajectoryValue(
-                        new SingleVertexPlannedPath(
-                                graph, 
-                                graph.getNearestWaypoint(new Point(4, 4, 0))
-                                ), 
-                        paths), 
-                0.001
-                );
-
-        assertEquals(
-                2, 
-                metric.getTrajectoryValue(
-                        new SingleVertexPlannedPath(
-                                graph, 
-                                graph.getNearestWaypoint(new Point(5, 7, 0))
-                                ), 
-                        paths), 
-                0.001
-                );
-    }
-    
     @Test
     public void testPathStart() {
         List<Maneuver> edges = Arrays.asList(
@@ -167,11 +110,11 @@ public class TrajecotryDistanceMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(3, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(3, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -187,11 +130,11 @@ public class TrajecotryDistanceMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(2, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -207,11 +150,11 @@ public class TrajecotryDistanceMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(3, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(3, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -227,11 +170,11 @@ public class TrajecotryDistanceMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(2, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -283,8 +226,6 @@ public class TrajecotryDistanceMetricTest {
                 edges2 
                 );
         
-        List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
-        paths.add(path2);
-        assertEquals(2, metric.getTrajectoryValue(path1, paths), 0.001);
+        assertEquals(2, metric.getTrajectoryDistance(path1, path2), 0.001);
     }
 }

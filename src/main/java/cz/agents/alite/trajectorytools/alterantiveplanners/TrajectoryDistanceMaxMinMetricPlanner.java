@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetri
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 
-public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner {
+public class TrajectoryDistanceMaxMinMetricPlanner implements AlternativePathPlanner {
 
     private static final int ALPHA = 1;
     
@@ -26,7 +26,7 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner {
 
     private final double maxDistance;
     
-    public TrajectoryDistanceMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, double maxDistance) {
+    public TrajectoryDistanceMaxMinMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, double maxDistance) {
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
         this.maxDistance = maxDistance;
@@ -44,7 +44,7 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner {
                     new GoalPenaltyFunction<SpatialWaypoint>() {
                         @Override
                         public double getGoalPenalty(SpatialWaypoint vertex) {
-                            double distance = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
+                            double distance = TrajectorySetMetrics.getRelativePlanSetMinDiversity(
                                     new SingleVertexPlannedPath(graph, vertex), 
                                     paths,
                                     metric

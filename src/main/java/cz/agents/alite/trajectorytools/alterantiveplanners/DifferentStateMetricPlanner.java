@@ -13,6 +13,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 
 public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
@@ -41,7 +42,11 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
                     new GoalPenaltyFunction<SpatialWaypoint>() {
                         @Override
                         public double getGoalPenalty(SpatialWaypoint vertex) {
-                            double value = metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                            double value = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
+                                    new SingleVertexPlannedPath(graph, vertex), 
+                                    paths,
+                                    metric
+                                    );
                             return ALPHA * (1 - value);
                         }
                     }, 
