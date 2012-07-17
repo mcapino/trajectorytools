@@ -13,10 +13,12 @@ import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanne
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePlannerSelector;
 import cz.agents.alite.trajectorytools.alterantiveplanners.DifferentStateMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
+import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMaxMinMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
 import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
@@ -32,8 +34,9 @@ import cz.agents.alite.trajectorytools.util.Point;
 
 public class AlternativePlanners1Creator implements Creator {
 
-    private static final int MIN_NUM_OF_OBSTACLES = 2;
-    private static final int MAX_NUM_OF_OBSTACLES = 8;
+    private static final int NUM_OF_OBSTACLES_MIN = 2;
+    private static final int NUM_OF_OBSTACLES_MAX = 16;
+    private static final int NUM_OF_OBSTACLES_STEP = 2;
     private static final int NUM_OF_REPEATS = 5;
     
     private static final int NUM_OF_THREADS = 5;
@@ -55,10 +58,11 @@ public class AlternativePlanners1Creator implements Creator {
 
     private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
         new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
-        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
+        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
+        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
         new ObstacleExtensions(planner),
-        new VoronoiDelaunayPlanner( planner ),
         new AlternativePlannerSelector( new ObstacleExtensions(planner), PATH_SOLUTION_LIMIT),
+        new VoronoiDelaunayPlanner( planner ),
         new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
     };
 
@@ -82,7 +86,7 @@ public class AlternativePlanners1Creator implements Creator {
 //            BufferedWriter aggrOut = new BufferedWriter(new FileWriter(
 //                    "results_aggr.csv"));
     
-            out.write("WORLD_SIZE;" + WORLD_SIZE + ";Repeats;" + NUM_OF_REPEATS + ";Obst. cases;" + ( MAX_NUM_OF_OBSTACLES - MIN_NUM_OF_OBSTACLES + 1)  );
+            out.write("WORLD_SIZE;" + WORLD_SIZE + ";Repeats;" + NUM_OF_REPEATS + ";Obst. cases;" + ( (NUM_OF_OBSTACLES_MAX - NUM_OF_OBSTACLES_MIN)/NUM_OF_OBSTACLES_STEP + 1)  );
             out.newLine();
             out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
             for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
@@ -90,22 +94,28 @@ public class AlternativePlanners1Creator implements Creator {
             }
             out.newLine();
     
-            for (int numObstacles = MIN_NUM_OF_OBSTACLES; numObstacles <= MAX_NUM_OF_OBSTACLES; numObstacles++) {
+            for (int numObstacles = NUM_OF_OBSTACLES_MIN; numObstacles <= NUM_OF_OBSTACLES_MAX; numObstacles+=NUM_OF_OBSTACLES_STEP) {
             
-                System.out.println("numObstacles: " + numObstacles);
+//                System.out.println("numObstacles: " + numObstacles);
                 
                 for (int repeat = 0; repeat < NUM_OF_REPEATS; repeat++) {
-                    System.out.println("repeat: " + repeat);
+//                    System.out.println("repeat: " + repeat);
                        
                     final List<Point> obstacles = generateRandomObstacles(numObstacles);
 
+                    int plannerNum = 0;
                     for (final AlternativePathPlanner planner : alternativePlanners) {
-                        System.out.println("planner.getName(): " + planner.getName());
+//                        System.out.println("planner.getName(): " + planner.getName());
+                        final String runStr = numObstacles + "/" + repeat;
 
+                        plannerNum++;
+                        
+                        final int curPlannerNum = plannerNum;
                         executor.execute(new Runnable() {
                             @Override
                             public void run() {
-                                runExperiment(out, obstacles, planner);
+                                System.out.println("run: " + runStr);
+                                runExperiment(out, obstacles, planner, curPlannerNum);
                             }
                         });
                     }
@@ -120,19 +130,36 @@ public class AlternativePlanners1Creator implements Creator {
     }
 
     private List<Point> generateRandomObstacles(int number) {
-	    List<Point> obstacles = new ArrayList<Point>(number);
-	    for (int i=0; i<number; i++) {
-	        obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
-	    }
-	            
-        return obstacles;
+        
+        while (true) {
+            List<Point> obstacles = new ArrayList<Point>(number);
+        
+    	    for (int i=0; i<number; i++) {
+    	        obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
+    	    }
+
+    	    //
+    	    // Check whether a path exists
+    	    //
+    	    ManeuverGraph graph = createGraph();
+    	    
+            PlannedPath<SpatialWaypoint, Maneuver> planPath = planner.planPath(
+                    graph, 
+                    graph.getNearestWaypoint(new Point(0, 0, 0)),
+                    graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                    );
+            if (planPath != null) {
+                return obstacles;
+            }
+        }
     }
     
     private void runExperiment(
             final BufferedWriter out,
             final List<Point> obstacles,
-            final AlternativePathPlanner planner) {
-        ManeuverGraphInterface originalGraph = FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0); 
+            final AlternativePathPlanner planner, 
+            int curPlannerNum) {
+        ManeuverGraphInterface originalGraph = createGraph(); 
 
         ObstacleGraphView graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
             @Override
@@ -163,11 +190,12 @@ public class AlternativePlanners1Creator implements Creator {
             }
             averageLength += path.getWeight();
         }
-        averageLength /= paths.size();
-
+        if (paths.size() != 0) {
+            averageLength /= paths.size();
+        }
         try {
             synchronized (out) {
-                out.write( obstacles.size() + ";" + planner.getName() + "-" + obstacles.size() + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
+                out.write( "" + obstacles.size() + ";" + curPlannerNum + "-" + planner.getName() + "-" + String.format("%03d", obstacles.size()) + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
 
                 for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
                     out.write(";" + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
@@ -179,5 +207,9 @@ public class AlternativePlanners1Creator implements Creator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private ManeuverGraph createGraph() {
+        return FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
     }
 }

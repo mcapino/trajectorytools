@@ -16,6 +16,9 @@ public class TrajectorySetMetrics {
      * @return
      */
     public static <V, E> double getPlanSetAvgDiversity(Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
+        if (trajectories.size() == 0) {
+            return 0;
+        }
         double value = 0;
         for (PlannedPath<V, E> traj1 : trajectories) {
             for (PlannedPath<V, E> traj2 : trajectories) {

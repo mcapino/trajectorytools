@@ -63,6 +63,6 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
     @Override
     public String getName() {
-        return "Different States Metric";
+        return "Different States Metric Planner";
     }
 }

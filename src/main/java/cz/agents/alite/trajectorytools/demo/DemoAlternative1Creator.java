@@ -54,8 +54,8 @@ public class DemoAlternative1Creator implements Creator {
 
     private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
         new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
-        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
-        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
+        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
+        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
         new ObstacleExtensions(planner),
         new VoronoiDelaunayPlanner( planner ),
         new AlternativePlannerSelector( new ObstacleExtensions(planner), PATH_SOLUTION_LIMIT),

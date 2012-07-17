@@ -17,8 +17,6 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 
 public class TrajectoryDistanceMaxMinMetricPlanner implements AlternativePathPlanner {
 
-    private static final int ALPHA = 1;
-    
     private final PathPlanner<SpatialWaypoint, Maneuver> planner;
     private final int pathSolutionLimit;
 
@@ -50,7 +48,7 @@ public class TrajectoryDistanceMaxMinMetricPlanner implements AlternativePathPla
                                     metric
                                     );
                             if (distance < maxDistance) {
-                                return ALPHA * ( maxDistance - distance );
+                                return maxDistance - distance ;
                             } else {
                                 return 0;
                             }
@@ -65,6 +63,6 @@ public class TrajectoryDistanceMaxMinMetricPlanner implements AlternativePathPla
 
     @Override
     public String getName() {
-        return "Trajectory Distance Metric";
+        return "Trajectory MaxMin Distance Metric Planner";
     }
 }

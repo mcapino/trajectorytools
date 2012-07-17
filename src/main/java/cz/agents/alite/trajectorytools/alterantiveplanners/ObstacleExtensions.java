@@ -36,7 +36,12 @@ public class ObstacleExtensions implements AlternativePathPlanner {
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
             ManeuverGraphWithObstacles originalGraph,
             SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+        
         final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
+
+        if (originalGraph.getObstacles().size() > 6) {
+            return paths;
+        }
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
