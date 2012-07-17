@@ -14,7 +14,6 @@ import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.util.Point;
-import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.element.FilledStyledCircle;
@@ -22,21 +21,21 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView<E> extends PlanarGraph<E> {
-	private static final long serialVersionUID = 3428956208593195747L;
+public class ObstacleGraphView<V extends Point, E> extends PlanarGraph<V, E> {
+    private static final long serialVersionUID = 3428956208593195747L;
 
-	private static final Color VERTEX_COLOR = new Color(240, 240, 240);
-	private static final Color VERTEX_COLOR_INACTIVE = new Color(250, 250, 250);
-	private static final Color EDGE_COLOR = new Color(220, 220, 220);
-	private static final Color EDGE_COLOR_INACTIVE = new Color(240, 240, 240);
+    private static final Color VERTEX_COLOR = new Color(240, 240, 240);
+    private static final Color VERTEX_COLOR_INACTIVE = new Color(250, 250, 250);
+    private static final Color EDGE_COLOR = new Color(220, 220, 220);
+    private static final Color EDGE_COLOR_INACTIVE = new Color(240, 240, 240);
 
-	private static final Color OBSTACLE_COLOR = Color.ORANGE;
-	private static final double OBSTACLE_RADIUS = 0.3;
+    private static final Color OBSTACLE_COLOR = Color.ORANGE;
+    private static final double OBSTACLE_RADIUS = 0.3;
 
 
-    private final Graph<Waypoint, E> originalGraph;
-    
-    private final Set<Waypoint> obstacles = new HashSet<Waypoint>();
+    private final Graph<V, E> originalGraph;
+
+    private final Set<V> obstacles = new HashSet<V>();
 
     private final ChangeListener changeListener;
 
@@ -44,27 +43,27 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
         void graphChanged();
     }
 
-	public ObstacleGraphView(Graph<Waypoint, E> originalGraph, ChangeListener changeListener) {
-		super(originalGraph);
+    public ObstacleGraphView(Graph<V, E> originalGraph, ChangeListener changeListener) {
+        super(originalGraph);
         this.changeListener = changeListener;
-       	
+
         this.originalGraph = SpatialGraphs.clone(originalGraph);
-        
-	}
-	
-	public void createVisualization() {
+
+    }
+
+    public void createVisualization() {
         VisManager.registerLayer(GraphLayer.create(originalGraph, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
         VisManager.registerLayer(GraphLayer.create(this, EDGE_COLOR, VERTEX_COLOR, 1, 4));
-        
+
         // clickable obstacles
 
         // interaction
         VisManager.registerLayer(VisualInteractionLayer.create(new VisualInteractionProvidingEntity() {
-            
+
             @Override
             public void interactVisually(double x, double y, MouseEvent e) {
                 // find the closest point of the Graph
-                Waypoint point = SpatialGraphs.getNearestWaypoint(originalGraph, new Point(x, y, 0));
+                V point = SpatialGraphs.getNearestVertex(originalGraph, new Point(x, y, 0));
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     removeVertex( point );
@@ -73,14 +72,14 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
                     if ( obstacles.contains(point) ) {
                         addVertex(point);
                         for (E edge : originalGraph.edgesOf(point)) {
-                            Waypoint source = originalGraph.getEdgeSource(edge);
-                            Waypoint target = originalGraph.getEdgeTarget(edge);
+                            V source = originalGraph.getEdgeSource(edge);
+                            V target = originalGraph.getEdgeTarget(edge);
                             if (containsVertex(source) && containsVertex(target)) {
                                 addEdge(source, target, edge);
                             }
                         }
-                        
-                        obstacles.remove(point);                    
+
+                        obstacles.remove(point);
                     }
                 } else {
                     return;
@@ -89,37 +88,37 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
                 if ( changeListener != null ) {
                     changeListener.graphChanged();
                 }
-            }           
-        
+            }
+
             @Override
             public String getName() {
                 return "Obstacles layer : ClickableObstaclesLayer";
             }
-            
+
             @Override
             public UrbanMap getMap() {
                 throw new UnsupportedOperationException("!!!!");
             }
-        })); 
+        }));
 
         // drawing obstacles
         VisManager.registerLayer(FilledStyledCircleLayer.create(new FilledStyledCircleElements() {
-            
+
             @Override
             public int getStrokeWidth() {
                 return 1;
             }
-            
+
             @Override
             public Color getColor() {
                 return OBSTACLE_COLOR.darker();
             }
-            
+
             @Override
             public Color getFillColor() {
                 return OBSTACLE_COLOR;
             }
-            
+
             @Override
             public Iterable<? extends FilledStyledCircle> getCircles() {
                 List<FilledStyledCircle> circles = new ArrayList<FilledStyledCircle>(obstacles.size());
@@ -130,25 +129,25 @@ public class ObstacleGraphView<E> extends PlanarGraph<E> {
                 return circles;
             }
         }));
-	}
+    }
 
     public void refresh() {
-        removeAllVertices(new ArrayList<Waypoint>(vertexSet()));
-        
-        for (Waypoint vertex : originalGraph.vertexSet()) {
+        removeAllVertices(new ArrayList<V>(vertexSet()));
+
+        for (V vertex : originalGraph.vertexSet()) {
             addVertex(vertex);
         }
-        
+
         for (E edge : originalGraph.edgeSet()) {
             addEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge));
         }
 
-        for (Waypoint obstacle : obstacles) {
+        for (V obstacle : obstacles) {
             removeVertex( obstacle );
         }
     }
-    
-    public Set<Waypoint> getObstacles() {
-		return obstacles;
-	}
+
+    public Set<V> getObstacles() {
+        return obstacles;
+    }
 }

@@ -8,8 +8,8 @@ import org.jgrapht.Graph;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
@@ -26,7 +26,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class Demo1Creator implements Creator {
 
-    private ObstacleGraphView graph;
+    private ObstacleGraphView<Waypoint, SpatialManeuver> graph;
     private PathHolder<Waypoint, SpatialManeuver> path = new PathHolder<Waypoint,SpatialManeuver>();
 
     @Override
@@ -37,7 +37,7 @@ public class Demo1Creator implements Creator {
     public void create() {
         Graph<Waypoint, SpatialManeuver> listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
 
-        graph = new ObstacleGraphView(listenableGraph, new ChangeListener() {
+        graph = new ObstacleGraphView<Waypoint, SpatialManeuver>(listenableGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
                 replan();
@@ -81,8 +81,8 @@ public class Demo1Creator implements Creator {
 
             path.plannedPath = aStar.planPath(
                     graph,
-                    SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

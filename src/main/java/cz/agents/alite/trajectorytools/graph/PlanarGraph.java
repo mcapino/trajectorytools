@@ -12,24 +12,23 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.GraphDelegator;
 
 import cz.agents.alite.trajectorytools.util.Point;
-import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
+public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
     private static final long serialVersionUID = -7039093249594157867L;
 
-    public PlanarGraph(Graph<Waypoint, E> g) {
+    public PlanarGraph(Graph<V, E> g) {
         super(g);
     }
 
     @Override
-    public E addEdge(Waypoint sourceVertex, Waypoint targetVertex) {
+    public E addEdge(V sourceVertex, V targetVertex) {
         addLine(sourceVertex, targetVertex, null);
         return null;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<Waypoint> addLine(Waypoint sourceVertex, Waypoint targetVertex, Map edgeMap) {
-        List<Waypoint> line = new LinkedList<Waypoint>(Arrays.asList(sourceVertex, targetVertex));
+    public List<V> addLine(V sourceVertex, V targetVertex, Map edgeMap) {
+        List<V> line = new LinkedList<V>(Arrays.asList(sourceVertex, targetVertex));
 
         //
         // Find intersections of edges with the line,
@@ -37,12 +36,12 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
         //
 
         List<E> toRemove = new ArrayList<E>();
-        Map<E, Waypoint> toAdd = new HashMap<E, Waypoint>();
+        Map<E, V> toAdd = new HashMap<E, V>();
         for (E edge : edgeSet()) {
 
-            Waypoint edgeSource = getEdgeSource(edge);
-            Waypoint edgeTarget = getEdgeTarget(edge);
-            Waypoint intersection = addLineIntersection(edgeSource, edgeTarget, line);
+            V edgeSource = getEdgeSource(edge);
+            V edgeTarget = getEdgeTarget(edge);
+            V intersection = addLineIntersection(edgeSource, edgeTarget, line);
 
             if (intersection != null) {
                 if (intersection.equals(edgeSource) || intersection.equals(edgeTarget)) {
@@ -54,13 +53,13 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
                 }
             }
         }
-        
+
         removeAllEdges(toRemove);
 
-        for (Entry<E, Waypoint> entry : toAdd.entrySet()) {
+        for (Entry<E, V> entry : toAdd.entrySet()) {
             E edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
             E edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
-            
+
             if (edgeMap != null) {
                 Object edgeInfo = edgeMap.get(entry.getKey());
                 if (edgeInfo != null) {
@@ -70,11 +69,11 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
             }
         }
 
-        Waypoint last = null;
-        for (Waypoint vertex : line) {
+        V last = null;
+        for (V vertex : line) {
             if (!containsVertex(vertex)) {
                 addVertex(vertex);
-            } 
+            }
             if (last != null) {
                 super.addEdge(last, vertex);
                 super.addEdge(vertex, last);
@@ -84,14 +83,14 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
 
         return line;
     }
-    
-    public int countCrossingEdges(Point point1, Point point2) {
+
+    public int countCrossingEdges(V point1, V point2) {
         int counter = 0;
         for (E edge : edgeSet()) {
 
-            Waypoint edgeSource = getEdgeSource(edge);
-            Waypoint edgeTarget = getEdgeTarget(edge);
-            Waypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            V edgeSource = getEdgeSource(edge);
+            V edgeTarget = getEdgeTarget(edge);
+            V intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 counter++;
@@ -100,29 +99,29 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
         return counter;
     }
 
-    
-    public void removeCrossingEdges(Point point1, Point point2) {
+
+    public void removeCrossingEdges(V point1, V point2) {
         List<E> toRemove = new ArrayList<E>();
         for (E edge : edgeSet()) {
 
-            Waypoint edgeSource = getEdgeSource(edge);
-            Waypoint edgeTarget = getEdgeTarget(edge);
-            Waypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            V edgeSource = getEdgeSource(edge);
+            V edgeTarget = getEdgeTarget(edge);
+            V intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 toRemove.add(edge);
             }
         }
-        
+
         removeAllEdges(toRemove);
     }
 
-    static Waypoint addLineIntersection(Waypoint point1, Waypoint point2, List<Waypoint> border) {
-        Waypoint last = null;
+    static <V extends Point> V addLineIntersection(V point1, V point2, List<V> border) {
+        V last = null;
         int index = 0;
-        for (Waypoint vertex : border) {
+        for (V vertex : border) {
             if (last != null) {
-                Waypoint intersection = getIntersection(point1, point2, last, vertex);
+                V intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null) {
                     if (intersection.epsilonEquals(last, 0.001)) {
                         return last;
@@ -134,7 +133,7 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
                     } else if (intersection.epsilonEquals(point2, 0.001)) {
                         border.add(index, point2);
                         return point2;
-                    } else { 
+                    } else {
                         border.add(index, intersection);
                         return intersection;
                     }
@@ -148,14 +147,14 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
 
     /**
      * intersection in 2D
-     * 
+     *
      * @param point1
      * @param point2
      * @param point3
      * @param point4
      * @return
      */
-    static Waypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
+    static <V extends Point> V getIntersection(V point1, V point2, V point3, V point4){
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -199,7 +198,7 @@ public class PlanarGraph<E> extends GraphDelegator<Waypoint, E> {
             return null;
         }
 
-        return new Waypoint(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return (V) new Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom, 0.0);
     }
 
     static boolean same_sign(double a, double b){

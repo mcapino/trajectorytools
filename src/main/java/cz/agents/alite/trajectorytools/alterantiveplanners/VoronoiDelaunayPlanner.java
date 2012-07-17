@@ -7,83 +7,82 @@ import java.util.List;
 
 import org.jgrapht.alg.AllPathsIterator;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
-import cz.agents.alite.trajectorytools.graph.maneuver.PlanarGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.VoronoiDelaunayGraph;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.PlanarGraph;
+import cz.agents.alite.trajectorytools.graph.VoronoiDelaunayGraph;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
 
-public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
+public class VoronoiDelaunayPlanner<V extends Point, E> implements AlternativePathPlanner<V, E> {
     private static int MAX_WORLD_SIZE = 10000;
 
-    private final AStarPlanner<SpatialWaypoint, Maneuver> planner;
+    private final AStarPlanner<V, E> planner;
 
-    public VoronoiDelaunayPlanner( AStarPlanner<SpatialWaypoint, Maneuver> planner ) {
+    public VoronoiDelaunayPlanner( AStarPlanner<V, E> planner ) {
         this.planner = planner;
     }
 
     @Override
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
-            ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex,
-            SpatialWaypoint endVertex) {
+    public Collection<PlannedPath<V, E>> planPath(
+            GraphWithObstacles<V,E> graph, V startVertex,
+            V endVertex) {
 
         VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
 
-        List<SpatialWaypoint> border = Arrays.asList(new SpatialWaypoint[] {
-                graph.getNearestWaypoint(new Point( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                graph.getNearestWaypoint(new Point( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                graph.getNearestWaypoint(new Point( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
-                graph.getNearestWaypoint(new Point( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
+        List<Point> border = Arrays.asList(new Point[] {
+                SpatialGraphs.getNearestVertex(graph, new Point( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new Point( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new Point( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new Point( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
         });
 
-        PlanarGraph<Maneuver> planarGraph = new PlanarGraph<Maneuver>(graph);
+        PlanarGraph<V,E> planarGraph = new PlanarGraph<V,E>(graph);
 
-        GraphHolder<SpatialWaypoint, Maneuver> voronoiGraph = new GraphHolder<SpatialWaypoint, Maneuver>();
-        GraphHolder<SpatialWaypoint, Maneuver> delaunayGraph = new GraphHolder<SpatialWaypoint, Maneuver>();
-        
+        GraphHolder<V, E> voronoiGraph = new GraphHolder<V, E>();
+        GraphHolder<V, E> delaunayGraph = new GraphHolder<V, E>();
+
         voronoiGraphAlg.setObstacles(graph.getObstacles());
-        
+
         voronoiGraph.graph = voronoiGraphAlg.getVoronoiGraph(border);
         delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
 
-        List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
+        List<PlannedPath<V, E>> paths = new ArrayList<PlannedPath<V,E>>();
 
-        AllPathsIterator<SpatialWaypoint, Maneuver> pathsIt = new AllPathsIterator<SpatialWaypoint, Maneuver>(voronoiGraph.graph,
+        AllPathsIterator<V, E> pathsIt = new AllPathsIterator<V, E>(voronoiGraph.graph,
                 startVertex,
                 endVertex
                 );
 
         while (pathsIt.hasNext()) {
 
-            PlannedPath<SpatialWaypoint, Maneuver> planPath = pathsIt.next();
+            PlannedPath<V, E> planPath = pathsIt.next();
 
             delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
-            
+
             voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
-            
+
 //            System.out.println("delaunayGraph.graph.vertexSet(): " + delaunayGraph.graph.vertexSet());
 
-//            PlanarGraph<Maneuver> planarGraphDelaunay = new PlanarGraph<Maneuver>(delaunayGraph.graph);
+//            PlanarGraph<E> planarGraphDelaunay = new PlanarGraph<E>(delaunayGraph.graph);
 //
 //            delaunayGraph.graph.removeVertex(startVertex);
 //            delaunayGraph.graph.removeVertex(targetVertex);
-//            
-//            for (Maneuver voronoiEdge: planPath.getEdgeList()) {
+//
+//            for (E voronoiEdge: planPath.getEdgeList()) {
 //                planarGraphDelaunay.removeCrossingEdges(voronoiEdge.getSource(), voronoiEdge.getTarget());
 //            }
-//    
+//
 //            delaunayGraph.graph = planarGraphDelaunay;
-        
+
             graph.refresh();
-        
-            for (Maneuver edge : delaunayGraph.graph.edgeSet()) {
+
+            for (E edge : delaunayGraph.graph.edgeSet()) {
                 planarGraph.removeCrossingEdges(edge.getSource(), edge.getTarget());
             }
-    
+
             planPath = planner.planPath(graph,
                     startVertex,
                     endVertex
@@ -95,7 +94,7 @@ public class VoronoiDelaunayPlanner implements AlternativePathPlanner {
                 }
             }
         }
-        
+
         return paths;
     }
 

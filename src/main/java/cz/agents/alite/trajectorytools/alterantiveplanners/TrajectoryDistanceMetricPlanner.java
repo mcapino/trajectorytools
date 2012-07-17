@@ -4,49 +4,48 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.jme3.scene.Spatial;
-
-import cz.agents.alite.planner.spatialmaneuver.maneuver.Maneuver;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
-import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
-import cz.agents.alite.trajectorytools.util.Waypoint;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
+import cz.agents.alite.trajectorytools.util.Point;
 
-public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner<Waypoint, SpatialManeuver> {
+public class TrajectoryDistanceMetricPlanner<V extends Point,E> implements AlternativePathPlanner<V, E> {
 
     private static final int ALPHA = 1;
 
-    private final PathPlanner<Waypoint, Maneuver> planner;
+    private final PathPlanner<V, E> planner;
     private final int pathSolutionLimit;
 
-    ManeuverTrajectoryMetric metric;
+    TrajectoryMetric<V,E> metric;
 
     private final double maxDistance;
 
-    public TrajectoryDistanceMetricPlanner(PathPlanner<Waypoint, Maneuver> planner, int pathSolutionLimit, double maxDistance) {
+    public TrajectoryDistanceMetricPlanner(PathPlanner<V, E> planner, int pathSolutionLimit, double maxDistance) {
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
         this.maxDistance = maxDistance;
 
-        metric = new TrajectoryDistanceMetric();
+        metric = new TrajectoryDistanceMetric<V,E>();
     }
 
     @Override
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(final ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+    public Collection<PlannedPath<V, E>> planPath(final GraphWithObstacles<V, E> graph, V startVertex, V endVertex) {
 
-        final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>(pathSolutionLimit);
+        final List<PlannedPath<V, E>> paths = new ArrayList<PlannedPath<V, E>>(pathSolutionLimit);
 
         for (int i = 0; i < pathSolutionLimit; i++) {
             paths.add( planner.planPath(
-                    graph, startVertex, endVertex, 
-                    new GoalPenaltyFunction<SpatialWaypoint>() {
+                    graph, startVertex, endVertex,
+                    new GoalPenaltyFunction<V>() {
                         @Override
-                        public double getGoalPenalty(SpatialWaypoint vertex) {
+                        public double getGoalPenalty(V vertex) {
                             double distance = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
-                                    new SingleVertexPlannedPath(graph, vertex), 
+                                    new SingleVertexPlannedPath(graph, vertex),
                                     paths,
                                     metric
                                     );
@@ -56,7 +55,7 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner<W
                                 return 0;
                             }
                         }
-                    }, 
+                    },
                     planner.getHeuristicFunction()
                     ) );
         }

@@ -1,16 +1,15 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
+import cz.agents.alite.trajectorytools.util.Point;
 
-public class DifferentStateMetric implements ManeuverTrajectoryMetric {
+public class DifferentStateMetric<V extends Point, E> implements TrajectoryMetric<V, E> {
 
     public DifferentStateMetric() {
     }
 
     @Override
-    public double getTrajectoryDistance( PlannedPath<SpatialWaypoint, Maneuver> path, PlannedPath<SpatialWaypoint, Maneuver> otherPath) {
+    public double getTrajectoryDistance( PlannedPath<V, E> path, PlannedPath<V, E> otherPath) {
         double penalty = 0;
         if (pathContainsVertex(path.getStartVertex(), otherPath)) {
             penalty += 0.5;
@@ -20,23 +19,23 @@ public class DifferentStateMetric implements ManeuverTrajectoryMetric {
             penalty += 0.5;
         }
 
-        for (Maneuver edge : path.getEdgeList()) {
-            if (pathContainsVertex(edge.getSource(), otherPath)) {
+        for (E edge : path.getEdgeList()) {
+            if (pathContainsVertex(path.getGraph().getEdgeSource(edge), otherPath)) {
                 penalty += 0.5;
             }
-            if (pathContainsVertex(edge.getTarget(), otherPath)) {
+            if (pathContainsVertex(path.getGraph().getEdgeTarget(edge), otherPath)) {
                 penalty += 0.5;
             }
         }
-            
+
         return 1 - penalty / (path.getEdgeList().size() + 1);
     }
 
-    private boolean pathContainsVertex(SpatialWaypoint vertex, PlannedPath<SpatialWaypoint, Maneuver> path) {
-        for (Maneuver edge : path.getEdgeList()) {
-            if ( vertex.equals(edge.getSource()) || vertex.equals(edge.getTarget()) ) {
+    private boolean pathContainsVertex(V vertex, PlannedPath<V, E> path) {
+        for (E edge : path.getEdgeList()) {
+            if ( vertex.equals(path.getGraph().getEdgeSource(edge)) || vertex.equals(path.getGraph().getEdgeTarget(edge)) ) {
                 return true;
-            }                            
+            }
         }
         return false;
     }

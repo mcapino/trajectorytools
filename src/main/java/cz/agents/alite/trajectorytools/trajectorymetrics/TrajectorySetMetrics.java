@@ -3,19 +3,20 @@ package cz.agents.alite.trajectorytools.trajectorymetrics;
 import java.util.Collection;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
+import cz.agents.alite.trajectorytools.util.Point;
 
 public class TrajectorySetMetrics {
-    
+
     private TrajectorySetMetrics() {}
 
     /**
      * See: 'Alexandra Coman: Generating Diverse Plans Using Quantitative and Qualitative Plan Distance Metrics'
-     * 
+     *
      * @param trajectories
      * @param distanceMetric
      * @return
      */
-    public static <V, E> double getPlanSetAvgDiversity(Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
+    public static <V extends Point, E> double getPlanSetAvgDiversity(Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
         if (trajectories.size() == 0) {
             return 0;
         }
@@ -28,7 +29,7 @@ public class TrajectorySetMetrics {
         return value / ( trajectories.size() * trajectories.size() - 1 );
     }
 
-    public static <V, E> double getRelativePlanSetAvgDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
+    public static <V extends Point, E> double getRelativePlanSetAvgDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
         double value = 0;
         for (PlannedPath<V, E> otherTraj : trajectories) {
             value += distanceMetric.getTrajectoryDistance(trajectory, otherTraj);
@@ -36,7 +37,7 @@ public class TrajectorySetMetrics {
         return value / trajectories.size();
     }
 
-    public static <V, E> double getRelativePlanSetMaxDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
+    public static <V extends Point, E> double getRelativePlanSetMaxDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
         double maxValue = 0;
         for (PlannedPath<V, E> otherTraj : trajectories) {
             maxValue = Math.max( maxValue, distanceMetric.getTrajectoryDistance(trajectory, otherTraj));
@@ -44,7 +45,7 @@ public class TrajectorySetMetrics {
         return maxValue;
     }
 
-    public static <V, E> double getRelativePlanSetMinDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
+    public static <V extends Point, E> double getRelativePlanSetMinDiversity(PlannedPath<V, E> trajectory, Collection<PlannedPath<V, E>> trajectories, TrajectoryMetric<V, E> distanceMetric) {
         double minValue = Double.MAX_VALUE;
         for (PlannedPath<V, E> otherTraj : trajectories) {
             minValue = Math.min( minValue, distanceMetric.getTrajectoryDistance(trajectory, otherTraj));

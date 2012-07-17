@@ -6,9 +6,7 @@ import java.util.List;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
-import cz.agents.alite.trajectorytools.util.Point;
-
-public class SingleVertexPlannedPath<V extends Point, E> implements
+public class SingleVertexPlannedPath<V, E> implements
         PlannedPath<V, E> {
     private final Graph<V,E> graph;
     private final V vertex;

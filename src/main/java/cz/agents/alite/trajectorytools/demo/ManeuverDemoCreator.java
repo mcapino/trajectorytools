@@ -86,8 +86,8 @@ public class ManeuverDemoCreator implements Creator {
 
             path.plannedPath = aStar.planPath(
                     graph,
-                    SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestWaypoint(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

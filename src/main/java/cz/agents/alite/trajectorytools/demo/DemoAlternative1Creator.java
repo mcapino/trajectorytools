@@ -3,8 +3,6 @@ package cz.agents.alite.trajectorytools.demo;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -17,19 +15,17 @@ import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMaxMinMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
-import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
-import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
-import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Waypoint;
@@ -58,8 +54,8 @@ public class DemoAlternative1Creator implements Creator {
         });
     }
 
-    private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
-        new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
+    private static final AlternativePathPlanner<Waypoint, SpatialManeuver>[] alternativePlanners = new AlternativePathPlanner[] {
+        new DifferentStateMetricPlanner<Waypoint, SpatialManeuver>( planner, PATH_SOLUTION_LIMIT ),
         new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
         new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
         new ObstacleExtensions(planner),
@@ -68,7 +64,7 @@ public class DemoAlternative1Creator implements Creator {
         new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
     };
 
-    private static final ManeuverTrajectoryMetric[] trajectoryMetrics = new ManeuverTrajectoryMetric [] {
+    private static final TrajectoryMetric<Waypoint, SpatialManeuver>[] trajectoryMetrics = new TrajectoryMetric[] {
         new DifferentStateMetric(),
         new TrajectoryDistanceMetric()
     };
@@ -115,24 +111,24 @@ public class DemoAlternative1Creator implements Creator {
     protected void replan() {
            try {
                 paths.clear();
-                
+
                 long startTime = System.currentTimeMillis();
-                
+
                 paths.addAll(
-                		alternativePlanners[CURRENT_PLANNER].planPath(
+                        alternativePlanners[CURRENT_PLANNER].planPath(
                         graph,
-                        SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
-                        SpatialGraphs.getNearestWaypoint(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                        SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
                     ) );
-	            
-	            System.out.println("Time: " + (System.currentTimeMillis() - startTime) + " ms");
-	            
+
+                System.out.println("Time: " + (System.currentTimeMillis() - startTime) + " ms");
+
                 System.out.println("paths: " + paths.size());
                 for (PlannedPath<Waypoint, SpatialManeuver> path : paths) {
                     System.out.println("path.getWeight(): " + path.getWeight());
                 }
-                
-                for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
+
+                for (TrajectoryMetric<Waypoint, SpatialManeuver> metric : trajectoryMetrics) {
                     System.out.println(metric.getName() + ": " + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 
