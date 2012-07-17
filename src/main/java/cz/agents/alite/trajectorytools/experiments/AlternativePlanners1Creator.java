@@ -34,9 +34,9 @@ public class AlternativePlanners1Creator implements Creator {
 
     private static final int MIN_NUM_OF_OBSTACLES = 2;
     private static final int MAX_NUM_OF_OBSTACLES = 8;
-    private static final int NUM_OF_REPEATS = 3;
+    private static final int NUM_OF_REPEATS = 5;
     
-    private static final int NUM_OF_THREADS = 8;
+    private static final int NUM_OF_THREADS = 5;
     private static final ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREADS);
 
     private static final int PATH_SOLUTION_LIMIT = 5;
@@ -82,7 +82,7 @@ public class AlternativePlanners1Creator implements Creator {
 //            BufferedWriter aggrOut = new BufferedWriter(new FileWriter(
 //                    "results_aggr.csv"));
     
-            out.write("WORLD_SIZE=" + WORLD_SIZE);
+            out.write("WORLD_SIZE;" + WORLD_SIZE + ";Repeats;" + NUM_OF_REPEATS + ";Obst. cases;" + ( MAX_NUM_OF_OBSTACLES - MIN_NUM_OF_OBSTACLES + 1)  );
             out.newLine();
             out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
             for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
@@ -129,7 +129,7 @@ public class AlternativePlanners1Creator implements Creator {
             
             value += metric.getTrajectoryValue(path, tmpPaths);
         }
-        return value;
+        return value / paths.size();
     }
 
     private List<Point> generateRandomObstacles(int number) {
