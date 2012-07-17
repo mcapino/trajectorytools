@@ -16,7 +16,7 @@ import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMaxMinMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
+import cz.agents.alite.trajectorytools.graph.maneuver.EightWayConstantSpeedGridGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
@@ -28,6 +28,7 @@ import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.ObstacleAvoidanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -68,7 +69,8 @@ public class AlternativePlanners1Creator implements Creator {
 
     private static final ManeuverTrajectoryMetric[] trajectoryMetrics = new ManeuverTrajectoryMetric [] {
         new DifferentStateMetric(),
-        new TrajectoryDistanceMetric()
+        new TrajectoryDistanceMetric(),
+        new ObstacleAvoidanceMetric()
     };
 
     @Override
@@ -210,6 +212,6 @@ public class AlternativePlanners1Creator implements Creator {
     }
 
     private ManeuverGraph createGraph() {
-        return FourWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
+        return EightWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
     }
 }

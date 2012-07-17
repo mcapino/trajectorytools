@@ -24,6 +24,7 @@ import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.ObstacleAvoidanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -64,7 +65,8 @@ public class DemoAlternative1Creator implements Creator {
 
     private static final ManeuverTrajectoryMetric[] trajectoryMetrics = new ManeuverTrajectoryMetric [] {
         new DifferentStateMetric(),
-        new TrajectoryDistanceMetric()
+        new TrajectoryDistanceMetric(),
+        new ObstacleAvoidanceMetric()
     };
 
     private static final int CURRENT_PLANNER = 2;

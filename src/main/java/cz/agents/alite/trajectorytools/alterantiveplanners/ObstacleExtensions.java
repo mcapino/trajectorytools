@@ -13,9 +13,9 @@ import javax.vecmath.Vector3d;
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
+import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
 import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
@@ -45,7 +45,7 @@ public class ObstacleExtensions implements AlternativePathPlanner {
         
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
-        for (ManeuverGraph graph : obstacleExtender) {
+        for (ManeuverGraphInterface graph : obstacleExtender) {
             PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
 
             if ( path != null ) {
@@ -56,7 +56,7 @@ public class ObstacleExtensions implements AlternativePathPlanner {
         return paths;
     }
 
-    static class ObstacleExtender implements Iterable<ManeuverGraph>{
+    static class ObstacleExtender implements Iterable<ManeuverGraphInterface>{
 
         int[] directions;
         private final ManeuverGraphWithObstacles originalGraph;
@@ -68,8 +68,8 @@ public class ObstacleExtensions implements AlternativePathPlanner {
         }
 
         @Override
-        public Iterator<ManeuverGraph> iterator() {
-            return new Iterator<ManeuverGraph>() {
+        public Iterator<ManeuverGraphInterface> iterator() {
+            return new Iterator<ManeuverGraphInterface>() {
 
                 boolean firstCall = true;
 
@@ -84,7 +84,7 @@ public class ObstacleExtensions implements AlternativePathPlanner {
                 }
 
                 @Override
-                public ManeuverGraph next() {
+                public ManeuverGraphInterface next() {
                     if ( !hasNext() ) {
                         throw new NoSuchElementException("No next element!");
                     }
@@ -97,8 +97,8 @@ public class ObstacleExtensions implements AlternativePathPlanner {
                     return generateNextGraph();
                 }
 
-                protected ManeuverGraph generateNextGraph() {
-                    ManeuverGraph graph = CopyManeuverGraph.create( originalGraph );
+                protected ManeuverGraphInterface generateNextGraph() {
+                    ManeuverGraphInterface graph = CopyManeuverGraphWithObstacles.create( originalGraph );
 
                     int currObstacle = 0;
 
@@ -110,7 +110,7 @@ public class ObstacleExtensions implements AlternativePathPlanner {
                     
                 }
 
-                private void removeObstacleExtension(ManeuverGraph graph, Point obstacle, int direction) {
+                private void removeObstacleExtension(ManeuverGraphInterface graph, Point obstacle, int direction) {
 
                     Zone zone = createZone(obstacle, direction);
                     
