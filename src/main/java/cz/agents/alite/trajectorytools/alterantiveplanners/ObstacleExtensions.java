@@ -166,4 +166,9 @@ public class ObstacleExtensions {
             }
         }
     }
+
+    @Override
+    public String getName() {
+        return "Obstacle Extension";
+    }
 }

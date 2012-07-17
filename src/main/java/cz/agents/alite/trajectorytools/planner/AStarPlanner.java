@@ -38,7 +38,7 @@ public final class AStarPlanner<V, E> implements PathPlanner<V, E>
 
             List<E> pathEdgeList = aStar.getPathEdgeList();
             if (pathEdgeList != null) {
-                return new PlannedPathImpl<V, E>(graph, startVertex, endVertex, pathEdgeList, aStar.getPathLength());
+                return new PlannedPathImpl<V, E>(graph, pathEdgeList);
             } else {
                 return null;
             }

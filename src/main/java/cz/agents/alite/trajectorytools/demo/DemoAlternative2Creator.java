@@ -33,8 +33,12 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative2Creator implements Creator {
 
+    private static final int NUM_OF_RANDOM_OBSTACLES = 8;
+
+    private static final int WORLD_SIZE = 10;
+
     // shows one trajectory with voronoi and delaunay graphs
-    private static final boolean DEBUG_VIEW = true;
+    private static final boolean DEBUG_VIEW = false;
 
     private ObstacleGraphView<SpatialManeuver> graph;
     private List<PlannedPath<Waypoint, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<Waypoint, DefaultWeightedEdge>>();
@@ -79,13 +83,13 @@ public class DemoAlternative2Creator implements Creator {
 
     @Override
     public void create() {
-        Graph<Waypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
+        Graph<Waypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
 
         border = Arrays.asList(new Waypoint[] {
                 SpatialGraphs.getNearestWaypoint(originalGraph, new Point( 0,  0, 0)),
-                SpatialGraphs.getNearestWaypoint(originalGraph, new Point( 0, 10, 0)),
-                SpatialGraphs.getNearestWaypoint(originalGraph, new Point(10, 10, 0)),
-                SpatialGraphs.getNearestWaypoint(originalGraph, new Point(10,  0, 0))
+                SpatialGraphs.getNearestWaypoint(originalGraph, new Point( 0, WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestWaypoint(originalGraph, new Point(WORLD_SIZE,  WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestWaypoint(originalGraph, new Point(WORLD_SIZE,  0, 0))
         });
 
 
@@ -97,6 +101,20 @@ public class DemoAlternative2Creator implements Creator {
         } );
 
         createVisualization();
+        
+        List<Point> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
+        for (Point obstacle : obstacles) {
+            graph.addObstacle(obstacle);
+        }
+    }
+
+    private List<Point> generateRandomObstacles(int number) {
+        List<Point> obstacles = new ArrayList<Point>(number);
+        for (int i=0; i<number; i++) {
+            obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
+        }
+                
+        return obstacles;
     }
 
     private void createVisualization() {
@@ -168,19 +186,21 @@ public class DemoAlternative2Creator implements Creator {
 
             voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
 
-            PlanarGraph<DefaultWeightedEdge> planarGraphDelaunay = new PlanarGraph<DefaultWeightedEdge>(delaunayGraph.graph);
+//            PlanarGraph<DefaultWeightedEdge> planarGraphDelaunay = new PlanarGraph<DefaultWeightedEdge>(delaunayGraph.graph);
 //
 //            delaunayGraph.graph.removeVertex(startVertex);
 //            delaunayGraph.graph.removeVertex(targetVertex);
 //
-            for (DefaultWeightedEdge voronoiEdge: planPath.getEdgeList()) {
-                planarGraphDelaunay.removeCrossingEdges(planarGraphDelaunay.getEdgeSource(voronoiEdge),planarGraphDelaunay.getEdgeTarget(voronoiEdge));
-            }
+//            for (DefaultWeightedEdge voronoiEdge: planPath.getEdgeList()) {
+//                planarGraphDelaunay.removeCrossingEdges(planarGraphDelaunay.getEdgeSource(voronoiEdge),planarGraphDelaunay.getEdgeTarget(voronoiEdge));
+//            }
 //
-            delaunayGraph.graph = planarGraphDelaunay;
+//            delaunayGraph.graph = planarGraphDelaunay;
 
             graph.refresh();
 
+            PlanarGraph<SpatialManeuver> planarGraph = new PlanarGraph<SpatialManeuver>(graph);
+            
             for (DefaultWeightedEdge edge : delaunayGraph.graph.edgeSet()) {
                 graph.removeCrossingEdges(delaunayGraph.graph.getEdgeSource(edge), delaunayGraph.graph.getEdgeTarget(edge));
             }

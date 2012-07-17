@@ -1,4 +1,4 @@
-package delaunay;
+package cz.agents.alite.trajectorytools.graph.delaunay;
 
 /*
  * Copyright (c) 2007 by L. Paul Chew.
