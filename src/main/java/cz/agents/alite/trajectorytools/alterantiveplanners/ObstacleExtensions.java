@@ -36,6 +36,17 @@ public class ObstacleExtensions {
     public Collection<PlannedPath<Waypoint, SpatialManeuver>> planPath(ObstacleGraphView originalGraph, Waypoint startVertex, Waypoint endVertex) {
         final Set<PlannedPath<Waypoint, SpatialManeuver>> paths = new HashSet<PlannedPath<Waypoint, SpatialManeuver>>();
 
+    @Override
+    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
+            ManeuverGraphWithObstacles originalGraph,
+            SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+        
+        final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
+
+        if (originalGraph.getObstacles().size() > 6) {
+            return paths;
+        }
+        
         ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
         for (Graph<Waypoint, SpatialManeuver> graph : obstacleExtender) {

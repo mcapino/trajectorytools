@@ -2,7 +2,6 @@ package cz.agents.alite.trajectorytools.trajectorymetrics;
 
 import static junit.framework.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class DifferentStateMetricTest {
 
     private static final int WORLD_SIZE = 10;
     private ManeuverGraphInterface graph;
-    private List<PlannedPath<SpatialWaypoint, Maneuver>> paths;
+    private PlannedPath<SpatialWaypoint, Maneuver> path;
     private SpatialWaypoint startVertex;
     private SpatialWaypoint endVertex;
     private ManeuverTrajectoryMetric metric;
@@ -59,39 +58,47 @@ public class DifferentStateMetricTest {
                         endVertex
                         )
                 );
-        paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
-        paths.add(new PlannedPathImpl<SpatialWaypoint, Maneuver>(graph, edges));
+        path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(graph, edges);
         
         metric = new DifferentStateMetric();
     }
     
     @Test
     public void testSetup() {
-        assertEquals(6.0, paths.get(0).getWeight(), 0.001);
-        assertEquals(6.0, paths.get(0).getPathLength(), 0.001);
+        assertEquals(6.0, path.getWeight(), 0.001);
+        assertEquals(6.0, path.getPathLength(), 0.001);
+    }
+
+    @Test
+    public void testSingleVertexPathOut() {
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph,
+                graph.getNearestWaypoint(new Point(2, 5, 0))
+                );
+        
+        assertEquals(1, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
     public void testSingleVertexPathStart() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph, startVertex);
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph, startVertex);
         
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
     public void testSingleVertexPathMid() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph,
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph,
                 graph.getNearestWaypoint(new Point(5, 2, 0))
                 );
         
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
     
     @Test
     public void testSingleVertexPathEnd() {
-        SingleVertexPlannedPath path = new SingleVertexPlannedPath(graph, endVertex);
+        SingleVertexPlannedPath otherPath = new SingleVertexPlannedPath(graph, endVertex);
         
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -107,11 +114,11 @@ public class DifferentStateMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2/3.0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -127,11 +134,11 @@ public class DifferentStateMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2/3.0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -147,11 +154,11 @@ public class DifferentStateMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2/3.0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -167,11 +174,11 @@ public class DifferentStateMetricTest {
                         )
                 );
 
-        PlannedPathImpl<SpatialWaypoint, Maneuver> path = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
+        PlannedPathImpl<SpatialWaypoint, Maneuver> otherPath = new PlannedPathImpl<SpatialWaypoint, Maneuver>(
                 graph, 
                 edges 
                 );
-        assertEquals(1, metric.getTrajectoryValue(path, paths), 0.001);
+        assertEquals(2/3.0, metric.getTrajectoryDistance(otherPath, path), 0.001);
     }
 
     @Test
@@ -223,8 +230,6 @@ public class DifferentStateMetricTest {
                 edges2 
                 );
         
-        List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>();
-        paths.add(path2);
-        assertEquals(3, metric.getTrajectoryValue(path1, paths), 0.001);
+        assertEquals(2/5.0, metric.getTrajectoryDistance(path1, path2), 0.001);
     }
 }

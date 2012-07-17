@@ -14,6 +14,7 @@ import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanne
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePlannerSelector;
 import cz.agents.alite.trajectorytools.alterantiveplanners.DifferentStateMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
+import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMaxMinMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
@@ -29,6 +30,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
@@ -58,7 +60,8 @@ public class DemoAlternative1Creator implements Creator {
 
     private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
         new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
-        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, WORLD_SIZE ),
+        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
+        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
         new ObstacleExtensions(planner),
         new VoronoiDelaunayPlanner( planner ),
         new AlternativePlannerSelector( new ObstacleExtensions(planner), PATH_SOLUTION_LIMIT),
@@ -70,7 +73,7 @@ public class DemoAlternative1Creator implements Creator {
         new TrajectoryDistanceMetric()
     };
 
-    private static final int CURRENT_PLANNER = 1;
+    private static final int CURRENT_PLANNER = 2;
     @Override
     public void init(String[] args) {
     }
@@ -112,19 +115,25 @@ public class DemoAlternative1Creator implements Creator {
     protected void replan() {
            try {
                 paths.clear();
+                
+                long startTime = System.currentTimeMillis();
+                
                 paths.addAll(
                 		alternativePlanners[CURRENT_PLANNER].planPath(
                         graph,
                         SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0)),
                         SpatialGraphs.getNearestWaypoint(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
                     ) );
+	            
+	            System.out.println("Time: " + (System.currentTimeMillis() - startTime) + " ms");
+	            
                 System.out.println("paths: " + paths.size());
                 for (PlannedPath<Waypoint, SpatialManeuver> path : paths) {
-                    System.out.println("path.getWeight(): " + path.getPathLength());
+                    System.out.println("path.getWeight(): " + path.getWeight());
                 }
                 
                 for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
-                    System.out.println(metric.getName() + ": " + evaluateTrajectories(paths, metric));
+                    System.out.println(metric.getName() + ": " + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 
             } catch (Exception e) {
@@ -133,17 +142,4 @@ public class DemoAlternative1Creator implements Creator {
                 paths.clear();
             }
     }
-	
-	   protected double evaluateTrajectories(
-	            Collection<PlannedPath<Waypoint, SpatialManeuver>> paths,
-	            ManeuverTrajectoryMetric metric) {
-	        double value = 0;
-	        for (PlannedPath<Waypoint, SpatialManeuver> path : paths) {
-	            Collection<PlannedPath<Waypoint, SpatialManeuver>> tmpPaths = new LinkedList<PlannedPath<Waypoint, SpatialManeuver>>(paths);
-	            tmpPaths.remove(path);
-	            
-	            value += metric.getTrajectoryValue(path, tmpPaths);
-	        }
-	        return value;
-	    }
 }

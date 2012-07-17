@@ -1,7 +1,5 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
-import java.util.Collection;
-
 import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
 import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
@@ -12,29 +10,26 @@ public class DifferentStateMetric implements ManeuverTrajectoryMetric {
     }
 
     @Override
-    public double getTrajectoryValue(PlannedPath<SpatialWaypoint, Maneuver> path,
-            Collection<PlannedPath<SpatialWaypoint, Maneuver>> otherPaths) {
+    public double getTrajectoryDistance( PlannedPath<SpatialWaypoint, Maneuver> path, PlannedPath<SpatialWaypoint, Maneuver> otherPath) {
         double penalty = 0;
+        if (pathContainsVertex(path.getStartVertex(), otherPath)) {
+            penalty += 0.5;
+        }
 
-        for (PlannedPath<SpatialWaypoint, Maneuver> other : otherPaths) {
-            if (pathContainsVertex(path.getStartVertex(), other)) {
+        if (pathContainsVertex(path.getEndVertex(), otherPath)) {
+            penalty += 0.5;
+        }
+
+        for (Maneuver edge : path.getEdgeList()) {
+            if (pathContainsVertex(edge.getSource(), otherPath)) {
                 penalty += 0.5;
             }
-
-            if (pathContainsVertex(path.getEndVertex(), other)) {
+            if (pathContainsVertex(edge.getTarget(), otherPath)) {
                 penalty += 0.5;
-            }
-
-            for (Maneuver edge : path.getEdgeList()) {
-                if (pathContainsVertex(edge.getSource(), other)) {
-                    penalty += 0.5;
-                }
-                if (pathContainsVertex(edge.getTarget(), other)) {
-                    penalty += 0.5;
-                }
             }
         }
-        return penalty;
+            
+        return 1 - penalty / (path.getEdgeList().size() + 1);
     }
 
     private boolean pathContainsVertex(SpatialWaypoint vertex, PlannedPath<SpatialWaypoint, Maneuver> path) {

@@ -1,12 +1,20 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
-import java.util.Collection;
-
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 
+/**
+ * Trajectory Distance Metric 
+ * 
+ * Used e.g. in 'Alexandra Coman: Generating Diverse Plans Using Quantitative and Qualitative Plan Distance Metrics'.
+ * 
+ * @author honza
+ *
+ * @param <V> 
+ * @param <E>
+ */
 public interface TrajectoryMetric<V, E> {
 
-    double getTrajectoryValue(PlannedPath<V, E> path, Collection<PlannedPath<V, E>> otherPaths);
+    double getTrajectoryDistance(PlannedPath<V, E> path, PlannedPath<V, E> otherPath);
     
     String getName();
 }

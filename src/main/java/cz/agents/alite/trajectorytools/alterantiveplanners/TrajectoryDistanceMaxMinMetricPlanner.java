@@ -11,51 +11,51 @@ import cz.agents.alite.trajectorytools.planner.GoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
-import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 
-public class DifferentStateMetricPlanner implements AlternativePathPlanner {
+public class TrajectoryDistanceMaxMinMetricPlanner implements AlternativePathPlanner {
 
-    private static final int ALPHA = 5;
-    
     private final PathPlanner<SpatialWaypoint, Maneuver> planner;
-
     private final int pathSolutionLimit;
 
     private final ManeuverTrajectoryMetric metric;
-        
-    public DifferentStateMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit) {
+
+    private final double maxDistance;
+    
+    public TrajectoryDistanceMaxMinMetricPlanner(PathPlanner<SpatialWaypoint, Maneuver> planner, int pathSolutionLimit, double maxDistance) {
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
-
-        metric = new DifferentStateMetric();
+        this.maxDistance = maxDistance;
+        
+        metric = new TrajectoryDistanceMetric();
     }
-
+    
     @Override
     public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(final ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+        
         final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>(pathSolutionLimit);
-
         for (int i = 0; i < pathSolutionLimit; i++) {
-            PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(
+            paths.add( planner.planPath(
                     graph, startVertex, endVertex, 
                     new GoalPenaltyFunction<SpatialWaypoint>() {
                         @Override
                         public double getGoalPenalty(SpatialWaypoint vertex) {
-                            double value = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
+                            double distance = TrajectorySetMetrics.getRelativePlanSetMinDiversity(
                                     new SingleVertexPlannedPath(graph, vertex), 
                                     paths,
                                     metric
                                     );
-                            return ALPHA * (1 - value);
+                            if (distance < maxDistance) {
+                                return maxDistance - distance ;
+                            } else {
+                                return 0;
+                            }
                         }
                     }, 
                     planner.getHeuristicFunction()
-                    );
-            if (path == null) {
-                System.out.println("!!!!!! NULL !!!!!!!");
-            }
-            paths.add( path );
+                    ) );
         }
         
         return paths;
@@ -63,6 +63,6 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
     @Override
     public String getName() {
-        return "Different States Metric Planner";
+        return "Trajectory MaxMin Distance Metric Planner";
     }
 }

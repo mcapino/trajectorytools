@@ -19,6 +19,12 @@ public final class AStarPlanner<V, E> implements PathPlanner<V, E>
     @Override
     public PlannedPath<V, E> planPath(final Graph<V, E> graph, final V startVertex,
             final V endVertex) {
+        return planPath(graph, startVertex, endVertex, functionG, functionH);
+    }
+    
+    @Override
+    public PlannedPath<V, E> planPath(final Graph<V, E> graph, final V startVertex,
+            final V endVertex, final GoalPenaltyFunction<V> functionG, final HeuristicFunction<V> functionH) {
         
     	GraphWithPenaltyFunction<V, E> penaltyGraph;
     	
@@ -69,6 +75,7 @@ public final class AStarPlanner<V, E> implements PathPlanner<V, E>
         @Override
         @SuppressWarnings("unchecked")
         public double getEdgeWeight(E e) {
+        	// return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) e.getSource()) + functionG.getGoalPenalty((V) e.getTarget());
             return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) super.getEdgeTarget(e));
         }
         

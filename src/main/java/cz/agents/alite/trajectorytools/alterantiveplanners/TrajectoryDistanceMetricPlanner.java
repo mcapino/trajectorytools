@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetri
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner<Waypoint, Spatial> {
+public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner<Waypoint, SpatialManeuver> {
 
     private static final int ALPHA = 1;
 
@@ -39,20 +39,26 @@ public class TrajectoryDistanceMetricPlanner implements AlternativePathPlanner<W
 
         final List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint, Maneuver>>(pathSolutionLimit);
 
-        planner.setGoalPenaltyFunction(new GoalPenaltyFunction<SpatialWaypoint>() {
-            @Override
-            public double getGoalPenalty(final SpatialWaypoint vertex) {
-                double distance = metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
-                if (distance < maxDistance) {
-                    return ALPHA * ( maxDistance - distance );
-                } else {
-                    return 0;
-                }
-            }
-        });
-
         for (int i = 0; i < pathSolutionLimit; i++) {
-            paths.add( planner.planPath(graph, startVertex, endVertex) );
+            paths.add( planner.planPath(
+                    graph, startVertex, endVertex, 
+                    new GoalPenaltyFunction<SpatialWaypoint>() {
+                        @Override
+                        public double getGoalPenalty(SpatialWaypoint vertex) {
+                            double distance = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
+                                    new SingleVertexPlannedPath(graph, vertex), 
+                                    paths,
+                                    metric
+                                    );
+                            if (distance < maxDistance) {
+                                return ALPHA * ( maxDistance - distance );
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }, 
+                    planner.getHeuristicFunction()
+                    ) );
         }
 
         return paths;
