@@ -18,8 +18,8 @@ public class AStarShortestPathOnManeuverGraphTest {
     @Test
     public void testAgainstDijkstra() {
         Graph<Waypoint, SpatialManeuver> graph = SpatialGridFactory.create4WayGrid(5, 5, 2, 2, 1.0);
-        Waypoint start = SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0));
-        Waypoint end = SpatialGraphs.getNearestWaypoint(graph,new Point(5.0, 5.0, 0));
+        Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
+        Waypoint end = SpatialGraphs.getNearestVertex(graph,new Point(5.0, 5.0, 0));
 
         AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
             @Override
@@ -67,8 +67,8 @@ public class AStarShortestPathOnManeuverGraphTest {
         for (int seed=1; seed<N; seed++) {
 
             Graph<Waypoint, SpatialManeuver> graph = SpatialGridFactory.createRandom(5, 5, 6, 3, seed, 1.0);
-            Waypoint start = SpatialGraphs.getNearestWaypoint(graph, new Point(0, 0, 0));
-            Waypoint end = SpatialGraphs.getNearestWaypoint(graph, new Point(5.0, 5.0, 0));
+            Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
+            Waypoint end = SpatialGraphs.getNearestVertex(graph, new Point(5.0, 5.0, 0));
 
             AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
                 @Override
