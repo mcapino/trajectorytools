@@ -16,7 +16,7 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetri
 
 public class DifferentStateMetricPlanner implements AlternativePathPlanner {
 
-    private static final int ALPHA = 1;
+    private static final int ALPHA = 5;
     
     private final PathPlanner<SpatialWaypoint, Maneuver> planner;
 
@@ -41,7 +41,8 @@ public class DifferentStateMetricPlanner implements AlternativePathPlanner {
                     new GoalPenaltyFunction<SpatialWaypoint>() {
                         @Override
                         public double getGoalPenalty(SpatialWaypoint vertex) {
-                            return ALPHA * metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                            double value = metric.getTrajectoryValue(new SingleVertexPlannedPath(graph, vertex), paths);
+                            return ALPHA * (1 - value);
                         }
                     }, 
                     planner.getHeuristicFunction()

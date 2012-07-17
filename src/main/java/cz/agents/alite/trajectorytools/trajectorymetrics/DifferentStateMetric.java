@@ -14,9 +14,10 @@ public class DifferentStateMetric implements ManeuverTrajectoryMetric {
     @Override
     public double getTrajectoryValue(PlannedPath<SpatialWaypoint, Maneuver> path,
             Collection<PlannedPath<SpatialWaypoint, Maneuver>> otherPaths) {
-        double penalty = 0;
+        double value = 0;
 
         for (PlannedPath<SpatialWaypoint, Maneuver> other : otherPaths) {
+            double penalty = 0;
             if (pathContainsVertex(path.getStartVertex(), other)) {
                 penalty += 0.5;
             }
@@ -33,8 +34,10 @@ public class DifferentStateMetric implements ManeuverTrajectoryMetric {
                     penalty += 0.5;
                 }
             }
+            
+            value += 1 - penalty / (path.getEdgeList().size() + 1);
         }
-        return penalty;
+        return value;
     }
 
     private boolean pathContainsVertex(SpatialWaypoint vertex, PlannedPath<SpatialWaypoint, Maneuver> path) {
