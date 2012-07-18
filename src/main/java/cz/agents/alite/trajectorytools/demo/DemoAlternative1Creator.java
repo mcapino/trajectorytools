@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanner;
@@ -42,7 +43,7 @@ public class DemoAlternative1Creator implements Creator {
     private static final int PATH_SOLUTION_LIMIT = 5;
 
     private ObstacleGraphView graph;
-    private List<PlannedPath<Waypoint, SpatialManeuver>> paths = new ArrayList<PlannedPath<Waypoint,SpatialManeuver>>();
+    private List<PlannedPath<Point, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<Point,DefaultWeightedEdge>>();
 
     private static final AStarPlanner<Waypoint, SpatialManeuver> planner = new AStarPlanner<Waypoint, SpatialManeuver>();
     {
@@ -54,7 +55,7 @@ public class DemoAlternative1Creator implements Creator {
         });
     }
 
-    private static final AlternativePathPlanner<Waypoint, SpatialManeuver>[] alternativePlanners = new AlternativePathPlanner[] {
+    private static final AlternativePathPlanner<Point, DefaultWeightedEdge>[] alternativePlanners = new AlternativePathPlanner[] {
         new DifferentStateMetricPlanner<Waypoint, SpatialManeuver>( planner, PATH_SOLUTION_LIMIT ),
         new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
         new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
@@ -64,12 +65,12 @@ public class DemoAlternative1Creator implements Creator {
         new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
     };
 
-    private static final TrajectoryMetric<Waypoint, SpatialManeuver>[] trajectoryMetrics = new TrajectoryMetric[] {
+    private static final TrajectoryMetric<Point, DefaultWeightedEdge>[] trajectoryMetrics = new TrajectoryMetric[] {
         new DifferentStateMetric(),
         new TrajectoryDistanceMetric()
     };
 
-    private static final int CURRENT_PLANNER = 2;
+    private static final int CURRENT_PLANNER = 4;
     @Override
     public void init(String[] args) {
     }
@@ -78,7 +79,7 @@ public class DemoAlternative1Creator implements Creator {
     public void create() {
         Graph<Waypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
 
-        graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
+        graph = ObstacleGraphView.createFromGraph(originalGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
                 replan();
@@ -116,19 +117,19 @@ public class DemoAlternative1Creator implements Creator {
 
                 paths.addAll(
                         alternativePlanners[CURRENT_PLANNER].planPath(
-                        graph,
-                        SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
-                    ) );
+                                graph,
+                                SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                                SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                                ) );
 
                 System.out.println("Time: " + (System.currentTimeMillis() - startTime) + " ms");
 
                 System.out.println("paths: " + paths.size());
-                for (PlannedPath<Waypoint, SpatialManeuver> path : paths) {
+                for (PlannedPath<Point, DefaultWeightedEdge> path : paths) {
                     System.out.println("path.getWeight(): " + path.getWeight());
                 }
 
-                for (TrajectoryMetric<Waypoint, SpatialManeuver> metric : trajectoryMetrics) {
+                for (TrajectoryMetric<Point, DefaultWeightedEdge> metric : trajectoryMetrics) {
                     System.out.println(metric.getName() + ": " + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 

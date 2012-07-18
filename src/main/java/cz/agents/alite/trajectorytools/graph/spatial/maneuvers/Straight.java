@@ -1,16 +1,15 @@
 package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
-
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class Straight implements SpatialManeuver {
-	
-	private Waypoint start;
+public class Straight extends SpatialManeuver {
+    private static final long serialVersionUID = -2519868162204278196L;
+    
+    private Waypoint start;
 	private Waypoint end;
 	private double speed;
 	

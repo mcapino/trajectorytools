@@ -10,15 +10,17 @@ public class Waypoint extends Point implements Comparable<Waypoint> {
     public final int id;
 
     public Waypoint(double x, double y) {
-        super(x,y,0.0);
-        this.id = globalIdCounter++;
+        this(globalIdCounter, x, y);
     }
 
     public Waypoint(int order, double x, double y) {
         super(x,y,0.0);
         this.id = order;
+        if (order >= globalIdCounter) {
+            globalIdCounter = order + 1;
+        }
     }
-
+    
     @Override
     public int compareTo(Waypoint other) {
         return id - other.id;

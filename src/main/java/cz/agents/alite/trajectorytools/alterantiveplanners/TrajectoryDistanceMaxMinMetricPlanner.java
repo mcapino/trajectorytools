@@ -28,7 +28,7 @@ public class TrajectoryDistanceMaxMinMetricPlanner<V extends Point, E> implement
         this.pathSolutionLimit = pathSolutionLimit;
         this.maxDistance = maxDistance;
 
-        metric = new TrajectoryDistanceMetric();
+        metric = new TrajectoryDistanceMetric<V, E>();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TrajectoryDistanceMaxMinMetricPlanner<V extends Point, E> implement
                         @Override
                         public double getGoalPenalty(V vertex) {
                             double distance = TrajectorySetMetrics.getRelativePlanSetMinDiversity(
-                                    new SingleVertexPlannedPath(graph, vertex),
+                                    new SingleVertexPlannedPath<V, E>(graph, vertex),
                                     paths,
                                     metric
                                     );

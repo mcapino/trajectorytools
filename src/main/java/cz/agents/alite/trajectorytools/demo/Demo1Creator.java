@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
@@ -26,8 +27,8 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class Demo1Creator implements Creator {
 
-    private ObstacleGraphView<Waypoint, SpatialManeuver> graph;
-    private PathHolder<Waypoint, SpatialManeuver> path = new PathHolder<Waypoint,SpatialManeuver>();
+    private ObstacleGraphView graph;
+    private PathHolder<Point, DefaultWeightedEdge> path = new PathHolder<Point, DefaultWeightedEdge>();
 
     @Override
     public void init(String[] args) {
@@ -37,7 +38,7 @@ public class Demo1Creator implements Creator {
     public void create() {
         Graph<Waypoint, SpatialManeuver> listenableGraph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
 
-        graph = new ObstacleGraphView<Waypoint, SpatialManeuver>(listenableGraph, new ChangeListener() {
+        graph = ObstacleGraphView.createFromGraph(listenableGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
                 replan();
@@ -70,11 +71,11 @@ public class Demo1Creator implements Creator {
     protected void replan() {
 
         try {
-            PathPlanner<Waypoint, SpatialManeuver> aStar = new AStarPlanner<Waypoint, SpatialManeuver>();
+            PathPlanner<Point, DefaultWeightedEdge> aStar = new AStarPlanner<Point, DefaultWeightedEdge>();
 
-            aStar.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
+            aStar.setHeuristicFunction(new HeuristicFunction<Point>() {
             @Override
-                public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
+                public double getHeuristicEstimate(Point current, Point goal) {
                     return current.distance(goal);
                 }
             });

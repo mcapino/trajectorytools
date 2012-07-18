@@ -45,7 +45,7 @@ public class TrajectoryDistanceMetricPlanner<V extends Point,E> implements Alter
                         @Override
                         public double getGoalPenalty(V vertex) {
                             double distance = TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
-                                    new SingleVertexPlannedPath(graph, vertex),
+                                    new SingleVertexPlannedPath<V, E>(graph, vertex),
                                     paths,
                                     metric
                                     );

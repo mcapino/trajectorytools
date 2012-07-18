@@ -73,15 +73,16 @@ public final class AStarPlanner<V, E> implements PathPlanner<V, E>
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public double getEdgeWeight(E e) {
             // return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) e.getSource()) + functionG.getGoalPenalty((V) e.getTarget());
-            return super.getEdgeWeight(e) + functionG.getGoalPenalty((V) super.getEdgeTarget(e));
+            return super.getEdgeWeight(e) + functionG.getGoalPenalty(super.getEdgeTarget(e));
         }
 
     }
 
     static class DirectedGraphWithPenaltyFunction<V, E> extends GraphWithPenaltyFunction<V, E> implements DirectedGraph<V,E> {
+        private static final long serialVersionUID = 8654284725272084227L;
+
         public DirectedGraphWithPenaltyFunction(Graph<V, E> g, GoalPenaltyFunction<V> functionG) {
             super(g, functionG);
         }

@@ -6,9 +6,10 @@ import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
-public class Wait implements SpatialManeuver {
-	
-	private Waypoint waypoint;
+public class Wait extends SpatialManeuver {
+    private static final long serialVersionUID = 4666115876426861278L;
+
+    private Waypoint waypoint;
 	private double duration;
 	
 	public Wait(Waypoint waypoint, double duration) {
