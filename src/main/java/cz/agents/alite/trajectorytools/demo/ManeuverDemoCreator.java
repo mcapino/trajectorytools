@@ -65,9 +65,13 @@ public class ManeuverDemoCreator implements Creator {
         // draw the shortest path
         //VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
 
-        TrajectoryProvider holder = new TrajectoryProvider();
-        holder.trajectory = trajectory;
-        VisManager.registerLayer(TrajectoryLayer.create(holder, Color.BLUE, 0.1, 100.0, 0.1, 't'));
+        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
+
+            @Override
+            public Trajectory getTrajectory() {
+                return trajectory;
+            }
+        }, Color.BLUE, 0.1, 100.0, 't'));
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
