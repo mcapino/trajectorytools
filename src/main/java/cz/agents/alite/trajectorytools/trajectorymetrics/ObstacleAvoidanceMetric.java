@@ -8,26 +8,24 @@ import javax.vecmath.Vector3d;
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class ObstacleAvoidanceMetric implements ManeuverTrajectoryMetric {
+public class ObstacleAvoidanceMetric<V extends Point,E> implements TrajectoryMetric<V,E> {
     private static final int DIRECTIONS = 4;
 
     @Override
     public double getTrajectoryDistance(
-            PlannedPath<SpatialWaypoint, Maneuver> path,
-            PlannedPath<SpatialWaypoint, Maneuver> otherPath) {
+            PlannedPath<V,E> path,
+            PlannedPath<V,E> otherPath) {
         
         if (! (path.getGraph() instanceof ObstacleGraphView )) {
             System.out.println(path.getGraph().getClass().getName() + " is not compatible with the Obstacle avoidance metric!");
             return 0;
         }
 
-        Set<SpatialWaypoint> obstacles = ((ObstacleGraphView) path.getGraph()).getObstacles();
+        Set<Point> obstacles = ((ObstacleGraphView) path.getGraph()).getObstacles();
 
         if (obstacles.isEmpty()) {
             return 0;
@@ -35,7 +33,7 @@ public class ObstacleAvoidanceMetric implements ManeuverTrajectoryMetric {
         
         double distance = 0;
         
-        for (SpatialWaypoint obstacle : obstacles) {
+        for (Point obstacle : obstacles) {
             for (int direction = 0; direction < DIRECTIONS; direction ++) {
                 Zone zone = createZone(obstacle, direction);
                 if (isZoneCrossed( zone, path) == isZoneCrossed( zone, otherPath)) {
@@ -47,9 +45,9 @@ public class ObstacleAvoidanceMetric implements ManeuverTrajectoryMetric {
         return distance / (obstacles.size() * DIRECTIONS);
     }
 
-    private boolean isZoneCrossed(Zone zone, PlannedPath<SpatialWaypoint, Maneuver> path) {
-        for (Maneuver edge : path.getEdgeList()) {
-            if (zone.testLine(edge.getSource(), edge.getTarget(), null)) {
+    private boolean isZoneCrossed(Zone zone, PlannedPath<V, E> path) {
+        for (E edge : path.getEdgeList()) {
+            if (zone.testLine(path.getGraph().getEdgeSource(edge), path.getGraph().getEdgeTarget(edge), null)) {
                 return true;
             }
         }
