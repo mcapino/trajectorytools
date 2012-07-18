@@ -45,30 +45,50 @@ public class DemoAlternative1Creator implements Creator {
     private ObstacleGraphView graph;
     private List<PlannedPath<Point, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<Point,DefaultWeightedEdge>>();
 
-    private static final AStarPlanner<Waypoint, SpatialManeuver> planner = new AStarPlanner<Waypoint, SpatialManeuver>();
+    private static final AStarPlanner<Point, DefaultWeightedEdge> planner = new AStarPlanner<Point, DefaultWeightedEdge>();
     {
-        planner.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
+        planner.setHeuristicFunction(new HeuristicFunction<Point>() {
         @Override
-            public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
+            public double getHeuristicEstimate(Point current, Point goal) {
                 return current.distance(goal) + ( current.x > current.y ? 0.1 : -0.1 );
             }
         });
     }
 
-    private static final AlternativePathPlanner<Point, DefaultWeightedEdge>[] alternativePlanners = new AlternativePathPlanner[] {
-        new DifferentStateMetricPlanner<Waypoint, SpatialManeuver>( planner, PATH_SOLUTION_LIMIT ),
-        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
-        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
-        new ObstacleExtensions(planner),
-        new VoronoiDelaunayPlanner( planner ),
-        new AlternativePlannerSelector( new ObstacleExtensions(planner), PATH_SOLUTION_LIMIT),
-        new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
-    };
+    private static final List<AlternativePathPlanner<Point, DefaultWeightedEdge>> alternativePlanners = new ArrayList<AlternativePathPlanner<Point,DefaultWeightedEdge>>();
+    {
+        alternativePlanners.add( 
+                new DifferentStateMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
+                );
+        alternativePlanners.add( 
+                new TrajectoryDistanceMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
+                );
+        alternativePlanners.add( 
+                new TrajectoryDistanceMaxMinMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
+                );
+        alternativePlanners.add( 
+                new ObstacleExtensions<Point, DefaultWeightedEdge>(planner) 
+                );
+        alternativePlanners.add( 
+                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new ObstacleExtensions<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                );
+        alternativePlanners.add( 
+                new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>( planner )
+                );
+        alternativePlanners.add( 
+                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                );
+    }
 
-    private static final TrajectoryMetric<Point, DefaultWeightedEdge>[] trajectoryMetrics = new TrajectoryMetric[] {
-        new DifferentStateMetric(),
-        new TrajectoryDistanceMetric()
-    };
+    private static final List<TrajectoryMetric<Point, DefaultWeightedEdge>> trajectoryMetrics = new ArrayList<TrajectoryMetric<Point,DefaultWeightedEdge>>();
+    {
+        trajectoryMetrics.add( 
+                new DifferentStateMetric<Point, DefaultWeightedEdge>()
+                );
+        trajectoryMetrics.add( 
+                new TrajectoryDistanceMetric<Point, DefaultWeightedEdge>()
+                );
+    }
 
     private static final int CURRENT_PLANNER = 4;
     @Override
@@ -116,7 +136,7 @@ public class DemoAlternative1Creator implements Creator {
                 long startTime = System.currentTimeMillis();
 
                 paths.addAll(
-                        alternativePlanners[CURRENT_PLANNER].planPath(
+                        alternativePlanners.get(CURRENT_PLANNER).planPath(
                                 graph,
                                 SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
                                 SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))

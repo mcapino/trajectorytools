@@ -13,7 +13,6 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.PlanarGraph;
 import cz.agents.alite.trajectorytools.graph.VoronoiDelaunayGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;

@@ -57,21 +57,41 @@ public class AlternativePlanners1Creator implements Creator {
             }
         });
     }
+    
+    private static final List<AlternativePathPlanner<Point, DefaultWeightedEdge>> alternativePlanners = new ArrayList<AlternativePathPlanner<Point,DefaultWeightedEdge>>();
+    {
+        alternativePlanners.add( 
+                new DifferentStateMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
+                );
+        alternativePlanners.add( 
+                new TrajectoryDistanceMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
+                );
+        alternativePlanners.add( 
+                new TrajectoryDistanceMaxMinMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
+                );
+        alternativePlanners.add( 
+                new ObstacleExtensions<Point, DefaultWeightedEdge>(planner) 
+                );
+        alternativePlanners.add( 
+                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new ObstacleExtensions<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                );
+        alternativePlanners.add( 
+                new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>( planner )
+                );
+        alternativePlanners.add( 
+                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                );
+    }
 
-    private static final AlternativePathPlanner<Point, DefaultWeightedEdge>[] alternativePlanners = new AlternativePathPlanner[] {
-        new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
-        new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
-        new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
-        new ObstacleExtensions(planner),
-        new AlternativePlannerSelector( new ObstacleExtensions(planner), PATH_SOLUTION_LIMIT),
-        new VoronoiDelaunayPlanner( planner ),
-        new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
-    };
-
-    private static final TrajectoryMetric<Point, DefaultWeightedEdge>[] trajectoryMetrics = new TrajectoryMetric [] {
-        new DifferentStateMetric(),
-        new TrajectoryDistanceMetric()
-    };
+    private static final List<TrajectoryMetric<Point, DefaultWeightedEdge>> trajectoryMetrics = new ArrayList<TrajectoryMetric<Point,DefaultWeightedEdge>>();
+    {
+        trajectoryMetrics.add( 
+                new DifferentStateMetric<Point, DefaultWeightedEdge>()
+                );
+        trajectoryMetrics.add( 
+                new TrajectoryDistanceMetric<Point, DefaultWeightedEdge>()
+                );
+    }
 
     @Override
     public void init(String[] args) {
