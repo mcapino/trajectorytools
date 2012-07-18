@@ -20,7 +20,7 @@ import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
-import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryHolder;
+import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -65,7 +65,7 @@ public class ManeuverDemoCreator implements Creator {
         // draw the shortest path
         //VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
 
-        TrajectoryHolder holder = new TrajectoryHolder();
+        TrajectoryProvider holder = new TrajectoryProvider();
         holder.trajectory = trajectory;
         VisManager.registerLayer(TrajectoryLayer.create(holder, Color.BLUE, 0.1, 100.0, 0.1, 't'));
 

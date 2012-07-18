@@ -15,6 +15,11 @@ public class OrientedPoint extends Point {
     // A normalized vector representing the orientation
     public Vector orientation;
 
+
+    public OrientedPoint(double x, double y, double z, double u, double v, double w) {
+        this(new Point(x,y,z), new Vector(u,v,w));
+    }
+
     public OrientedPoint(Point point, Vector orientation) {
         super(point);
         if (orientation == null) {

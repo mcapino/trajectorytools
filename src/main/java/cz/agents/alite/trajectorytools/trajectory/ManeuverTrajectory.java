@@ -5,40 +5,35 @@ import java.util.List;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.Graphs;
-import org.jgrapht.SingleEdgeGraphPath;
-import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Vector;
-import cz.agents.alite.trajectorytools.util.Waypoint;
 
 /**
  * A wrapper that interprets a graph path as a trajectory.
- * Start time must be be given. Then, the trajectory parameters should 
+ * Start time must be be given. Then, the trajectory parameters should
  * be interpreted as follows:
  *
  *                      duration
  *       | --------------------------------> |
- *  start time                             max time                                             
+ *  start time                             max time
  *
  */
 
-public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> implements Trajectory {
+public class ManeuverTrajectory<V extends Point, E extends SpatialManeuver> implements Trajectory {
 
     private List<E> maneuvers = null;
 
-    private Waypoint startWaypoint;
-    private Waypoint endWaypoint;
-    
+    private Point startWaypoint;
+    private Point endWaypoint;
+
     Graph<V,E> graph;
 
     private double startTime;
     private double duration = Double.POSITIVE_INFINITY;
-    
+
     public ManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
@@ -51,7 +46,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
 
     @Override
     public OrientedPoint getPosition(double t) {
-        Waypoint currentWaypoint = startWaypoint;
+        Point currentWaypoint = startWaypoint;
         double currentWaypointTime = startTime;
         Vector currentDirection = new Vector(1,0,0);
 
@@ -62,14 +57,14 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
 
         if (maneuvers != null)  {
             for (E maneuver: maneuvers) {
-                Waypoint nextWaypoint = graph.getEdgeTarget(maneuver);
-                double duration  = maneuver.getDuration(); 
+                Point nextWaypoint = graph.getEdgeTarget(maneuver);
+                double duration  = maneuver.getDuration();
                 double nextWaypointTime = currentWaypointTime + duration;
 
 
                 if ( currentWaypointTime <= t && t <= nextWaypointTime) {
                     // linear approximation
-                	OrientedPoint pos = maneuver.getTrajectory(currentWaypointTime).getPosition(t);
+                    OrientedPoint pos = maneuver.getTrajectory(currentWaypointTime).getPosition(t);
                     return pos;
                 }
                 currentWaypoint = nextWaypoint;
@@ -77,7 +72,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
             }
         }
         if (t >= currentWaypointTime) {
-               	return new OrientedPoint(currentWaypoint, currentDirection);
+                   return new OrientedPoint(currentWaypoint, currentDirection);
         }
 
         return null;
@@ -86,7 +81,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ManeuverTrajectory){
-        	ManeuverTrajectory other = (ManeuverTrajectory) obj;
+            ManeuverTrajectory other = (ManeuverTrajectory) obj;
             if (startWaypoint.equals(other.startWaypoint) &&
                     endWaypoint.equals(other.endWaypoint) &&
                     maneuvers.equals(other.maneuvers) &&
@@ -94,7 +89,7 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -115,11 +110,11 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
         sb.append("MT(@");
         DecimalFormat f = new DecimalFormat("#0.00");
         sb.append(f.format(startTime));
-       
+
         if (!maneuvers.isEmpty()) {
-        	sb.append(" " + graph.getEdgeSource(maneuvers.get(0)));
+            sb.append(" " + graph.getEdgeSource(maneuvers.get(0)));
         }
-        
+
         for (E maneuver: maneuvers) {
             sb.append(" " + graph.getEdgeTarget(maneuver));
         }
@@ -127,13 +122,13 @@ public class ManeuverTrajectory<V extends Waypoint, E extends SpatialManeuver> i
         return sb.toString();
     }
 
-	@Override
-	public double getMinTime() {
-		return startTime;
-	}
+    @Override
+    public double getMinTime() {
+        return startTime;
+    }
 
-	@Override
-	public double getMaxTime() {
-		return startTime + duration;
-	}
+    @Override
+    public double getMaxTime() {
+        return startTime + duration;
+    }
 }
