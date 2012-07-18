@@ -99,7 +99,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
                 }
 
                 protected Graph<VV, EE> generateNextGraph() {
-                   Graph<VV, EE>graph = (Graph<VV, EE>) SpatialGraphs.clone(originalGraph);
+                   Graph<VV, EE>graph = SpatialGraphs.clone(originalGraph);
 
                     int currObstacle = 0;
 

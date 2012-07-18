@@ -2,9 +2,6 @@ package cz.agents.alite.trajectorytools.vis;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Random;
-
-import javax.vecmath.Point3d;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
@@ -12,7 +9,6 @@ import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
 import cz.agents.alite.vis.element.aggregation.StyledLineElements;
 import cz.agents.alite.vis.element.aggregation.StyledPointElements;
-import cz.agents.alite.vis.element.implemetation.StyledLineImpl;
 import cz.agents.alite.vis.element.implemetation.StyledPointImpl;
 import cz.agents.alite.vis.layer.GroupLayer;
 import cz.agents.alite.vis.layer.VisLayer;
