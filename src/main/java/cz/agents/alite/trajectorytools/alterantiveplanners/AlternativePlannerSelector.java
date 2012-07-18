@@ -6,42 +6,41 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
+import cz.agents.alite.trajectorytools.util.Point;
 
-public class AlternativePlannerSelector implements AlternativePathPlanner {
+public class AlternativePlannerSelector<V extends Point,E> implements AlternativePathPlanner<V,E> {
 
-    private final AlternativePathPlanner planner;
+    private final AlternativePathPlanner<V,E> planner;
     private final int limit;
 
-    public AlternativePlannerSelector(AlternativePathPlanner planner, int limit) {
+    public AlternativePlannerSelector(AlternativePathPlanner<V,E> planner, int limit) {
         this.planner = planner;
         this.limit = limit;
     }
-    
+
     @Override
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
-            ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex,
-            SpatialWaypoint endVertex) {
-        
-        Collection<PlannedPath<SpatialWaypoint, Maneuver>> plannedPaths = planner.planPath(graph, startVertex, endVertex);
+    public Collection<PlannedPath<V, E>> planPath(
+            GraphWithObstacles<V,E> graph, V startVertex,
+            V endVertex) {
+
+        Collection<PlannedPath<V, E>> plannedPaths = planner.planPath(graph, startVertex, endVertex);
 
         if (plannedPaths.size() <= limit) {
             return plannedPaths;
         }
-        
-        List<PlannedPath<SpatialWaypoint, Maneuver>> paths = new ArrayList<PlannedPath<SpatialWaypoint,Maneuver>>(plannedPaths);
-        
-        Collections.sort(paths, new Comparator<PlannedPath<SpatialWaypoint, Maneuver>>() {
+
+        List<PlannedPath<V, E>> paths = new ArrayList<PlannedPath<V,E>>(plannedPaths);
+
+        Collections.sort(paths, new Comparator<PlannedPath<V, E>>() {
             @Override
-            public int compare(PlannedPath<SpatialWaypoint, Maneuver> o1,
-                    PlannedPath<SpatialWaypoint, Maneuver> o2) {
+            public int compare(PlannedPath<V, E> o1,
+                    PlannedPath<V, E> o2) {
                 return Double.compare(o1.getWeight(), o2.getWeight() );
             }
         });
-        
+
         return paths.subList(0, limit);
     }
 

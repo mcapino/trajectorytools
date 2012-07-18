@@ -10,66 +10,67 @@ import java.util.Set;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
+import org.jgrapht.Graph;
+
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.maneuver.CopyManeuverGraphWithObstacles;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class ObstacleExtensions implements AlternativePathPlanner {
+public class ObstacleExtensions<V extends Point, E> implements AlternativePathPlanner<V,E> {
 
     private static final int DIRECTIONS = 4;
 
-    private final PathPlanner<SpatialWaypoint, Maneuver> planner;
-    
-    public ObstacleExtensions(PathPlanner<SpatialWaypoint, Maneuver> planner) {
+    private final PathPlanner<V, E> planner;
+
+    public ObstacleExtensions(PathPlanner<V, E> planner) {
         this.planner = planner;
     }
 
+    final Set<PlannedPath<V, E>> paths = new HashSet<PlannedPath<V, E>>();
+
     @Override
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(
-            ManeuverGraphWithObstacles originalGraph,
-            SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
-        
-        final Set<PlannedPath<SpatialWaypoint, Maneuver>> paths = new HashSet<PlannedPath<SpatialWaypoint, Maneuver>>();
+    public Collection<PlannedPath<V, E>> planPath(
+            GraphWithObstacles<V, E> originalGraph,
+            V startVertex, V endVertex) {
+
+        final Set<PlannedPath<V, E>> paths = new HashSet<PlannedPath<V, E>>();
 
         if (originalGraph.getObstacles().size() > 6) {
             return paths;
         }
-        
-        ObstacleExtender obstacleExtender = new ObstacleExtender(originalGraph);
 
-        for (ManeuverGraphInterface graph : obstacleExtender) {
-            PlannedPath<SpatialWaypoint, Maneuver> path = planner.planPath(graph, startVertex, endVertex);
+        ObstacleExtender<V,E> obstacleExtender = new ObstacleExtender<V,E>(originalGraph);
+
+        for (Graph<V, E> graph : obstacleExtender) {
+            PlannedPath<V, E> path = planner.planPath(graph, startVertex, endVertex);
 
             if ( path != null ) {
                 paths.add( path );
             }
         }
-            
+
         return paths;
     }
 
-    static class ObstacleExtender implements Iterable<ManeuverGraphInterface>{
+    static class ObstacleExtender<VV extends Point, EE> implements Iterable<Graph<VV, EE>>{
 
         int[] directions;
-        private final ManeuverGraphWithObstacles originalGraph;
+        private final GraphWithObstacles<VV, EE> originalGraph;
 
-        public ObstacleExtender(ManeuverGraphWithObstacles originalGraph) {
+        public ObstacleExtender(GraphWithObstacles<VV, EE> originalGraph) {
             this.originalGraph = originalGraph;
-            
+
             directions = new int[originalGraph.getObstacles().size()];
         }
 
         @Override
-        public Iterator<ManeuverGraphInterface> iterator() {
-            return new Iterator<ManeuverGraphInterface>() {
+        public Iterator<Graph<VV, EE>> iterator() {
+            return new Iterator<Graph<VV, EE>>() {
 
                 boolean firstCall = true;
 
@@ -84,44 +85,44 @@ public class ObstacleExtensions implements AlternativePathPlanner {
                 }
 
                 @Override
-                public ManeuverGraphInterface next() {
+                public Graph<VV, EE> next() {
                     if ( !hasNext() ) {
                         throw new NoSuchElementException("No next element!");
                     }
-                    
+
                     if ( !firstCall ) {
                         incrementDirections();
                     }
                     firstCall = false;
-                   
+
                     return generateNextGraph();
                 }
 
-                protected ManeuverGraphInterface generateNextGraph() {
-                    ManeuverGraphInterface graph = CopyManeuverGraphWithObstacles.create( originalGraph );
+                protected Graph<VV, EE> generateNextGraph() {
+                   Graph<VV, EE>graph = SpatialGraphs.clone(originalGraph);
 
                     int currObstacle = 0;
 
                     for (Point obstacle : originalGraph.getObstacles()) {
-                        removeObstacleExtension( graph, obstacle, directions[ currObstacle++ ] );
+                        removeObstacleExtension(graph, obstacle, directions[ currObstacle++ ] );
                     }
-                    
+
                     return graph;
-                    
+
                 }
 
-                private void removeObstacleExtension(ManeuverGraphInterface graph, Point obstacle, int direction) {
+                private void removeObstacleExtension(Graph<VV, EE> graph, Point obstacle, int direction) {
 
                     Zone zone = createZone(obstacle, direction);
-                    
-                    for (SpatialWaypoint vertex : new ArrayList<SpatialWaypoint>(graph.vertexSet())) {
+
+                    for (VV vertex : new ArrayList<VV>(graph.vertexSet())) {
                         if ( zone.testPoint( vertex ) ) {
                             graph.removeVertex( vertex );
                         }
                     }
 
-                    for (Maneuver edge : new ArrayList<Maneuver>(graph.edgeSet())) {
-                        if ( zone.testLine(edge.getSource(), edge.getTarget(), null) ) {
+                    for (EE edge : new ArrayList<EE>(graph.edgeSet())) {
+                        if ( zone.testLine(graph.getEdgeSource(edge), graph.getEdgeTarget(edge), null) ) {
                             graph.removeEdge(edge);
                         }
                     }

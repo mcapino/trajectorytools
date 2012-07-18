@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.maneuver;
+package cz.agents.alite.trajectorytools.graph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,40 +9,70 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.GraphDelegator;
+import org.jgrapht.graph.SimpleGraph;
 
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
+public class PlanarGraph extends GraphDelegator<Point, DefaultWeightedEdge> {
     private static final long serialVersionUID = -7039093249594157867L;
 
-    public PlanarGraph(Graph<SpatialWaypoint, E> g) {
-        super(g);
+    protected PlanarGraph(Graph<Point, DefaultWeightedEdge> graph) {
+        super(graph);
+    }
+
+
+    /**
+     * Creates a planar view over the given graph.
+     * 
+     * @param graph
+     */
+    public static PlanarGraph createPlanarGraphView(Graph<Point, DefaultWeightedEdge> graph) {
+        return new PlanarGraph(graph);
+    }
+
+    /**
+     * Creates new graph - it's not a view
+     * 
+     * @param graph
+     * @return
+     */
+    public static <V extends Point, E> PlanarGraph createPlanarGraphCopy(Graph<V, E> graph) {
+        Graph<Point, DefaultWeightedEdge> planarGraph = new SimpleGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        for (V vertex : graph.vertexSet()) {
+            planarGraph.addVertex(vertex);
+        }
+        
+        for (E edge : graph.edgeSet()) {
+            planarGraph.addEdge(graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+        }
+        
+        return new PlanarGraph(planarGraph);
     }
 
     @Override
-    public E addEdge(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex) {
+    public DefaultWeightedEdge addEdge(Point sourceVertex, Point targetVertex) {
         addLine(sourceVertex, targetVertex, null);
         return null;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<SpatialWaypoint> addLine(SpatialWaypoint sourceVertex, SpatialWaypoint targetVertex, Map edgeMap) {
-        List<SpatialWaypoint> line = new LinkedList<SpatialWaypoint>(Arrays.asList(sourceVertex, targetVertex));
+    public List<Point> addLine(Point sourceVertex, Point targetVertex, Map edgeMap) {
+        List<Point> line = new LinkedList<Point>(Arrays.asList(sourceVertex, targetVertex));
 
         //
         // Find intersections of edges with the line,
         // add there new points and split the edges.
         //
 
-        List<E> toRemove = new ArrayList<E>();
-        Map<E, SpatialWaypoint> toAdd = new HashMap<E, SpatialWaypoint>();
-        for (E edge : edgeSet()) {
+        List<DefaultWeightedEdge> toRemove = new ArrayList<DefaultWeightedEdge>();
+        Map<DefaultWeightedEdge, Point> toAdd = new HashMap<DefaultWeightedEdge, Point>();
+        for (DefaultWeightedEdge edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = addLineIntersection(edgeSource, edgeTarget, line);
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = addLineIntersection(edgeSource, edgeTarget, line);
 
             if (intersection != null) {
                 if (intersection.equals(edgeSource) || intersection.equals(edgeTarget)) {
@@ -54,13 +84,13 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
                 }
             }
         }
-        
+
         removeAllEdges(toRemove);
 
-        for (Entry<E, SpatialWaypoint> entry : toAdd.entrySet()) {
-            E edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
-            E edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
-            
+        for (Entry<DefaultWeightedEdge, Point> entry : toAdd.entrySet()) {
+            DefaultWeightedEdge edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
+            DefaultWeightedEdge edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
+
             if (edgeMap != null) {
                 Object edgeInfo = edgeMap.get(entry.getKey());
                 if (edgeInfo != null) {
@@ -70,11 +100,11 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             }
         }
 
-        SpatialWaypoint last = null;
-        for (SpatialWaypoint vertex : line) {
+        Point last = null;
+        for (Point vertex : line) {
             if (!containsVertex(vertex)) {
                 addVertex(vertex);
-            } 
+            }
             if (last != null) {
                 super.addEdge(last, vertex);
                 super.addEdge(vertex, last);
@@ -84,45 +114,45 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
 
         return line;
     }
-    
+
     public int countCrossingEdges(Point point1, Point point2) {
         int counter = 0;
-        for (E edge : edgeSet()) {
+        for (DefaultWeightedEdge edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
-            if (intersection != null && !intersection.equals(point1) && !intersection.equals(point2)) {
+            if (intersection != null) {
                 counter++;
             }
         }
         return counter;
     }
 
-    
-    public void removeCrossingEdges(Point point1, Point point2) {
-        List<E> toRemove = new ArrayList<E>();
-        for (E edge : edgeSet()) {
 
-            SpatialWaypoint edgeSource = getEdgeSource(edge);
-            SpatialWaypoint edgeTarget = getEdgeTarget(edge);
-            SpatialWaypoint intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+    public void removeCrossingEdges(Point point1, Point point2) {
+        List<DefaultWeightedEdge> toRemove = new ArrayList<DefaultWeightedEdge>();
+        for (DefaultWeightedEdge edge : edgeSet()) {
+
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 toRemove.add(edge);
             }
         }
-        
+
         removeAllEdges(toRemove);
     }
 
-    static SpatialWaypoint addLineIntersection(SpatialWaypoint point1, SpatialWaypoint point2, List<SpatialWaypoint> border) {
-        SpatialWaypoint last = null;
+    static Point addLineIntersection(Point point1, Point point2, List<Point> border) {
+        Point last = null;
         int index = 0;
-        for (SpatialWaypoint vertex : border) {
+        for (Point vertex : border) {
             if (last != null) {
-                SpatialWaypoint intersection = getIntersection(point1, point2, last, vertex);
+                Point intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null) {
                     if (intersection.epsilonEquals(last, 0.001)) {
                         return last;
@@ -134,7 +164,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
                     } else if (intersection.epsilonEquals(point2, 0.001)) {
                         border.add(index, point2);
                         return point2;
-                    } else { 
+                    } else {
                         border.add(index, intersection);
                         return intersection;
                     }
@@ -148,14 +178,14 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
 
     /**
      * intersection in 2D
-     * 
+     *
      * @param point1
      * @param point2
      * @param point3
      * @param point4
      * @return
      */
-    static SpatialWaypoint getIntersection(Point point1, Point point2, Point point3, Point point4){
+    static Point getIntersection(Point point1, Point point2, Point point3, Point point4) {
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -199,7 +229,7 @@ public class PlanarGraph<E> extends GraphDelegator<SpatialWaypoint, E> {
             return null;
         }
 
-        return new SpatialWaypoint(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom, 0.0);
     }
 
     static boolean same_sign(double a, double b){

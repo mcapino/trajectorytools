@@ -2,28 +2,27 @@ package cz.agents.alite.trajectorytools.alterantiveplanners;
 
 import java.util.Collection;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphWithObstacles;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
+import cz.agents.alite.trajectorytools.util.Point;
 
 /**
  * Not working - cannot be planned by AStar type of planner!
- * 
+ *
  * Can propose 3 trajectories at maximum...
- * 
+ *
  * Price of the edge depends on the previous trajectory
- * 
+ *
  * @author honza
  *
  */
-public class SoftObstacleAvoidanceMetricPlanner implements AlternativePathPlanner {
+public class SoftObstacleAvoidanceMetricPlanner<V extends Point, E> implements AlternativePathPlanner<V,E> {
 
     public SoftObstacleAvoidanceMetricPlanner() {
     }
-    
+
     @Override
-    public Collection<PlannedPath<SpatialWaypoint, Maneuver>> planPath(ManeuverGraphWithObstacles graph, SpatialWaypoint startVertex, SpatialWaypoint endVertex) {
+    public Collection<PlannedPath<V, E>> planPath(GraphWithObstacles<V,E> graph, V startVertex, V endVertex) {
         throw new UnsupportedOperationException("cannot be planned by AStar type of planner!");
     }
 

@@ -1,38 +1,38 @@
-package cz.agents.alite.trajectorytools.graph.maneuver;
+package cz.agents.alite.trajectorytools.graph;
 import junit.framework.Assert;
 
+import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.junit.Test;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.FourWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.RandomWaypointGraph;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class AStarShortestPathOnManeuverGraphTest {
 
     @Test
     public void testAgainstDijkstra() {
-        ManeuverGraph graph = FourWayConstantSpeedGridGraph.create(5, 5, 2, 2, 1.0);
-        SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
-        SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
+        Graph<Waypoint, SpatialManeuver> graph = SpatialGridFactory.create4WayGrid(5, 5, 2, 2, 1.0);
+        Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
+        Waypoint end = SpatialGraphs.getNearestVertex(graph,new Point(5.0, 5.0, 0));
 
-        AStarShortestPath.Heuristic<SpatialWaypoint> heuristic = new AStarShortestPath.Heuristic<SpatialWaypoint>() {
+        AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
             @Override
-            public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
+            public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
                 return current.distance(goal);
             }
         };
 
         long startTime = System.nanoTime();
-        AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+        AStarShortestPath<Waypoint, SpatialManeuver> astar = new AStarShortestPath<Waypoint, SpatialManeuver>(
                 graph, start, end, heuristic);
 
-        GraphPath<SpatialWaypoint, Maneuver> astarPath = astar.getPath();
+        GraphPath<Waypoint, SpatialManeuver> astarPath = astar.getPath();
         System.out.println("A* search");
         printPath(astarPath);
         System.out.println("time:" + (System.nanoTime() - startTime)/1000000 + " ms. Length:" + astarPath.getWeight());
@@ -40,10 +40,10 @@ public class AStarShortestPathOnManeuverGraphTest {
         System.out.println();
 
         startTime = System.nanoTime();
-        DijkstraShortestPath<SpatialWaypoint, Maneuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, Maneuver>(
+        DijkstraShortestPath<Waypoint, SpatialManeuver> dijkstra = new DijkstraShortestPath<Waypoint, SpatialManeuver>(
                 graph, start, end);
 
-        GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra
+        GraphPath<Waypoint, SpatialManeuver> dijkstraPath = dijkstra
                 .getPath();
         System.out.println("Dijkstra");
         printPath(dijkstraPath);
@@ -66,35 +66,35 @@ public class AStarShortestPathOnManeuverGraphTest {
 
         for (int seed=1; seed<N; seed++) {
 
-            ManeuverGraph graph = RandomWaypointGraph.create(5, 5, 6, 3, seed);
-            SpatialWaypoint start = graph.getNearestWaypoint(new Point(0, 0, 0));
-            SpatialWaypoint end = graph.getNearestWaypoint(new Point(5.0, 5.0, 0));
+            Graph<Waypoint, SpatialManeuver> graph = SpatialGridFactory.createRandom(5, 5, 6, 3, seed, 1.0);
+            Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
+            Waypoint end = SpatialGraphs.getNearestVertex(graph, new Point(5.0, 5.0, 0));
 
-            AStarShortestPath.Heuristic<SpatialWaypoint> heuristic = new AStarShortestPath.Heuristic<SpatialWaypoint>() {
+            AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
                 @Override
-                public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
+                public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
                     return current.distance(goal);
                 }
             };
 
             long startTime = System.nanoTime();
-            AStarShortestPath<SpatialWaypoint, Maneuver> astar = new AStarShortestPath<SpatialWaypoint, Maneuver>(
+            AStarShortestPath<Waypoint, SpatialManeuver> astar = new AStarShortestPath<Waypoint, SpatialManeuver>(
                     graph, start, end, heuristic);
 
-            GraphPath<SpatialWaypoint, Maneuver> astarPath = astar.getPath();
+            GraphPath<Waypoint, SpatialManeuver> astarPath = astar.getPath();
 
             astarTime += System.nanoTime()-startTime;
 
 
 
             startTime = System.nanoTime();
-            DijkstraShortestPath<SpatialWaypoint, Maneuver> dijkstra = new DijkstraShortestPath<SpatialWaypoint, Maneuver>(
+            DijkstraShortestPath<Waypoint, SpatialManeuver> dijkstra = new DijkstraShortestPath<Waypoint, SpatialManeuver>(
                     graph, start, end);
 
-            GraphPath<SpatialWaypoint, Maneuver> dijkstraPath = dijkstra.getPath();
+            GraphPath<Waypoint, SpatialManeuver> dijkstraPath = dijkstra.getPath();
 
             dijkstraTime += System.nanoTime()-startTime;
-            
+
             Assert.assertFalse((dijkstraPath == null) && (astarPath != null));
             Assert.assertFalse((dijkstraPath != null) && (astarPath == null));
 
@@ -121,18 +121,18 @@ public class AStarShortestPathOnManeuverGraphTest {
         System.out.println("Examined " + N + " random graphs. Dijkstra avg. time: " + dijkstraTime/(1000*N) + "ms" + ". A* avg. time: " + astarTime/(1000*N)+"ms.");
     }
 
-    private void printPath(GraphPath<SpatialWaypoint, Maneuver> path) {
+    private void printPath(GraphPath<Waypoint, SpatialManeuver> path) {
          if (path == null) {
              System.out.println("no path found");
              return;
          }
          System.out.print(path.getStartVertex() + ", ");
-         for (Maneuver edge : path.getEdgeList()) {
+         for (SpatialManeuver edge : path.getEdgeList()) {
              if (edge == null) {
                  System.out.println("Edge is null");
              }
-             System.out.print(edge.getSource() + "-"
-                     + edge.getTarget() + ", ");
+             System.out.print(path.getGraph().getEdgeSource(edge) + "-"
+                     + path.getGraph().getEdgeTarget(edge) + ", ");
          }
          System.out.print(path.getEndVertex());
          System.out.print(" Path weight:" + path.getWeight());

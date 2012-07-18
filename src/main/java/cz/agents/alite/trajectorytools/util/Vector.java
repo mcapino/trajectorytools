@@ -37,4 +37,10 @@ public class Vector extends Vector3d {
         super();
     }
     
+    public static Vector subtract(Tuple3d v1, Tuple3d v2) {
+    	Vector result = new Vector(v1);
+    	result.sub(v2);
+    	return result;
+    }
+    
 }

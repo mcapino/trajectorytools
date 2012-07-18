@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePathPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.AlternativePlannerSelector;
@@ -16,22 +19,20 @@ import cz.agents.alite.trajectorytools.alterantiveplanners.ObstacleExtensions;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMaxMinMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.TrajectoryDistanceMetricPlanner;
 import cz.agents.alite.trajectorytools.alterantiveplanners.VoronoiDelaunayPlanner;
-import cz.agents.alite.trajectorytools.graph.maneuver.EightWayConstantSpeedGridGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraph;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView;
-import cz.agents.alite.trajectorytools.graph.maneuver.ObstacleGraphView.ChangeListener;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.ObstacleGraphView.ChangeListener;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
+import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
-import cz.agents.alite.trajectorytools.trajectorymetrics.ManeuverTrajectoryMetric;
-import cz.agents.alite.trajectorytools.trajectorymetrics.ObstacleAvoidanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class AlternativePlanners1Creator implements Creator {
 
@@ -47,17 +48,17 @@ public class AlternativePlanners1Creator implements Creator {
 
     private static final int WORLD_SIZE = 10;
 
-    private static final AStarPlanner<SpatialWaypoint, Maneuver> planner = new AStarPlanner<SpatialWaypoint, Maneuver>();
+    private static final AStarPlanner<Point, DefaultWeightedEdge> planner = new AStarPlanner<Point, DefaultWeightedEdge>();
     {
-        planner.setHeuristicFunction(new HeuristicFunction<SpatialWaypoint>() {
+        planner.setHeuristicFunction(new HeuristicFunction<Point>() {
         @Override
-            public double getHeuristicEstimate(SpatialWaypoint current, SpatialWaypoint goal) {
+            public double getHeuristicEstimate(Point current, Point goal) {
                 return current.distance(goal) + ( current.x > current.y ? 0.1 : -0.1 );
             }
         });
     }
 
-    private static final AlternativePathPlanner[] alternativePlanners = new AlternativePathPlanner[] {
+    private static final AlternativePathPlanner<Point, DefaultWeightedEdge>[] alternativePlanners = new AlternativePathPlanner[] {
         new DifferentStateMetricPlanner( planner, PATH_SOLUTION_LIMIT ),
         new TrajectoryDistanceMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2),
         new TrajectoryDistanceMaxMinMetricPlanner( planner, PATH_SOLUTION_LIMIT, 2 ),
@@ -67,10 +68,9 @@ public class AlternativePlanners1Creator implements Creator {
         new AlternativePlannerSelector( new VoronoiDelaunayPlanner(planner), PATH_SOLUTION_LIMIT),
     };
 
-    private static final ManeuverTrajectoryMetric[] trajectoryMetrics = new ManeuverTrajectoryMetric [] {
+    private static final TrajectoryMetric<Point, DefaultWeightedEdge>[] trajectoryMetrics = new TrajectoryMetric [] {
         new DifferentStateMetric(),
-        new TrajectoryDistanceMetric(),
-        new ObstacleAvoidanceMetric()
+        new TrajectoryDistanceMetric()
     };
 
     @Override
@@ -91,7 +91,7 @@ public class AlternativePlanners1Creator implements Creator {
             out.write("WORLD_SIZE;" + WORLD_SIZE + ";Repeats;" + NUM_OF_REPEATS + ";Obst. cases;" + ( (NUM_OF_OBSTACLES_MAX - NUM_OF_OBSTACLES_MIN)/NUM_OF_OBSTACLES_STEP + 1)  );
             out.newLine();
             out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
-            for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
+            for (TrajectoryMetric<Point, DefaultWeightedEdge> metric : trajectoryMetrics) {
                 out.write(";" + metric.getName());
             }
             out.newLine();
@@ -106,7 +106,7 @@ public class AlternativePlanners1Creator implements Creator {
                     final List<Point> obstacles = generateRandomObstacles(numObstacles);
 
                     int plannerNum = 0;
-                    for (final AlternativePathPlanner planner : alternativePlanners) {
+                    for (final AlternativePathPlanner<Point, DefaultWeightedEdge> planner : alternativePlanners) {
 //                        System.out.println("planner.getName(): " + planner.getName());
                         final String runStr = numObstacles + "/" + repeat;
 
@@ -143,12 +143,16 @@ public class AlternativePlanners1Creator implements Creator {
     	    //
     	    // Check whether a path exists
     	    //
-    	    ManeuverGraph graph = createGraph();
+            ObstacleGraphView graph = ObstacleGraphView.createFromGraph(createGraph(), new ChangeListener() {
+                @Override
+                public void graphChanged() {
+                }
+            } );
     	    
-            PlannedPath<SpatialWaypoint, Maneuver> planPath = planner.planPath(
+            PlannedPath<Point, DefaultWeightedEdge> planPath = planner.planPath(
                     graph, 
-                    graph.getNearestWaypoint(new Point(0, 0, 0)),
-                    graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
                     );
             if (planPath != null) {
                 return obstacles;
@@ -159,11 +163,11 @@ public class AlternativePlanners1Creator implements Creator {
     private void runExperiment(
             final BufferedWriter out,
             final List<Point> obstacles,
-            final AlternativePathPlanner planner, 
+            final AlternativePathPlanner<Point, DefaultWeightedEdge> planner, 
             int curPlannerNum) {
-        ManeuverGraphInterface originalGraph = createGraph(); 
+        Graph<Waypoint, SpatialManeuver> originalGraph = createGraph(); 
 
-        ObstacleGraphView graph = new ObstacleGraphView( originalGraph, new ChangeListener() {
+        ObstacleGraphView graph = ObstacleGraphView.createFromGraph(originalGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
             }
@@ -174,16 +178,16 @@ public class AlternativePlanners1Creator implements Creator {
         }
 
         long startTime = System.currentTimeMillis();
-        Collection<PlannedPath<SpatialWaypoint, Maneuver>> paths = 
+        Collection<PlannedPath<Point, DefaultWeightedEdge>> paths = 
                 planner.planPath(
                         graph, 
-                        graph.getNearestWaypoint(new Point(0, 0, 0)),
-                        graph.getNearestWaypoint(new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                        SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
                         );
         long duration = System.currentTimeMillis() - startTime;
 
         double averageLength = 0;
-        for (PlannedPath<SpatialWaypoint, Maneuver> path : paths) {
+        for (PlannedPath<Point, DefaultWeightedEdge> path : paths) {
             if (path == null) {
                 System.out.println("paths: " + paths);
                 System.out.println("graph.getObstacles(): "
@@ -199,7 +203,7 @@ public class AlternativePlanners1Creator implements Creator {
             synchronized (out) {
                 out.write( "" + obstacles.size() + ";" + curPlannerNum + "-" + planner.getName() + "-" + String.format("%03d", obstacles.size()) + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
 
-                for (ManeuverTrajectoryMetric metric : trajectoryMetrics) {
+                for (TrajectoryMetric<Point, DefaultWeightedEdge> metric : trajectoryMetrics) {
                     out.write(";" + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 
@@ -211,7 +215,7 @@ public class AlternativePlanners1Creator implements Creator {
         }
     }
 
-    private ManeuverGraph createGraph() {
-        return EightWayConstantSpeedGridGraph.create(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
+    private Graph<Waypoint, SpatialManeuver> createGraph() {
+        return SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
     }
 }

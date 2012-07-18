@@ -6,39 +6,34 @@ import java.util.List;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
-import cz.agents.alite.trajectorytools.graph.maneuver.Maneuver;
-import cz.agents.alite.trajectorytools.graph.maneuver.ManeuverGraphInterface;
-import cz.agents.alite.trajectorytools.graph.spatialwaypoint.SpatialWaypoint;
+public class SingleVertexPlannedPath<V, E> implements
+        PlannedPath<V, E> {
+    private final Graph<V,E> graph;
+    private final V vertex;
 
-public class SingleVertexPlannedPath implements
-        PlannedPath<SpatialWaypoint, Maneuver> {
-    private final ManeuverGraphInterface graph;
-    private final SpatialWaypoint vertex;
-
-    public SingleVertexPlannedPath(ManeuverGraphInterface graph,
-            SpatialWaypoint vertex) {
+    public SingleVertexPlannedPath(Graph<V,E> graph, V vertex) {
         this.graph = graph;
         this.vertex = vertex;
     }
 
     @Override
-    public Graph<SpatialWaypoint, Maneuver> getGraph() {
+    public Graph<V, E> getGraph() {
         return graph;
     }
 
     @Override
-    public SpatialWaypoint getStartVertex() {
+    public V getStartVertex() {
         return vertex;
     }
 
     @Override
-    public SpatialWaypoint getEndVertex() {
+    public V getEndVertex() {
         return vertex;
     }
 
     @Override
-    public List<Maneuver> getEdgeList() {
-        return new ArrayList<Maneuver>();
+    public List<E> getEdgeList() {
+        return new ArrayList<E>();
     }
 
     @Override
@@ -47,12 +42,12 @@ public class SingleVertexPlannedPath implements
     }
 
     @Override
-    public List<Maneuver> getPathEdgeList() {
-        return new ArrayList<Maneuver>();
+    public List<E> getPathEdgeList() {
+        return new ArrayList<E>();
     }
 
     @Override
-    public GraphPath<SpatialWaypoint, Maneuver> getPath() {
+    public GraphPath<V, E> getPath() {
         throw new UnsupportedOperationException();
     }
 
