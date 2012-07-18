@@ -9,39 +9,70 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.GraphDelegator;
+import org.jgrapht.graph.SimpleGraph;
 
 import cz.agents.alite.trajectorytools.util.Point;
 
-public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
+public class PlanarGraph extends GraphDelegator<Point, DefaultWeightedEdge> {
     private static final long serialVersionUID = -7039093249594157867L;
 
-    public PlanarGraph(Graph<V, E> g) {
-        super(g);
+    protected PlanarGraph(Graph<Point, DefaultWeightedEdge> graph) {
+        super(graph);
+    }
+
+
+    /**
+     * Creates a planar view over the given graph.
+     * 
+     * @param graph
+     */
+    public static PlanarGraph createPlanarGraphView(Graph<Point, DefaultWeightedEdge> graph) {
+        return new PlanarGraph(graph);
+    }
+
+    /**
+     * Creates new graph - it's not a view
+     * 
+     * @param graph
+     * @return
+     */
+    public static <V extends Point, E> PlanarGraph createPlanarGraphCopy(Graph<V, E> graph) {
+        Graph<Point, DefaultWeightedEdge> planarGraph = new SimpleGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        for (V vertex : graph.vertexSet()) {
+            planarGraph.addVertex(vertex);
+        }
+        
+        for (E edge : graph.edgeSet()) {
+            planarGraph.addEdge(graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+        }
+        
+        return new PlanarGraph(planarGraph);
     }
 
     @Override
-    public E addEdge(V sourceVertex, V targetVertex) {
+    public DefaultWeightedEdge addEdge(Point sourceVertex, Point targetVertex) {
         addLine(sourceVertex, targetVertex, null);
         return null;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<V> addLine(V sourceVertex, V targetVertex, Map edgeMap) {
-        List<V> line = new LinkedList<V>(Arrays.asList(sourceVertex, targetVertex));
+    public List<Point> addLine(Point sourceVertex, Point targetVertex, Map edgeMap) {
+        List<Point> line = new LinkedList<Point>(Arrays.asList(sourceVertex, targetVertex));
 
         //
         // Find intersections of edges with the line,
         // add there new points and split the edges.
         //
 
-        List<E> toRemove = new ArrayList<E>();
-        Map<E, V> toAdd = new HashMap<E, V>();
-        for (E edge : edgeSet()) {
+        List<DefaultWeightedEdge> toRemove = new ArrayList<DefaultWeightedEdge>();
+        Map<DefaultWeightedEdge, Point> toAdd = new HashMap<DefaultWeightedEdge, Point>();
+        for (DefaultWeightedEdge edge : edgeSet()) {
 
-            V edgeSource = getEdgeSource(edge);
-            V edgeTarget = getEdgeTarget(edge);
-            V intersection = addLineIntersection(edgeSource, edgeTarget, line);
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = addLineIntersection(edgeSource, edgeTarget, line);
 
             if (intersection != null) {
                 if (intersection.equals(edgeSource) || intersection.equals(edgeTarget)) {
@@ -56,9 +87,9 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
 
         removeAllEdges(toRemove);
 
-        for (Entry<E, V> entry : toAdd.entrySet()) {
-            E edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
-            E edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
+        for (Entry<DefaultWeightedEdge, Point> entry : toAdd.entrySet()) {
+            DefaultWeightedEdge edge1 = super.addEdge(getEdgeSource(entry.getKey()), entry.getValue());
+            DefaultWeightedEdge edge2 = super.addEdge(entry.getValue(), getEdgeTarget(entry.getKey()));
 
             if (edgeMap != null) {
                 Object edgeInfo = edgeMap.get(entry.getKey());
@@ -69,8 +100,8 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
             }
         }
 
-        V last = null;
-        for (V vertex : line) {
+        Point last = null;
+        for (Point vertex : line) {
             if (!containsVertex(vertex)) {
                 addVertex(vertex);
             }
@@ -84,13 +115,13 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
         return line;
     }
 
-    public int countCrossingEdges(V point1, V point2) {
+    public int countCrossingEdges(Point point1, Point point2) {
         int counter = 0;
-        for (E edge : edgeSet()) {
+        for (DefaultWeightedEdge edge : edgeSet()) {
 
-            V edgeSource = getEdgeSource(edge);
-            V edgeTarget = getEdgeTarget(edge);
-            V intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 counter++;
@@ -100,13 +131,13 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
     }
 
 
-    public void removeCrossingEdges(V point1, V point2) {
-        List<E> toRemove = new ArrayList<E>();
-        for (E edge : edgeSet()) {
+    public void removeCrossingEdges(Point point1, Point point2) {
+        List<DefaultWeightedEdge> toRemove = new ArrayList<DefaultWeightedEdge>();
+        for (DefaultWeightedEdge edge : edgeSet()) {
 
-            V edgeSource = getEdgeSource(edge);
-            V edgeTarget = getEdgeTarget(edge);
-            V intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
+            Point edgeSource = getEdgeSource(edge);
+            Point edgeTarget = getEdgeTarget(edge);
+            Point intersection = getIntersection(point1, point2, edgeSource, edgeTarget);
 
             if (intersection != null) {
                 toRemove.add(edge);
@@ -116,12 +147,12 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
         removeAllEdges(toRemove);
     }
 
-    static <V extends Point> V addLineIntersection(V point1, V point2, List<V> border) {
-        V last = null;
+    static Point addLineIntersection(Point point1, Point point2, List<Point> border) {
+        Point last = null;
         int index = 0;
-        for (V vertex : border) {
+        for (Point vertex : border) {
             if (last != null) {
-                V intersection = getIntersection(point1, point2, last, vertex);
+                Point intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null) {
                     if (intersection.epsilonEquals(last, 0.001)) {
                         return last;
@@ -154,7 +185,7 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
      * @param point4
      * @return
      */
-    static <V extends Point> V getIntersection(V point1, V point2, V point3, V point4){
+    static Point getIntersection(Point point1, Point point2, Point point3, Point point4) {
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -198,7 +229,7 @@ public class PlanarGraph<V extends Point, E> extends GraphDelegator<V, E> {
             return null;
         }
 
-        return (V) new Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom, 0.0);
+        return new Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom, 0.0);
     }
 
     static boolean same_sign(double a, double b){

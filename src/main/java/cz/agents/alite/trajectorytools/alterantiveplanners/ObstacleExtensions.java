@@ -15,7 +15,6 @@ import org.jgrapht.Graph;
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
@@ -34,6 +33,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
 
     final Set<PlannedPath<V, E>> paths = new HashSet<PlannedPath<V, E>>();
 
+    @Override
     public Collection<PlannedPath<V, E>> planPath(
             GraphWithObstacles<V, E> originalGraph,
             V startVertex, V endVertex) {
@@ -60,9 +60,9 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
     static class ObstacleExtender<VV extends Point, EE> implements Iterable<Graph<VV, EE>>{
 
         int[] directions;
-        private final ObstacleGraphView<VV, EE> originalGraph;
+        private final GraphWithObstacles<VV, EE> originalGraph;
 
-        public ObstacleExtender(ObstacleGraphView<VV, EE> originalGraph) {
+        public ObstacleExtender(GraphWithObstacles<VV, EE> originalGraph) {
             this.originalGraph = originalGraph;
 
             directions = new int[originalGraph.getObstacles().size()];

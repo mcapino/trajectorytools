@@ -20,7 +20,7 @@ public class Waypoint extends Point implements Comparable<Waypoint> {
             globalIdCounter = order + 1;
         }
     }
-
+    
     @Override
     public int compareTo(Waypoint other) {
         return id - other.id;

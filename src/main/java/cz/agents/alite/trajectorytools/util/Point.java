@@ -36,7 +36,7 @@ public class Point extends Point3d implements cz.agents.alite.vis.element.Point 
     public Point() {
         super();
     }
-
+    
     @Override
     public javax.vecmath.Point3d getPosition() {
         return this;

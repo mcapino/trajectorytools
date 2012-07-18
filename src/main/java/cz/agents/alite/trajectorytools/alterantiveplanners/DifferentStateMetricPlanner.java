@@ -28,7 +28,7 @@ public class DifferentStateMetricPlanner<V extends Point, E> implements Alternat
         this.planner = planner;
         this.pathSolutionLimit = pathSolutionLimit;
 
-        metric = new DifferentStateMetric();
+        metric = new DifferentStateMetric<V, E>();
     }
 
     @Override
