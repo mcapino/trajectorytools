@@ -94,7 +94,7 @@ public class DemoAlternative1Creator implements Creator {
                 );
     }
 
-    private static final int CURRENT_PLANNER = 4;
+    private static final int CURRENT_PLANNER = 5;
     @Override
     public void init(String[] args) {
     }
