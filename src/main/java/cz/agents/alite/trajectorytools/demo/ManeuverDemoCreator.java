@@ -18,6 +18,7 @@ import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
+import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
@@ -58,7 +59,13 @@ public class ManeuverDemoCreator implements Creator {
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
         // graph
-        VisManager.registerLayer(GraphLayer.create(graph, Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(GraphLayer.create( new GraphProvider<Waypoint, SpatialManeuver>() {
+
+			@Override
+			public Graph<Waypoint, SpatialManeuver> getGraph() {
+				return graph;
+			}
+		}, Color.GRAY, Color.GRAY, 1, 4));
 
 
 

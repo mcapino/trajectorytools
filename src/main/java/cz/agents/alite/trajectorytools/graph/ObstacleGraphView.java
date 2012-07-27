@@ -18,6 +18,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
+import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.element.FilledStyledCircle;
 import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
@@ -30,7 +31,7 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
     private static final Color VERTEX_COLOR = new Color(240, 240, 240);
     private static final Color VERTEX_COLOR_INACTIVE = new Color(250, 250, 250);
     private static final Color EDGE_COLOR = new Color(220, 220, 220);
-    private static final Color EDGE_COLOR_INACTIVE = new Color(240, 240, 240);
+    private static final Color EDGE_COLOR_INACTIVE = new Color(250, 250, 250);
 
     private static final Color OBSTACLE_COLOR = Color.ORANGE;
     private static final double OBSTACLE_RADIUS = 0.3;
@@ -68,8 +69,19 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
 
 
     public void createVisualization() {
-        VisManager.registerLayer(GraphLayer.create(originalGraph, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
-        VisManager.registerLayer(GraphLayer.create(this, EDGE_COLOR, VERTEX_COLOR, 1, 4));
+        VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, DefaultWeightedEdge>() {
+			@Override
+			public Graph<Point, DefaultWeightedEdge> getGraph() {
+				return originalGraph;
+			}
+		}, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
+        
+        VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, DefaultWeightedEdge>() {
+			@Override
+			public Graph<Point, DefaultWeightedEdge> getGraph() {
+				return  ObstacleGraphView.this;
+			}
+		}, EDGE_COLOR, VERTEX_COLOR, 1, 4));
 
         // clickable obstacles
 

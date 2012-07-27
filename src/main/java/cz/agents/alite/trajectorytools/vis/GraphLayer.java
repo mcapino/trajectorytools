@@ -8,6 +8,7 @@ import javax.vecmath.Vector3d;
 
 import org.jgrapht.Graph;
 
+import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -21,14 +22,18 @@ import cz.agents.alite.vis.layer.terminal.PointLayer;
 
 public class GraphLayer extends AbstractLayer {
 
+    public static interface GraphProvider<V, E> {
+    	Graph<V, E> getGraph();
+    }
+	
     GraphLayer() {
     }
 
-    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
+    public static <V extends Point,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
-        return create(graph, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, 0.0);
+        return create(graphProvider, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, 0.0);
     }
-    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Color edgeColor, final Color vertexColor,
+    public static <V extends Point,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth, final double offset) {
         GroupLayer group = GroupLayer.create();
 
@@ -37,6 +42,7 @@ public class GraphLayer extends AbstractLayer {
 
             @Override
             public Iterable<Line> getLines() {
+            	Graph<V, E> graph = graphProvider.getGraph();
                 LinkedList<Line> lines = new LinkedList<Line>();
                 Vector3d transition = new Vector3d(offset, offset, 0);
                 for (E edge : graph.edgeSet()) {
@@ -63,9 +69,14 @@ public class GraphLayer extends AbstractLayer {
 
         // vertices
         group.addSubLayer(PointLayer.create(new PointElements() {
-
+        	
+        	
+        	
             @Override
             public Iterable<Point> getPoints() {
+            	
+            	Graph<V, E> graph = graphProvider.getGraph();
+            	
                 LinkedList<Point> points = new LinkedList<Point>();
                 for (Point vertex : graph.vertexSet()) {
                     points.add(vertex);

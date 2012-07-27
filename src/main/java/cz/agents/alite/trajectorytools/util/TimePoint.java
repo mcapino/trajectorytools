@@ -1,27 +1,29 @@
 package cz.agents.alite.trajectorytools.util;
 
-public class TimePoint extends Point {
+import javax.vecmath.Point4d;
+
+public class TimePoint extends Point4d {
     private static final long serialVersionUID = 1136064568843307511L;
 
-    double time;
-
     public TimePoint(double x, double y, double z, double time) {
-        super(x, y, z);
-        this.time = time;
+        super(x,y,z,time);
     }
 
     public TimePoint(Point p, double time) {
-        super(p);
-        this.time = time;
+    	super(p.x,p.y,p.z,time);
     }
+    
+    public Point get3dPoint() {
+		return new Point(x,y,z);
+	}
 
     public double getTime() {
-        return time;
+        return w;
     }
 
     @Override
     public String toString() {
-        return super.toString() + " @ " + time +"";
+        return get3dPoint().toString() + " @ " + getTime() +"";
     }
 
 }
