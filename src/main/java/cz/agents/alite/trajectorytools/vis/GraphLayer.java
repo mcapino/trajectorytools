@@ -74,7 +74,6 @@ public class GraphLayer extends AbstractLayer {
         	
             @Override
             public Iterable<Point> getPoints() {
-            	
             	Graph<V, E> graph = graphProvider.getGraph();
             	
                 LinkedList<Point> points = new LinkedList<Point>();

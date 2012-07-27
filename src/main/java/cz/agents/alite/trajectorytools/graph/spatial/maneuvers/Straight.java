@@ -9,11 +9,11 @@ import cz.agents.alite.trajectorytools.util.Waypoint;
 public class Straight extends SpatialManeuver {
     private static final long serialVersionUID = -2519868162204278196L;
     
-    private Waypoint start;
-	private Waypoint end;
+    private Point start;
+	private Point end;
 	private double speed;
 	
-	public Straight(Waypoint start, Waypoint end, double speed) {
+	public Straight(Point start, Point end, double speed) {
 		super();
 		this.start = start;
 		this.end = end;	
