@@ -13,6 +13,13 @@ public class Straight extends SpatialManeuver {
 	private Point end;
 	private double speed;
 	
+	public Straight(Waypoint start, Waypoint end, double speed) {
+		super();
+		this.start = start;
+		this.end = end;	
+		this.speed = speed;
+	}
+	
 	public Straight(Point start, Point end, double speed) {
 		super();
 		this.start = start;
