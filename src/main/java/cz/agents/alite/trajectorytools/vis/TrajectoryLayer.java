@@ -33,16 +33,18 @@ public class TrajectoryLayer extends CommonLayer {
                 ArrayList<StyledPoint> points = new ArrayList<StyledPoint>();
                 Trajectory t = trajectoryProvider.getTrajectory();
 
-                double maxTime = Math.min(t.getMaxTime(), maxTimeArg);
-
-                points.add(new StyledPointImpl(t.getPosition(t.getMinTime()), color, 8));
-                points.add(new StyledPointImpl(t.getPosition(t.getMaxTime()), color, 8));
-
                 if (t != null) {
-                    for (double time = t.getMinTime(); time < maxTime; time += samplingInterval) {
-                        OrientedPoint pos = t.getPosition(time);
-                        if (pos != null) {
-                            points.add(new StyledPointImpl(pos, color, 6));
+                    double maxTime = Math.min(t.getMaxTime(), maxTimeArg);
+
+                    points.add(new StyledPointImpl(t.getPosition(t.getMinTime()), color, 8));
+                    points.add(new StyledPointImpl(t.getPosition(t.getMaxTime()), color, 8));
+
+                    if (t != null) {
+                        for (double time = t.getMinTime(); time < maxTime; time += samplingInterval) {
+                            OrientedPoint pos = t.getPosition(time);
+                            if (pos != null) {
+                                points.add(new StyledPointImpl(pos, color, 6));
+                            }
                         }
                     }
                 }

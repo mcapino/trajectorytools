@@ -5,13 +5,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
-
-import org.jgrapht.Graph;
 
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
-import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -25,7 +21,7 @@ import cz.agents.alite.vis.layer.terminal.PointLayer;
 
 public class RRTStarLayer extends AbstractLayer {
 
-	
+
     RRTStarLayer() {
     }
 
@@ -37,37 +33,37 @@ public class RRTStarLayer extends AbstractLayer {
         group.addSubLayer(LineLayer.create(new LineElements() {
 
             @Override
-            public Iterable<Line> getLines() {            	
+            public Iterable<Line> getLines() {
                 LinkedList<Line> lines = new LinkedList<Line>();
-                
-        		Queue<Vertex<V>> queue = new LinkedList<Vertex<V>>();
-        		queue.add(rrtstar.getRoot());
-        		
-        		while(!queue.isEmpty()) {
-        			Vertex<V> current = queue.poll();
-       			for (Vertex<V> child : current.getChildren()) {
-        				queue.offer(child);
-        				
-        				Point3d source =  null;
-        				Point3d target = null;
-        				
-        				if (current.getPoint() instanceof Point3d) {
-        					source = (Point3d) current.getPoint(); 
-        				}
-        				
-        				
-        				if (child.getPoint() instanceof Point3d) {
-        					target = (Point3d) child.getPoint(); 
-        				}
-        				
-        				// draw edge
-        				if (source != null && target != null) {
-	                        lines.add(new LineImpl(source, target));
-        				}
-        				
-        			}			
-        		}
-                
+
+                Queue<Vertex<V,?>> queue = new LinkedList<Vertex<V,?>>();
+                queue.add(rrtstar.getRoot());
+
+                while(!queue.isEmpty()) {
+                    Vertex<V,?> current = queue.poll();
+                   for (Vertex<V,?> child : current.getChildren()) {
+                        queue.offer(child);
+
+                        Point3d source =  null;
+                        Point3d target = null;
+
+                        if (current.getPoint() instanceof Point3d) {
+                            source = (Point3d) current.getPoint();
+                        }
+
+
+                        if (child.getPoint() instanceof Point3d) {
+                            target = (Point3d) child.getPoint();
+                        }
+
+                        // draw edge
+                        if (source != null && target != null) {
+                            lines.add(new LineImpl(source, target));
+                        }
+
+                    }
+                }
+
                 return lines;
             }
 
@@ -85,27 +81,27 @@ public class RRTStarLayer extends AbstractLayer {
 
         // vertices
         group.addSubLayer(PointLayer.create(new PointElements() {
-        	
-        	
-        	
+
+
+
             @Override
             public Iterable<Point> getPoints() {
                 LinkedList<Point> points = new LinkedList<Point>();
 
-        		Queue<Vertex<V>> queue = new LinkedList<Vertex<V>>();
-        		queue.add(rrtstar.getRoot());
-        		
-        		while(!queue.isEmpty()) {
-        			Vertex<V> current = queue.poll();
-        			
-    				if (current.getPoint() instanceof Point) {
-    					points.add((Point) current.getPoint()); 
-    				}
-    				
-	       			for (Vertex<V> child : current.getChildren()) {
-        				queue.offer(child);
-	        		}			
-        		}
+                Queue<Vertex<V,?>> queue = new LinkedList<Vertex<V,?>>();
+                queue.add(rrtstar.getRoot());
+
+                while(!queue.isEmpty()) {
+                    Vertex<V,?> current = queue.poll();
+
+                    if (current.getPoint() instanceof Point) {
+                        points.add((Point) current.getPoint());
+                    }
+
+                       for (Vertex<V,?> child : current.getChildren()) {
+                        queue.offer(child);
+                    }
+                }
                 return points;
             }
 
