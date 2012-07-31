@@ -38,7 +38,7 @@ public class RRTStar4dDemoCreator implements Creator {
     TimePoint initialPoint = new TimePoint(100, 100, 0, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 1000, 100));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new StaticBoxRegion(new Point(500, 850, -1000), new Point(600, 870, 1000));
+    Region target = new StaticBoxRegion(new Point(800, 100, -1000), new Point(820, 120, 1000));
 
     Trajectory trajectory = null;
 
@@ -62,12 +62,12 @@ public class RRTStar4dDemoCreator implements Creator {
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
-        int n=300;
+        int n=100000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
             if (rrtstar.getBestVertex() != null) {
-                //System.out.println("Best vertex: " + rrtstar.getBestVertex());
+                System.out.println("Best path cost: " + rrtstar.getBestVertex().getCostFromRoot());
                 GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
                 trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
