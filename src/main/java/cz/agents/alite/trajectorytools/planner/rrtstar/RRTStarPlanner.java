@@ -42,7 +42,7 @@ public class RRTStarPlanner<P,E> implements Graph<P,E> {
 
     public void iterate() {
         // 1. Sample a new state
-        P randomSample = domain.getRandomSample();
+        P randomSample = domain.sampleState();
 
         // 2. Compute the set of all near vertices
         Collection<Vertex<P,E>> nearVertices = getNear(randomSample, nSamples);

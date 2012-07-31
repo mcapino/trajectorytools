@@ -10,12 +10,12 @@ public class TimePoint extends Point4d {
     }
 
     public TimePoint(Point p, double time) {
-    	super(p.x,p.y,p.z,time);
+        super(p.x,p.y,p.z,time);
     }
-    
-    public Point get3dPoint() {
-		return new Point(x,y,z);
-	}
+
+    public Point getPoint3d() {
+        return new Point(x,y,z);
+    }
 
     public double getTime() {
         return w;
@@ -23,7 +23,7 @@ public class TimePoint extends Point4d {
 
     @Override
     public String toString() {
-        return get3dPoint().toString() + " @ " + getTime() +"";
+        return super.toString();
     }
 
 }

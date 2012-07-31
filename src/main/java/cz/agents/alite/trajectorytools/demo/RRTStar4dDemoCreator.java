@@ -4,22 +4,25 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
-import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
-import cz.agents.alite.trajectorytools.graph.spatial.region.Region;
-import cz.agents.alite.trajectorytools.graph.spatial.rrtstar.SpatialStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.SpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
-import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
+import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
-import cz.agents.alite.trajectorytools.vis.Regions3dLayer;
-import cz.agents.alite.trajectorytools.vis.Regions3dLayer.RegionsProvider;
+import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
+import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.vis.Vis;
@@ -28,16 +31,18 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
-public class RRTStar2dDemoCreator implements Creator {
+public class RRTStar4dDemoCreator implements Creator {
 
-    RRTStarPlanner<Point, SpatialManeuver> rrtstar;
+    RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
-    Point initialPoint = new Point(100, 100, 0);
-    BoxRegion bounds = new BoxRegion(new Point(0, 0, 0), new Point(1000, 1000, 1000));
+    TimePoint initialPoint = new TimePoint(100, 100, 0, 0);
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 1000, 100));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new BoxRegion(new Point(500, 850, -1000), new Point(600, 870, 1000));
+    Region target = new StaticBoxRegion(new Point(500, 850, -1000), new Point(600, 870, 1000));
 
     Trajectory trajectory = null;
+
+    double gamma = 1300;
 
     @Override
     public void init(String[] args) {
@@ -46,31 +51,31 @@ public class RRTStar2dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new BoxRegion(new Point(250, 250, 0), new Point(750,750,750)));
+        obstacles.add(new StaticBoxRegion(new Point(250, 250, 0), new Point(750,750,750)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
-        obstacles.add(new BoxRegion(new Point(100, 200, 0), new Point(230,950,750)));
+        obstacles.add(new StaticBoxRegion(new Point(100, 200, 0), new Point(230,950,750)));
 
 
-        Domain<Point, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
-        rrtstar = new RRTStarPlanner<Point, SpatialManeuver>(domain, initialPoint, 1300);
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new SpatioTemporalStraightLineDomain(bounds, obstacles, target, 12,15,25, new Random(1));
+        rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
-        int n=100000;
+        int n=300;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
             if (rrtstar.getBestVertex() != null) {
                 //System.out.println("Best vertex: " + rrtstar.getBestVertex());
-                GraphPath<Point, SpatialManeuver> path = rrtstar.getBestPath();
-                trajectory = new SpatialManeuverTrajectory<Point, SpatialManeuver>(0.0, path, path.getWeight());
+                GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
+                trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
             }
 
             /*
             try {
-                Thread.sleep(5);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }*/
@@ -91,7 +96,7 @@ public class RRTStar2dDemoCreator implements Creator {
         // graph
         VisManager.registerLayer(RRTStarLayer.create(rrtstar, Color.GRAY, Color.GRAY, 1, 4));
 
-        VisManager.registerLayer(Regions3dLayer.create(new RegionsProvider() {
+        VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 
             @Override
             public Collection<Region> getRegions() {
@@ -109,7 +114,7 @@ public class RRTStar2dDemoCreator implements Creator {
             public Trajectory getTrajectory() {
                 return trajectory;
             }
-        }, Color.BLUE, 10, 2000.0, 't'));
+        }, Color.BLUE, 1, 2000.0, 't'));
 
 
         // Overlay

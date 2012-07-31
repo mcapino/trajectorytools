@@ -34,7 +34,7 @@ public class ConflictsLayer extends CommonLayer {
                 ArrayList<Circle> circles = new ArrayList<Circle>();
 
                 for (TimePoint conflict : conflictsHolder.conflicts) {
-                    circles.add(new CircleImpl(conflict.get3dPoint(), separation/2.0));
+                    circles.add(new CircleImpl(conflict.getPoint3d(), separation/2.0));
                 }
 
                 return circles;

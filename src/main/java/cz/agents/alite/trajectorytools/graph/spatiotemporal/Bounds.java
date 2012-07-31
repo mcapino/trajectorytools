@@ -29,12 +29,12 @@ public class Bounds {
 		}	
 		
 		public boolean isInside(TimePoint timepoint) {
-			return minx <= timepoint.get3dPoint().x &&
-					maxx >= timepoint.get3dPoint().x &&
-					miny <= timepoint.get3dPoint().y &&
-					maxy >= timepoint.get3dPoint().y &&
-					minz <= timepoint.get3dPoint().z &&
-					maxz >= timepoint.get3dPoint().z &&
+			return minx <= timepoint.getPoint3d().x &&
+					maxx >= timepoint.getPoint3d().x &&
+					miny <= timepoint.getPoint3d().y &&
+					maxy >= timepoint.getPoint3d().y &&
+					minz <= timepoint.getPoint3d().z &&
+					maxz >= timepoint.getPoint3d().z &&
 					mint <= timepoint.getTime() &&
 					maxt >= timepoint.getTime() ;
 		}

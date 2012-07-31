@@ -22,7 +22,7 @@ import cz.agents.alite.trajectorytools.util.Vector;
  *
  */
 
-public class ManeuverTrajectory<V extends Point, E extends SpatialManeuver> implements Trajectory {
+public class SpatialManeuverTrajectory<V extends Point, E extends SpatialManeuver> implements Trajectory {
 
     private List<E> maneuvers = null;
 
@@ -34,7 +34,7 @@ public class ManeuverTrajectory<V extends Point, E extends SpatialManeuver> impl
     private double startTime;
     private double duration = Double.POSITIVE_INFINITY;
 
-    public ManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
+    public SpatialManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
         this.maneuvers = graphPath.getEdgeList();
@@ -80,8 +80,8 @@ public class ManeuverTrajectory<V extends Point, E extends SpatialManeuver> impl
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ManeuverTrajectory){
-            ManeuverTrajectory other = (ManeuverTrajectory) obj;
+        if (obj instanceof SpatialManeuverTrajectory){
+            SpatialManeuverTrajectory other = (SpatialManeuverTrajectory) obj;
             if (startWaypoint.equals(other.startWaypoint) &&
                     endWaypoint.equals(other.endWaypoint) &&
                     maneuvers.equals(other.maneuvers) &&

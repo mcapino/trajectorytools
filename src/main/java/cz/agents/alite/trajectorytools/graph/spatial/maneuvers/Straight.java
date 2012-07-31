@@ -34,7 +34,7 @@ public class Straight extends SpatialManeuver {
             @Override
             public OrientedPoint getPosition(double t) {
                 if (t < startTime || t > startTime + getDuration())
-                    throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory");
+                    throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory. Length: " + getDistance() + ". Trajectory defined for interval (" + startTime + ", " + (startTime + getDuration()) + ")");
 
                 double alpha = (t - startTime) / getDuration();
                 assert(alpha >= -0.01 && alpha <= 1.01);

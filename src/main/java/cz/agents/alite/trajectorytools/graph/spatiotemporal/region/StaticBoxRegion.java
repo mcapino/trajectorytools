@@ -5,36 +5,36 @@ import javax.vecmath.Point3d;
 import cz.agents.alite.trajectorytools.util.Point;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class BoxRegion implements Region {
-	
-	Point corner1;
-	Point corner2;
+public class StaticBoxRegion implements Region {
 
-	public BoxRegion(Point corner1, Point corner2) {
-		super();
-		this.corner1 = corner1;
-		this.corner2 = corner2;
-	}
+    Point corner1;
+    Point corner2;
 
-	@Override
-	public boolean isVisible(TimePoint p1, TimePoint p2) {
-		Point3d hitPoint = new Point3d();
-		return isLineIntersectingBox(corner1, corner2, p1.get3dPoint(), p2.get3dPoint(), hitPoint);
-	}
+    public StaticBoxRegion(Point corner1, Point corner2) {
+        super();
+        this.corner1 = corner1;
+        this.corner2 = corner2;
+    }
 
-	@Override
-	public boolean isInside(TimePoint p) {
-		
-		if (inBox(p.get3dPoint(), corner1, corner2, 1) && 
-			inBox(p.get3dPoint(), corner1, corner2, 2) &&
-			inBox(p.get3dPoint(), corner1, corner2, 3)) {		
-		return true;
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean intersectsLine(TimePoint p1, TimePoint p2) {
+        Point3d hitPoint = new Point3d();
+        return isLineIntersectingBox(corner1, corner2, p1.getPoint3d(), p2.getPoint3d(), hitPoint);
+    }
 
-	// found in Alite ... I guess it was originaly taken from http://www.3dkingdoms.com/weekly/weekly.php?a=3
+    @Override
+    public boolean isInside(TimePoint p) {
+
+        if (inBox(p.getPoint3d(), corner1, corner2, 1) &&
+            inBox(p.getPoint3d(), corner1, corner2, 2) &&
+            inBox(p.getPoint3d(), corner1, corner2, 3)) {
+        return true;
+        } else {
+            return false;
+        }
+    }
+
+    // found in Alite ... I guess it was originally taken from http://www.3dkingdoms.com/weekly/weekly.php?a=3
     // returns true if line (L1, L2) intersects with the box (B1, B2)
     // returns intersection point in hitPoint
     static boolean isLineIntersectingBox(Point3d boxCorner1, Point3d boxCorner2, Point3d lineEnd1, Point3d lineEnd2, Point3d hitPoint) {
@@ -64,8 +64,8 @@ public class BoxRegion implements Region {
 
         return false;
     }
-    
-    
+
+
     static boolean getIntersection(double fDst1, double fDst2, Point3d P1, Point3d P2, Point3d hit) {
         if ((fDst1 * fDst2) >= 0.0)
             return false;
@@ -87,6 +87,14 @@ public class BoxRegion implements Region {
         if (axis == 3 && hitPoint.x >= boxCorner1.x && hitPoint.x <= boxCorner2.x && hitPoint.y >= boxCorner1.y && hitPoint.y <= boxCorner2.y)
             return true;
         return false;
+    }
+
+    public Point getCorner1() {
+        return corner1;
+    }
+
+    public Point getCorner2() {
+        return corner2;
     }
 
 }

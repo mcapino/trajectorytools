@@ -3,38 +3,37 @@ package cz.agents.alite.trajectorytools.graph.spatial.region;
 import javax.vecmath.Point3d;
 
 import cz.agents.alite.trajectorytools.util.Point;
-import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class BoxRegion implements Region {
-	
-	Point corner1;
-	Point corner2;
 
-	public BoxRegion(Point corner1, Point corner2) {
-		super();
-		this.corner1 = corner1;
-		this.corner2 = corner2;
-	}
+    Point corner1;
+    Point corner2;
 
-	@Override
-	public boolean isVisible(Point p1, Point p2) {
-		Point3d hitPoint = new Point3d();
-		return !isLineIntersectingBox(corner1, corner2, p1, p2, hitPoint);
-	}
+    public BoxRegion(Point corner1, Point corner2) {
+        super();
+        this.corner1 = corner1;
+        this.corner2 = corner2;
+    }
 
-	@Override
-	public boolean isInside(Point p) {
-		
-		if (inBox(p, corner1, corner2, 1) && 
-			inBox(p, corner1, corner2, 2) &&
-			inBox(p, corner1, corner2, 3)) {		
-		return true;
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean intersectsLine(Point p1, Point p2) {
+        Point3d hitPoint = new Point3d();
+        return isLineIntersectingBox(corner1, corner2, p1, p2, hitPoint);
+    }
 
-	// found in Alite ... I guess it was originaly taken from http://www.3dkingdoms.com/weekly/weekly.php?a=3
+    @Override
+    public boolean isInside(Point p) {
+
+        if (inBox(p, corner1, corner2, 1) &&
+            inBox(p, corner1, corner2, 2) &&
+            inBox(p, corner1, corner2, 3)) {
+        return true;
+        } else {
+            return false;
+        }
+    }
+
+    // found in Alite ... I guess it was originaly taken from http://www.3dkingdoms.com/weekly/weekly.php?a=3
     // returns true if line (L1, L2) intersects with the box (B1, B2)
     // returns intersection point in hitPoint
     static boolean isLineIntersectingBox(Point3d boxCorner1, Point3d boxCorner2, Point3d lineEnd1, Point3d lineEnd2, Point3d hitPoint) {
@@ -64,8 +63,8 @@ public class BoxRegion implements Region {
 
         return false;
     }
-    
-    
+
+
     static boolean getIntersection(double fDst1, double fDst2, Point3d P1, Point3d P2, Point3d hit) {
         if ((fDst1 * fDst2) >= 0.0)
             return false;
@@ -88,13 +87,13 @@ public class BoxRegion implements Region {
             return true;
         return false;
     }
-    
+
     public Point getCorner1() {
-		return corner1;
-	}
-    
+        return corner1;
+    }
+
     public Point getCorner2() {
-		return corner2;
-	}
+        return corner2;
+    }
 
 }

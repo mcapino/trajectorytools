@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.NullGoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.trajectory.ManeuverTrajectory;
+import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.Point;
@@ -68,8 +68,8 @@ public class SeparationDetectorDemoCreator implements Creator {
                 SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
                 new NullGoalPenaltyFunction<Waypoint>(), h);
 
-        trajectory1 =  new SampledTrajectory(new ManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path1, path1.getWeight()), 0.1);
-        trajectory2 =  new SampledTrajectory(new ManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path2, path2.getWeight()), 0.1);
+        trajectory1 =  new SampledTrajectory(new SpatialManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path1, path1.getWeight()), 0.1);
+        trajectory2 =  new SampledTrajectory(new SpatialManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path2, path2.getWeight()), 0.1);
 
         List<Trajectory> trajectories = new LinkedList<Trajectory>();
         trajectories.add(trajectory1);

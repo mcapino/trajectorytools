@@ -30,7 +30,7 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
     }
 
     @Override
-    public Point getRandomSample() {
+    public Point sampleState() {
         Point point;
         do {
             double x = bounds.getCorner1().x + (random.nextDouble() * (bounds.getCorner2().x - bounds.getCorner1().x));
@@ -56,7 +56,7 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
 
         // check obstacles
         for (Region obstacle : obstacles) {
-            if (!obstacle.isVisible(p1, p2)) {
+            if (obstacle.intersectsLine(p1, p2)) {
                 return false;
             }
         }
