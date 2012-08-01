@@ -1,7 +1,7 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 /**
  * Trajectory Distance Metric
@@ -13,7 +13,7 @@ import cz.agents.alite.trajectorytools.util.Point;
  * @param <V>
  * @param <E>
  */
-public interface TrajectoryMetric<V extends Point, E> {
+public interface TrajectoryMetric<V extends SpatialPoint, E> {
 
     double getTrajectoryDistance(PlannedPath<V, E> path, PlannedPath<V, E> otherPath);
 

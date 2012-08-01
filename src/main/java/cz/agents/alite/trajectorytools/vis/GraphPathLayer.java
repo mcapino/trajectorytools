@@ -11,7 +11,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
@@ -38,7 +38,7 @@ public class GraphPathLayer extends AbstractLayer {
     GraphPathLayer() {
     }
 
-    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final PathHolder<V, E> pathHolder, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint,E> VisLayer create(final Graph<V, E> graph, final PathHolder<V, E> pathHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
@@ -73,8 +73,8 @@ public class GraphPathLayer extends AbstractLayer {
         group.addSubLayer(PointLayer.create(new PointElements() {
 
             @Override
-            public Iterable<Point> getPoints() {
-                Collection<Point> points = new ArrayList<Point>();
+            public Iterable<SpatialPoint> getPoints() {
+                Collection<SpatialPoint> points = new ArrayList<SpatialPoint>();
                 GraphPath<V,E> path = pathHolder.plannedPath;
                 if (path != null) {
                     for (E edge : path.getEdgeList()) {
@@ -100,11 +100,11 @@ public class GraphPathLayer extends AbstractLayer {
         return group;
     }
 
-    public static <V extends Point,E> VisLayer create(final Graph<V, E> graph, final Iterable<PlannedPath<V, E>> paths,
+    public static <V extends SpatialPoint,E> VisLayer create(final Graph<V, E> graph, final Iterable<PlannedPath<V, E>> paths,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         return create(new GraphHolder<V, E>(graph), paths, edgeStrokeWidth, vertexStrokeWidth);
     }
-    public static <V extends Point,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Iterable<PlannedPath<V, E>> paths,
+    public static <V extends SpatialPoint,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Iterable<PlannedPath<V, E>> paths,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 

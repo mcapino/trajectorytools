@@ -17,7 +17,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.PlannedPathImpl;
 import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class TrajectorySetMetricsTest {
@@ -32,34 +32,34 @@ public class TrajectorySetMetricsTest {
     @Before
     public void setup() {
         graph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
-        startVertex = SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0));
-        endVertex = SpatialGraphs.getNearestVertex(graph, new Point(5, 5, 0));
+        startVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0));
+        endVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 5, 0));
 
         paths = new ArrayList<PlannedPath<Waypoint, SpatialManeuver>>();
 
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
                         startVertex,
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 3, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 3, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 4, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 3, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 4, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 4, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 4, 0)),
                         endVertex
                         )
                 );
@@ -68,12 +68,12 @@ public class TrajectorySetMetricsTest {
 
         edges = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 5, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 5, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 5, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 5, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 5, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 5, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 5, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 5, 0))
                         )
                 );
         paths.add(new PlannedPathImpl<Waypoint, SpatialManeuver>(graph, edges));
@@ -88,7 +88,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(4, 5, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 5, 0))
                                 ),
                         paths,
                         metric
@@ -104,7 +104,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetMinDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(4, 5, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 5, 0))
                                 ),
                         paths,
                         metric
@@ -120,7 +120,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetMaxDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(4, 5, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 5, 0))
                                 ),
                         paths,
                         metric
@@ -136,7 +136,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                                 ),
                         paths,
                         metric
@@ -152,7 +152,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetMinDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                                 ),
                         paths,
                         metric
@@ -168,7 +168,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetMaxDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                                 ),
                         paths,
                         metric
@@ -184,7 +184,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(4, 4, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 4, 0))
                                 ),
                         paths,
                         metric
@@ -200,7 +200,7 @@ public class TrajectorySetMetricsTest {
                 TrajectorySetMetrics.getRelativePlanSetAvgDiversity(
                         new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(
                                 graph,
-                                SpatialGraphs.getNearestVertex(graph, new Point(5, 7, 0))
+                                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 7, 0))
                                 ),
                         paths,
                         metric

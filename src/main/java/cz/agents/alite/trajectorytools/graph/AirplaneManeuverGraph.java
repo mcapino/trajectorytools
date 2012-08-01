@@ -12,7 +12,7 @@ import org.jgrapht.graph.ListenableDirectedWeightedGraph;
 import cz.agents.alite.trajectorytools.util.BoundedInteger;
 import cz.agents.alite.trajectorytools.util.ManeuverEdge;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
 public class AirplaneManeuverGraph extends ListenableDirectedWeightedGraph<OrientedPoint, ManeuverEdge> {
@@ -82,19 +82,19 @@ public class AirplaneManeuverGraph extends ListenableDirectedWeightedGraph<Orien
             Vector normalizedPrimaryIncrement = new Vector(primaryIncrement);
             normalizedPrimaryIncrement.normalize();
 
-            Point currentPrimary = new Point(CENTER_X, CENTER_Y, 70);
+            SpatialPoint currentPrimary = new SpatialPoint(CENTER_X, CENTER_Y, 70);
             toInitialPosition(currentPrimary, primaryIncrement, secondaryIncrement, SPATIAL_STEPS);
-            Point currentSecondary = new Point(currentPrimary);
+            SpatialPoint currentSecondary = new SpatialPoint(currentPrimary);
 
             for (int j = -SPATIAL_STEPS; j <= SPATIAL_STEPS; j++) {
                 for (int i = -SPATIAL_STEPS; i <= SPATIAL_STEPS; i++) {
-                    vertices[s][i + SPATIAL_STEPS][j + SPATIAL_STEPS] = new OrientedPoint(new Point(currentPrimary), normalizedPrimaryIncrement);
+                    vertices[s][i + SPATIAL_STEPS][j + SPATIAL_STEPS] = new OrientedPoint(new SpatialPoint(currentPrimary), normalizedPrimaryIncrement);
                     addVertex(vertices[s][i + SPATIAL_STEPS][j + SPATIAL_STEPS]);
 
                     currentPrimary.add(primaryIncrement);
                 }
                 currentSecondary.add(secondaryIncrement);
-                currentPrimary = new Point(currentSecondary);
+                currentPrimary = new SpatialPoint(currentSecondary);
             }
 
             rotation.transform(primaryIncrement);
@@ -151,7 +151,7 @@ public class AirplaneManeuverGraph extends ListenableDirectedWeightedGraph<Orien
         return direction;
     }
 
-    private void toInitialPosition(Point point, Vector primaryIncrement, Vector secondaryIncrement, int spatialSteps) {
+    private void toInitialPosition(SpatialPoint point, Vector primaryIncrement, Vector secondaryIncrement, int spatialSteps) {
         Vector primaryShift = new Vector(primaryIncrement);
         primaryShift.scale(-spatialSteps);
         point.add(primaryShift);

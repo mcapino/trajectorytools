@@ -2,15 +2,15 @@ package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class Straight extends SpatialManeuver {
     private static final long serialVersionUID = -2519868162204278196L;
 
-    private Point start;
-    private Point end;
+    private SpatialPoint start;
+    private SpatialPoint end;
     private double speed;
 
     public Straight(Waypoint start, Waypoint end, double speed) {
@@ -20,7 +20,7 @@ public class Straight extends SpatialManeuver {
         this.speed = speed;
     }
 
-    public Straight(Point start, Point end, double speed) {
+    public Straight(SpatialPoint start, SpatialPoint end, double speed) {
         super();
         this.start = start;
         this.end = end;
@@ -39,7 +39,7 @@ public class Straight extends SpatialManeuver {
                 double alpha = (t - startTime) / getDuration();
                 assert(alpha >= -0.01 && alpha <= 1.01);
 
-                Point pos = Point.interpolate(start, end, alpha);
+                SpatialPoint pos = SpatialPoint.interpolate(start, end, alpha);
                 Vector dir;
                 if (!end.equals(start)) {
                     dir = Vector.subtract(end, start);
@@ -71,6 +71,10 @@ public class Straight extends SpatialManeuver {
     @Override
     public double getDuration() {
         return getDistance()/speed;
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 
 }

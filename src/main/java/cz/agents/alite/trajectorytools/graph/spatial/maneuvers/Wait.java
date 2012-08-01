@@ -2,7 +2,7 @@ package cz.agents.alite.trajectorytools.graph.spatial.maneuvers;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
@@ -27,7 +27,7 @@ public class Wait extends SpatialManeuver {
 				if (t < startTime || t > startTime + getDuration()) 
 					throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory");
 				
-				Point pos = waypoint;
+				SpatialPoint pos = waypoint;
 				Vector dir = new Vector(0,1,0);
 				
 				return new OrientedPoint(pos, dir);

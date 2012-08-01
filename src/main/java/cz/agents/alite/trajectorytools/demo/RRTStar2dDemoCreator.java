@@ -16,7 +16,7 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions3dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions3dLayer.RegionsProvider;
@@ -30,12 +30,12 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class RRTStar2dDemoCreator implements Creator {
 
-    RRTStarPlanner<Point, SpatialManeuver> rrtstar;
+    RRTStarPlanner<SpatialPoint, SpatialManeuver> rrtstar;
 
-    Point initialPoint = new Point(100, 100, 0);
-    BoxRegion bounds = new BoxRegion(new Point(0, 0, 0), new Point(1000, 1000, 1000));
+    SpatialPoint initialPoint = new SpatialPoint(100, 100, 0);
+    BoxRegion bounds = new BoxRegion(new SpatialPoint(0, 0, 0), new SpatialPoint(1000, 1000, 1000));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new BoxRegion(new Point(500, 850, -1000), new Point(600, 870, 1000));
+    Region target = new BoxRegion(new SpatialPoint(500, 850, -1000), new SpatialPoint(600, 870, 1000));
 
     Trajectory trajectory = null;
 
@@ -46,15 +46,15 @@ public class RRTStar2dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new BoxRegion(new Point(250, 250, 0), new Point(750,750,750)));
+        obstacles.add(new BoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,750)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
-        obstacles.add(new BoxRegion(new Point(100, 200, 0), new Point(230,950,750)));
+        obstacles.add(new BoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,750)));
 
 
-        Domain<Point, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
-        rrtstar = new RRTStarPlanner<Point, SpatialManeuver>(domain, initialPoint, 1300);
+        Domain<SpatialPoint, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
+        rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain, initialPoint, 1300);
         createVisualization();
 
         int n=100000;
@@ -63,8 +63,8 @@ public class RRTStar2dDemoCreator implements Creator {
 
             if (rrtstar.getBestVertex() != null) {
                 //System.out.println("Best vertex: " + rrtstar.getBestVertex());
-                GraphPath<Point, SpatialManeuver> path = rrtstar.getBestPath();
-                trajectory = new SpatialManeuverTrajectory<Point, SpatialManeuver>(0.0, path, path.getWeight());
+                GraphPath<SpatialPoint, SpatialManeuver> path = rrtstar.getBestPath();
+                trajectory = new SpatialManeuverTrajectory<SpatialPoint, SpatialManeuver>(0.0, path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
             }
 

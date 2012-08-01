@@ -1,9 +1,9 @@
 package cz.agents.alite.trajectorytools.util;
 
 /**
- * A waypoint is a {@link Point} having an identifier.
+ * A waypoint is a {@link SpatialPoint} having an identifier.
  */
-public class Waypoint extends Point implements Comparable<Waypoint> {
+public class Waypoint extends SpatialPoint implements Comparable<Waypoint> {
     private static final long serialVersionUID = -9146741978852925425L;
     public static int globalIdCounter = 0;
 

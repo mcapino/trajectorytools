@@ -8,9 +8,9 @@ import java.util.List;
 
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class AlternativePlannerSelector<V extends Point,E> implements AlternativePathPlanner<V,E> {
+public class AlternativePlannerSelector<V extends SpatialPoint,E> implements AlternativePathPlanner<V,E> {
 
     private final AlternativePathPlanner<V,E> planner;
     private final int limit;

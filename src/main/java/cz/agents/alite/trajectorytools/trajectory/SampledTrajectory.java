@@ -1,7 +1,7 @@
 package cz.agents.alite.trajectorytools.trajectory;
 
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
 
@@ -63,7 +63,7 @@ public class SampledTrajectory implements Trajectory{
 				OrientedPoint left = samples[leftSampleNo];
 				OrientedPoint right = samples[rightSampleNo];
 						
-				Point pos = Point.interpolate(left, right, alpha);
+				SpatialPoint pos = SpatialPoint.interpolate(left, right, alpha);
 				Vector dir;
 				if (!left.equals(right)) {
 					dir = Vector.subtract(right, left);

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
 import cz.agents.alite.vis.element.implemetation.LineImpl;
@@ -46,10 +46,10 @@ public class Regions4dLayer extends AbstractLayer {
                         double x2 = box.getCorner2().x;
                         double y2 = box.getCorner2().y;
 
-                        lines.add(new LineImpl(new Point(x1,y1,0), new Point(x1,y2,0)));
-                        lines.add(new LineImpl(new Point(x2,y1,0), new Point(x2,y2,0)));
-                        lines.add(new LineImpl(new Point(x1,y1,0), new Point(x2,y1,0)));
-                        lines.add(new LineImpl(new Point(x1,y2,0), new Point(x2,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y1,0), new SpatialPoint(x1,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x2,y1,0), new SpatialPoint(x2,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y1,0), new SpatialPoint(x2,y1,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y2,0), new SpatialPoint(x2,y2,0)));
 
                     }
 
@@ -62,10 +62,10 @@ public class Regions4dLayer extends AbstractLayer {
                         double x2 = box.getCorner2().x;
                         double y2 = box.getCorner2().y;
 
-                        lines.add(new LineImpl(new Point(x1,y1,0), new Point(x1,y2,0)));
-                        lines.add(new LineImpl(new Point(x2,y1,0), new Point(x2,y2,0)));
-                        lines.add(new LineImpl(new Point(x1,y1,0), new Point(x2,y1,0)));
-                        lines.add(new LineImpl(new Point(x1,y2,0), new Point(x2,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y1,0), new SpatialPoint(x1,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x2,y1,0), new SpatialPoint(x2,y2,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y1,0), new SpatialPoint(x2,y1,0)));
+                        lines.add(new LineImpl(new SpatialPoint(x1,y2,0), new SpatialPoint(x2,y2,0)));
 
                     }
                 }

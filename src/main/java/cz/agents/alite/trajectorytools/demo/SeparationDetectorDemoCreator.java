@@ -18,7 +18,7 @@ import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.SeparationDetector;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
@@ -59,13 +59,13 @@ public class SeparationDetectorDemoCreator implements Creator {
         AStarPlanner<Waypoint, SpatialManeuver> astar = new AStarPlanner<Waypoint, SpatialManeuver>();
 
         PlannedPath<Waypoint, SpatialManeuver> path1 = astar.planPath(graph,
-                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0)),
                     new NullGoalPenaltyFunction<Waypoint>(), h);
 
         PlannedPath<Waypoint, SpatialManeuver> path2 = astar.planPath(graph,
-                SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0)),
-                SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0)),
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
                 new NullGoalPenaltyFunction<Waypoint>(), h);
 
         trajectory1 =  new SampledTrajectory(new SpatialManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path1, path1.getWeight()), 0.1);

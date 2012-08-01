@@ -16,7 +16,7 @@ import cz.agents.alite.tactical.vis.VisualInteractionLayer;
 import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.vis.VisManager;
@@ -25,7 +25,7 @@ import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
-public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles<Point, DefaultWeightedEdge> {
+public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles<SpatialPoint, DefaultWeightedEdge> {
     private static final long serialVersionUID = 3428956208593195747L;
 
     private static final Color VERTEX_COLOR = new Color(240, 240, 240);
@@ -37,9 +37,9 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
     private static final double OBSTACLE_RADIUS = 0.3;
 
 
-    private final Graph<Point, DefaultWeightedEdge> originalGraph;
+    private final Graph<SpatialPoint, DefaultWeightedEdge> originalGraph;
 
-    private final Set<Point> obstacles = new HashSet<Point>();
+    private final Set<SpatialPoint> obstacles = new HashSet<SpatialPoint>();
 
     private final ChangeListener changeListener;
 
@@ -47,15 +47,15 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
         void graphChanged();
     }
 
-    public ObstacleGraphView(Graph<Point, DefaultWeightedEdge> originalGraph, ChangeListener changeListener) {
+    public ObstacleGraphView(Graph<SpatialPoint, DefaultWeightedEdge> originalGraph, ChangeListener changeListener) {
         super(originalGraph);
         this.changeListener = changeListener;
 
         this.originalGraph = SpatialGraphs.clone(originalGraph);
     }
     
-    public static <V extends Point, E> ObstacleGraphView createFromGraph(Graph<V, E> graph, ChangeListener changeListener) {
-        Graph<Point, DefaultWeightedEdge> planarGraph = new DirectedWeightedMultigraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+    public static <V extends SpatialPoint, E> ObstacleGraphView createFromGraph(Graph<V, E> graph, ChangeListener changeListener) {
+        Graph<SpatialPoint, DefaultWeightedEdge> planarGraph = new DirectedWeightedMultigraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
         for (V vertex : graph.vertexSet()) {
             planarGraph.addVertex(vertex);
         }
@@ -69,16 +69,16 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
 
 
     public void createVisualization() {
-        VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, DefaultWeightedEdge>() {
+        VisManager.registerLayer(GraphLayer.create(new GraphProvider<SpatialPoint, DefaultWeightedEdge>() {
 			@Override
-			public Graph<Point, DefaultWeightedEdge> getGraph() {
+			public Graph<SpatialPoint, DefaultWeightedEdge> getGraph() {
 				return originalGraph;
 			}
 		}, EDGE_COLOR_INACTIVE, VERTEX_COLOR_INACTIVE, 1, 4));
         
-        VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, DefaultWeightedEdge>() {
+        VisManager.registerLayer(GraphLayer.create(new GraphProvider<SpatialPoint, DefaultWeightedEdge>() {
 			@Override
-			public Graph<Point, DefaultWeightedEdge> getGraph() {
+			public Graph<SpatialPoint, DefaultWeightedEdge> getGraph() {
 				return  ObstacleGraphView.this;
 			}
 		}, EDGE_COLOR, VERTEX_COLOR, 1, 4));
@@ -91,7 +91,7 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
             @Override
             public void interactVisually(double x, double y, MouseEvent e) {
                 // find the closest point of the Graph
-                Point point = SpatialGraphs.getNearestVertex(originalGraph, new Point(x, y, 0));
+                SpatialPoint point = SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(x, y, 0));
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     addObstacle(point);
@@ -138,7 +138,7 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
             @Override
             public Iterable<? extends FilledStyledCircle> getCircles() {
                 List<FilledStyledCircle> circles = new ArrayList<FilledStyledCircle>(obstacles.size());
-                for (final Point point : obstacles) {
+                for (final SpatialPoint point : obstacles) {
                     FilledStyledCircle circle = new FilledStyledCircleImpl(point, OBSTACLE_RADIUS, OBSTACLE_COLOR, OBSTACLE_COLOR.darker());
                     circles.add(circle);
                 }
@@ -149,9 +149,9 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
 
     @Override
     public void refresh() {
-        removeAllVertices(new ArrayList<Point>(vertexSet()));
+        removeAllVertices(new ArrayList<SpatialPoint>(vertexSet()));
 
-        for (Point vertex : originalGraph.vertexSet()) {
+        for (SpatialPoint vertex : originalGraph.vertexSet()) {
             addVertex(vertex);
         }
 
@@ -159,28 +159,28 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
             addEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge));
         }
 
-        for (Point obstacle : obstacles) {
+        for (SpatialPoint obstacle : obstacles) {
             removeVertex( obstacle );
         }
     }
 
     @Override
-    public Set<Point> getObstacles() {
+    public Set<SpatialPoint> getObstacles() {
         return obstacles;
     }
 
     @Override
-    public void addObstacle(Point point) {
+    public void addObstacle(SpatialPoint point) {
         removeVertex( point );
         obstacles.add(point);
     }
 
-    public void removeObstacle(Point point) {
+    public void removeObstacle(SpatialPoint point) {
         if ( obstacles.contains(point) ) {
             addVertex(point);
             for (DefaultWeightedEdge edge : originalGraph.edgesOf(point)) {
-                Point source = originalGraph.getEdgeSource(edge);
-                Point target = originalGraph.getEdgeTarget(edge);
+                SpatialPoint source = originalGraph.getEdgeSource(edge);
+                SpatialPoint target = originalGraph.getEdgeTarget(edge);
                 if (containsVertex(source) && containsVertex(target)) {
                     addEdge(source, target, edge);
                 }

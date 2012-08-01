@@ -27,12 +27,12 @@ public class ManeuverEdge extends DefaultWeightedEdge {
     private final List<Point3d> pathCache = new ArrayList<Point3d>();
     private double lengthOfPathInCache;
 
-    public static ManeuverEdge createTurnEdge(Point start, Vector direction, double radius, double angle) {
+    public static ManeuverEdge createTurnEdge(SpatialPoint start, Vector direction, double radius, double angle) {
         Maneuver turnLeftManeuver = new TurnManeuver(start, direction, 0, radius, angle, DUMMY_PATH_FIND_SPECIFICATION);
         return new ManeuverEdge(turnLeftManeuver );
     }
 
-    public static ManeuverEdge createStraightEdge(Point start, Vector direction, double length) {
+    public static ManeuverEdge createStraightEdge(SpatialPoint start, Vector direction, double length) {
         Maneuver straightManeuver = new StraightManeuver(start, direction, 0, length, DUMMY_PATH_FIND_SPECIFICATION);
         return new ManeuverEdge(straightManeuver);
     }
@@ -61,7 +61,7 @@ public class ManeuverEdge extends DefaultWeightedEdge {
                     Vector targetOrientation = ((OrientedPoint) getTarget()).orientation;
                     orientation.interpolate(targetOrientation, ratio);
 
-                    OrientedPoint returnedPoint = new OrientedPoint(new Point(oldPoint), orientation);
+                    OrientedPoint returnedPoint = new OrientedPoint(new SpatialPoint(oldPoint), orientation);
                     returnedPoint.interpolate(point, (lengthOfPathInCache * ratio - oldLength) / currentLength);
                     return returnedPoint;
                 }

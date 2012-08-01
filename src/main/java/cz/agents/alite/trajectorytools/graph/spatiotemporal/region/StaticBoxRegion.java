@@ -2,15 +2,15 @@ package cz.agents.alite.trajectorytools.graph.spatiotemporal.region;
 
 import javax.vecmath.Point3d;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class StaticBoxRegion implements Region {
 
-    Point corner1;
-    Point corner2;
+    SpatialPoint corner1;
+    SpatialPoint corner2;
 
-    public StaticBoxRegion(Point corner1, Point corner2) {
+    public StaticBoxRegion(SpatialPoint corner1, SpatialPoint corner2) {
         super();
         this.corner1 = corner1;
         this.corner2 = corner2;
@@ -19,15 +19,15 @@ public class StaticBoxRegion implements Region {
     @Override
     public boolean intersectsLine(TimePoint p1, TimePoint p2) {
         Point3d hitPoint = new Point3d();
-        return isLineIntersectingBox(corner1, corner2, p1.getPoint3d(), p2.getPoint3d(), hitPoint);
+        return isLineIntersectingBox(corner1, corner2, p1.getSpatialPoint(), p2.getSpatialPoint(), hitPoint);
     }
 
     @Override
     public boolean isInside(TimePoint p) {
 
-        if (inBox(p.getPoint3d(), corner1, corner2, 1) &&
-            inBox(p.getPoint3d(), corner1, corner2, 2) &&
-            inBox(p.getPoint3d(), corner1, corner2, 3)) {
+        if (inBox(p.getSpatialPoint(), corner1, corner2, 1) &&
+            inBox(p.getSpatialPoint(), corner1, corner2, 2) &&
+            inBox(p.getSpatialPoint(), corner1, corner2, 3)) {
         return true;
         } else {
             return false;
@@ -89,11 +89,11 @@ public class StaticBoxRegion implements Region {
         return false;
     }
 
-    public Point getCorner1() {
+    public SpatialPoint getCorner1() {
         return corner1;
     }
 
-    public Point getCorner2() {
+    public SpatialPoint getCorner2() {
         return corner2;
     }
 

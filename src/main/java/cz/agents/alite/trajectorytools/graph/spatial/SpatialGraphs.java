@@ -4,10 +4,10 @@ import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class SpatialGraphs {
-    public static <V extends Point, E> V getNearestVertex(Graph<V, E> graph, Point pos) {
+    public static <V extends SpatialPoint, E> V getNearestVertex(Graph<V, E> graph, SpatialPoint pos) {
         V nearestVertex = null;
         double nearestDistance = Double.POSITIVE_INFINITY;
         for (V currentVertex : graph.vertexSet()) {

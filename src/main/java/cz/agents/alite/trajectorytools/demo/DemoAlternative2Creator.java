@@ -20,7 +20,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
@@ -40,14 +40,14 @@ public class DemoAlternative2Creator implements Creator {
     private static final boolean DEBUG_VIEW = false;
 
     private ObstacleGraphView graph;
-    private List<PlannedPath<Point, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<Point, DefaultWeightedEdge>>();
-    private List<PlannedPath<Point, DefaultWeightedEdge>> maneuverPaths = new ArrayList<PlannedPath<Point, DefaultWeightedEdge>>();
+    private List<PlannedPath<SpatialPoint, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<SpatialPoint, DefaultWeightedEdge>>();
+    private List<PlannedPath<SpatialPoint, DefaultWeightedEdge>> maneuverPaths = new ArrayList<PlannedPath<SpatialPoint, DefaultWeightedEdge>>();
 
 
     VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
-    GraphHolder<Point, DefaultWeightedEdge> voronoiGraph = new GraphHolder<Point, DefaultWeightedEdge>();
-    GraphHolder<Point, DefaultWeightedEdge> delaunayGraph = new GraphHolder<Point, DefaultWeightedEdge>();
-    GraphHolder<Point, DefaultWeightedEdge> otherGraph = new GraphHolder<Point, DefaultWeightedEdge>();
+    GraphHolder<SpatialPoint, DefaultWeightedEdge> voronoiGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
+    GraphHolder<SpatialPoint, DefaultWeightedEdge> delaunayGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
+    GraphHolder<SpatialPoint, DefaultWeightedEdge> otherGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
 
     private static final AStarPlanner<Waypoint, DefaultWeightedEdge> planner = new AStarPlanner<Waypoint, DefaultWeightedEdge>();
     {
@@ -59,7 +59,7 @@ public class DemoAlternative2Creator implements Creator {
         });
     }
 
-    private static final AStarPlanner<Point, DefaultWeightedEdge> maneuverPlanner = new AStarPlanner<Point, DefaultWeightedEdge>();
+    private static final AStarPlanner<SpatialPoint, DefaultWeightedEdge> maneuverPlanner = new AStarPlanner<SpatialPoint, DefaultWeightedEdge>();
     {
         planner.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
         @Override
@@ -70,7 +70,7 @@ public class DemoAlternative2Creator implements Creator {
     }
 
 //    private static final ObstacleExtensions alternativePlanner = new ObstacleExtensions(planner);
-    private List<Point> border;
+    private List<SpatialPoint> border;
 
 //    private static final AlternativePathPlanner<SpatialWaypoint, SpatialManeuver> alternativePlanner = new TrajectoryDistanceMetric<SpatialWaypoint, SpatialManeuver>( planner );
 //    private static final AlternativePathPlanner<SpatialWaypoint, SpatialManeuver> alternativePlanner = new DifferentStateMetric<SpatialWaypoint, SpatialManeuver>( planner );
@@ -84,11 +84,11 @@ public class DemoAlternative2Creator implements Creator {
     public void create() {
         Graph<Waypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
 
-        border = Arrays.asList(new Point[] {
-                SpatialGraphs.getNearestVertex(originalGraph, new Point( 0,  0, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new Point( 0, WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new Point(WORLD_SIZE,  WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new Point(WORLD_SIZE,  0, 0))
+        border = Arrays.asList(new SpatialPoint[] {
+                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint( 0,  0, 0)),
+                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint( 0, WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(WORLD_SIZE,  WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(WORLD_SIZE,  0, 0))
         });
 
 
@@ -101,16 +101,16 @@ public class DemoAlternative2Creator implements Creator {
 
         createVisualization();
 
-        List<Point> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
-        for (Point obstacle : obstacles) {
+        List<SpatialPoint> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
+        for (SpatialPoint obstacle : obstacles) {
             graph.addObstacle(obstacle);
         }
     }
 
-    private List<Point> generateRandomObstacles(int number) {
-        List<Point> obstacles = new ArrayList<Point>(number);
+    private List<SpatialPoint> generateRandomObstacles(int number) {
+        List<SpatialPoint> obstacles = new ArrayList<SpatialPoint>(number);
         for (int i=0; i<number; i++) {
-            obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
+            obstacles.add(new SpatialPoint(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
         }
 
         return obstacles;
@@ -157,11 +157,11 @@ public class DemoAlternative2Creator implements Creator {
 
         paths.clear();
 
-        Point startVertex = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
-        Point targetVertex =  SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0));
+        SpatialPoint startVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0));
+        SpatialPoint targetVertex =  SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0));
 
-        AllPathsIterator<Point, DefaultWeightedEdge> pathsIt
-            = new AllPathsIterator<Point, DefaultWeightedEdge>(voronoiGraph.graph,
+        AllPathsIterator<SpatialPoint, DefaultWeightedEdge> pathsIt
+            = new AllPathsIterator<SpatialPoint, DefaultWeightedEdge>(voronoiGraph.graph,
                 startVertex,
                 targetVertex
                 );
@@ -176,7 +176,7 @@ public class DemoAlternative2Creator implements Creator {
                 }
             }
 
-            PlannedPath<Point, DefaultWeightedEdge> planPath = pathsIt.next();
+            PlannedPath<SpatialPoint, DefaultWeightedEdge> planPath = pathsIt.next();
             if (DEBUG_VIEW) {
                 paths.add(planPath);
             }
@@ -204,7 +204,7 @@ public class DemoAlternative2Creator implements Creator {
                 graph.removeCrossingEdges(delaunayGraph.graph.getEdgeSource(edge), delaunayGraph.graph.getEdgeTarget(edge));
             }
 
-            PlannedPath<Point, DefaultWeightedEdge> result = maneuverPlanner.planPath(graph,
+            PlannedPath<SpatialPoint, DefaultWeightedEdge> result = maneuverPlanner.planPath(graph,
                     startVertex,
                     targetVertex
                     );

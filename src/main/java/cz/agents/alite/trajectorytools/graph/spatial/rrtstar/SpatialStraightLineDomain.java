@@ -10,9 +10,9 @@ import cz.agents.alite.trajectorytools.graph.spatial.region.Region;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver> {
+public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialManeuver> {
 
     BoxRegion bounds;
     Collection<Region> obstacles;
@@ -30,29 +30,29 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
     }
 
     @Override
-    public Point sampleState() {
-        Point point;
+    public SpatialPoint sampleState() {
+        SpatialPoint point;
         do {
             double x = bounds.getCorner1().x + (random.nextDouble() * (bounds.getCorner2().x - bounds.getCorner1().x));
             double y = bounds.getCorner1().y + (random.nextDouble() * (bounds.getCorner2().y - bounds.getCorner1().y));
             double z = 0;
-            point = new Point(x, y, z);
+            point = new SpatialPoint(x, y, z);
         } while (!isInFreeSpace(point));
         return point;
     }
 
     @Override
-    public Extension<Point, SpatialManeuver>
-    extendTo(Point from, Point to) {
-        Extension<Point, SpatialManeuver> result = null;
+    public Extension<SpatialPoint, SpatialManeuver>
+    extendTo(SpatialPoint from, SpatialPoint to) {
+        Extension<SpatialPoint, SpatialManeuver> result = null;
         if (isVisible(from, to)) {
             Straight maneuver = new Straight(from, to, speed);
-            result = new Extension<Point, SpatialManeuver>(from, to, maneuver, maneuver.getDuration(), true);
+            result = new Extension<SpatialPoint, SpatialManeuver>(from, to, maneuver, maneuver.getDuration(), true);
         }
         return result;
     }
 
-    private boolean isVisible(Point p1, Point p2) {
+    private boolean isVisible(SpatialPoint p1, SpatialPoint p2) {
 
         // check obstacles
         for (Region obstacle : obstacles) {
@@ -63,7 +63,7 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
         return true;
     }
 
-    private boolean isInFreeSpace(Point p) {
+    private boolean isInFreeSpace(SpatialPoint p) {
         if (bounds.isInside(p)) {
             for (Region obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
@@ -77,12 +77,12 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
     }
 
     @Override
-    public ExtensionEstimate<Point, SpatialManeuver> estimateExtension(Point p1, Point p2) {
-        return new ExtensionEstimate<Point, SpatialManeuver>(p1.distance(p2)/speed, true);
+    public ExtensionEstimate<SpatialPoint, SpatialManeuver> estimateExtension(SpatialPoint p1, SpatialPoint p2) {
+        return new ExtensionEstimate<SpatialPoint, SpatialManeuver>(p1.distance(p2)/speed, true);
     }
 
     @Override
-    public double distance(Point p1, Point p2) {
+    public double distance(SpatialPoint p1, SpatialPoint p2) {
         return p1.distance(p2);
     }
 
@@ -92,12 +92,12 @@ public class SpatialStraightLineDomain implements Domain<Point, SpatialManeuver>
     }
 
     @Override
-    public boolean isInTargetRegion(Point p) {
+    public boolean isInTargetRegion(SpatialPoint p) {
         return target.isInside(p);
     }
 
     @Override
-    public double estimateCostToGo(Point p1) {
+    public double estimateCostToGo(SpatialPoint p1) {
         return 0.0;
     }
 }

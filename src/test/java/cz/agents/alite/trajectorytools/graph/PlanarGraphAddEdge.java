@@ -7,20 +7,20 @@ import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.junit.Before;
 import org.junit.Test;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class PlanarGraphAddEdge {
 
     private PlanarGraph graph;
 
-    private Point point1 = new Point(2, 0, 0);
-    private Point point2 = new Point(0, 2, 0);
-    private Point point3 = new Point(-2, 0, 0);
-    private Point point4 = new Point(0, -2, 0);
+    private SpatialPoint point1 = new SpatialPoint(2, 0, 0);
+    private SpatialPoint point2 = new SpatialPoint(0, 2, 0);
+    private SpatialPoint point3 = new SpatialPoint(-2, 0, 0);
+    private SpatialPoint point4 = new SpatialPoint(0, -2, 0);
 
     @Before
     public void setup() {
-        graph = PlanarGraph.createPlanarGraphCopy( new DirectedWeightedMultigraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class));
+        graph = PlanarGraph.createPlanarGraphCopy( new DirectedWeightedMultigraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class));
         graph.addVertex( point1 );
         graph.addVertex( point2 );
         graph.addVertex( point3 );
@@ -41,8 +41,8 @@ public class PlanarGraphAddEdge {
     // +  intersection
     @Test
     public void testAddEdge1() {
-        Point start = new Point(0, 0, 0);
-        Point target = new Point(4, 4, 0);
+        SpatialPoint start = new SpatialPoint(0, 0, 0);
+        SpatialPoint target = new SpatialPoint(4, 4, 0);
 
         graph.addEdge(start, target);
 
@@ -53,8 +53,8 @@ public class PlanarGraphAddEdge {
     // ++  intersection
     @Test
     public void testAddEdge1a() {
-        Point start = new Point(-4, -4, 0);
-        Point target = new Point(4, 4, 0);
+        SpatialPoint start = new SpatialPoint(-4, -4, 0);
+        SpatialPoint target = new SpatialPoint(4, 4, 0);
 
         graph.addEdge(start, target);
 
@@ -65,8 +65,8 @@ public class PlanarGraphAddEdge {
     // |<  intersection
     @Test
     public void testAddEdge2() {
-        Point start = new Point(-2, -4, 0);
-        Point target = new Point(-2, 4, 0);
+        SpatialPoint start = new SpatialPoint(-2, -4, 0);
+        SpatialPoint target = new SpatialPoint(-2, 4, 0);
 
         graph.addEdge(start, target);
 
@@ -77,8 +77,8 @@ public class PlanarGraphAddEdge {
     // -< intersection
     @Test
     public void testAddEdge3() {
-        Point start = new Point(-4, 0, 0);
-        Point target = point3;
+        SpatialPoint start = new SpatialPoint(-4, 0, 0);
+        SpatialPoint target = point3;
 
         graph.addEdge(start, target);
 

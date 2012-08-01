@@ -5,35 +5,35 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Tuple3d;
 import javax.vecmath.Tuple3f;
 
-public class Point extends Point3d implements cz.agents.alite.vis.element.Point {
+public class SpatialPoint extends Point3d implements cz.agents.alite.vis.element.Point {
 
     private static final long serialVersionUID = -4209007401452559887L;
 
-    public Point(double x, double y, double z) {
+    public SpatialPoint(double x, double y, double z) {
         super(x, y, z);
     }
 
-    public Point(double[] p) {
+    public SpatialPoint(double[] p) {
         super(p);
     }
 
-    public Point(Point3d p1) {
+    public SpatialPoint(Point3d p1) {
         super(p1);
     }
 
-    public Point(Point3f p1) {
+    public SpatialPoint(Point3f p1) {
         super(p1);
     }
 
-    public Point(Tuple3f t1) {
+    public SpatialPoint(Tuple3f t1) {
         super(t1);
     }
 
-    public Point(Tuple3d t1) {
+    public SpatialPoint(Tuple3d t1) {
         super(t1);
     }
 
-    public Point() {
+    public SpatialPoint() {
         super();
     }
     
@@ -42,8 +42,8 @@ public class Point extends Point3d implements cz.agents.alite.vis.element.Point 
         return this;
     }
     
-    public static Point interpolate(Point p1, Point p2, double alpha) {
-    	Point result = new Point();
+    public static SpatialPoint interpolate(SpatialPoint p1, SpatialPoint p2, double alpha) {
+    	SpatialPoint result = new SpatialPoint();
     	((Tuple3d)result).interpolate(p1, p2, alpha);
     	return result;
     }

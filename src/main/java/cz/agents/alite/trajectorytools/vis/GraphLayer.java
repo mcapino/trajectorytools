@@ -9,7 +9,7 @@ import javax.vecmath.Vector3d;
 import org.jgrapht.Graph;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
 import cz.agents.alite.vis.element.aggregation.PointElements;
@@ -29,11 +29,11 @@ public class GraphLayer extends AbstractLayer {
     GraphLayer() {
     }
 
-    public static <V extends Point,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         return create(graphProvider, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, 0.0);
     }
-    public static <V extends Point,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint,E> VisLayer create(final GraphProvider<V, E> graphProvider, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth, final double offset) {
         GroupLayer group = GroupLayer.create();
 
@@ -73,11 +73,11 @@ public class GraphLayer extends AbstractLayer {
         	
         	
             @Override
-            public Iterable<Point> getPoints() {
+            public Iterable<SpatialPoint> getPoints() {
             	Graph<V, E> graph = graphProvider.getGraph();
             	
-                LinkedList<Point> points = new LinkedList<Point>();
-                for (Point vertex : graph.vertexSet()) {
+                LinkedList<SpatialPoint> points = new LinkedList<SpatialPoint>();
+                for (SpatialPoint vertex : graph.vertexSet()) {
                     points.add(vertex);
                 }
                 return points;
@@ -98,12 +98,12 @@ public class GraphLayer extends AbstractLayer {
         return group;
     }
 
-    public static <V extends Point,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         return create(graphHolder, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, 0);
     }
 
-    public static <V extends Point,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth, final double offset) {
         GroupLayer group = GroupLayer.create();
 
@@ -142,10 +142,10 @@ public class GraphLayer extends AbstractLayer {
         group.addSubLayer(PointLayer.create(new PointElements() {
 
             @Override
-            public Iterable<Point> getPoints() {
-                LinkedList<Point> points = new LinkedList<Point>();
+            public Iterable<SpatialPoint> getPoints() {
+                LinkedList<SpatialPoint> points = new LinkedList<SpatialPoint>();
                 if (graphHolder.graph != null) {
-                    for (Point vertex : graphHolder.graph.vertexSet()) {
+                    for (SpatialPoint vertex : graphHolder.graph.vertexSet()) {
                         points.add(vertex);
                     }
                 }

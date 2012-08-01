@@ -31,7 +31,7 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class AlternativePlanners1Creator implements Creator {
@@ -48,48 +48,48 @@ public class AlternativePlanners1Creator implements Creator {
 
     private static final int WORLD_SIZE = 10;
 
-    private static final AStarPlanner<Point, DefaultWeightedEdge> planner = new AStarPlanner<Point, DefaultWeightedEdge>();
+    private static final AStarPlanner<SpatialPoint, DefaultWeightedEdge> planner = new AStarPlanner<SpatialPoint, DefaultWeightedEdge>();
     {
-        planner.setHeuristicFunction(new HeuristicFunction<Point>() {
+        planner.setHeuristicFunction(new HeuristicFunction<SpatialPoint>() {
         @Override
-            public double getHeuristicEstimate(Point current, Point goal) {
+            public double getHeuristicEstimate(SpatialPoint current, SpatialPoint goal) {
                 return current.distance(goal) + ( current.x > current.y ? 0.1 : -0.1 );
             }
         });
     }
     
-    private static final List<AlternativePathPlanner<Point, DefaultWeightedEdge>> alternativePlanners = new ArrayList<AlternativePathPlanner<Point,DefaultWeightedEdge>>();
+    private static final List<AlternativePathPlanner<SpatialPoint, DefaultWeightedEdge>> alternativePlanners = new ArrayList<AlternativePathPlanner<SpatialPoint,DefaultWeightedEdge>>();
     {
         alternativePlanners.add( 
-                new DifferentStateMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
+                new DifferentStateMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
                 );
         alternativePlanners.add( 
-                new TrajectoryDistanceMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
+                new TrajectoryDistanceMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
                 );
         alternativePlanners.add( 
-                new TrajectoryDistanceMaxMinMetricPlanner<Point, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
+                new TrajectoryDistanceMaxMinMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
                 );
         alternativePlanners.add( 
-                new ObstacleExtensions<Point, DefaultWeightedEdge>(planner) 
+                new ObstacleExtensions<SpatialPoint, DefaultWeightedEdge>(planner) 
                 );
         alternativePlanners.add( 
-                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new ObstacleExtensions<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new ObstacleExtensions<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
                 );
         alternativePlanners.add( 
-                new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>( planner )
+                new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>( planner )
                 );
         alternativePlanners.add( 
-                new AlternativePlannerSelector<Point, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<Point, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
                 );
     }
 
-    private static final List<TrajectoryMetric<Point, DefaultWeightedEdge>> trajectoryMetrics = new ArrayList<TrajectoryMetric<Point,DefaultWeightedEdge>>();
+    private static final List<TrajectoryMetric<SpatialPoint, DefaultWeightedEdge>> trajectoryMetrics = new ArrayList<TrajectoryMetric<SpatialPoint,DefaultWeightedEdge>>();
     {
         trajectoryMetrics.add( 
-                new DifferentStateMetric<Point, DefaultWeightedEdge>()
+                new DifferentStateMetric<SpatialPoint, DefaultWeightedEdge>()
                 );
         trajectoryMetrics.add( 
-                new TrajectoryDistanceMetric<Point, DefaultWeightedEdge>()
+                new TrajectoryDistanceMetric<SpatialPoint, DefaultWeightedEdge>()
                 );
     }
 
@@ -111,7 +111,7 @@ public class AlternativePlanners1Creator implements Creator {
             out.write("WORLD_SIZE;" + WORLD_SIZE + ";Repeats;" + NUM_OF_REPEATS + ";Obst. cases;" + ( (NUM_OF_OBSTACLES_MAX - NUM_OF_OBSTACLES_MIN)/NUM_OF_OBSTACLES_STEP + 1)  );
             out.newLine();
             out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
-            for (TrajectoryMetric<Point, DefaultWeightedEdge> metric : trajectoryMetrics) {
+            for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
                 out.write(";" + metric.getName());
             }
             out.newLine();
@@ -123,10 +123,10 @@ public class AlternativePlanners1Creator implements Creator {
                 for (int repeat = 0; repeat < NUM_OF_REPEATS; repeat++) {
 //                    System.out.println("repeat: " + repeat);
                        
-                    final List<Point> obstacles = generateRandomObstacles(numObstacles);
+                    final List<SpatialPoint> obstacles = generateRandomObstacles(numObstacles);
 
                     int plannerNum = 0;
-                    for (final AlternativePathPlanner<Point, DefaultWeightedEdge> planner : alternativePlanners) {
+                    for (final AlternativePathPlanner<SpatialPoint, DefaultWeightedEdge> planner : alternativePlanners) {
 //                        System.out.println("planner.getName(): " + planner.getName());
                         final String runStr = numObstacles + "/" + repeat;
 
@@ -151,13 +151,13 @@ public class AlternativePlanners1Creator implements Creator {
         executor.shutdown();
     }
 
-    private List<Point> generateRandomObstacles(int number) {
+    private List<SpatialPoint> generateRandomObstacles(int number) {
         
         while (true) {
-            List<Point> obstacles = new ArrayList<Point>(number);
+            List<SpatialPoint> obstacles = new ArrayList<SpatialPoint>(number);
         
     	    for (int i=0; i<number; i++) {
-    	        obstacles.add(new Point(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
+    	        obstacles.add(new SpatialPoint(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
     	    }
 
     	    //
@@ -169,10 +169,10 @@ public class AlternativePlanners1Creator implements Creator {
                 }
             } );
     	    
-            PlannedPath<Point, DefaultWeightedEdge> planPath = planner.planPath(
+            PlannedPath<SpatialPoint, DefaultWeightedEdge> planPath = planner.planPath(
                     graph, 
-                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0))
                     );
             if (planPath != null) {
                 return obstacles;
@@ -182,8 +182,8 @@ public class AlternativePlanners1Creator implements Creator {
     
     private void runExperiment(
             final BufferedWriter out,
-            final List<Point> obstacles,
-            final AlternativePathPlanner<Point, DefaultWeightedEdge> planner, 
+            final List<SpatialPoint> obstacles,
+            final AlternativePathPlanner<SpatialPoint, DefaultWeightedEdge> planner, 
             int curPlannerNum) {
         Graph<Waypoint, SpatialManeuver> originalGraph = createGraph(); 
 
@@ -193,21 +193,21 @@ public class AlternativePlanners1Creator implements Creator {
             }
         } );
 
-        for (Point obstacle : obstacles) {
+        for (SpatialPoint obstacle : obstacles) {
             graph.addObstacle(obstacle);
         }
 
         long startTime = System.currentTimeMillis();
-        Collection<PlannedPath<Point, DefaultWeightedEdge>> paths = 
+        Collection<PlannedPath<SpatialPoint, DefaultWeightedEdge>> paths = 
                 planner.planPath(
                         graph, 
-                        SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(WORLD_SIZE, WORLD_SIZE, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0))
                         );
         long duration = System.currentTimeMillis() - startTime;
 
         double averageLength = 0;
-        for (PlannedPath<Point, DefaultWeightedEdge> path : paths) {
+        for (PlannedPath<SpatialPoint, DefaultWeightedEdge> path : paths) {
             if (path == null) {
                 System.out.println("paths: " + paths);
                 System.out.println("graph.getObstacles(): "
@@ -223,7 +223,7 @@ public class AlternativePlanners1Creator implements Creator {
             synchronized (out) {
                 out.write( "" + obstacles.size() + ";" + curPlannerNum + "-" + planner.getName() + "-" + String.format("%03d", obstacles.size()) + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
 
-                for (TrajectoryMetric<Point, DefaultWeightedEdge> metric : trajectoryMetrics) {
+                for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
                     out.write(";" + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
                 }
 

@@ -11,25 +11,25 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cz.agents.alite.trajectorytools.graph.PlanarGraph;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class PlanarGraphAddLineIntersectionTest {
 
-    private Point point1;
-    private Point point2;
+    private SpatialPoint point1;
+    private SpatialPoint point2;
 
     @Before
     public void setup() {
-        point1 = new Point(0, 0, 0);
-        point2 = new Point(5, 0, 0);
+        point1 = new SpatialPoint(0, 0, 0);
+        point2 = new SpatialPoint(5, 0, 0);
     }
     
     // +  intersection
     @Test
     public void testAddLineIntersection1() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(2, -2, 0), new Point(2, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(2, -2, 0), new SpatialPoint(2, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -41,9 +41,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // T  intersection
     @Test
     public void testAddLineIntersection2() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(2, 0, 0), new Point(2, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(2, 0, 0), new SpatialPoint(2, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(line.toString(), 2, line.size());
@@ -54,9 +54,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // |- intersection
     @Test
     public void testAddLineIntersection3() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(0, -2, 0), new Point(0, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(0, -2, 0), new SpatialPoint(0, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -67,9 +67,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -| intersection
     @Test
     public void testAddLineIntersection3a() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(5, -2, 0), new Point(5, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(5, -2, 0), new SpatialPoint(5, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(3, line.size());
@@ -80,9 +80,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // ,- intersection
     @Test
     public void testAddLineIntersection4() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(point1, new Point(0, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(point1, new SpatialPoint(0, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -92,9 +92,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -, intersection
     @Test
     public void testAddLineIntersection4a() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(point2, new Point(5, 2, 0)));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(point2, new SpatialPoint(5, 2, 0)));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -104,9 +104,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // `- intersection
     @Test
     public void testAddLineIntersection4b() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(0, -2, 0), point1));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(0, -2, 0), point1));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());
@@ -116,9 +116,9 @@ public class PlanarGraphAddLineIntersectionTest {
     // -, intersection
     @Test
     public void testAddLineIntersection4v() {
-        List<Point> line = new LinkedList<Point>(Arrays.asList(new Point(5, -2, 0), point2));
+        List<SpatialPoint> line = new LinkedList<SpatialPoint>(Arrays.asList(new SpatialPoint(5, -2, 0), point2));
         
-        Point intersection = PlanarGraph.addLineIntersection(point1, point2, line);
+        SpatialPoint intersection = PlanarGraph.addLineIntersection(point1, point2, line);
         
         assertNotNull(intersection);
         assertEquals(2, line.size());

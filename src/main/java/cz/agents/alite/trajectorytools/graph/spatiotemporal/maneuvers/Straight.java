@@ -13,8 +13,8 @@ public class Straight extends SpatioTemporalManeuver {
     public Straight(TimePoint start, TimePoint end) {
         super();
         this.start = start;
-        double speed = start.getPoint3d().distance(end.getPoint3d()) / (end.getTime() - start.getTime());
-        this.spatialStraight = new cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight(start.getPoint3d(), end.getPoint3d(), speed);
+        double speed = start.getSpatialPoint().distance(end.getSpatialPoint()) / (end.getTime() - start.getTime());
+        this.spatialStraight = new cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight(start.getSpatialPoint(), end.getSpatialPoint(), speed);
     }
 
     @Override
@@ -37,6 +37,7 @@ public class Straight extends SpatioTemporalManeuver {
         return spatialStraight.getDuration();
     }
 
-
-
+    public double getSpeed() {
+        return spatialStraight.getSpeed();
+    }
 }

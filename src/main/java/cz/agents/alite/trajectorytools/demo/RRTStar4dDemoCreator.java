@@ -13,12 +13,13 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.SpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
@@ -36,13 +37,13 @@ public class RRTStar4dDemoCreator implements Creator {
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
     TimePoint initialPoint = new TimePoint(100, 100, 0, 0);
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 1000, 100));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 1000));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new StaticBoxRegion(new Point(800, 100, -1000), new Point(820, 120, 1000));
+    Region target = new StaticSphereRegion(new SpatialPoint(800, 100, 0), 50);
 
     Trajectory trajectory = null;
 
-    double gamma = 1300;
+    double gamma = 5300;
 
     @Override
     public void init(String[] args) {
@@ -51,23 +52,26 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new StaticBoxRegion(new Point(250, 250, 0), new Point(750,750,750)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,750)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
-        obstacles.add(new StaticBoxRegion(new Point(100, 200, 0), new Point(230,950,750)));
+        obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,750)));
 
 
         Domain<TimePoint, SpatioTemporalManeuver> domain = new SpatioTemporalStraightLineDomain(bounds, obstacles, target, 12,15,25, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
+        double bestCost = Double.POSITIVE_INFINITY;
         int n=100000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
-            if (rrtstar.getBestVertex() != null) {
-                System.out.println("Best path cost: " + rrtstar.getBestVertex().getCostFromRoot());
+            if (rrtstar.getBestVertex() != null && rrtstar.getBestVertex().getCostFromRoot() < bestCost) {
+                bestCost = rrtstar.getBestVertex().getCostFromRoot();
+                System.out.println("Iteration: " + i + " Best path cost: " + bestCost);
                 GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
                 trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);

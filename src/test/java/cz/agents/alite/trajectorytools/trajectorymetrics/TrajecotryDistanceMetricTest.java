@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.planner.PlannedPathImpl;
 import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 
@@ -31,31 +31,31 @@ public class TrajecotryDistanceMetricTest {
     @Before
     public void setup() {
         graph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
-        startVertex = SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0));
-        endVertex = SpatialGraphs.getNearestVertex(graph, new Point(5, 5, 0));
+        startVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0));
+        endVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 5, 0));
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
                         startVertex,
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(4, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(4, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 3, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 3, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 4, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 3, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 4, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 4, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 4, 0)),
                         endVertex
                         )
                 );
@@ -85,7 +85,7 @@ public class TrajecotryDistanceMetricTest {
     @Test
     public void testSingleVertexPathMid() {
         SingleVertexPlannedPath<Waypoint, SpatialManeuver> otherPath = new SingleVertexPlannedPath<Waypoint, SpatialManeuver>(graph,
-                SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0))
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0))
                 );
 
         assertEquals(0, metric.getTrajectoryDistance(otherPath, path), 0.001);
@@ -102,12 +102,12 @@ public class TrajecotryDistanceMetricTest {
     public void testPathStart() {
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 4, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 4, 0))
                         )
                 );
 
@@ -122,12 +122,12 @@ public class TrajecotryDistanceMetricTest {
     public void testPathMid() {
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                         )
                 );
 
@@ -142,12 +142,12 @@ public class TrajecotryDistanceMetricTest {
     public void testPathEnd() {
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 0, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 1, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 0, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 1, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0))
                         )
                 );
 
@@ -162,12 +162,12 @@ public class TrajecotryDistanceMetricTest {
     public void testPathCorner() {
         List<SpatialManeuver> edges = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(5, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(6, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(6, 2, 0))
                         )
                 );
 
@@ -182,38 +182,38 @@ public class TrajecotryDistanceMetricTest {
     public void testTwoPaths() {
         List<SpatialManeuver> edges1 = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(1, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(1, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(1, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(1, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(1, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(1, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 3, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 3, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 3, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                         )
                 );
         List<SpatialManeuver> edges2 = Arrays.asList(
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(1, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 1, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(1, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 1, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 1, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 1, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(2, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(2, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0))
                         ),
                 graph.getEdge(
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 2, 0)),
-                        SpatialGraphs.getNearestVertex(graph, new Point(3, 3, 0))
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 2, 0)),
+                        SpatialGraphs.getNearestVertex(graph, new SpatialPoint(3, 3, 0))
                         )
                 );
 

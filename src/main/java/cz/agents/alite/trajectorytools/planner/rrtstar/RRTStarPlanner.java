@@ -282,6 +282,10 @@ public class RRTStarPlanner<P,E> implements Graph<P,E> {
         return bestVertex;
     }
 
+    public boolean foundSolution() {
+        return bestVertex != null;
+    }
+
 
     @Override
     public E addEdge(P arg0, P arg1) {

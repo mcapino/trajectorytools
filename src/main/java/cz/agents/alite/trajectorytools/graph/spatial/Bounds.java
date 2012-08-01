@@ -1,6 +1,6 @@
 package cz.agents.alite.trajectorytools.graph.spatial;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class Bounds {
 		final public double minx;
@@ -24,7 +24,7 @@ public class Bounds {
 			this.maxz = maxz;
 		}	
 		
-		public boolean isInside(Point point) {
+		public boolean isInside(SpatialPoint point) {
 			return minx <= point.x &&
 					maxx >= point.x &&
 					miny <= point.y &&

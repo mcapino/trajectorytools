@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
@@ -98,8 +98,8 @@ public class ManeuverDemoCreator implements Creator {
 
             path.plannedPath = aStar.planPath(
                     graph,
-                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

@@ -1,6 +1,6 @@
 package cz.agents.alite.trajectorytools.graph.delaunay;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 /*
  * Copyright (c) 2005, 2007 by L. Paul Chew.
@@ -439,11 +439,11 @@ public class Pnt {
         return new Pnt(result);
     }
 
-    public Point toPoint() {
+    public SpatialPoint toPoint() {
         if (coordinates.length == 2) {
-            return new Point(coordinates[0], coordinates[1], 0.0);
+            return new SpatialPoint(coordinates[0], coordinates[1], 0.0);
         } else {
-            return new Point(coordinates[0], coordinates[1], coordinates[2]);
+            return new SpatialPoint(coordinates[0], coordinates[1], coordinates[2]);
         }
     }
 }

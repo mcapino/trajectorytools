@@ -15,7 +15,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
@@ -28,7 +28,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class Demo1Creator implements Creator {
 
     private ObstacleGraphView graph;
-    private PathHolder<Point, DefaultWeightedEdge> path = new PathHolder<Point, DefaultWeightedEdge>();
+    private PathHolder<SpatialPoint, DefaultWeightedEdge> path = new PathHolder<SpatialPoint, DefaultWeightedEdge>();
 
     @Override
     public void init(String[] args) {
@@ -71,19 +71,19 @@ public class Demo1Creator implements Creator {
     protected void replan() {
 
         try {
-            PathPlanner<Point, DefaultWeightedEdge> aStar = new AStarPlanner<Point, DefaultWeightedEdge>();
+            PathPlanner<SpatialPoint, DefaultWeightedEdge> aStar = new AStarPlanner<SpatialPoint, DefaultWeightedEdge>();
 
-            aStar.setHeuristicFunction(new HeuristicFunction<Point>() {
+            aStar.setHeuristicFunction(new HeuristicFunction<SpatialPoint>() {
             @Override
-                public double getHeuristicEstimate(Point current, Point goal) {
+                public double getHeuristicEstimate(SpatialPoint current, SpatialPoint goal) {
                     return current.distance(goal);
                 }
             });
 
             path.plannedPath = aStar.planPath(
                     graph,
-                    SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0)),
-                    SpatialGraphs.getNearestVertex(graph, new Point(10, 10, 0))
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
+                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0))
                     );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

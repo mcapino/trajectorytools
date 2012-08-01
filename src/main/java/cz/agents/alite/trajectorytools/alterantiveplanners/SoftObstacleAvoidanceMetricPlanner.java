@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 /**
  * Not working - cannot be planned by AStar type of planner!
@@ -16,7 +16,7 @@ import cz.agents.alite.trajectorytools.util.Point;
  * @author honza
  *
  */
-public class SoftObstacleAvoidanceMetricPlanner<V extends Point, E> implements AlternativePathPlanner<V,E> {
+public class SoftObstacleAvoidanceMetricPlanner<V extends SpatialPoint, E> implements AlternativePathPlanner<V,E> {
 
     public SoftObstacleAvoidanceMetricPlanner() {
     }

@@ -12,9 +12,9 @@ import cz.agents.alite.trajectorytools.planner.SingleVertexPlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class TrajectoryDistanceMaxMinMetricPlanner<V extends Point, E> implements AlternativePathPlanner<V,E> {
+public class TrajectoryDistanceMaxMinMetricPlanner<V extends SpatialPoint, E> implements AlternativePathPlanner<V,E> {
 
     private final PathPlanner<V, E> planner;
     private final int pathSolutionLimit;

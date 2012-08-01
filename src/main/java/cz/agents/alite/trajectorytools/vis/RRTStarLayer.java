@@ -8,7 +8,7 @@ import javax.vecmath.Point3d;
 
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -58,12 +58,12 @@ public class RRTStarLayer extends AbstractLayer {
                         }
 
                         if (current.getPoint() instanceof TimePoint) {
-                            source = ((TimePoint) current.getPoint()).getPoint3d();
+                            source = ((TimePoint) current.getPoint()).getSpatialPoint();
                         }
 
 
                         if (child.getPoint() instanceof TimePoint) {
-                            target = ((TimePoint) child.getPoint()).getPoint3d();
+                            target = ((TimePoint) child.getPoint()).getSpatialPoint();
                         }
 
                         // draw edge
@@ -93,8 +93,8 @@ public class RRTStarLayer extends AbstractLayer {
         group.addSubLayer(PointLayer.create(new PointElements() {
 
             @Override
-            public Iterable<Point> getPoints() {
-                LinkedList<Point> points = new LinkedList<Point>();
+            public Iterable<SpatialPoint> getPoints() {
+                LinkedList<SpatialPoint> points = new LinkedList<SpatialPoint>();
 
                 Queue<Vertex<V,?>> queue = new LinkedList<Vertex<V,?>>();
                 queue.add(rrtstar.getRoot());
@@ -102,13 +102,13 @@ public class RRTStarLayer extends AbstractLayer {
                 while(!queue.isEmpty()) {
                     Vertex<V,?> current = queue.poll();
 
-                    if (current.getPoint() instanceof Point) {
-                        points.add((Point) current.getPoint());
+                    if (current.getPoint() instanceof SpatialPoint) {
+                        points.add((SpatialPoint) current.getPoint());
                     }
 
 
                     if (current.getPoint() instanceof TimePoint) {
-                        points.add(((TimePoint) current.getPoint()).getPoint3d());
+                        points.add(((TimePoint) current.getPoint()).getSpatialPoint());
                     }
 
                        for (Vertex<V,?> child : current.getChildren()) {

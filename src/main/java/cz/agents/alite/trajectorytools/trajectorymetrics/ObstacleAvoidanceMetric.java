@@ -10,9 +10,9 @@ import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
 import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class ObstacleAvoidanceMetric<V extends Point,E> implements TrajectoryMetric<V,E> {
+public class ObstacleAvoidanceMetric<V extends SpatialPoint,E> implements TrajectoryMetric<V,E> {
     private static final int DIRECTIONS = 4;
 
     @Override
@@ -25,7 +25,7 @@ public class ObstacleAvoidanceMetric<V extends Point,E> implements TrajectoryMet
             return 0;
         }
 
-        Set<Point> obstacles = ((ObstacleGraphView) path.getGraph()).getObstacles();
+        Set<SpatialPoint> obstacles = ((ObstacleGraphView) path.getGraph()).getObstacles();
 
         if (obstacles.isEmpty()) {
             return 0;
@@ -33,7 +33,7 @@ public class ObstacleAvoidanceMetric<V extends Point,E> implements TrajectoryMet
         
         double distance = 0;
         
-        for (Point obstacle : obstacles) {
+        for (SpatialPoint obstacle : obstacles) {
             for (int direction = 0; direction < DIRECTIONS; direction ++) {
                 Zone zone = createZone(obstacle, direction);
                 if (isZoneCrossed( zone, path) == isZoneCrossed( zone, otherPath)) {
@@ -59,7 +59,7 @@ public class ObstacleAvoidanceMetric<V extends Point,E> implements TrajectoryMet
         return "Obstacle Avoidance Metric";
     }
 
-    private Zone createZone(Point obstacle, int direction) {
+    private Zone createZone(SpatialPoint obstacle, int direction) {
         Zone zone;
         Zone boxZone = new BoxZone(new Vector3d(Double.MAX_VALUE, 0.2, 0.2));
 

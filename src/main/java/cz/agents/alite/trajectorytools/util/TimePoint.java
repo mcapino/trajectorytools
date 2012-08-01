@@ -1,5 +1,6 @@
 package cz.agents.alite.trajectorytools.util;
 
+import javax.vecmath.Point3d;
 import javax.vecmath.Point4d;
 
 public class TimePoint extends Point4d {
@@ -9,12 +10,12 @@ public class TimePoint extends Point4d {
         super(x,y,z,time);
     }
 
-    public TimePoint(Point p, double time) {
+    public TimePoint(Point3d p, double time) {
         super(p.x,p.y,p.z,time);
     }
 
-    public Point getPoint3d() {
-        return new Point(x,y,z);
+    public SpatialPoint getSpatialPoint() {
+        return new SpatialPoint(x,y,z);
     }
 
     public double getTime() {

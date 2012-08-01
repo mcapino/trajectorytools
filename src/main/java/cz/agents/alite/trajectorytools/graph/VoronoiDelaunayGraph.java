@@ -15,7 +15,7 @@ import org.jgrapht.graph.SimpleGraph;
 import cz.agents.alite.trajectorytools.graph.delaunay.Pnt;
 import cz.agents.alite.trajectorytools.graph.delaunay.Triangle;
 import cz.agents.alite.trajectorytools.graph.delaunay.Triangulation;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class VoronoiDelaunayGraph {
   
@@ -35,48 +35,48 @@ public class VoronoiDelaunayGraph {
 
     private static int order = 1000;
 
-    private Set<Point> obstacles;
+    private Set<SpatialPoint> obstacles;
 
-    private Graph<Point, DefaultWeightedEdge> voronoiGraph = null;
+    private Graph<SpatialPoint, DefaultWeightedEdge> voronoiGraph = null;
     private Map<DefaultWeightedEdge, VoronoiEdge> voronoiEdges = new HashMap<DefaultWeightedEdge, VoronoiEdge>();
 
-    private List<Point> voronoiBorder = new ArrayList<Point>();
+    private List<SpatialPoint> voronoiBorder = new ArrayList<SpatialPoint>();
 
-    private Map<Pnt, Point> delaunayVertexes = new HashMap<Pnt, Point>();
+    private Map<Pnt, SpatialPoint> delaunayVertexes = new HashMap<Pnt, SpatialPoint>();
 
     private Map<DefaultWeightedEdge, List<DefaultWeightedEdge>> dualEdges = new HashMap<DefaultWeightedEdge, List<DefaultWeightedEdge>>();
 
     public VoronoiDelaunayGraph() {       
         dt = new Triangulation(initialTriangle);
-        obstacles = new HashSet<Point>();
+        obstacles = new HashSet<SpatialPoint>();
     }
     
 
-    public void addObstacle(Point obstacle) {
+    public void addObstacle(SpatialPoint obstacle) {
         obstacles.add(obstacle);
         dt.delaunayPlace( new Pnt(obstacle.x, obstacle.y) );
     }
 
-    public void setObstacles(Set<Point> obstacles) {
+    public void setObstacles(Set<SpatialPoint> obstacles) {
         this.obstacles = obstacles;
         dt = new Triangulation(initialTriangle);
 
-        for (Point point : obstacles) {
+        for (SpatialPoint point : obstacles) {
             dt.delaunayPlace( new Pnt(point.x, point.y) );
         }
     }
 
-    public Graph<Point, DefaultWeightedEdge> getVoronoiGraph(List<Point> border) {
-        Graph<Point, DefaultWeightedEdge> graph = new SimpleGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+    public Graph<SpatialPoint, DefaultWeightedEdge> getVoronoiGraph(List<SpatialPoint> border) {
+        Graph<SpatialPoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         order = 0;
 
-        Map<Triangle, Point> vertexes = new HashMap<Triangle, Point>(); 
+        Map<Triangle, SpatialPoint> vertexes = new HashMap<Triangle, SpatialPoint>(); 
         
         for (Triangle triangle : dt) {
             Pnt circumcenter = triangle.getCircumcenter();
             
-            Point vertex = new Point(order++, circumcenter.coord(0), circumcenter.coord(1));
+            SpatialPoint vertex = new SpatialPoint(order++, circumcenter.coord(0), circumcenter.coord(1));
             vertexes.put(triangle, vertex);
             graph.addVertex( vertex );
         }
@@ -85,8 +85,8 @@ public class VoronoiDelaunayGraph {
         
         for (Triangle triangle : dt) {
             for (Triangle tri: dt.neighbors(triangle)) {
-                Point sourceVertex = vertexes.get(triangle);
-                Point targetVertex = vertexes.get(tri);
+                SpatialPoint sourceVertex = vertexes.get(triangle);
+                SpatialPoint targetVertex = vertexes.get(tri);
 
                 if (!sourceVertex.equals(targetVertex)) {
                 	DefaultWeightedEdge edge = graph.addEdge(sourceVertex, targetVertex);
@@ -105,12 +105,12 @@ public class VoronoiDelaunayGraph {
         return voronoiGraph;
     }
 
-    private void removeObstaclesFromGraph(Graph<Point, DefaultWeightedEdge> graph) {
+    private void removeObstaclesFromGraph(Graph<SpatialPoint, DefaultWeightedEdge> graph) {
         List<DefaultWeightedEdge> toRemove = new LinkedList<DefaultWeightedEdge>();
-        for (Point obstacle : obstacles) {
+        for (SpatialPoint obstacle : obstacles) {
             for (DefaultWeightedEdge edge : graph.edgeSet()) {
                 // is the edge crossing the obstacle?
-                Point point = getClosestIntersection(obstacle, graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+                SpatialPoint point = getClosestIntersection(obstacle, graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
                 if (point.distance(obstacle) < 0.001) {
                     toRemove.add(edge);
                 }
@@ -119,19 +119,19 @@ public class VoronoiDelaunayGraph {
         graph.removeAllEdges(toRemove);
     }
 
-    public Graph<Point, DefaultWeightedEdge> getDelaunayGraph(List<Point> border) {
+    public Graph<SpatialPoint, DefaultWeightedEdge> getDelaunayGraph(List<SpatialPoint> border) {
         
         if (voronoiGraph == null) {
             getVoronoiGraph(border);
         }
         
-        Graph<Point, DefaultWeightedEdge> graph = new SimpleGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        Graph<SpatialPoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         order = 0;
         delaunayVertexes.clear(); 
         for (Triangle triangle : dt) {
             for (Pnt pnt : triangle) {
-                Point vertex = new Point(order++, pnt.coord(0), pnt.coord(1));
+                SpatialPoint vertex = new SpatialPoint(order++, pnt.coord(0), pnt.coord(1));
                 graph.addVertex(vertex);
                 delaunayVertexes.put(pnt, vertex);
             }
@@ -147,7 +147,7 @@ public class VoronoiDelaunayGraph {
         return graph;
     }
 
-    public void removeDualEdges(Graph<Point, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
+    public void removeDualEdges(Graph<SpatialPoint, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
         for (DefaultWeightedEdge maneuver : edgeList) {
             for (DefaultWeightedEdge edge : dualEdges.get(maneuver)) {
                 graph.removeEdge(edge);
@@ -155,7 +155,7 @@ public class VoronoiDelaunayGraph {
         }
     }
     
-    private List<DefaultWeightedEdge> addDelaunayEdges(Graph<Point, DefaultWeightedEdge> graph, PlanarGraph voronoiPlanarGraph, DefaultWeightedEdge edge) {
+    private List<DefaultWeightedEdge> addDelaunayEdges(Graph<SpatialPoint, DefaultWeightedEdge> graph, PlanarGraph voronoiPlanarGraph, DefaultWeightedEdge edge) {
 
         List<DefaultWeightedEdge> newEdges = new ArrayList<DefaultWeightedEdge>();
         
@@ -165,14 +165,14 @@ public class VoronoiDelaunayGraph {
             newEdges.add( graph.addEdge(delaunayEdge.source, delaunayEdge.target) );
         } else {
             // it's a border edge
-            Point center = new Point(
+            SpatialPoint center = new SpatialPoint(
                     (graph.getEdgeSource(edge).x + graph.getEdgeTarget(edge).x / 2.0), 
                     (graph.getEdgeSource(edge).y + graph.getEdgeTarget(edge).y / 2.0),
                     0
                     );
             graph.addVertex(center);
 
-            for (Point obstacle : obstacles) {
+            for (SpatialPoint obstacle : obstacles) {
                 if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
                     newEdges.add( graph.addEdge(center, obstacle) );
                 }
@@ -183,8 +183,8 @@ public class VoronoiDelaunayGraph {
     }
     
     private class TemporaryEdge {
-        Point source;
-        Point target;
+        SpatialPoint source;
+        SpatialPoint target;
     }
     
     private TemporaryEdge getDualEdgeToVoronoi(DefaultWeightedEdge edge) {
@@ -209,11 +209,11 @@ public class VoronoiDelaunayGraph {
     }
 
 
-    private void clipVoronoiGraph(Graph<Point, DefaultWeightedEdge> graph, List<Point> border) {
+    private void clipVoronoiGraph(Graph<SpatialPoint, DefaultWeightedEdge> graph, List<SpatialPoint> border) {
         PlanarGraph planarGraph = PlanarGraph.createPlanarGraphView(graph);
         
-        Point last = null;
-        for (Point vertex : border) {
+        SpatialPoint last = null;
+        for (SpatialPoint vertex : border) {
             if (last != null) {
                 voronoiBorder.addAll(
                     planarGraph.addLine(last, vertex, voronoiEdges)
@@ -228,17 +228,17 @@ public class VoronoiDelaunayGraph {
         removeOutsideVertices(graph, border);
     }
 
-    private static <E> void removeOutsideVertices(Graph<Point, E> graph,
-            List<Point> border) {
+    private static <E> void removeOutsideVertices(Graph<SpatialPoint, E> graph,
+            List<SpatialPoint> border) {
         
-        List<Point> toRemove = getOutsideVertices(graph, border);
+        List<SpatialPoint> toRemove = getOutsideVertices(graph, border);
         graph.removeAllVertices(toRemove);
     }
 
-    private static <E> List<Point> getOutsideVertices(
-            Graph<Point, E> graph, List<Point> border) {
-        Point center = new Point();
-        for (Point point : border) {
+    private static <E> List<SpatialPoint> getOutsideVertices(
+            Graph<SpatialPoint, E> graph, List<SpatialPoint> border) {
+        SpatialPoint center = new SpatialPoint();
+        for (SpatialPoint point : border) {
             center.x += point.x;
             center.y += point.y;
         }
@@ -247,9 +247,9 @@ public class VoronoiDelaunayGraph {
         center.y /= border.size();
         
 
-        List<Point> toRemove = new ArrayList<Point>();
-        for (Point vertex : graph.vertexSet()) {
-            Point intersection = getBorderIntersection(center, vertex, border);
+        List<SpatialPoint> toRemove = new ArrayList<SpatialPoint>();
+        for (SpatialPoint vertex : graph.vertexSet()) {
+            SpatialPoint intersection = getBorderIntersection(center, vertex, border);
             if (intersection != null) {
                 if (!intersection.epsilonEquals(vertex, 0.01)) {
                     toRemove.add( vertex );
@@ -259,11 +259,11 @@ public class VoronoiDelaunayGraph {
         return toRemove;
     }
     
-    private static Point getBorderIntersection(Point point1, Point point2, List<Point> border) {
-        Point last = null;
-        for (Point vertex : border) {
+    private static SpatialPoint getBorderIntersection(SpatialPoint point1, SpatialPoint point2, List<SpatialPoint> border) {
+        SpatialPoint last = null;
+        for (SpatialPoint vertex : border) {
             if (last != null) {
-                Point intersection = getIntersection(point1, point2, last, vertex);
+                SpatialPoint intersection = getIntersection(point1, point2, last, vertex);
                 if (intersection != null && !intersection.epsilonEquals(point1, 0.001) && !intersection.epsilonEquals(point2, 0.001)) {
                     return intersection;
                 }
@@ -273,7 +273,7 @@ public class VoronoiDelaunayGraph {
         return getIntersection(point1, point2, last, border.get(0));
     }
 
-    private static Point getClosestIntersection(Point point, Point point1, Point point2) {
+    private static SpatialPoint getClosestIntersection(SpatialPoint point, SpatialPoint point1, SpatialPoint point2) {
         double u = ((point.x - point1.x) * (point2.x - point1.x) + (point.y - point1.y) * (point2.y - point1.y)) / point1.distanceSquared(point2);
         if (u < 0) {
             return point1;
@@ -283,7 +283,7 @@ public class VoronoiDelaunayGraph {
             double x = point1.x + u * ( point2.x - point1.x );
             double y = point1.y + u * ( point2.y - point1.y );
 
-            return new Point(x, y, 0);
+            return new SpatialPoint(x, y, 0);
         }
     }
 
@@ -296,7 +296,7 @@ public class VoronoiDelaunayGraph {
      * @param point4
      * @return
      */
-    private static Point getIntersection(Point point1, Point point2, Point point3, Point point4){
+    private static SpatialPoint getIntersection(SpatialPoint point1, SpatialPoint point2, SpatialPoint point3, SpatialPoint point4){
         double a1, a2, b1, b2, c1, c2;
         double r1, r2 , r3, r4;
         double denom;
@@ -340,7 +340,7 @@ public class VoronoiDelaunayGraph {
           return null;
         }
 
-        return new Point(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new SpatialPoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
     }
 
     private static boolean same_sign(double a, double b){

@@ -8,7 +8,7 @@ import org.jgrapht.GraphPath;
 
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
 /**
@@ -22,12 +22,12 @@ import cz.agents.alite.trajectorytools.util.Vector;
  *
  */
 
-public class SpatialManeuverTrajectory<V extends Point, E extends SpatialManeuver> implements Trajectory {
+public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends SpatialManeuver> implements Trajectory {
 
     private List<E> maneuvers = null;
 
-    private Point startWaypoint;
-    private Point endWaypoint;
+    private SpatialPoint startWaypoint;
+    private SpatialPoint endWaypoint;
 
     Graph<V,E> graph;
 
@@ -46,7 +46,7 @@ public class SpatialManeuverTrajectory<V extends Point, E extends SpatialManeuve
 
     @Override
     public OrientedPoint getPosition(double t) {
-        Point currentWaypoint = startWaypoint;
+        SpatialPoint currentWaypoint = startWaypoint;
         double currentWaypointTime = startTime;
         Vector currentDirection = new Vector(1,0,0);
 
@@ -57,7 +57,7 @@ public class SpatialManeuverTrajectory<V extends Point, E extends SpatialManeuve
 
         if (maneuvers != null)  {
             for (E maneuver: maneuvers) {
-                Point nextWaypoint = graph.getEdgeTarget(maneuver);
+                SpatialPoint nextWaypoint = graph.getEdgeTarget(maneuver);
                 double duration  = maneuver.getDuration();
                 double nextWaypointTime = currentWaypointTime + duration;
 

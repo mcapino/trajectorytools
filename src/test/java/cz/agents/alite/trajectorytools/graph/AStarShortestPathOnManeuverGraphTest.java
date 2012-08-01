@@ -11,7 +11,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
 import cz.agents.alite.trajectorytools.graph.spatial.TimeWeightedSpatialManeuverGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class AStarShortestPathOnManeuverGraphTest {
@@ -19,8 +19,8 @@ public class AStarShortestPathOnManeuverGraphTest {
     @Test
     public void testAgainstDijkstraOnGrid() {
         Graph<Waypoint, SpatialManeuver> graph = new TimeWeightedSpatialManeuverGraph<Waypoint, SpatialManeuver>(SpatialGridFactory.create4WayGrid(5, 5, 2, 2, 1.0));
-        Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
-        Waypoint end = SpatialGraphs.getNearestVertex(graph,new Point(5.0, 5.0, 0));
+        Waypoint start = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0));
+        Waypoint end = SpatialGraphs.getNearestVertex(graph,new SpatialPoint(5.0, 5.0, 0));
 
         AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
             @Override
@@ -68,8 +68,8 @@ public class AStarShortestPathOnManeuverGraphTest {
         for (int seed=1; seed<N; seed++) {
             Graph<Waypoint, SpatialManeuver> graph = new TimeWeightedSpatialManeuverGraph<Waypoint, SpatialManeuver>(
                     SpatialGridFactory.createRandom(5, 5, 6, 3, seed, 1.0));
-            Waypoint start = SpatialGraphs.getNearestVertex(graph, new Point(0, 0, 0));
-            Waypoint end = SpatialGraphs.getNearestVertex(graph, new Point(5.0, 5.0, 0));
+            Waypoint start = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0));
+            Waypoint end = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(5.0, 5.0, 0));
 
             AStarShortestPath.Heuristic<Waypoint> heuristic = new AStarShortestPath.Heuristic<Waypoint>() {
                 @Override

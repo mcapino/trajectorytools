@@ -64,7 +64,7 @@ public class SpatioTemporalManeuverTrajectory<V extends TimePoint, E extends Spa
             }
         }
         if (t >= endPoint.getTime()) {
-            return new OrientedPoint(currentPoint.getPoint3d(), currentDirection);
+            return new OrientedPoint(currentPoint.getSpatialPoint(), currentDirection);
         }
 
         return null;

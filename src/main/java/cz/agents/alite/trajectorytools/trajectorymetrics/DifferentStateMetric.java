@@ -1,9 +1,9 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class DifferentStateMetric<V extends Point, E> implements TrajectoryMetric<V, E> {
+public class DifferentStateMetric<V extends SpatialPoint, E> implements TrajectoryMetric<V, E> {
 
     public DifferentStateMetric() {
     }

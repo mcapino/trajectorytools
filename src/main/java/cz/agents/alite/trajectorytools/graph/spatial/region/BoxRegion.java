@@ -2,27 +2,27 @@ package cz.agents.alite.trajectorytools.graph.spatial.region;
 
 import javax.vecmath.Point3d;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class BoxRegion implements Region {
 
-    Point corner1;
-    Point corner2;
+    SpatialPoint corner1;
+    SpatialPoint corner2;
 
-    public BoxRegion(Point corner1, Point corner2) {
+    public BoxRegion(SpatialPoint corner1, SpatialPoint corner2) {
         super();
         this.corner1 = corner1;
         this.corner2 = corner2;
     }
 
     @Override
-    public boolean intersectsLine(Point p1, Point p2) {
+    public boolean intersectsLine(SpatialPoint p1, SpatialPoint p2) {
         Point3d hitPoint = new Point3d();
         return isLineIntersectingBox(corner1, corner2, p1, p2, hitPoint);
     }
 
     @Override
-    public boolean isInside(Point p) {
+    public boolean isInside(SpatialPoint p) {
 
         if (inBox(p, corner1, corner2, 1) &&
             inBox(p, corner1, corner2, 2) &&
@@ -88,11 +88,11 @@ public class BoxRegion implements Region {
         return false;
     }
 
-    public Point getCorner1() {
+    public SpatialPoint getCorner1() {
         return corner1;
     }
 
-    public Point getCorner2() {
+    public SpatialPoint getCorner2() {
         return corner2;
     }
 

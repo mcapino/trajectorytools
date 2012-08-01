@@ -19,9 +19,9 @@ import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class ObstacleExtensions<V extends Point, E> implements AlternativePathPlanner<V,E> {
+public class ObstacleExtensions<V extends SpatialPoint, E> implements AlternativePathPlanner<V,E> {
 
     private static final int DIRECTIONS = 4;
 
@@ -57,7 +57,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
         return paths;
     }
 
-    static class ObstacleExtender<VV extends Point, EE> implements Iterable<Graph<VV, EE>>{
+    static class ObstacleExtender<VV extends SpatialPoint, EE> implements Iterable<Graph<VV, EE>>{
 
         int[] directions;
         private final GraphWithObstacles<VV, EE> originalGraph;
@@ -103,7 +103,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
 
                     int currObstacle = 0;
 
-                    for (Point obstacle : originalGraph.getObstacles()) {
+                    for (SpatialPoint obstacle : originalGraph.getObstacles()) {
                         removeObstacleExtension(graph, obstacle, directions[ currObstacle++ ] );
                     }
 
@@ -111,7 +111,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
 
                 }
 
-                private void removeObstacleExtension(Graph<VV, EE> graph, Point obstacle, int direction) {
+                private void removeObstacleExtension(Graph<VV, EE> graph, SpatialPoint obstacle, int direction) {
 
                     Zone zone = createZone(obstacle, direction);
 
@@ -128,7 +128,7 @@ public class ObstacleExtensions<V extends Point, E> implements AlternativePathPl
                     }
                 }
 
-                private Zone createZone(Point obstacle, int direction) {
+                private Zone createZone(SpatialPoint obstacle, int direction) {
                     Zone zone;
                     Zone boxZone = new BoxZone(new Vector3d(Double.MAX_VALUE, 0.2, 0.2));
 

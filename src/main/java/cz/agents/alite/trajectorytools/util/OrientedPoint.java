@@ -9,7 +9,7 @@ import javax.vecmath.Matrix4d;
 /**
  * A point having a specific orientation.
  */
-public class OrientedPoint extends Point {
+public class OrientedPoint extends SpatialPoint {
     private static final long serialVersionUID = 5757663724715260037L;
 
     // A normalized vector representing the orientation
@@ -17,10 +17,10 @@ public class OrientedPoint extends Point {
 
 
     public OrientedPoint(double x, double y, double z, double u, double v, double w) {
-        this(new Point(x,y,z), new Vector(u,v,w));
+        this(new SpatialPoint(x,y,z), new Vector(u,v,w));
     }
 
-    public OrientedPoint(Point point, Vector orientation) {
+    public OrientedPoint(SpatialPoint point, Vector orientation) {
         super(point);
         if (orientation == null) {
             throw new NullPointerException("Orientation cannot be null.");
@@ -83,7 +83,7 @@ public class OrientedPoint extends Point {
         nx = r * Math.cos(theta);
         ny = r * Math.sin(theta);
 
-        return new OrientedPoint(new Point(x + nx, y + ny, z), orientation);
+        return new OrientedPoint(new SpatialPoint(x + nx, y + ny, z), orientation);
     }
 
     public void rotate(double angleInRads) {

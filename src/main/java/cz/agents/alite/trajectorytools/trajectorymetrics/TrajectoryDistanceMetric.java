@@ -1,7 +1,7 @@
 package cz.agents.alite.trajectorytools.trajectorymetrics;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 /**
  *
@@ -10,7 +10,7 @@ import cz.agents.alite.trajectorytools.util.Point;
  * @author honza
  *
  */
-public class TrajectoryDistanceMetric<V extends Point,E> implements TrajectoryMetric<V,E> {
+public class TrajectoryDistanceMetric<V extends SpatialPoint,E> implements TrajectoryMetric<V,E> {
 
     public TrajectoryDistanceMetric() {
     }

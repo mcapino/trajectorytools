@@ -14,10 +14,10 @@ import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
 
-public class VoronoiDelaunayPlanner<V extends Point, E> implements AlternativePathPlanner<V, E> {
+public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements AlternativePathPlanner<V, E> {
     private static int MAX_WORLD_SIZE = 10000;
 
     private final AStarPlanner<V, E> planner;
@@ -33,19 +33,19 @@ public class VoronoiDelaunayPlanner<V extends Point, E> implements AlternativePa
 
         VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
 
-        List<Point> border = Arrays.asList(new Point[] {
-                SpatialGraphs.getNearestVertex(graph, new Point( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new Point( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new Point( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new Point( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
+        List<SpatialPoint> border = Arrays.asList(new SpatialPoint[] {
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
+                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
         });
 
         PlanarGraph planarGraph = PlanarGraph.createPlanarGraphCopy(graph);
 
-        GraphHolder<Point, DefaultWeightedEdge> voronoiGraph = new GraphHolder<Point, DefaultWeightedEdge>();
-        GraphHolder<Point, DefaultWeightedEdge> delaunayGraph = new GraphHolder<Point, DefaultWeightedEdge>();
+        GraphHolder<SpatialPoint, DefaultWeightedEdge> voronoiGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
+        GraphHolder<SpatialPoint, DefaultWeightedEdge> delaunayGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
 
-        for (Point obstacle : graph.getObstacles()) {
+        for (SpatialPoint obstacle : graph.getObstacles()) {
             voronoiGraphAlg.addObstacle(obstacle);
         }
 
@@ -54,14 +54,14 @@ public class VoronoiDelaunayPlanner<V extends Point, E> implements AlternativePa
 
         List<PlannedPath<V, E>> paths = new ArrayList<PlannedPath<V,E>>();
 
-        AllPathsIterator<Point, DefaultWeightedEdge> pathsIt = new AllPathsIterator<Point, DefaultWeightedEdge>(voronoiGraph.graph,
+        AllPathsIterator<SpatialPoint, DefaultWeightedEdge> pathsIt = new AllPathsIterator<SpatialPoint, DefaultWeightedEdge>(voronoiGraph.graph,
                 startVertex,
                 endVertex
                 );
 
         while (pathsIt.hasNext()) {
 
-            PlannedPath<Point, DefaultWeightedEdge> voronoiPath = pathsIt.next();
+            PlannedPath<SpatialPoint, DefaultWeightedEdge> voronoiPath = pathsIt.next();
 
             delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
 
