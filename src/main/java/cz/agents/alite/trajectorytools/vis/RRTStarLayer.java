@@ -84,10 +84,12 @@ public class RRTStarLayer extends AbstractLayer {
 
                 while(!queue.isEmpty()) {
                     Vertex<V,?> current = queue.poll();
+
+
                     Point2d point = projection.project(current.getPoint());
                     points.add(new PointImpl(new Point3d(point.x, point.y, 0)));
 
-                       for (Vertex<V,?> child : current.getChildren()) {
+                    for (Vertex<V,?> child : current.getChildren()) {
                         queue.offer(child);
                     }
                 }

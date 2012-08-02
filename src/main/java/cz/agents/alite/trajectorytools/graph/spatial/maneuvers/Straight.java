@@ -37,7 +37,7 @@ public class Straight extends SpatialManeuver {
                     throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory. Length: " + getDistance() + ". Trajectory defined for interval (" + startTime + ", " + (startTime + getDuration()) + ")");
 
                 double alpha = (t - startTime) / getDuration();
-                assert(alpha >= -0.01 && alpha <= 1.01);
+                assert(alpha >= -0.00001 && alpha <= 1.00001);
 
                 SpatialPoint pos = SpatialPoint.interpolate(start, end, alpha);
                 Vector dir;
@@ -76,5 +76,44 @@ public class Straight extends SpatialManeuver {
     public double getSpeed() {
         return speed;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((end == null) ? 0 : end.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(speed);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((start == null) ? 0 : start.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Straight other = (Straight) obj;
+        if (end == null) {
+            if (other.end != null)
+                return false;
+        } else if (!end.equals(other.end))
+            return false;
+        if (Double.doubleToLongBits(speed) != Double
+                .doubleToLongBits(other.speed))
+            return false;
+        if (start == null) {
+            if (other.start != null)
+                return false;
+        } else if (!start.equals(other.start))
+            return false;
+        return true;
+    }
+
+
 
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 
 import javax.vecmath.Point2d;
 
@@ -44,6 +45,8 @@ public class RRTStar2dDemoCreator implements Creator {
 
     Trajectory trajectory = null;
 
+    Random random = new Random(1);
+
     @Override
     public void init(String[] args) {
 
@@ -51,12 +54,8 @@ public class RRTStar2dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new BoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,750)));
 
-        //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
-
-        obstacles.add(new BoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,750)));
-
+        createObstacles(455, 80);
 
         Domain<SpatialPoint, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
         rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain, initialPoint, 1300);
@@ -81,6 +80,20 @@ public class RRTStar2dDemoCreator implements Creator {
             }*/
         }
 
+    }
+
+    private void createObstacles(int n, double maxSize) {
+
+        for (int i=0; i<n; i++) {
+
+            double size = random.nextDouble() * maxSize;
+            double x = bounds.getCorner1().x + random.nextDouble() *  (bounds.getCorner2().x - bounds.getCorner1().x);
+            double y = bounds.getCorner1().y + random.nextDouble() *  (bounds.getCorner2().y - bounds.getCorner1().y);
+            Region obstacle = new BoxRegion(new SpatialPoint(x, y, 0), new SpatialPoint(x+size,y+size,750));
+            if (!obstacle.isInside(initialPoint)) {
+                obstacles.add(obstacle);
+            }
+        }
     }
 
     private void createVisualization() {

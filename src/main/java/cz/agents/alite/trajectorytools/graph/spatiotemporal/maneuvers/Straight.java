@@ -1,7 +1,10 @@
 package cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
+import cz.agents.alite.trajectorytools.util.OrientedPoint;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
+import cz.agents.alite.trajectorytools.util.Vector;
 
 public class Straight extends SpatioTemporalManeuver {
     private static final long serialVersionUID = -2519868162204278196L;
@@ -9,17 +12,53 @@ public class Straight extends SpatioTemporalManeuver {
         spatialStraight;
 
     TimePoint start;
+    TimePoint end;
 
     public Straight(TimePoint start, TimePoint end) {
         super();
         this.start = start;
+        this.end = end;
         double speed = start.getSpatialPoint().distance(end.getSpatialPoint()) / (end.getTime() - start.getTime());
         this.spatialStraight = new cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight(start.getSpatialPoint(), end.getSpatialPoint(), speed);
     }
 
     @Override
     public Trajectory getTrajectory() {
-        return spatialStraight.getTrajectory(start.getTime());
+
+        return new Trajectory() {
+
+            @Override
+            public OrientedPoint getPosition(double t) {
+                if (t < start.getTime() || t > end.getTime())
+                    throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory. Length: " + getDistance() + ". Trajectory defined for interval (" + start.getTime() + ", " + end.getTime() + ")");
+
+                double alpha = (t - start.getTime()) / (end.getTime() - start.getTime());
+                assert(alpha >= -0.00001 && alpha <= 1.00001);
+
+                SpatialPoint pos = SpatialPoint.interpolate(start.getSpatialPoint(), end.getSpatialPoint(), alpha);
+                Vector dir;
+                if (!end.getSpatialPoint().equals(start.getSpatialPoint())) {
+                    dir = Vector.subtract(end.getSpatialPoint(), start.getSpatialPoint());
+                    dir.normalize();
+                } else {
+                    dir = new Vector(0,1,0);
+                }
+
+                return new OrientedPoint(pos, dir);
+            }
+
+            @Override
+            public double getMinTime() {
+                return start.getTime();
+            }
+
+            @Override
+            public double getMaxTime() {
+                return end.getTime();
+            }
+        };
+
+        //return spatialStraight.getTrajectory(start.getTime());
     }
 
     @Override
@@ -29,15 +68,59 @@ public class Straight extends SpatioTemporalManeuver {
 
     @Override
     public double getDistance() {
-        return spatialStraight.getDistance();
+        return start.getSpatialPoint().distance(end.getSpatialPoint());
     }
 
     @Override
     public double getDuration() {
-        return spatialStraight.getDuration();
+        return end.getTime() - start.getTime();
     }
 
     public double getSpeed() {
-        return spatialStraight.getSpeed();
+        return getDistance()/getDuration();
     }
-}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((end == null) ? 0 : end.hashCode());
+        result = prime * result + ((start == null) ? 0 : start.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Straight other = (Straight) obj;
+        if (end == null) {
+            if (other.end != null)
+                return false;
+        } else if (!end.equals(other.end))
+            return false;
+        if (start == null) {
+            if (other.start != null)
+                return false;
+        } else if (!start.equals(other.start))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + start + "=>" + end + "]";
+    }
+
+    public TimePoint getStart() {
+        return start;
+    }
+
+    public TimePoint getEnd() {
+        return end;
+    }
+ }

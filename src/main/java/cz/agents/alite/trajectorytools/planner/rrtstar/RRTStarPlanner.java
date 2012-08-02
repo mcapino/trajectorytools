@@ -14,7 +14,9 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphPathImpl;
 
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class RRTStarPlanner<P,E> implements Graph<P,E> {
 
@@ -101,6 +103,17 @@ public class RRTStarPlanner<P,E> implements Graph<P,E> {
         target.setCostFromParent(extension.cost);
         target.setCostFromRoot(parent.getCostFromRoot() + extension.cost);
 
+
+        // DEBUG
+
+        if (extension.edge instanceof Straight) {
+            Straight straight = (Straight) extension.edge;
+            assert(straight.getStart().distance((TimePoint) parent.getPoint()) <= 0.001);
+            assert(straight.getEnd().distance((TimePoint) target.getPoint()) <= 0.001);
+        }
+
+        ////////
+
         checkBestVertex(target);
 
         edgeSources.put(extension.edge, parent.getPoint());
@@ -172,7 +185,7 @@ public class RRTStarPlanner<P,E> implements Graph<P,E> {
                 double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
                 if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
                     Extension<P, E> extension = domain.extendTo(candidateParent.getPoint(), nearVertex.getPoint());
-                    if (extension != null)  {
+                    if (extension != null && extension.exact)  {
                         insertExtension(candidateParent, extension, nearVertex);
                         updateBranchCost(nearVertex);
                     }
@@ -275,7 +288,6 @@ public class RRTStarPlanner<P,E> implements Graph<P,E> {
         }
 
         return new GraphPathImpl<P, E>(this, start, end, edges, bestVertex.getCostFromRoot());
-
     }
 
     public Vertex<P, E> getBestVertex() {

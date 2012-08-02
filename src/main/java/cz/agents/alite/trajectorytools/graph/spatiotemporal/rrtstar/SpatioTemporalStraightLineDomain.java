@@ -61,7 +61,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             TimePoint from, TimePoint to) {
 
         double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
-        double requiredSpeed = distance / to.getTime() - from.getTime();
+        double requiredSpeed = distance / (to.getTime() - from.getTime());
         boolean exact = (requiredSpeed >= minSpeed && requiredSpeed <= maxSpeed);
         double actualSpeed = MathUtil.clamp(requiredSpeed, minSpeed, maxSpeed);
         TimePoint extensionTarget = new TimePoint(to.getSpatialPoint(), from.getTime() + distance / actualSpeed);
@@ -81,7 +81,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             TimePoint from, TimePoint to) {
 
         double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
-        double requiredSpeed = distance / to.getTime() - from.getTime();
+        double requiredSpeed = distance / (to.getTime() - from.getTime());
         boolean exact = (requiredSpeed >= minSpeed && requiredSpeed <= maxSpeed);
         double actualSpeed = MathUtil.clamp(requiredSpeed, minSpeed, maxSpeed);
         double cost = evaluateFuelCost(from.getSpatialPoint(), to.getSpatialPoint(), actualSpeed);

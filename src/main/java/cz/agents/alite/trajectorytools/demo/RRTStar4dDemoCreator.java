@@ -68,7 +68,7 @@ public class RRTStar4dDemoCreator implements Creator {
         createVisualization();
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=100000;
+        int n=40000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
@@ -91,8 +91,8 @@ public class RRTStar4dDemoCreator implements Creator {
     }
 
     private void createVisualization() {
-        VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 2000, 2000);
-        VisManager.setPanningBounds(new Rectangle(-2000, -2000, 5000, 5000));
+        VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
+        VisManager.setPanningBounds(new Rectangle(-4000, -4000, 10000, 10000));
         VisManager.init();
 
         Vis.setPosition(50, 50, 1);
@@ -170,7 +170,7 @@ public class RRTStar4dDemoCreator implements Creator {
             public Trajectory getTrajectory() {
                 return trajectory;
             }
-        }, projection, Color.BLUE, 1, bounds.getCorner2().w, 't'));
+        }, projection, Color.BLUE, 0.5, bounds.getCorner2().w, 't'));
 
         VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 

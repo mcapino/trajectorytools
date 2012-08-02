@@ -2,6 +2,7 @@ package cz.agents.alite.trajectorytools.trajectory;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
@@ -22,6 +23,7 @@ import cz.agents.alite.trajectorytools.util.Vector;
  */
 
 public class SpatioTemporalManeuverTrajectory<V extends TimePoint, E extends SpatioTemporalManeuver> implements Trajectory {
+    static Logger LOGGER = Logger.getLogger(SpatioTemporalManeuverTrajectory.class);
 
     private List<E> maneuvers = null;
 
@@ -43,6 +45,7 @@ public class SpatioTemporalManeuverTrajectory<V extends TimePoint, E extends Spa
 
     @Override
     public OrientedPoint getPosition(double t) {
+
         TimePoint currentPoint = startPoint;
         Vector currentDirection = new Vector(1,0,0);
 
@@ -58,6 +61,7 @@ public class SpatioTemporalManeuverTrajectory<V extends TimePoint, E extends Spa
                 if ( maneuver.getStartTime() <= t && t <= maneuver.getStartTime() + maneuver.getDuration()) {
                     // linear approximation
                     OrientedPoint pos = maneuver.getTrajectory().getPosition(t);
+                    //LOGGER.info("Asked for t: "+t+" returned:" + pos);
                     return pos;
                 }
                 currentPoint = nextWaypoint;
