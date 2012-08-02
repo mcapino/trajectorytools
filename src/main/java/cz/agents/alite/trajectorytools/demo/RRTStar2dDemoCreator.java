@@ -5,6 +5,8 @@ import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import javax.vecmath.Point2d;
+
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
@@ -17,11 +19,14 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions3dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions3dLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
+import cz.agents.alite.trajectorytools.vis.projection.DefaultProjection;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -89,7 +94,7 @@ public class RRTStar2dDemoCreator implements Creator {
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
         // graph
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.GRAY, Color.GRAY, 1, 4));
 
         VisManager.registerLayer(Regions3dLayer.create(new RegionsProvider() {
 
@@ -108,6 +113,12 @@ public class RRTStar2dDemoCreator implements Creator {
             @Override
             public Trajectory getTrajectory() {
                 return trajectory;
+            }
+        }, new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
             }
         }, Color.BLUE, 10, 2000.0, 't'));
 

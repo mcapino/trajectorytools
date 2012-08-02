@@ -3,6 +3,8 @@ package cz.agents.alite.trajectorytools.demo;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import javax.vecmath.Point2d;
+
 import org.jgrapht.Graph;
 
 import cz.agents.alite.creator.Creator;
@@ -12,16 +14,18 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
-import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
+import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -61,11 +65,11 @@ public class ManeuverDemoCreator implements Creator {
         // graph
         VisManager.registerLayer(GraphLayer.create( new GraphProvider<Waypoint, SpatialManeuver>() {
 
-			@Override
-			public Graph<Waypoint, SpatialManeuver> getGraph() {
-				return graph;
-			}
-		}, Color.GRAY, Color.GRAY, 1, 4));
+            @Override
+            public Graph<Waypoint, SpatialManeuver> getGraph() {
+                return graph;
+            }
+        }, Color.GRAY, Color.GRAY, 1, 4));
 
 
 
@@ -77,6 +81,12 @@ public class ManeuverDemoCreator implements Creator {
             @Override
             public Trajectory getTrajectory() {
                 return trajectory;
+            }
+        }, new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
             }
         }, Color.BLUE, 0.1, 100.0, 't'));
 

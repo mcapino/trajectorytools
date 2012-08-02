@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import javax.vecmath.Point2d;
+
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
@@ -26,6 +28,7 @@ import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -37,13 +40,13 @@ public class RRTStar4dDemoCreator implements Creator {
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
     TimePoint initialPoint = new TimePoint(100, 100, 0, 0);
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 1000));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new StaticSphereRegion(new SpatialPoint(800, 100, 0), 50);
+    Region target = new StaticSphereRegion(new SpatialPoint(400, 800, 150), 50);
 
     Trajectory trajectory = null;
 
-    double gamma = 5300;
+    double gamma = 1300;
 
     @Override
     public void init(String[] args) {
@@ -52,15 +55,15 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,750)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
-        obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,750)));
+        //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new SpatioTemporalStraightLineDomain(bounds, obstacles, target, 12,15,25, new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new SpatioTemporalStraightLineDomain(bounds, obstacles, target, 12,15,30, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
@@ -77,12 +80,12 @@ public class RRTStar4dDemoCreator implements Creator {
                 //trajectory =  new SampledTrajectory(trajectory, 100);
             }
 
-            /*
+
             try {
-                Thread.sleep(50);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
@@ -97,8 +100,77 @@ public class RRTStar4dDemoCreator implements Creator {
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
+
+
+        // X-Y TOP View ////////////////////////////////////////////////////////////////
+
+        createView( new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
+            }
+        });
+
+
+        // X-Z SIDE View ///////////////////////////////////////////////////////////////
+
+        createView( new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, -point.z + 1200);
+            }
+        });
+
+        // Y-Z SIDE View ///////////////////////////////////////////////////////////////
+
+        createView( new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.z+1200, point.y);
+            }
+        });
+
+        // Y-T View ///////////////////////////////////////////////////////////////
+
+        createView( new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(-point.w-300, point.y);
+            }
+        });
+
+
+        // X-T View ///////////////////////////////////////////////////////////////
+
+        createView( new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, -point.w -300);
+            }
+        });
+
+        ///////////////////////////////////////////////////////////////////////////
+
+        // Overlay
+        VisManager.registerLayer(VisInfoLayer.create());
+    }
+
+    private void createView(ProjectionTo2d<TimePoint> projection) {
         // graph
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(RRTStarLayer.create(rrtstar, projection, Color.GRAY, Color.GRAY, 1, 4));
+
+        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
+
+            @Override
+            public Trajectory getTrajectory() {
+                return trajectory;
+            }
+        }, projection, Color.BLUE, 1, bounds.getCorner2().w, 't'));
 
         VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 
@@ -110,19 +182,11 @@ public class RRTStar4dDemoCreator implements Creator {
                 regions.add(target);
                 return regions;
             }
-        }, Color.BLACK, 1));
-
-        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
-
-            @Override
-            public Trajectory getTrajectory() {
-                return trajectory;
-            }
-        }, Color.BLUE, 1, 2000.0, 't'));
-
-
-        // Overlay
-        VisManager.registerLayer(VisInfoLayer.create());
+        },
+        projection,
+        Color.BLACK, 1));
     }
+
+
 
   }

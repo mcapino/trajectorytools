@@ -14,6 +14,10 @@ public class TimePoint extends Point4d {
         super(p.x,p.y,p.z,time);
     }
 
+    public TimePoint(Point4d p1) {
+        super(p1);
+    }
+
     public SpatialPoint getSpatialPoint() {
         return new SpatialPoint(x,y,z);
     }

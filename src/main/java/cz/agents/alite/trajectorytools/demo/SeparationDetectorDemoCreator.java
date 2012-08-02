@@ -5,6 +5,8 @@ import java.awt.Rectangle;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.vecmath.Point2d;
+
 import org.jgrapht.Graph;
 
 import cz.agents.alite.creator.Creator;
@@ -15,11 +17,11 @@ import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.NullGoalPenaltyFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
+import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
-import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.SeparationDetector;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.ConflictsLayer;
@@ -28,6 +30,7 @@ import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -92,11 +95,19 @@ public class SeparationDetectorDemoCreator implements Creator {
         // graph
         VisManager.registerLayer(GraphLayer.create( new GraphProvider<Waypoint, SpatialManeuver>() {
 
-			@Override
-			public Graph<Waypoint, SpatialManeuver> getGraph() {
-				return graph;
-			}
-		}, Color.GRAY, Color.GRAY, 1, 4));
+            @Override
+            public Graph<Waypoint, SpatialManeuver> getGraph() {
+                return graph;
+            }
+        }, Color.GRAY, Color.GRAY, 1, 4));
+
+        ProjectionTo2d<TimePoint> projection =  new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
+            }
+        };
 
         VisManager.registerLayer(TrajectoryLayer.create(
                 new TrajectoryProvider() {
@@ -104,7 +115,7 @@ public class SeparationDetectorDemoCreator implements Creator {
                     public Trajectory getTrajectory() {
                         return trajectory1;
                     }
-                }, Color.BLUE, 0.1, 100.0, 't'));
+                }, projection, Color.BLUE, 0.1, 100.0, 't'));
 
         VisManager.registerLayer(TrajectoryLayer.create(
                 new TrajectoryProvider() {
@@ -114,7 +125,7 @@ public class SeparationDetectorDemoCreator implements Creator {
                         return trajectory2;
                     }
 
-                }, Color.YELLOW, 0.1, 100.0, 't'));
+                }, projection,  Color.YELLOW, 0.1, 100.0, 't'));
 
         VisManager.registerLayer(ConflictsLayer.create(new ConflictsHolder(conflicts), 1.0));
 

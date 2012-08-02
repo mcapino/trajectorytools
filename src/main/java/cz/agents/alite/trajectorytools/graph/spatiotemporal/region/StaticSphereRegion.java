@@ -80,5 +80,11 @@ public class StaticSphereRegion implements Region {
         return null;
     }
 
+    public Point3d getCenter() {
+        return center;
+    }
 
+    public double getRadius() {
+        return radius;
+    }
 }

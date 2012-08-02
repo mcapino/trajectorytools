@@ -3,8 +3,13 @@ package cz.agents.alite.trajectorytools.vis;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
+
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
+import cz.agents.alite.trajectorytools.util.TimePoint;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
 import cz.agents.alite.vis.element.aggregation.StyledLineElements;
@@ -23,7 +28,7 @@ public class TrajectoryLayer extends CommonLayer {
         Trajectory getTrajectory();
     }
 
-    public static VisLayer create(final TrajectoryProvider trajectoryProvider, final Color color, final double samplingInterval, final double maxTimeArg, final char toggleKey) {
+    public static VisLayer create(final TrajectoryProvider trajectoryProvider, final ProjectionTo2d<TimePoint> projection, final Color color, final double samplingInterval, final double maxTimeArg, final char toggleKey) {
         GroupLayer group = GroupLayer.create();
 
         group.addSubLayer(StyledPointLayer.create(new StyledPointElements() {
@@ -36,14 +41,18 @@ public class TrajectoryLayer extends CommonLayer {
                 if (t != null) {
                     double maxTime = Math.min(t.getMaxTime(), maxTimeArg);
 
-                    points.add(new StyledPointImpl(t.getPosition(t.getMinTime()), color, 8));
-                    points.add(new StyledPointImpl(t.getPosition(t.getMaxTime()), color, 8));
+                    Point2d start = projection.project(new TimePoint(t.getPosition(t.getMinTime()), t.getMinTime()));
+                    Point2d target = projection.project(new TimePoint(t.getPosition(t.getMaxTime()), t.getMaxTime()));
+
+                    points.add(new StyledPointImpl( new Point3d(start.x, start.y, 0), color, 8));
+                    points.add(new StyledPointImpl( new Point3d(target.x, target.y, 0), color, 8));
 
                     if (t != null) {
                         for (double time = t.getMinTime(); time < maxTime; time += samplingInterval) {
                             OrientedPoint pos = t.getPosition(time);
                             if (pos != null) {
-                                points.add(new StyledPointImpl(pos, color, 6));
+                                Point2d point = projection.project(new TimePoint(pos, time));
+                                points.add(new StyledPointImpl(new Point3d(point.x, point.y, 0), color, 6));
                             }
                         }
                     }
