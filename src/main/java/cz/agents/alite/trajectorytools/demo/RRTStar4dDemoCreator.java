@@ -12,11 +12,12 @@ import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.SpatioTemporalStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
@@ -39,10 +40,12 @@ public class RRTStar4dDemoCreator implements Creator {
 
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
-    TimePoint initialPoint = new TimePoint(100, 100, 0, 0);
+    TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new StaticSphereRegion(new SpatialPoint(400, 800, 150), 50);
+    SpatialPoint target = new SpatialPoint(400, 800, 50);
+    double targetReachedTolerance = 5;
+    Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
@@ -55,7 +58,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z/2)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
@@ -63,12 +66,12 @@ public class RRTStar4dDemoCreator implements Creator {
         obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new SpatioTemporalStraightLineDomain(bounds, obstacles, target, 12,15,30, new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, 50,  new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=40000;
+        int n=10000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
@@ -78,6 +81,14 @@ public class RRTStar4dDemoCreator implements Creator {
                 GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
                 trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
+
+                for (SpatioTemporalManeuver maneuver : path.getEdgeList()) {
+                    if (maneuver instanceof Straight) {
+                        Straight straight = (Straight) maneuver;
+                        System.out.println(straight);
+                    }
+                }
+
             }
 
 
@@ -129,7 +140,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
             @Override
             public Point2d project(TimePoint point) {
-                return new Point2d(point.z+1200, point.y);
+                return new Point2d(point.z+1050, point.y);
             }
         });
 
@@ -139,7 +150,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
             @Override
             public Point2d project(TimePoint point) {
-                return new Point2d(-point.w-300, point.y);
+                return new Point2d(-point.w - 50, point.y);
             }
         });
 
@@ -150,7 +161,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
             @Override
             public Point2d project(TimePoint point) {
-                return new Point2d(point.x, -point.w -300);
+                return new Point2d(point.x, -point.w - 50);
             }
         });
 
@@ -179,7 +190,7 @@ public class RRTStar4dDemoCreator implements Creator {
                 LinkedList<Region> regions = new LinkedList<Region>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
-                regions.add(target);
+                regions.add(targetRegion);
                 return regions;
             }
         },

@@ -36,18 +36,18 @@ public class SpatialPoint extends Point3d implements cz.agents.alite.vis.element
     public SpatialPoint() {
         super();
     }
-    
+
     @Override
     public javax.vecmath.Point3d getPosition() {
         return this;
     }
-    
+
     public static SpatialPoint interpolate(SpatialPoint p1, SpatialPoint p2, double alpha) {
-    	SpatialPoint result = new SpatialPoint();
-    	((Tuple3d)result).interpolate(p1, p2, alpha);
-    	return result;
+        SpatialPoint result = new SpatialPoint();
+        ((Tuple3d)result).interpolate(p1, p2, alpha);
+        return result;
     }
-    
-    
+
+
 
 }

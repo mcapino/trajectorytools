@@ -113,7 +113,7 @@ public class Straight extends SpatioTemporalManeuver {
 
     @Override
     public String toString() {
-        return "[" + start + "=>" + end + "]";
+        return "[" + start + "=>" + end + " spped:" + spatialStraight.getSpeed() + " m/s ]";
     }
 
     public TimePoint getStart() {

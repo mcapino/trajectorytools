@@ -3,6 +3,8 @@ package cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar;
 import java.util.Collection;
 import java.util.Random;
 
+import javax.vecmath.Point2d;
+
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -18,28 +20,34 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     Box4dRegion bounds;
     Collection<Region> obstacles;
-    Region target;
 
+    TimePoint initialPoint;
+    SpatialPoint target;
+    double targetReachedTolerance;
 
     double minSpeed;
     double optSpeed;
     double maxSpeed;
 
+    double maxPitch;
+    double minEdgeLength;
+
     Random random;
 
-
-
-
-    public SpatioTemporalStraightLineDomain(Box4dRegion bounds,
-            Collection<Region> obstacles, Region target, double minSpeed,
-            double optSpeed, double maxSpeed, Random random) {
+    public SpatioTemporalStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
+            Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
+            double optSpeed, double maxSpeed, double maxPitch, double minEdgeLength, Random random) {
         super();
         this.bounds = bounds;
+        this.initialPoint = initialPoint;
         this.obstacles = obstacles;
         this.target = target;
+        this.targetReachedTolerance = targetReachedTolerance;
         this.minSpeed = minSpeed;
         this.optSpeed = optSpeed;
         this.maxSpeed = maxSpeed;
+        this.maxPitch = maxPitch;
+        this.minEdgeLength = minEdgeLength;
         this.random = random;
     }
 
@@ -68,7 +76,8 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
         double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), actualSpeed);
 
-        if (isVisible(from, extensionTarget)) {
+        if (satisfiesSpeedPitchEdgleLengthLimits(from, extensionTarget) &&
+            !intersectsObstacles(from, extensionTarget)) {
             return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget,
                        maneuver, cost, exact);
         } else {
@@ -91,7 +100,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     @Override
     public double estimateCostToGo(TimePoint p) {
-        return 0;
+        return evaluateFuelCost(p.getSpatialPoint(), target, optSpeed);
     }
 
     @Override
@@ -106,10 +115,10 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     @Override
     public boolean isInTargetRegion(TimePoint p) {
-        return target.isInside(p);
+        return target.distance(p.getSpatialPoint()) <= targetReachedTolerance;
     }
 
-    private boolean isInFreeSpace(TimePoint p) {
+    protected boolean isInFreeSpace(TimePoint p) {
         if (bounds.isInside(p)) {
             for (Region obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
@@ -122,36 +131,46 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         }
     }
 
-    private boolean isReachable(TimePoint p1, TimePoint p2) {
-        double tDiff = p2.getTime() - p1.getTime();
-        double distance = p1.getSpatialPoint().distance(p2.getSpatialPoint());
-        double speed = distance / tDiff;
-
-        return (speed >= minSpeed &&  speed <= maxSpeed);
-    }
-
     // Simple approximation that should force the planner to use optimal cruise speed
-    private double evaluateFuelCost(SpatialPoint start, SpatialPoint end, double speed) {
+    protected double evaluateFuelCost(SpatialPoint start, SpatialPoint end, double speed) {
         return start.distance(end) * ((Math.abs(speed - optSpeed) / optSpeed) + 1.0);
     }
 
-    public boolean isVisible(TimePoint p1, TimePoint p2) {
+    protected boolean intersectsObstacles(TimePoint p1, TimePoint p2) {
+            // check obstacles
+            for (Region obstacle : obstacles) {
+                if (obstacle.intersectsLine(p1, p2)) {
+                    return true;
+                }
+            }
+            return false;
+    }
+
+    protected boolean satisfiesSpeedPitchEdgleLengthLimits(TimePoint p1, TimePoint p2) {
         // check speed constraints
         double requiredSpeed = (p1.getSpatialPoint().distance(p2.getSpatialPoint()))
                 / (p2.getTime() - p1.getTime());
 
-        if (requiredSpeed >= minSpeed - 0.001 || requiredSpeed <= maxSpeed + 0.001) {
+        // check pitch limit
+        double horizontalDistance = (new Point2d(p1.x, p1.y)).distance(new Point2d(p2.x, p2.y));
+        double verticalDistance = (p2.z-p1.z);
+        double climbAngleDeg = Math.atan(verticalDistance/horizontalDistance) * 180/Math.PI;
 
-            // check obstacles
-            for (Region obstacle : obstacles) {
-                if (obstacle.intersectsLine(p1, p2)) {
-                    return false;
-                }
-            }
-            return true;
-
-        } else {
+        if (Math.abs(climbAngleDeg) > maxPitch) {
             return false;
         }
+
+        // check min length
+        if (p1.getSpatialPoint().distance(p2.getSpatialPoint()) < minEdgeLength) {
+            return false;
+        }
+
+
+        if (!(requiredSpeed >= minSpeed - 0.001 || requiredSpeed <= maxSpeed + 0.001)) {
+            return false;
+        }
+
+        return true;
     }
+
 }
