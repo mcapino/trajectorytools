@@ -27,6 +27,11 @@ public class AlternativePlannerSelector<V extends SpatialPoint,E> implements Alt
 
         Collection<PlannedPath<V, E>> plannedPaths = planner.planPath(graph, startVertex, endVertex);
 
+        return getShortestPaths(plannedPaths, limit);
+    }
+
+    static public Collection<PlannedPath<SpatialWaypoint, Maneuver>> getShortestPaths(
+            Collection<PlannedPath<SpatialWaypoint, Maneuver>> plannedPaths, int limit) {
         if (plannedPaths.size() <= limit) {
             return plannedPaths;
         }

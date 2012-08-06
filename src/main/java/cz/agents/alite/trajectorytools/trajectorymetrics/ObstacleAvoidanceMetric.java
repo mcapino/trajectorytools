@@ -31,18 +31,18 @@ public class ObstacleAvoidanceMetric<V extends SpatialPoint,E> implements Trajec
             return 0;
         }
         
-        double distance = 0;
+        double similarity = 0;
         
         for (SpatialPoint obstacle : obstacles) {
             for (int direction = 0; direction < DIRECTIONS; direction ++) {
                 Zone zone = createZone(obstacle, direction);
                 if (isZoneCrossed( zone, path) == isZoneCrossed( zone, otherPath)) {
-                    distance ++;
+                    similarity ++;
                 }
             }
         }
         
-        return distance / (obstacles.size() * DIRECTIONS);
+        return 1 - (similarity / (obstacles.size() * DIRECTIONS));
     }
 
     private boolean isZoneCrossed(Zone zone, PlannedPath<V, E> path) {

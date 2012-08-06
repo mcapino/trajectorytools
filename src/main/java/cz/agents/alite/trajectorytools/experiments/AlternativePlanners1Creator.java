@@ -5,8 +5,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -28,11 +30,14 @@ import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.ObstacleAvoidanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
+import cz.agents.alite.trajectorytools.util.Point;
+
 
 public class AlternativePlanners1Creator implements Creator {
 
@@ -45,6 +50,8 @@ public class AlternativePlanners1Creator implements Creator {
     private static final ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREADS);
 
     private static final int PATH_SOLUTION_LIMIT = 5;
+
+    private static final int [] PATH_SOLUTION_LIMITS = new int [] {3, 5, 10};
 
     private static final int WORLD_SIZE = 10;
 
@@ -91,8 +98,13 @@ public class AlternativePlanners1Creator implements Creator {
         trajectoryMetrics.add( 
                 new TrajectoryDistanceMetric<SpatialPoint, DefaultWeightedEdge>()
                 );
+        trajectoryMetrics.add( 
+                new ObstacleAvoidanceMetric<SpatialPoint, DefaultWeightedEdge>()
+                );
     }
 
+    Random random = new Random(123);
+    
     @Override
     public void init(String[] args) {
     }
@@ -113,6 +125,14 @@ public class AlternativePlanners1Creator implements Creator {
             out.write( "numObstacles;experiment name;planner;duration;num of paths;average path lenth" );
             for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
                 out.write(";" + metric.getName());
+            }
+            if (PATH_SOLUTION_LIMITS != null) {
+                for (int limit : PATH_SOLUTION_LIMITS) {
+                    for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
+                        out.write(';');
+                        out.write( metric.getName() + " (" + limit + ")" );
+                    }
+                }
             }
             out.newLine();
     
@@ -149,6 +169,12 @@ public class AlternativePlanners1Creator implements Creator {
         }
         
         executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Done!");
     }
 
     private List<SpatialPoint> generateRandomObstacles(int number) {
@@ -157,27 +183,28 @@ public class AlternativePlanners1Creator implements Creator {
             List<SpatialPoint> obstacles = new ArrayList<SpatialPoint>(number);
         
     	    for (int i=0; i<number; i++) {
-    	        obstacles.add(new SpatialPoint(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE, 0.0 ));
-    	    }
-
-    	    //
-    	    // Check whether a path exists
-    	    //
-            ObstacleGraphView graph = ObstacleGraphView.createFromGraph(createGraph(), new ChangeListener() {
-                @Override
-                public void graphChanged() {
-                }
-            } );
-    	    
-            PlannedPath<SpatialPoint, DefaultWeightedEdge> planPath = planner.planPath(
-                    graph, 
-                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
-                    SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0))
-                    );
-            if (planPath != null) {
+    	        int tries = 0;
+                tryGenerate:
+    	        while (true) {
+        	        Point randomPoint = new Point(random.nextInt( WORLD_SIZE - 1 ) + 1, random.nextInt( WORLD_SIZE - 1 ) + 1, 0.0 );
+        	        for (Point point : obstacles) {
+                        if (randomPoint.distance(point) < 1.5) {
+                            tries ++;
+                            if (tries > 100 ) {
+                                i = 0;
+                                tries = 0;
+                                obstacles.clear();
+                                System.out.println("reseting obstacles (experiment.generateRandomObstacles)");
+                            }
+                            continue tryGenerate;
+                        }
+                    }
+                    obstacles.add(randomPoint);
+                    break;
+    	        }
                 return obstacles;
-            }
-        }
+    	    }
+	    }
     }
     
     private void runExperiment(
@@ -219,17 +246,35 @@ public class AlternativePlanners1Creator implements Creator {
         if (paths.size() != 0) {
             averageLength /= paths.size();
         }
+        
+        StringBuffer sb = new StringBuffer("" + obstacles.size() + ";" + curPlannerNum + "-" + planner.getName() + "-" + String.format("%03d", obstacles.size()) + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
+
+        for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
+            sb.append(';');
+            sb.append( TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric) );
+        }
+        if (PATH_SOLUTION_LIMITS != null) {
+            for (int limit : PATH_SOLUTION_LIMITS) {
+                Collection<PlannedPath<SpatialPoint, DefaultWeightedEdge>> bestPaths;
+                bestPaths = AlternativePlannerSelector.getShortestPaths(paths, limit);
+                for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
+                    sb.append(';');
+                    sb.append( 
+                            TrajectorySetMetrics.getPlanSetAvgDiversity(
+                                    bestPaths, 
+                                    metric ));
+                }
+            }
+        }
+
         try {
             synchronized (out) {
-                out.write( "" + obstacles.size() + ";" + curPlannerNum + "-" + planner.getName() + "-" + String.format("%03d", obstacles.size()) + ";" + planner.getName() + ";" + duration + ";" + paths.size() + ";" + averageLength);
-
-                for (TrajectoryMetric<SpatialPoint, DefaultWeightedEdge> metric : trajectoryMetrics) {
-                    out.write(";" + TrajectorySetMetrics.getPlanSetAvgDiversity(paths, metric));
-                }
+                out.write( sb.toString() );
 
                 out.newLine();
             }
             out.flush();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
