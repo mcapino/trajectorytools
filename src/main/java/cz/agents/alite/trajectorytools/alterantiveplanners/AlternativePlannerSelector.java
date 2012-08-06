@@ -30,8 +30,8 @@ public class AlternativePlannerSelector<V extends SpatialPoint,E> implements Alt
         return getShortestPaths(plannedPaths, limit);
     }
 
-    static public Collection<PlannedPath<SpatialWaypoint, Maneuver>> getShortestPaths(
-            Collection<PlannedPath<SpatialWaypoint, Maneuver>> plannedPaths, int limit) {
+    static public <V, E> Collection<PlannedPath<V, E>> getShortestPaths(
+            Collection<PlannedPath<V, E>> plannedPaths, int limit) {
         if (plannedPaths.size() <= limit) {
             return plannedPaths;
         }

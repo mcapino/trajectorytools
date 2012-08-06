@@ -36,7 +36,6 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
-import cz.agents.alite.trajectorytools.util.Point;
 
 
 public class AlternativePlanners1Creator implements Creator {
@@ -179,32 +178,29 @@ public class AlternativePlanners1Creator implements Creator {
 
     private List<SpatialPoint> generateRandomObstacles(int number) {
         
-        while (true) {
-            List<SpatialPoint> obstacles = new ArrayList<SpatialPoint>(number);
-        
-    	    for (int i=0; i<number; i++) {
-    	        int tries = 0;
-                tryGenerate:
-    	        while (true) {
-        	        Point randomPoint = new Point(random.nextInt( WORLD_SIZE - 1 ) + 1, random.nextInt( WORLD_SIZE - 1 ) + 1, 0.0 );
-        	        for (Point point : obstacles) {
-                        if (randomPoint.distance(point) < 1.5) {
-                            tries ++;
-                            if (tries > 100 ) {
-                                i = 0;
-                                tries = 0;
-                                obstacles.clear();
-                                System.out.println("reseting obstacles (experiment.generateRandomObstacles)");
-                            }
-                            continue tryGenerate;
+        List<SpatialPoint> obstacles = new ArrayList<SpatialPoint>(number);
+    
+	    while ( obstacles.size() < number ) {
+	        int tries = 0;
+            tryGenerate:
+	        while (true) {
+	            SpatialPoint randomPoint = new SpatialPoint(random.nextInt( WORLD_SIZE - 1 ) + 1, random.nextInt( WORLD_SIZE - 1 ) + 1, 0.0 );
+    	        for (SpatialPoint point : obstacles) {
+                    if (randomPoint.distance(point) < 1.5) {
+                        tries ++;
+                        if (tries > 100 ) {
+                            tries = 0;
+                            obstacles.clear();
+                            System.out.println("reseting obstacles (experiment.generateRandomObstacles)");
                         }
+                        continue tryGenerate;
                     }
-                    obstacles.add(randomPoint);
-                    break;
-    	        }
-                return obstacles;
-    	    }
+                }
+                obstacles.add(randomPoint);
+                break;
+	        }
 	    }
+        return obstacles;
     }
     
     private void runExperiment(

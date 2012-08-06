@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.event.MouseInputAdapter;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;
 import cz.agents.alite.vis.layer.GroupLayer;
@@ -15,7 +15,7 @@ import cz.agents.alite.vis.layer.VisLayer;
 
 public class ButtonLayer extends AbstractLayer {
 
-    public static <V extends Point,E> VisLayer create(final String text, ActionListener actionListener, final int x, final int y, int width, int height) {
+    public static <V extends SpatialPoint,E> VisLayer create(final String text, ActionListener actionListener, final int x, final int y, int width, int height) {
         GroupLayer group = GroupLayer.create();
 
         final JButton button = new JButton(text);

@@ -7,7 +7,7 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.MouseInputAdapter;
 
-import cz.agents.alite.trajectorytools.util.Point;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;
 import cz.agents.alite.vis.layer.GroupLayer;
@@ -19,7 +19,7 @@ public class ListLayer extends AbstractLayer {
         void selectedIndex(int index);
     }
     
-    public static <V extends Point,E> VisLayer create(Object[] data, final SelectionListener listener, final int x, final int y, int width, int height) {
+    public static <V extends SpatialPoint,E> VisLayer create(Object[] data, final SelectionListener listener, final int x, final int y, int width, int height) {
         GroupLayer group = GroupLayer.create();
 
         final JList list = new JList(data);
