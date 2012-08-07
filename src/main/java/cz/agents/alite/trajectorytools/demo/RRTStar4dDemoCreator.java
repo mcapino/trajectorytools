@@ -43,7 +43,7 @@ public class RRTStar4dDemoCreator implements Creator {
     TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(400, 800, 50);
+    SpatialPoint target = new SpatialPoint(900, 760, 80);
     double targetReachedTolerance = 5;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
@@ -58,12 +58,21 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z/2)));
+        //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z*0.9)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
 
         //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
+        //obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
+
+        // Add obstacles
+
+        for(int x=5; x < 20; x++) {
+            for (int y=5; y < 20; y++) {
+                int z = (int) (Math.random() * bounds.getCorner2().z / 2);
+                obstacles.add(new StaticBoxRegion(new SpatialPoint(x*50, y*50, z), new SpatialPoint(x*50+30, y*50+30, z + bounds.getCorner2().z/2)));
+            }
+        }
 
 
         Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, 50,  new Random(1));
@@ -71,7 +80,7 @@ public class RRTStar4dDemoCreator implements Creator {
         createVisualization();
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=10000;
+        int n=100000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
@@ -91,12 +100,12 @@ public class RRTStar4dDemoCreator implements Creator {
 
             }
 
-
+            /*
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
     }
