@@ -11,6 +11,8 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.TrajectorySafeRegion;
+import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Circle;
@@ -146,6 +148,13 @@ public class Regions4dLayer extends AbstractLayer {
                         StaticSphereRegion sphere = (StaticSphereRegion) region;
                         Point2d center1 = projection.project(new TimePoint(sphere.getCenter().x,sphere.getCenter().y,sphere.getCenter().z,0.0));
                         circles.add(new CircleImpl(new Point3d(center1.x, center1.y, 0), sphere.getRadius()));
+                    }
+
+                    if (region instanceof TrajectorySafeRegion) {
+                        TrajectorySafeRegion safeRegion = (TrajectorySafeRegion) region;
+                        Trajectory traj = safeRegion.getTrajectory();
+
+                        // Not finished yet...
                     }
                 }
 
