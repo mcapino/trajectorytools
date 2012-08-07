@@ -25,6 +25,7 @@ import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectorymetrics.DifferentStateMetric;
+import cz.agents.alite.trajectorytools.trajectorymetrics.ObstacleAvoidanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryDistanceMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectoryMetric;
 import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
@@ -88,9 +89,12 @@ public class DemoAlternative1Creator implements Creator {
         trajectoryMetrics.add( 
                 new TrajectoryDistanceMetric<SpatialPoint, DefaultWeightedEdge>()
                 );
+        trajectoryMetrics.add( 
+                new ObstacleAvoidanceMetric<SpatialPoint, DefaultWeightedEdge>()
+                );
     }
 
-    private static final int CURRENT_PLANNER = 4;
+    private static final int CURRENT_PLANNER = 5;
     @Override
     public void init(String[] args) {
     }

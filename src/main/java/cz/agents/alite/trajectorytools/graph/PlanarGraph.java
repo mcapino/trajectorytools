@@ -40,14 +40,21 @@ public class PlanarGraph extends GraphDelegator<SpatialPoint, DefaultWeightedEdg
      */
     public static <V extends SpatialPoint, E> PlanarGraph createPlanarGraphCopy(Graph<V, E> graph) {
         Graph<SpatialPoint, DefaultWeightedEdge> planarGraph = new SimpleGraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        Map<V, SpatialPoint> vertexes = new HashMap<V, SpatialPoint>();
         for (V vertex : graph.vertexSet()) {
-            planarGraph.addVertex(vertex);
+            SpatialPoint point = new SpatialPoint(vertex.x, vertex.y, vertex.z);
+            planarGraph.addVertex(point);
+            vertexes.put(vertex, point);
         }
         
         for (E edge : graph.edgeSet()) {
-            planarGraph.addEdge(graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+            if ( !graph.getEdgeSource(edge).equals( graph.getEdgeTarget(edge) ) ) {
+                planarGraph.addEdge(
+                        vertexes.get( graph.getEdgeSource(edge) ), 
+                        vertexes.get( graph.getEdgeTarget(edge) ));
+            }
         }
-        
+
         return new PlanarGraph(planarGraph);
     }
 
