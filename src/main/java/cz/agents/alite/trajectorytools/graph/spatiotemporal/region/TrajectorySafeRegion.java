@@ -9,11 +9,11 @@ public class TrajectorySafeRegion implements Region {
     Trajectory trajectory;
     double radius;
 
-    public TrajectorySafeRegion(Trajectory trajectory, double radius) {
+    public TrajectorySafeRegion(Trajectory trajectory, double radius, double samplingInterval) {
         super();
         this.trajectory = trajectory;
         this.radius = radius;
-        this.samplingInterval = radius / 10.0;
+        this.samplingInterval = samplingInterval;
     }
 
     @Override

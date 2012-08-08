@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.MessageFormat;
 
-import cz.agents.alite.simulation.Simulation;
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentEnvironment;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;
@@ -33,12 +32,10 @@ import cz.agents.alite.vis.layer.toggle.KeyToggleLayer;
  */
 public class SimulationControlLayer extends AbstractLayer {
 
-    private final Simulation simulation;
     private SimulatedAgentEnvironment environment;
 
     SimulationControlLayer(SimulatedAgentEnvironment environment) {
         this.environment = environment;
-        this.simulation = environment.getSimulation();
     }
 
     @Override
@@ -58,24 +55,24 @@ public class SimulationControlLayer extends AbstractLayer {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyChar() == '+') {
-                    simulation.setSimulationSpeed(simulation.getSimulationSpeed() * 0.9);
+                    environment.getSimulation().setSimulationSpeed(environment.getSimulation().getSimulationSpeed() * 0.9);
                 } else if (e.getKeyChar() == '-') {
-                    simulation.setSimulationSpeed(simulation.getSimulationSpeed() * 1.1);
+                    environment.getSimulation().setSimulationSpeed(environment.getSimulation().getSimulationSpeed() * 1.1);
                 } else if (e.getKeyChar() == '*') {
                     if ((e.getModifiers() & (KeyEvent.CTRL_MASK | KeyEvent.CTRL_DOWN_MASK)) != 0) {
-                        simulation.setSimulationSpeed(0);
+                        environment.getSimulation().setSimulationSpeed(0);
                     } else {
-                        simulation.setSimulationSpeed(0.2);
+                        environment.getSimulation().setSimulationSpeed(0.2);
                     }
                 } else if (e.getKeyChar() == ' ') {
-                    if (simulation.isRunning()) {
-                        simulation.setRunning(false);
+                    if (environment.getSimulation().isRunning()) {
+                        environment.getSimulation().setRunning(false);
                     } else {
-                        simulation.setRunning(true);
+                        environment.getSimulation().setRunning(true);
                     }
                 } else if (e.getKeyChar() == 'f') {
                     environment.startFlightSimulation(0.2);
-                    simulation.setRunning(true);
+                    environment.getSimulation().setRunning(true);
                 }
 
             }
@@ -86,14 +83,14 @@ public class SimulationControlLayer extends AbstractLayer {
     public void paint(Graphics2D canvas) {
         StringBuilder label = new StringBuilder();
         label.append("TIME: ");
-        label.append(simulation.getCurrentTime() / 1000.0);
+        label.append(environment.getSimulation().getCurrentTime() / 1000.0);
         label.append(" ");
-        if (simulation.isFinished()) {
+        if (environment.getSimulation().isFinished()) {
             label.append("(FINISHED)");
         } else {
-                if (simulation.isRunning()) {
+                if (environment.getSimulation().isRunning()) {
                         label.append("(");
-                        label.append(MessageFormat.format("{0,number,#.##}", 1/simulation.getSimulationSpeed()));
+                        label.append(MessageFormat.format("{0,number,#.##}", 1/environment.getSimulation().getSimulationSpeed()));
                         label.append("x)");
                 } else {
                     label.append("(PAUSED)");

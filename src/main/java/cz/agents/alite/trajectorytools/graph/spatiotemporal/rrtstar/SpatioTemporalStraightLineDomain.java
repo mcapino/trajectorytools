@@ -18,6 +18,8 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, SpatioTemporalManeuver> {
 
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
+
     Box4dRegion bounds;
     Collection<Region> obstacles;
 
@@ -133,7 +135,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     // Simple approximation that should force the planner to use optimal cruise speed
     protected double evaluateFuelCost(SpatialPoint start, SpatialPoint end, double speed) {
-        return start.distance(end) * ((Math.abs(speed - optSpeed) / optSpeed) + 1.0);
+        return start.distance(end) * ((Math.abs(speed - optSpeed) / optSpeed) * NONOPTIMAL_SPEED_PENALTY_COEF + 1.0);
     }
 
     protected boolean intersectsObstacles(TimePoint p1, TimePoint p2) {

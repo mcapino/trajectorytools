@@ -63,9 +63,11 @@ public class SimulatedAgentEnvironment {
     }
 
     public void startFlightSimulation(double samplingInterval) {
-        //simulation = new Simulation();
-        //simulation.setSimulationSpeed(samplingInterval);
         simulation.clearQueue();
+        simulation = new Simulation();
+        simulation.setSimulationSpeed(1.0);
+        //simulation.setSimulationSpeed(samplingInterval);
+        //simulation.clearQueue();
 
         for(String agentName : trajectories.keySet()) {
             simulateFlight(agentName, trajectories.get(agentName), samplingInterval);

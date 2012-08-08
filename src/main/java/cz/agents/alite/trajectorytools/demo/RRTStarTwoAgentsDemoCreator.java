@@ -42,6 +42,8 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class RRTStarTwoAgentsDemoCreator implements Creator {
 
+    final double SEPARATION = 100.0;
+
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
     TimePoint initialPoint = new TimePoint(100, 500, 50, 0);
@@ -68,9 +70,10 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
         t2 = (new Straight(new TimePoint(500, 100, 50, 0), new TimePoint(500, 900, 50, 53))).getTrajectory();
 
-        obstacles.add(new TrajectorySafeRegion(t2, 200.0));
+        obstacles.add(new TrajectorySafeRegion(t2, SEPARATION, 0.5));
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, 50,  new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain
+            = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5,15,30, 45, 1,  new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
@@ -88,12 +91,13 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
                 t1 = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
 
+                /*
                 for (SpatioTemporalManeuver maneuver : path.getEdgeList()) {
                     if (maneuver instanceof Straight) {
                         Straight straight = (Straight) maneuver;
                         System.out.println(straight);
                     }
-                }
+                }*/
 
                 simulation.updateTrajectory("t1", t1);
 
@@ -221,6 +225,6 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
             public double getTime() {
                 return simulation.getTime();
             }
-        }, 200, 5));
+        }, SEPARATION, 5));
     }
   }

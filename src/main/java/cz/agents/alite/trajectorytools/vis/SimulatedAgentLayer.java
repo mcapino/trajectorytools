@@ -10,12 +10,16 @@ import cz.agents.alite.trajectorytools.simulation.SimulatedAgentStorage;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
+import cz.agents.alite.vis.element.Circle;
 import cz.agents.alite.vis.element.StyledPoint;
+import cz.agents.alite.vis.element.aggregation.CircleElements;
 import cz.agents.alite.vis.element.aggregation.StyledPointElements;
+import cz.agents.alite.vis.element.implemetation.CircleImpl;
 import cz.agents.alite.vis.element.implemetation.StyledPointImpl;
 import cz.agents.alite.vis.layer.GroupLayer;
 import cz.agents.alite.vis.layer.VisLayer;
 import cz.agents.alite.vis.layer.common.CommonLayer;
+import cz.agents.alite.vis.layer.terminal.CircleLayer;
 import cz.agents.alite.vis.layer.terminal.StyledPointLayer;
 
 public class SimulatedAgentLayer extends CommonLayer {
@@ -65,7 +69,7 @@ public class SimulatedAgentLayer extends CommonLayer {
             }
 
         }));
-
+        */
         group.addSubLayer(CircleLayer.create(new CircleElements() {
 
             @Override
@@ -73,7 +77,8 @@ public class SimulatedAgentLayer extends CommonLayer {
                 ArrayList<Circle> circles = new ArrayList<Circle>();
 
                 for (OrientedPoint pos : agentStorage.getAgents().values()) {
-                    circles.add(new CircleImpl(pos, separation/2.0));
+                    Point2d pos2d = projection.project(new TimePoint(pos, timeProvider.getTime()));
+                    circles.add(new CircleImpl(new Point3d(pos2d.x, pos2d.y, 0), separation));
                 }
 
                 return circles;
@@ -89,7 +94,7 @@ public class SimulatedAgentLayer extends CommonLayer {
                 return 1;
             }
 
-        })); */
+        }));
 
         //group.addSubLayer(AgentIdLayer.create(agentStorage, Color.BLACK, 1, "a"));
         return group;
