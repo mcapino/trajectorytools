@@ -18,7 +18,7 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, SpatioTemporalManeuver> {
 
-    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 1.0;
 
     Box4dRegion bounds;
     Collection<Region> obstacles;

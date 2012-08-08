@@ -68,7 +68,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
     @Override
     public void create() {
 
-        t2 = (new Straight(new TimePoint(500, 100, 50, 0), new TimePoint(500, 900, 50, 53))).getTrajectory();
+        t2 = (new Straight(new TimePoint(500, 900, 50, 0), new TimePoint(500, 100, 50, 53))).getTrajectory();
 
         obstacles.add(new TrajectorySafeRegion(t2, SEPARATION, 0.5));
 
@@ -105,7 +105,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
