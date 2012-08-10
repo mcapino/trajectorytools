@@ -3,50 +3,50 @@ package cz.agents.alite.trajectorytools.planner.rrtstar;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class Vertex<P, E> {
-    P point;
-    Vertex<P, E> parent;
-    Collection<Vertex<P, E>> children;
+public class Vertex<S, E> {
+    S state;
+    Vertex<S, E> parent;
+    Collection<Vertex<S, E>> children;
 
     E edgeFromParent;
 
     double costFromRoot;
     double costFromParent;
 
-    public Vertex(P point) {
+    public Vertex(S state) {
         super();
-        this.point = point;
+        this.state = state;
         this.parent = null;
         this.costFromRoot = 0.0;
         this.costFromParent = 0.0;
-        this.children = new HashSet<Vertex<P, E>>();
+        this.children = new HashSet<Vertex<S, E>>();
     }
 
-    public P getPoint() {
-        return point;
+    public S getState() {
+        return state;
     }
 
     public double getCostFromRoot() {
         return costFromRoot;
     }
 
-    public void addChild(Vertex<P, E> child) {
+    public void addChild(Vertex<S, E> child) {
         children.add(child);
     }
 
-    public void removeChild(Vertex<P, E> child) {
+    public void removeChild(Vertex<S, E> child) {
         children.remove(child);
     }
 
-    public Vertex<P,E> getParent() {
+    public Vertex<S,E> getParent() {
         return parent;
     }
 
-    public void setParent(Vertex<P,E> parent) {
+    public void setParent(Vertex<S,E> parent) {
         this.parent = parent;
     }
 
-    public Collection<Vertex<P,E>> getChildren() {
+    public Collection<Vertex<S,E>> getChildren() {
         return children;
     }
 
@@ -64,7 +64,7 @@ public class Vertex<P, E> {
 
     @Override
     public String toString() {
-        return "(" + point + ", toRoot=" + costFromRoot
+        return "(" + state + ", toRoot=" + costFromRoot
                 + ", toParent=" + costFromParent + ")";
     }
 

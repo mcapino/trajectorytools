@@ -47,8 +47,8 @@ public class RRTStarLayer extends AbstractLayer {
                    for (Vertex<V,?> child : current.getChildren()) {
                         queue.offer(child);
 
-                        Point2d source = projection.project(current.getPoint());
-                        Point2d target = projection.project(child.getPoint());
+                        Point2d source = projection.project(current.getState());
+                        Point2d target = projection.project(child.getState());
 
                         // draw edge
                         if (source != null && target != null) {
@@ -86,7 +86,7 @@ public class RRTStarLayer extends AbstractLayer {
                     Vertex<V,?> current = queue.poll();
 
 
-                    Point2d point = projection.project(current.getPoint());
+                    Point2d point = projection.project(current.getState());
                     points.add(new PointImpl(new Point3d(point.x, point.y, 0)));
 
                     for (Vertex<V,?> child : current.getChildren()) {

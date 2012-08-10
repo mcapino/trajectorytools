@@ -51,7 +51,7 @@ public class WaypointStraightLineTrajectory implements Trajectory {
             }
         }
 
-        throw new RuntimeException("Requesting position for time "+t+", which is undefined in this trajectory.");
+        throw new RuntimeException("Requesting position for time "+t+", which is undefined in this trajectory. tmin: " + waypoints.get(0) + ", tmax: " + waypoints.get(waypoints.size()-1));
     }
 
 }

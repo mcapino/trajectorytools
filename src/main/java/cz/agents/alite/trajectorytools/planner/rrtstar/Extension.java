@@ -1,13 +1,13 @@
 package cz.agents.alite.trajectorytools.planner.rrtstar;
 
-public class Extension<P,E> {
-    final public  P source;
-    final public P target;
+public class Extension<S,E> {
+    final public  S source;
+    final public S target;
     final public E edge;
     final public double cost;
     final public boolean exact;
 
-    public Extension(P source, P target, E edge, double cost, boolean exact) {
+    public Extension(S source, S target, E edge, double cost, boolean exact) {
         super();
         this.source = source;
         this.target = target;

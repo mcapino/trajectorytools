@@ -1,6 +1,6 @@
 package cz.agents.alite.trajectorytools.planner.rrtstar;
 
-public class ExtensionEstimate<P,E> {
+public class ExtensionEstimate<S,E> {
     final public double cost;
     final public boolean exact;
 
