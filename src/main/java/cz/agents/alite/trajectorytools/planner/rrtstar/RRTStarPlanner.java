@@ -181,7 +181,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     private void rewire(Vertex<S,E> candidateParent, Collection<Vertex<S,E>> vertices) {
         for (Vertex<S,E> nearVertex : vertices) {
             if (nearVertex != candidateParent) {
-                ExtensionEstimate<S, E> extensionEst = domain.estimateExtension(candidateParent.getState(), nearVertex.getState());
+                ExtensionEstimate extensionEst = domain.estimateExtension(candidateParent.getState(), nearVertex.getState());
                 double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
                 if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
                     Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());

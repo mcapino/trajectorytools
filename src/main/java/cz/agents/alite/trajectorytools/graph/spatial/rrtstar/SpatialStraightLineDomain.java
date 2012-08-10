@@ -77,8 +77,8 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
     }
 
     @Override
-    public ExtensionEstimate<SpatialPoint, SpatialManeuver> estimateExtension(SpatialPoint p1, SpatialPoint p2) {
-        return new ExtensionEstimate<SpatialPoint, SpatialManeuver>(p1.distance(p2)/speed, true);
+    public ExtensionEstimate estimateExtension(SpatialPoint p1, SpatialPoint p2) {
+        return new ExtensionEstimate(p1.distance(p2)/speed, true);
     }
 
     @Override

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Random;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
@@ -18,7 +20,7 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, SpatioTemporalManeuver> {
 
-    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 1.0;
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.01;
 
     Box4dRegion bounds;
     Collection<Region> obstacles;
@@ -32,13 +34,12 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
     double maxSpeed;
 
     double maxPitch;
-    double minEdgeLength;
 
     Random random;
 
     public SpatioTemporalStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
             Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
-            double optSpeed, double maxSpeed, double maxPitch, double minEdgeLength, Random random) {
+            double optSpeed, double maxSpeed, double maxPitch, Random random) {
         super();
         this.bounds = bounds;
         this.initialPoint = initialPoint;
@@ -49,7 +50,6 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         this.optSpeed = optSpeed;
         this.maxSpeed = maxSpeed;
         this.maxPitch = maxPitch;
-        this.minEdgeLength = minEdgeLength;
         this.random = random;
     }
 
@@ -66,8 +66,24 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         return point;
     }
 
+    public TimePoint sampleState(double t) {
+        TimePoint point;
+        do {
+            double x = bounds.getCorner1().x + (random.nextDouble() * (bounds.getCorner2().x - bounds.getCorner1().x));
+            double y = bounds.getCorner1().y + (random.nextDouble() * (bounds.getCorner2().y - bounds.getCorner1().y));
+            double z = bounds.getCorner1().z + (random.nextDouble() * (bounds.getCorner2().z - bounds.getCorner1().z));
+            point = new TimePoint(x, y, z, t);
+        } while (!isInFreeSpace(point));
+        return point;
+    }
+
     @Override
     public Extension<TimePoint, SpatioTemporalManeuver> extendTo(
+            TimePoint from, TimePoint to) {
+        return extendMaintainSpatialPoint(from, to);
+   }
+
+    public Extension<TimePoint, SpatioTemporalManeuver> extendMaintainSpatialPoint(
             TimePoint from, TimePoint to) {
 
         double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
@@ -78,7 +94,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
         double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), actualSpeed);
 
-        if (satisfiesSpeedPitchEdgleLengthLimits(from, extensionTarget) &&
+        if (satisfiesSpeedPitchLimits(from, extensionTarget) &&
             !intersectsObstacles(from, extensionTarget)) {
             return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget,
                        maneuver, cost, exact);
@@ -87,8 +103,47 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         }
    }
 
+
+
+    public Extension<TimePoint, SpatioTemporalManeuver> extendMaintainTime(
+            TimePoint from, TimePoint to) {
+
+        double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
+        double requiredDuration = to.getTime() - from.getTime();
+        double speed = distance / requiredDuration;
+
+        boolean exact = (speed >= minSpeed && speed <= maxSpeed);
+
+        TimePoint extensionTarget;
+        if (exact) {
+            extensionTarget = to;
+        } else {
+            Vector3d dir = new Vector3d(to.getSpatialPoint());
+            dir.sub(from.getSpatialPoint());
+            dir.normalize();
+            dir.scale(requiredDuration * optSpeed);
+            Point3d spatialTarget = new Point3d(from.getSpatialPoint());
+            spatialTarget.add(dir);
+            extensionTarget = new TimePoint(spatialTarget, to.getTime());
+        }
+
+        if (bounds.isInside(extensionTarget)) {
+            SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
+            speed = from.getSpatialPoint().distance(extensionTarget.getSpatialPoint());
+            double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), speed);
+
+            if (satisfiesSpeedPitchLimits(from, extensionTarget) &&
+                !intersectsObstacles(from, extensionTarget)) {
+                return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget, maneuver, cost, exact);
+            }
+        }
+
+        return null;
+   }
+
+
     @Override
-    public ExtensionEstimate<TimePoint, SpatioTemporalManeuver> estimateExtension(
+    public ExtensionEstimate estimateExtension(
             TimePoint from, TimePoint to) {
 
         double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
@@ -97,7 +152,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         double actualSpeed = MathUtil.clamp(requiredSpeed, minSpeed, maxSpeed);
         double cost = evaluateFuelCost(from.getSpatialPoint(), to.getSpatialPoint(), actualSpeed);
 
-        return new ExtensionEstimate<TimePoint, SpatioTemporalManeuver>(cost, exact);
+        return new ExtensionEstimate(cost, exact);
     }
 
     @Override
@@ -148,7 +203,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             return false;
     }
 
-    protected boolean satisfiesSpeedPitchEdgleLengthLimits(TimePoint p1, TimePoint p2) {
+    protected boolean satisfiesSpeedPitchLimits(TimePoint p1, TimePoint p2) {
         // check speed constraints
         double requiredSpeed = (p1.getSpatialPoint().distance(p2.getSpatialPoint()))
                 / (p2.getTime() - p1.getTime());
@@ -161,12 +216,6 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         if (Math.abs(climbAngleDeg) > maxPitch) {
             return false;
         }
-
-        // check min length
-        if (p1.getSpatialPoint().distance(p2.getSpatialPoint()) < minEdgeLength) {
-            return false;
-        }
-
 
         if (!(requiredSpeed >= minSpeed - 0.001 || requiredSpeed <= maxSpeed + 0.001)) {
             return false;

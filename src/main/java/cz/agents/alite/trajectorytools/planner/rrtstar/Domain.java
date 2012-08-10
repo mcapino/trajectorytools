@@ -23,7 +23,7 @@ public interface Domain<S,E> {
      * @return an estimate of the extension cost without collision checking
      * (used to sort neighbors before trying to construct extensions)
      */
-    ExtensionEstimate<S,E> estimateExtension(S from, S to);
+    ExtensionEstimate estimateExtension(S from, S to);
 
     /**
      * @return the lower bound heuristic estimate of the cost from state s1 to the target region

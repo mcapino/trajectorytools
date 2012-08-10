@@ -75,7 +75,7 @@ public class RRTStar4dDemoCreator implements Creator {
         }
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, 50,  new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
