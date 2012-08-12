@@ -9,6 +9,7 @@ import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointState
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.SpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
@@ -24,7 +25,7 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
     double separation;
     private Box4dRegion bounds;
     private Random random;
-
+    
     public SynchronousJointSpatioTemporalStraightLineDomain(Box4dRegion bounds, double separation, TimePoint[] initialPoints,
             Collection<Region> obstacles, SpatialPoint[] targets, double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double maxPitch, Random random) {
@@ -35,9 +36,11 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
         this.random = random;
 
         assert(separated(initialPoints, separation));
-
+        
+        domains = new SpatioTemporalStraightLineDomain[initialPoints.length];
+        
         for (int i = 0; i < initialPoints.length; i++) {
-            domains[i] = new SpatioTemporalStraightLineDomain(bounds,
+            domains[i] = new GuidedStraightLineDomain(bounds,
                     initialPoints[i], obstacles, targets[i],
                     targetReachedTolerance, minSpeed, optSpeed, maxSpeed,
                     maxPitch, random);
@@ -151,7 +154,7 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
 
     private static boolean separated(TimePoint[] timePoints, double separation) {
         for (int i=0; i<timePoints.length; i++) {
-            for (int j=i+1; j<timePoints.length; i++) {
+            for (int j=i+1; j<timePoints.length; j++) {
                 if (Math.abs(timePoints[i].getTime() - timePoints[j].getTime()) < 0.001) {
                     if (timePoints[i].getSpatialPoint().distance(timePoints[j].getSpatialPoint()) < separation) {
                         return false;

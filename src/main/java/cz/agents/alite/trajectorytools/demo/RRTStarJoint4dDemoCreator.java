@@ -12,8 +12,10 @@ import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuver;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuversToTrajectoriesConverter;
 import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointState;
 import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.rrtstar.SynchronousJointSpatioTemporalStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.vis.JointRRTStarLayer;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -24,9 +26,10 @@ import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajecto
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
-import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
+import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer;
+import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer.TrajectoriesProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
@@ -36,23 +39,21 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
-public class RRTStarMultiAgent4dDemoCreator implements Creator {
+public class RRTStarJoint4dDemoCreator implements Creator {
 
     RRTStarPlanner<JointState, JointManeuver> rrtstar;
 
-    TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(900, 760, 80);
-    double targetReachedTolerance = 5;
+    double targetReachedTolerance = 250;
 
     double gamma = 1300;
 
     private double SEPARATION = 100;
     final int nAgents = 2;
     Trajectory trajectories[] = new Trajectory[nAgents];
-    private TimePoint[] starts = { new TimePoint(0,0,50,0), new TimePoint(1000,1000,50,0)};
-    private SpatialPoint[] targets = { new SpatialPoint(1000, 1000, 50), new SpatialPoint(0, 0, 50)};
+    private TimePoint[] starts = { new TimePoint(0,1000,50,0), new TimePoint(1000,1000,50,0)};
+    private SpatialPoint[] targets = { new SpatialPoint(1000, 0, 50), new SpatialPoint(0, 0, 50)};
 
 
 
@@ -88,24 +89,16 @@ public class RRTStarMultiAgent4dDemoCreator implements Creator {
                 bestCost = rrtstar.getBestVertex().getCostFromRoot();
                 System.out.println("Iteration: " + i + " Best path cost: " + bestCost);
                 GraphPath<JointState, JointManeuver> path = rrtstar.getBestPath();
-                trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
-                //trajectory =  new SampledTrajectory(trajectory, 100);
-
-                for (SpatioTemporalManeuver maneuver : path.getEdgeList()) {
-                    if (maneuver instanceof Straight) {
-                        Straight straight = (Straight) maneuver;
-                        System.out.println(straight);
-                    }
-                }
-
+                
+                trajectories =  JointManeuversToTrajectoriesConverter.convert(path);
             }
 
-            /*
+            
             try {
-                Thread.sleep(10);
+                Thread.sleep(850);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
@@ -182,15 +175,15 @@ public class RRTStarMultiAgent4dDemoCreator implements Creator {
 
     private void createView(ProjectionTo2d<TimePoint> projection) {
         // graph
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, projection, Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(JointRRTStarLayer.create(rrtstar, projection, 1, 4));
 
-        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
+        VisManager.registerLayer(TrajectoriesLayer.create(new TrajectoriesProvider() {
 
             @Override
-            public Trajectory getTrajectory() {
-                return trajectory;
+            public Trajectory[] getTrajectories() {
+                return trajectories;
             }
-        }, projection, Color.BLUE, 0.5, bounds.getCorner2().w, 't'));
+        }, projection, 0.5, bounds.getCorner2().w, 't'));
 
         VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 
@@ -199,7 +192,6 @@ public class RRTStarMultiAgent4dDemoCreator implements Creator {
                 LinkedList<Region> regions = new LinkedList<Region>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
-                regions.add(targetRegion);
                 return regions;
             }
         },

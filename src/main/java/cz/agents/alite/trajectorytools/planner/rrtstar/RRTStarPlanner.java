@@ -30,6 +30,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     Map<E,S> edgeSources = new HashMap<E,S>();
     Map<E,S> edgeTargets = new HashMap<E,S>();
+    Map<S,E> incomingEdges = new HashMap<S,E>();
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
         super();
@@ -118,6 +119,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         edgeSources.put(extension.edge, parent.getState());
         edgeTargets.put(extension.edge, target.getState());
+        incomingEdges.put(target.getState(), extension.edge);
     }
 
     class BestParentSearchResult{
@@ -157,8 +159,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         List<VertexCost> vertexCosts = new LinkedList<VertexCost>();
 
         for (Vertex<S,E> vertex : nearVertices) {
-            vertexCosts.add(new VertexCost(vertex,
-                    vertex.getCostFromRoot() + domain.estimateExtension(vertex.getState(), randomSample).cost));
+        	ExtensionEstimate extensionEst = domain.estimateExtension(vertex.getState(), randomSample);
+        	if (extensionEst != null) {
+        		vertexCosts.add(new VertexCost(vertex, vertex.getCostFromRoot() + extensionEst.cost));
+        	}
         }
 
         // Sort according to the vertex costs
@@ -182,13 +186,15 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         for (Vertex<S,E> nearVertex : vertices) {
             if (nearVertex != candidateParent) {
                 ExtensionEstimate extensionEst = domain.estimateExtension(candidateParent.getState(), nearVertex.getState());
-                double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
-                if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
-                    Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());
-                    if (extension != null && extension.exact)  {
-                        insertExtension(candidateParent, extension, nearVertex);
-                        updateBranchCost(nearVertex);
-                    }
+                if (extensionEst != null) {
+                	double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
+	                if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
+	                    Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());
+	                    if (extension != null && extension.exact)  {
+	                        insertExtension(candidateParent, extension, nearVertex);
+	                        updateBranchCost(nearVertex);
+	                    }
+	                }
                 }
 
             }
@@ -354,8 +360,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
 
     @Override
-    public E getEdge(S arg0, S arg1) {
-        throw new NotImplementedException();
+    public E getEdge(S start, S end) {
+       return incomingEdges.get(end);
     }
 
 
