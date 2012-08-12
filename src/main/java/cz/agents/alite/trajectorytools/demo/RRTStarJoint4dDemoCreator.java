@@ -11,22 +11,25 @@ import javax.vecmath.Point2d;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuver;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuversToTrajectoriesConverter;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointState;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.rrtstar.SynchronousJointSpatioTemporalStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.vis.JointRRTStarLayer;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
-import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
+import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer;
+import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer.TrajectoriesProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
@@ -36,20 +39,24 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
-public class RRTStar4dDemoCreator implements Creator {
+public class RRTStarJoint4dDemoCreator implements Creator {
 
-    RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
+    RRTStarPlanner<JointState, JointManeuver> rrtstar;
 
-    TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(900, 760, 80);
-    double targetReachedTolerance = 5;
-    Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
-
-    Trajectory trajectory = null;
+    double targetReachedTolerance = 250;
 
     double gamma = 1300;
+
+    private double SEPARATION = 100;
+    final int nAgents = 2;
+    Trajectory trajectories[] = new Trajectory[nAgents];
+    private TimePoint[] starts = { new TimePoint(0,1000,50,0), new TimePoint(1000,1000,50,0)};
+    private SpatialPoint[] targets = { new SpatialPoint(1000, 0, 50), new SpatialPoint(0, 0, 50)};
+
+
+
 
     @Override
     public void init(String[] args) {
@@ -67,16 +74,10 @@ public class RRTStar4dDemoCreator implements Creator {
 
         // Add obstacles
 
-        for(int x=5; x < 20; x++) {
-            for (int y=5; y < 20; y++) {
-                int z = (int) (Math.random() * bounds.getCorner2().z / 2);
-                obstacles.add(new StaticBoxRegion(new SpatialPoint(x*50, y*50, z), new SpatialPoint(x*50+30, y*50+30, z + bounds.getCorner2().z/2)));
-            }
-        }
 
-
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, new Random(1));
-        rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
+        Domain<JointState, JointManeuver> domain
+            = new SynchronousJointSpatioTemporalStraightLineDomain(bounds, SEPARATION, starts, obstacles, targets, targetReachedTolerance, 10, 15, 30, 45, new Random(1));
+        rrtstar = new RRTStarPlanner<JointState, JointManeuver>(domain, new JointState(starts), gamma);
         createVisualization();
 
         double bestCost = Double.POSITIVE_INFINITY;
@@ -87,25 +88,17 @@ public class RRTStar4dDemoCreator implements Creator {
             if (rrtstar.getBestVertex() != null && rrtstar.getBestVertex().getCostFromRoot() < bestCost) {
                 bestCost = rrtstar.getBestVertex().getCostFromRoot();
                 System.out.println("Iteration: " + i + " Best path cost: " + bestCost);
-                GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
-                trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
-                //trajectory =  new SampledTrajectory(trajectory, 100);
-
-                for (SpatioTemporalManeuver maneuver : path.getEdgeList()) {
-                    if (maneuver instanceof Straight) {
-                        Straight straight = (Straight) maneuver;
-                        System.out.println(straight);
-                    }
-                }
-
+                GraphPath<JointState, JointManeuver> path = rrtstar.getBestPath();
+                
+                trajectories =  JointManeuversToTrajectoriesConverter.convert(path);
             }
 
-            /*
+            
             try {
-                Thread.sleep(10);
+                Thread.sleep(850);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
@@ -182,15 +175,15 @@ public class RRTStar4dDemoCreator implements Creator {
 
     private void createView(ProjectionTo2d<TimePoint> projection) {
         // graph
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, projection, Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(JointRRTStarLayer.create(rrtstar, projection, 1, 4));
 
-        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
+        VisManager.registerLayer(TrajectoriesLayer.create(new TrajectoriesProvider() {
 
             @Override
-            public Trajectory getTrajectory() {
-                return trajectory;
+            public Trajectory[] getTrajectories() {
+                return trajectories;
             }
-        }, projection, Color.BLUE, 0.5, bounds.getCorner2().w, 't'));
+        }, projection, 0.5, bounds.getCorner2().w, 't'));
 
         VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 
@@ -199,7 +192,6 @@ public class RRTStar4dDemoCreator implements Creator {
                 LinkedList<Region> regions = new LinkedList<Region>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
-                regions.add(targetRegion);
                 return regions;
             }
         },

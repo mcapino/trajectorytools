@@ -21,10 +21,9 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
     public GuidedStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
             Collection<Region> obstacles, SpatialPoint target,
             double targetReachedTolerance, double minSpeed, double optSpeed,
-            double maxSpeed, double maxPitch, double minEdgeLength,
-            Random random) {
+            double maxSpeed, double maxPitch, Random random) {
         super(bounds, initialPoint, obstacles, target, targetReachedTolerance,
-                minSpeed, optSpeed, maxSpeed, maxPitch, minEdgeLength, random);
+                minSpeed, optSpeed, maxSpeed, maxPitch, random);
         samplesPool.add(getTargetSample(initialPoint));
     }
 

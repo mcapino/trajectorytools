@@ -1,7 +1,7 @@
 package cz.agents.alite.trajectorytools.planner.rrtstar;
 
 public class Extension<S,E> {
-    final public  S source;
+    final public S source;
     final public S target;
     final public E edge;
     final public double cost;

@@ -73,7 +73,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         obstacles.add(new TrajectorySafeRegion(t2, SEPARATION, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
-            = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5,15,30, 45, 1,  new Random(1));
+            = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5,15,30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
