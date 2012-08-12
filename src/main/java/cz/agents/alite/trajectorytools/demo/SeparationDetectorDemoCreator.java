@@ -77,7 +77,7 @@ public class SeparationDetectorDemoCreator implements Creator {
         List<Trajectory> trajectories = new LinkedList<Trajectory>();
         trajectories.add(trajectory1);
         trajectories.add(trajectory2);
-        conflicts = SeparationDetector.computeAllPairwiseConflicts(trajectories, 1.0);
+        conflicts = SeparationDetector.computeAllPairwiseConflicts(trajectories, 1.0, 0.2);
 
         createVisualization();
     }

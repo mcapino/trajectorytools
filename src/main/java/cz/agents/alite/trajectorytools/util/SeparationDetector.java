@@ -9,17 +9,14 @@ import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 
 public class SeparationDetector {
 
-    final static double SAMPLES_PER_SEPARATION_RANGE = 4.0;
-
     /**
      * Computes pairwise conflicts between thisTrajectory and otherTrajectories.
      */
     public static List<TimePoint> computePairwiseConflicts(
             Trajectory thisTrajectory,
             Collection<Trajectory> otherTrajectoriesCollection,
-            double separation) {
+            double separation, double samplingInterval) {
 
-        double samplingInterval = separation / SAMPLES_PER_SEPARATION_RANGE;
 
         List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
         List<TimePoint> conflicts = new LinkedList<TimePoint>();
@@ -44,9 +41,7 @@ public class SeparationDetector {
     /**
      * Computes all pairwise conflicts between all pairs of trajectories from trajectoriesCollection.
      */
-    public static List<TimePoint> computeAllPairwiseConflicts(Collection<Trajectory> trajectoriesCollection, double separation) {
-
-        double samplingInterval = separation / SAMPLES_PER_SEPARATION_RANGE;
+    public static List<TimePoint> computeAllPairwiseConflicts(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
 
         List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
         List<TimePoint> conflicts = new LinkedList<TimePoint>();
@@ -92,9 +87,7 @@ public class SeparationDetector {
      * finds the first conflicts and returns ids of the two agents involved in the conflict
      * @return array containing ids of agents involved in the conflict, null if no conflicts are found
      */
-    public static int[] findFirstConflict(Collection<Trajectory> trajectoriesCollection, double separation) {
-
-        double samplingInterval = separation / SAMPLES_PER_SEPARATION_RANGE;
+    public static int[] findFirstConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
 
         List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
 
@@ -135,19 +128,17 @@ public class SeparationDetector {
         return null;
     }
 
-    public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation) {
-        return (computeAllPairwiseConflicts(trajectoriesCollection, separation).size() > 0);
+    public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
+        return (computeAllPairwiseConflicts(trajectoriesCollection, separation, samplingInterval).size() > 0);
     }
 
     /**
      * Determines if thisTrajectory has conflict with any of the trajectories from otherTrajectoriesCollection.
      */
-    public static boolean hasConflict(Trajectory thisTrajectory, Collection<Trajectory> otherTrajectoriesCollection, double separation) {
+    public static boolean hasConflict(Trajectory thisTrajectory, Collection<Trajectory> otherTrajectoriesCollection, double separation, double samplingInterval) {
 
         assert(thisTrajectory != null);
         assert(!otherTrajectoriesCollection.contains(null));
-
-        double samplingInterval = separation / SAMPLES_PER_SEPARATION_RANGE;
 
         List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
 
@@ -172,14 +163,12 @@ public class SeparationDetector {
     /**
      *  Counts the number of trajectories from the given collection that have a conflict with the given trajectory
      */
-    public static int countConflictingTrajectories(Trajectory thisTrajectory, Collection<Trajectory> otherTrajectoriesCollection, double separation) {
+    public static int countConflictingTrajectories(Trajectory thisTrajectory, Collection<Trajectory> otherTrajectoriesCollection, double separation, double samplingInterval) {
 
         int count = 0;
 
         assert(thisTrajectory != null);
         assert(!otherTrajectoriesCollection.contains(null));
-
-        double samplingInterval = separation / SAMPLES_PER_SEPARATION_RANGE;
 
         List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
 

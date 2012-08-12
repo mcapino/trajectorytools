@@ -41,9 +41,9 @@ public class RRTStar4dDemoCreator implements Creator {
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
     TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 49, 0), new TimePoint(1000, 1000, 55, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(900, 760, 80);
+    SpatialPoint target = new SpatialPoint(900, 760, 50);
     double targetReachedTolerance = 5;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 

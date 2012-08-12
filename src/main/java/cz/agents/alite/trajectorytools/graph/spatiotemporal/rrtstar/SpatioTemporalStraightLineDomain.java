@@ -9,6 +9,7 @@ import javax.vecmath.Vector3d;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Wait;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
@@ -113,6 +114,11 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         double speed = distance / requiredDuration;
 
         boolean exact = (speed >= minSpeed && speed <= maxSpeed);
+        
+        if (from.getSpatialPoint().epsilonEquals(to.getSpatialPoint(), 0.001) && isInTargetRegion(from)) {
+        	// Wait at target
+        	return new Extension<TimePoint, SpatioTemporalManeuver>(from, to, new Wait(from, to), 0, true);
+        }
 
         TimePoint extensionTarget;
         if (exact) {

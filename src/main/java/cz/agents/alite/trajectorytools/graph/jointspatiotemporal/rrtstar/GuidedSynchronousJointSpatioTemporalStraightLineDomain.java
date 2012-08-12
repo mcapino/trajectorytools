@@ -2,6 +2,7 @@ package cz.agents.alite.trajectorytools.graph.jointspatiotemporal.rrtstar;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuver;
@@ -27,6 +28,9 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
     private Box4dRegion bounds;
     private Random random;
 	private double deviation;
+	private double samplingInterval;
+	
+	private Queue<JointState> samplesPool = new LinkedList<JointState>();
     
     public GuidedSynchronousJointSpatioTemporalStraightLineDomain(Box4dRegion bounds, double separation, TimePoint[] initialPoints,
             Collection<Region> obstacles, SpatialPoint[] targets, 
@@ -40,6 +44,7 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
         this.random = random;
         this.decoupledTrajectories = decoupledTrajectories;
         this.deviation = deviation;
+        this.samplingInterval = (separation / 4) / maxSpeed;
 
         assert(separated(initialPoints, separation));
         
@@ -62,15 +67,24 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
 
     @Override
     public JointState sampleState() {
-        TimePoint[] points = new TimePoint[nAgents()];
-        do {
-            double t = bounds.getCorner1().w + random.nextDouble() * (bounds.getCorner2().w - bounds.getCorner1().w);
-            for (int i = 0; i < nAgents(); i++) {
-                points[i] = new TimePoint(getNearbyPoint(decoupledTrajectories[i].getPosition(t), deviation, random), t);
-            }
-        } while (!separated(points, separation)); /* not necessary probably, will be checked when extending anyway */
-
-        return new JointState(points);
+    	if (samplesPool.isEmpty()) {
+    		TimePoint[] pointsNearby = new TimePoint[nAgents()];
+    		TimePoint[] pointsExact = new TimePoint[nAgents()];
+    		
+	        do {
+	            double t = bounds.getCorner1().w + random.nextDouble() * (bounds.getCorner2().w - bounds.getCorner1().w);
+	            for (int i = 0; i < nAgents(); i++) {
+	                pointsNearby[i] = new TimePoint(getNearbyPoint(decoupledTrajectories[i].getPosition(t), deviation, random), t);
+	                pointsExact[i] = new TimePoint(decoupledTrajectories[i].getPosition(t), t);
+	            }
+	        } while (!separated(pointsNearby, separation)); /* not necessary probably, will be checked when extending anyway */
+	        samplesPool.offer(new JointState(pointsNearby));
+	        samplesPool.offer(new JointState(pointsExact));
+    	} 
+    	
+    	return samplesPool.poll();
+    	
+        
     }
 
     @Override
@@ -103,7 +117,7 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
             trajectories.add(maneuvers[i].getTrajectory());
         }
 
-        if (!SeparationDetector.hasConflict(trajectories, separation)) {
+        if (!SeparationDetector.hasConflict(trajectories, separation, samplingInterval)) {
             return new Extension<JointState, JointManeuver> (from, new JointState(targets), new JointManeuver(maneuvers), cost, exact);
         }
         return null;

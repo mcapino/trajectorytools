@@ -25,6 +25,7 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
     double separation;
     private Box4dRegion bounds;
     private Random random;
+	private double samplingInterval;
     
     public SynchronousJointSpatioTemporalStraightLineDomain(Box4dRegion bounds, double separation, TimePoint[] initialPoints,
             Collection<Region> obstacles, SpatialPoint[] targets, double targetReachedTolerance, double minSpeed,
@@ -34,6 +35,7 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
         this.separation = separation;
         this.bounds = bounds;
         this.random = random;
+        this.samplingInterval = (separation / 4) / maxSpeed;
 
         assert(separated(initialPoints, separation));
         
@@ -92,7 +94,7 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
             trajectories.add(maneuvers[i].getTrajectory());
         }
 
-        if (!SeparationDetector.hasConflict(trajectories, separation)) {
+        if (!SeparationDetector.hasConflict(trajectories, separation, samplingInterval)) {
             return new Extension<JointState, JointManeuver> (from, new JointState(targets), new JointManeuver(maneuvers), cost, exact);
         }
         return null;
