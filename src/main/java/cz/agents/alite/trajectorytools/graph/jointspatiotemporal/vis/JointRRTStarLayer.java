@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.vis;
+package cz.agents.alite.trajectorytools.graph.jointspatiotemporal.vis;
 
 import java.awt.Color;
 import java.util.LinkedList;
@@ -8,8 +8,8 @@ import java.util.Random;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuver;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointState;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuver;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointState;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
 import cz.agents.alite.trajectorytools.util.TimePoint;

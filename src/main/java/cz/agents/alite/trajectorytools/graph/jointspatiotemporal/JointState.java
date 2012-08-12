@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal;
+package cz.agents.alite.trajectorytools.graph.jointspatiotemporal;
 
 import cz.agents.alite.trajectorytools.util.TimePoint;
 

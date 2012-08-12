@@ -11,11 +11,11 @@ import javax.vecmath.Point2d;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuver;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointManeuversToTrajectoriesConverter;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.JointState;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.rrtstar.SynchronousJointSpatioTemporalStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal.vis.JointRRTStarLayer;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuver;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuversToTrajectoriesConverter;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointState;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.vis.JointRRTStarLayer;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.rrtstar.SynchronousJointSpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;

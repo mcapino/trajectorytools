@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.graph.multiagentspatiotemporal;
+package cz.agents.alite.trajectorytools.graph.jointspatiotemporal;
 
 import java.util.LinkedList;
 import java.util.List;
