@@ -41,7 +41,15 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         this.bestVertex = null;
     }
-
+    
+    
+    public GraphPath<S,E> plan(double maxIterations) {
+    	for(int i=0	; i < maxIterations; i++) {
+    		iterate();
+    	}
+    	
+    	return getBestPath();
+    }
 
     public void iterate() {
         // 1. Sample a new state

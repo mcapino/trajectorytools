@@ -15,11 +15,13 @@ import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuver;
 import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointManeuversToTrajectoriesConverter;
 import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.JointState;
 import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.vis.JointRRTStarLayer;
+import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.rrtstar.GuidedSynchronousJointSpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.jointspatiotemporal.rrtstar.SynchronousJointSpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
@@ -43,13 +45,18 @@ public class RRTStarJoint4dDemoCreator implements Creator {
 
     RRTStarPlanner<JointState, JointManeuver> rrtstar;
 
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 150));
     Collection<Region> obstacles = new LinkedList<Region>();
     double targetReachedTolerance = 250;
 
     double gamma = 1300;
 
     private double SEPARATION = 100;
+    private double MINSPEED= 10;
+    private double OPTSPEED = 15;
+    private double MAXSPEED = 20;
+    private double MAXPITCH = 45;
+    
     final int nAgents = 2;
     Trajectory trajectories[] = new Trajectory[nAgents];
     private TimePoint[] starts = { new TimePoint(0,1000,50,0), new TimePoint(1000,1000,50,0)};
@@ -61,6 +68,18 @@ public class RRTStarJoint4dDemoCreator implements Creator {
     @Override
     public void init(String[] args) {
 
+    }
+    
+    private Trajectory[] getDecoupledTrajectories() {
+    	Trajectory[] decoupledTrajectories = new Trajectory[starts.length];
+    	for (int i=0; i < starts.length; i++) {
+            Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, starts[i], obstacles, targets[i], targetReachedTolerance, MINSPEED, OPTSPEED, MAXSPEED, MAXPITCH, new Random(1));
+            RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, starts[i], gamma);
+            GraphPath<TimePoint, SpatioTemporalManeuver> graphPath = rrtstar.plan(1000);
+            assert(graphPath != null);
+            decoupledTrajectories[i] = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(graphPath, graphPath.getWeight());
+    	}
+    	return decoupledTrajectories;
     }
 
     @Override
@@ -76,7 +95,7 @@ public class RRTStarJoint4dDemoCreator implements Creator {
 
 
         Domain<JointState, JointManeuver> domain
-            = new SynchronousJointSpatioTemporalStraightLineDomain(bounds, SEPARATION, starts, obstacles, targets, targetReachedTolerance, 10, 15, 30, 45, new Random(1));
+            = new GuidedSynchronousJointSpatioTemporalStraightLineDomain(bounds, SEPARATION, starts, obstacles, targets, getDecoupledTrajectories(), 250, targetReachedTolerance, 10, 15, 30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<JointState, JointManeuver>(domain, new JointState(starts), gamma);
         createVisualization();
 
@@ -93,12 +112,12 @@ public class RRTStarJoint4dDemoCreator implements Creator {
                 trajectories =  JointManeuversToTrajectoriesConverter.convert(path);
             }
 
-            
+            /*
             try {
-                Thread.sleep(850);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
     }
