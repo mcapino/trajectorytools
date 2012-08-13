@@ -29,8 +29,10 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentEnvironment;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
+import cz.agents.alite.trajectorytools.util.AgentMissionGenerator;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
+import cz.agents.alite.trajectorytools.util.AgentMissionGenerator.Mission;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
 import cz.agents.alite.trajectorytools.vis.SimulatedAgentLayer;
 import cz.agents.alite.trajectorytools.vis.SimulationControlLayer;
@@ -51,24 +53,24 @@ public class RRTStarJoint4dDemoCreator implements Creator {
 
     RRTStarPlanner<JointState, JointManeuver> rrtstar;
 
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 200, 200));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 400, 300));
     Collection<Region> obstacles = new LinkedList<Region>();
     double targetReachedTolerance = 50;
 
     double gamma = 1300;
 
-    private double SEPARATION = 100;
+    private double SEPARATION = 50;
     private double MINSPEED= 10;
     private double OPTSPEED = 15;
     private double MAXSPEED = 20;
     private double MAXPITCH = 45;
     
-    final int nAgents = 2;
-    Trajectory trajectories[] = new Trajectory[nAgents];
-    private TimePoint[] starts = { new TimePoint(0,1000,50,0), new TimePoint(1000,1000,50,0)};
-    private SpatialPoint[] targets = { new SpatialPoint(1000, 0, 50), new SpatialPoint(0, 0, 50)};
+    int nAgents;
+    private Trajectory[] trajectories;
+    private TimePoint[] starts;
+    private SpatialPoint[] targets;
 
-    Trajectory[] decoupledTrajectories = new Trajectory[starts.length];
+    Trajectory[] nominalTrajectories;
     SimulatedAgentEnvironment simulation = new SimulatedAgentEnvironment();
 
 
@@ -77,19 +79,35 @@ public class RRTStarJoint4dDemoCreator implements Creator {
 
     }
     
-    private Trajectory[] getDecoupledTrajectories() {
+    private Trajectory[] getNominalTrajectories() {
     	for (int i=0; i < starts.length; i++) {
             Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, starts[i], obstacles, targets[i], targetReachedTolerance, MINSPEED, OPTSPEED, MAXSPEED, MAXPITCH, new Random(1));
             RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, starts[i], gamma);
             GraphPath<TimePoint, SpatioTemporalManeuver> graphPath = rrtstar.plan(1000);
             assert(graphPath != null);
-            decoupledTrajectories[i] = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(graphPath, graphPath.getWeight());
+            nominalTrajectories[i] = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(graphPath, graphPath.getWeight());
     	}
-    	return decoupledTrajectories;
+    	return nominalTrajectories;
     }
 
     @Override
     public void create() {
+    	
+    	Mission[] missions = AgentMissionGenerator.generateSuperconflict(3, new SpatialPoint(500, 500, 150), 400);
+    	
+        nAgents = missions.length;
+        trajectories = new Trajectory[nAgents];
+        nominalTrajectories = new Trajectory[nAgents];
+        
+        starts = new TimePoint[nAgents];
+        targets = new SpatialPoint[nAgents];
+    	
+    	
+    	for (int i=0; i<missions.length; i++) {
+    		starts[i] = new TimePoint(missions[i].start, 0);
+    		targets[i] = missions[i].end;
+    	}
+    	
         //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z*0.9)));
 
         //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
@@ -101,7 +119,7 @@ public class RRTStarJoint4dDemoCreator implements Creator {
 
 
         Domain<JointState, JointManeuver> domain
-            = new GuidedSynchronousJointSpatioTemporalStraightLineDomain(bounds, SEPARATION, starts, obstacles, targets, getDecoupledTrajectories(), 250, targetReachedTolerance, 10, 15, 30, 45, new Random(1));
+            = new GuidedSynchronousJointSpatioTemporalStraightLineDomain(bounds, SEPARATION, starts, obstacles, targets, getNominalTrajectories(), 500, targetReachedTolerance, 10, 15, 30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<JointState, JointManeuver>(domain, new JointState(starts), gamma);
         createVisualization();
 
@@ -122,12 +140,12 @@ public class RRTStarJoint4dDemoCreator implements Creator {
                 }
             }
 
-            
+            /*
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            } */
         }
 
     }

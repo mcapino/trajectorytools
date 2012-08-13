@@ -27,14 +27,14 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
     double separation;
     private Box4dRegion bounds;
     private Random random;
-	private double deviation;
+	private double variance;
 	private double samplingInterval;
 	
 	private Queue<JointState> samplesPool = new LinkedList<JointState>();
     
     public GuidedSynchronousJointSpatioTemporalStraightLineDomain(Box4dRegion bounds, double separation, TimePoint[] initialPoints,
             Collection<Region> obstacles, SpatialPoint[] targets, 
-            Trajectory[] decoupledTrajectories, double deviation, 
+            Trajectory[] decoupledTrajectories, double variance, 
             double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double maxPitch, Random random) {
         super();
@@ -43,7 +43,7 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
         this.bounds = bounds;
         this.random = random;
         this.decoupledTrajectories = decoupledTrajectories;
-        this.deviation = deviation;
+        this.variance = variance;
         this.samplingInterval = (separation / 4) / maxSpeed;
 
         assert(separated(initialPoints, separation));
@@ -74,7 +74,7 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
 	        do {
 	            double t = bounds.getCorner1().w + random.nextDouble() * (bounds.getCorner2().w - bounds.getCorner1().w);
 	            for (int i = 0; i < nAgents(); i++) {
-	                pointsNearby[i] = new TimePoint(getNearbyPoint(decoupledTrajectories[i].getPosition(t), deviation, random), t);
+	                pointsNearby[i] = new TimePoint(getNearbyPoint(decoupledTrajectories[i].getPosition(t), variance, random), t);
 	                pointsExact[i] = new TimePoint(decoupledTrajectories[i].getPosition(t), t);
 	            }
 	        } while (!separated(pointsNearby, separation)); /* not necessary probably, will be checked when extending anyway */
