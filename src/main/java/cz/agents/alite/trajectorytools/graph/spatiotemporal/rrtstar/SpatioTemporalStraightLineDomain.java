@@ -42,6 +42,11 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double maxPitch, Random random) {
         super();
+
+        if (!isInFreeSpace(initialPoint)) {
+            throw new IllegalArgumentException("Initial point is not in free space");
+        }
+
         this.bounds = bounds;
         this.initialPoint = initialPoint;
         this.obstacles = obstacles;
@@ -114,10 +119,10 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         double speed = distance / requiredDuration;
 
         boolean exact = (speed >= minSpeed && speed <= maxSpeed);
-        
+
         if (from.getSpatialPoint().epsilonEquals(to.getSpatialPoint(), 0.001) && isInTargetRegion(from)) {
-        	// Wait at target
-        	return new Extension<TimePoint, SpatioTemporalManeuver>(from, to, new Wait(from, to), 0, true);
+            // Wait at target
+            return new Extension<TimePoint, SpatioTemporalManeuver>(from, to, new Wait(from, to), 0, true);
         }
 
         TimePoint extensionTarget;

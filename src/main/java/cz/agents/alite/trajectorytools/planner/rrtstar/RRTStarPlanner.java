@@ -34,6 +34,9 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
         super();
+
+        // Check if the initialState is in free space
+
         this.domain = domain;
         this.gamma = gamma;
         this.root = new Vertex<S,E>(initialState);
@@ -41,14 +44,14 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         this.bestVertex = null;
     }
-    
-    
+
+
     public GraphPath<S,E> plan(double maxIterations) {
-    	for(int i=0	; i < maxIterations; i++) {
-    		iterate();
-    	}
-    	
-    	return getBestPath();
+        for(int i=0	; i < maxIterations; i++) {
+            iterate();
+        }
+
+        return getBestPath();
     }
 
     public void iterate() {
@@ -167,10 +170,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         List<VertexCost> vertexCosts = new LinkedList<VertexCost>();
 
         for (Vertex<S,E> vertex : nearVertices) {
-        	ExtensionEstimate extensionEst = domain.estimateExtension(vertex.getState(), randomSample);
-        	if (extensionEst != null) {
-        		vertexCosts.add(new VertexCost(vertex, vertex.getCostFromRoot() + extensionEst.cost));
-        	}
+            ExtensionEstimate extensionEst = domain.estimateExtension(vertex.getState(), randomSample);
+            if (extensionEst != null) {
+                vertexCosts.add(new VertexCost(vertex, vertex.getCostFromRoot() + extensionEst.cost));
+            }
         }
 
         // Sort according to the vertex costs
@@ -195,14 +198,14 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             if (nearVertex != candidateParent) {
                 ExtensionEstimate extensionEst = domain.estimateExtension(candidateParent.getState(), nearVertex.getState());
                 if (extensionEst != null) {
-                	double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
-	                if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
-	                    Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());
-	                    if (extension != null && extension.exact)  {
-	                        insertExtension(candidateParent, extension, nearVertex);
-	                        updateBranchCost(nearVertex);
-	                    }
-	                }
+                    double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
+                    if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
+                        Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());
+                        if (extension != null && extension.exact)  {
+                            insertExtension(candidateParent, extension, nearVertex);
+                            updateBranchCost(nearVertex);
+                        }
+                    }
                 }
 
             }
