@@ -53,6 +53,8 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
     }
 
     private boolean isVisible(SpatialPoint p1, SpatialPoint p2) {
+    	
+    	
 
         // check obstacles
         for (Region obstacle : obstacles) {

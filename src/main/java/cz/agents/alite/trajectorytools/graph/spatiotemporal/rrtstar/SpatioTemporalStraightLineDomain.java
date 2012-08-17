@@ -43,10 +43,6 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             double optSpeed, double maxSpeed, double maxPitch, Random random) {
         super();
 
-        if (!isInFreeSpace(initialPoint)) {
-            throw new IllegalArgumentException("Initial point is not in free space");
-        }
-
         this.bounds = bounds;
         this.initialPoint = initialPoint;
         this.obstacles = obstacles;
@@ -57,6 +53,10 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         this.maxSpeed = maxSpeed;
         this.maxPitch = maxPitch;
         this.random = random;
+
+        if (!isInFreeSpace(initialPoint)) {
+            throw new IllegalArgumentException("Initial point is not in free space");
+        }
     }
 
     @Override

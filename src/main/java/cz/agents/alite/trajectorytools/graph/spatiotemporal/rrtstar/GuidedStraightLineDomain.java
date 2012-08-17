@@ -15,9 +15,6 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
 
     Queue<TimePoint> samplesPool = new LinkedList<TimePoint>();
 
-
-
-
     public GuidedStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
             Collection<Region> obstacles, SpatialPoint target,
             double targetReachedTolerance, double minSpeed, double optSpeed,

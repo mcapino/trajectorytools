@@ -16,7 +16,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.TrajectorySafeRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
@@ -70,7 +70,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
         t2 = (new Straight(new TimePoint(500, 900, 50, 0), new TimePoint(500, 100, 50, 53))).getTrajectory();
 
-        obstacles.add(new TrajectorySafeRegion(t2, SEPARATION, 0.5));
+        obstacles.add(new MovingSphereSafeRegion(t2, SEPARATION, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
             = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5,15,30, 45, new Random(1));
