@@ -42,13 +42,13 @@ public class RRTStar4dDemoCreator implements Creator {
     TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 10, 0), new TimePoint(1000, 1000, 70, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(500, 760, 50);
+    SpatialPoint target = new SpatialPoint(160, 990, 50);
     double targetReachedTolerance = 5;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
-    double gamma = 1300;
+    double gamma = 3300;
 
     @Override
     public void init(String[] args) {

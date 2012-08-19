@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.graph.spatiotemporal.region;
 
+import javax.vecmath.Point2d;
+
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
@@ -11,7 +13,7 @@ public class MovingCylinderSafeRegion implements Region {
     double radius;
 
 
-    public MovingCylinderSafeRegion(Trajectory trajectory, double radius, double samplingInterval, double halfHeight) {
+    public MovingCylinderSafeRegion(Trajectory trajectory, double radius, double halfHeight, double samplingInterval) {
         super();
         this.trajectory = trajectory;
         this.radius = radius;
@@ -39,10 +41,12 @@ public class MovingCylinderSafeRegion implements Region {
             double alpha = (t - start.getTime())
                     / (end.getTime() - start.getTime());
             assert (alpha >= -0.00001 && alpha <= 1.00001);
-            SpatialPoint pos = SpatialPoint.interpolate(
+            SpatialPoint linePos = SpatialPoint.interpolate(
                     start.getSpatialPoint(), end.getSpatialPoint(), alpha);
-
-            if (trajectory.getPosition(t).distance(pos) <= radius) {
+            SpatialPoint trajPos = trajectory.getPosition(t);
+            
+            if ((new Point2d(trajPos.x,trajPos.y)).distance(new Point2d(linePos.x, linePos.y)) <= radius && 
+            	Math.abs(trajPos.z - linePos.z) < halfHeight) {
                 return true;
             }
         }
@@ -54,8 +58,13 @@ public class MovingCylinderSafeRegion implements Region {
     @Override
     public boolean isInside(TimePoint p) {
         if (p.getTime() >= trajectory.getMinTime() && p.getTime() <= trajectory.getMaxTime()) {
-            return (p.getSpatialPoint()
-                .distance(trajectory.getPosition(p.getTime())) <= radius);
+        	SpatialPoint trajPos = trajectory.getPosition(p.getTime());
+        	if ((new Point2d(trajPos.x,trajPos.y)).distance(new Point2d(p.x, p.y)) <= radius && 
+                	Math.abs(trajPos.z - p.z) < halfHeight) {
+                    return true;
+                } else {
+                	return false;
+                }
         } else {
             return false;
         }

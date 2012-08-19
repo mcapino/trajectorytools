@@ -14,10 +14,12 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingCylinderSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentEnvironment;
@@ -36,13 +38,14 @@ import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
 public class RRTStarTwoAgentsDemoCreator implements Creator {
 
-    final double SEPARATION = 100.0;
+    final double SEPARATION = 140.0;
 
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
@@ -70,10 +73,10 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
         t2 = (new Straight(new TimePoint(500, 900, 50, 0), new TimePoint(500, 100, 50, 53))).getTrajectory();
 
-        obstacles.add(new MovingSphereSafeRegion(t2, SEPARATION, 0.5));
+        obstacles.add(new MovingCylinderSafeRegion(t2, SEPARATION, 20, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
-            = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5,15,30, 45, new Random(1));
+            = new ProcerusStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
@@ -114,7 +117,14 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
     }
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
-        VisManager.setPanningBounds(new Rectangle(-4000, -4000, 10000, 10000));
+        VisManager.setSceneParam(new SceneParams() {
+
+			@Override
+			public Rectangle getWorldBounds() {
+				return new Rectangle(-1000, -1000, 3000, 3000);
+			}
+
+        });
         VisManager.init();
 
         Vis.setPosition(50, 50, 1);

@@ -100,7 +100,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
         double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), actualSpeed);
 
-        if (satisfiesSpeedPitchLimits(from, extensionTarget) &&
+        if (satisfiesDynamicLimits(from, extensionTarget) &&
             !intersectsObstacles(from, extensionTarget)) {
             return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget,
                        maneuver, cost, exact);
@@ -143,7 +143,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             speed = from.getSpatialPoint().distance(extensionTarget.getSpatialPoint());
             double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), speed);
 
-            if (satisfiesSpeedPitchLimits(from, extensionTarget) &&
+            if (satisfiesDynamicLimits(from, extensionTarget) &&
                 !intersectsObstacles(from, extensionTarget)) {
                 return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget, maneuver, cost, exact);
             }
@@ -214,7 +214,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
             return false;
     }
 
-    protected boolean satisfiesSpeedPitchLimits(TimePoint p1, TimePoint p2) {
+    protected boolean satisfiesDynamicLimits(TimePoint p1, TimePoint p2) {
         // check speed constraints
         double requiredSpeed = (p1.getSpatialPoint().distance(p2.getSpatialPoint()))
                 / (p2.getTime() - p1.getTime());

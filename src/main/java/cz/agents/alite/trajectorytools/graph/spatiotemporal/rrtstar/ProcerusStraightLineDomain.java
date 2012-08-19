@@ -38,9 +38,15 @@ public class ProcerusStraightLineDomain extends GuidedStraightLineDomain {
     }
 
     @Override
-    protected boolean satisfiesSpeedPitchLimits(TimePoint p1, TimePoint p2) {
-        if (super.satisfiesSpeedPitchLimits(p1, p2)) {
-            TimePoint parent = parents.get(p1);
+    protected boolean satisfiesDynamicLimits(TimePoint p1, TimePoint p2) {
+        if (super.satisfiesDynamicLimits(p1, p2)) {
+            // Check min length
+        	if (p1.getSpatialPoint().distance(p2.getSpatialPoint()) < 20) {
+        		return false;
+        	}
+        	
+        	// Check angle
+        	TimePoint parent = parents.get(p1);
 
             if (parent == null) return true;
 
