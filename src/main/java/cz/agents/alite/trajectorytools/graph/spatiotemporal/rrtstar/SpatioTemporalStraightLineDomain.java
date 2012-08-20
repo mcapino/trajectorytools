@@ -94,11 +94,16 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
         double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
         double requiredSpeed = distance / (to.getTime() - from.getTime());
-        boolean exact = (requiredSpeed >= minSpeed && requiredSpeed <= maxSpeed);
+        boolean exact = false;
         double actualSpeed = MathUtil.clamp(requiredSpeed, minSpeed, maxSpeed);
         TimePoint extensionTarget = new TimePoint(to.getSpatialPoint(), from.getTime() + distance / actualSpeed);
         SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
         double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), actualSpeed);
+
+        if (extensionTarget.epsilonEquals(to, 0.001)) {
+            extensionTarget = to;
+            exact = true;
+        }
 
         if (satisfiesDynamicLimits(from, extensionTarget) &&
             !intersectsObstacles(from, extensionTarget)) {

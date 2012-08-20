@@ -34,10 +34,10 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.AgentMissionGenerator.Mission;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
-import cz.agents.alite.trajectorytools.vis.SimulatedAgentLayer;
+import cz.agents.alite.trajectorytools.vis.SimulatedCylindricAgentLayer;
 import cz.agents.alite.trajectorytools.vis.SimulationControlLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
-import cz.agents.alite.trajectorytools.vis.SimulatedAgentLayer.TimeProvider;
+import cz.agents.alite.trajectorytools.vis.SimulatedCylindricAgentLayer.TimeProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoriesLayer.TrajectoriesProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
@@ -250,7 +250,7 @@ public class RRTStarJoint4dDemoCreator implements Creator {
         projection,
         Color.BLACK, 1));
         
-        VisManager.registerLayer(SimulatedAgentLayer.create(simulation.getAgentStorage(), projection, new TimeProvider() {
+        VisManager.registerLayer(SimulatedCylindricAgentLayer.create(simulation.getAgentStorage(), projection, new TimeProvider() {
 
             @Override
             public double getTime() {

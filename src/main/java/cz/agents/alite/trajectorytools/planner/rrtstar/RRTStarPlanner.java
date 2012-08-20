@@ -15,6 +15,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphPathImpl;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
@@ -80,7 +81,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
             if (newVertex != null) {
                 // 4. rewire the tree
-                rewire(newVertex, nearVertices);
+                //rewire(newVertex, nearVertices);
             }
         }
 
@@ -108,6 +109,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             target.parent.removeChild(target);
         }
 
+        assert(extension.exact ? extension.target.equals(target.getState()) : true);
+
         parent.addChild(target);
         target.setParent(parent);
         target.setEdgeFromParent(extension.edge);
@@ -122,6 +125,16 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             Straight straight = (Straight) extension.edge;
             assert(straight.getStart().distance((TimePoint) parent.getState()) <= 0.001);
             assert(straight.getEnd().distance((TimePoint) target.getState()) <= 0.001);
+        }
+
+        if (domain instanceof ProcerusStraightLineDomain) {
+            ProcerusStraightLineDomain psld = (ProcerusStraightLineDomain) domain;
+            TimePoint storedParent = psld.parents.get(target.getState());
+
+            if (parent != null) {
+                assert(storedParent != null);
+                assert(storedParent.equals(parent.getState()));
+            }
         }
 
         ////////

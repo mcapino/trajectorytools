@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Vector3d;
 
 import org.jgrapht.GraphPath;
 
@@ -17,8 +18,6 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingCylinderSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
@@ -30,8 +29,8 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
 import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
-import cz.agents.alite.trajectorytools.vis.SimulatedAgentLayer;
-import cz.agents.alite.trajectorytools.vis.SimulatedAgentLayer.TimeProvider;
+import cz.agents.alite.trajectorytools.vis.SimulatedCylindricAgentLayer;
+import cz.agents.alite.trajectorytools.vis.SimulatedCylindricAgentLayer.TimeProvider;
 import cz.agents.alite.trajectorytools.vis.SimulationControlLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
@@ -46,6 +45,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class RRTStarTwoAgentsDemoCreator implements Creator {
 
     final double SEPARATION = 140.0;
+    final double HALFHEIGHT = 20.0;
 
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
@@ -73,17 +73,17 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
         t2 = (new Straight(new TimePoint(500, 900, 50, 0), new TimePoint(500, 100, 50, 53))).getTrajectory();
 
-        obstacles.add(new MovingCylinderSafeRegion(t2, SEPARATION, 20, 0.5));
+        obstacles.add(new MovingCylinderSafeRegion(t2, SEPARATION, HALFHEIGHT, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
-            = new ProcerusStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 45, new Random(1));
+            = new ProcerusStraightLineDomain(bounds, initialPoint, new Vector3d(0,1,0), obstacles, target, targetReachedTolerance, 12, 15, 18, 45, 50, 100, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
         simulation.updateTrajectory("t2", t2);
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=100000;
+        int n=100;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
@@ -119,10 +119,10 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
         VisManager.setSceneParam(new SceneParams() {
 
-			@Override
-			public Rectangle getWorldBounds() {
-				return new Rectangle(-1000, -1000, 3000, 3000);
-			}
+            @Override
+            public Rectangle getWorldBounds() {
+                return new Rectangle(-1000, -1000, 3000, 3000);
+            }
 
         });
         VisManager.init();
@@ -229,12 +229,12 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         projection,
         Color.BLACK, 1));
 
-        VisManager.registerLayer(SimulatedAgentLayer.create(simulation.getAgentStorage(), projection, new TimeProvider() {
+        VisManager.registerLayer(SimulatedCylindricAgentLayer.create(simulation.getAgentStorage(), projection, new TimeProvider() {
 
             @Override
             public double getTime() {
                 return simulation.getTime();
             }
-        }, SEPARATION, 5));
+        }, SEPARATION, HALFHEIGHT));
     }
   }

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Vector3d;
 
 import org.jgrapht.GraphPath;
 
@@ -14,7 +15,6 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
@@ -39,10 +39,11 @@ public class RRTStar4dDemoCreator implements Creator {
 
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
-    TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
+    TimePoint initialPoint = new TimePoint(100, 500, 50, 0);
+    Vector3d initialHeading = new Vector3d(0,1,0);
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 10, 0), new TimePoint(1000, 1000, 70, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(160, 990, 50);
+    SpatialPoint target = new SpatialPoint(120, 500, 50);
     double targetReachedTolerance = 5;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
@@ -57,10 +58,11 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
+        /*
         obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
         obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
         obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
-
+    */
         // Add obstacles
         /*
         for(int x=5; x < 20; x++) {
@@ -71,7 +73,7 @@ public class RRTStar4dDemoCreator implements Creator {
         }*/
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new ProcerusStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new ProcerusStraightLineDomain(bounds, initialPoint, initialHeading, obstacles, target, targetReachedTolerance, 12,15,30, 45, 100, 100, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
@@ -95,6 +97,7 @@ public class RRTStar4dDemoCreator implements Creator {
                 }
 
             }
+
 
             /*
             try {

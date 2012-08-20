@@ -5,6 +5,7 @@ import javax.vecmath.Point4d;
 
 public class TimePoint extends Point4d {
     private static final long serialVersionUID = 1136064568843307511L;
+    private static final double EPSILON = 1e-6;
 
     public TimePoint(double x, double y, double z, double time) {
         super(x,y,z,time);
