@@ -1,6 +1,8 @@
 package cz.agents.alite.trajectorytools.util;
 
 import javax.vecmath.Matrix4d;
+import javax.vecmath.Tuple4d;
+import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
 public class OrientedTimePoint extends TimePoint {
@@ -68,7 +70,28 @@ public class OrientedTimePoint extends TimePoint {
         ddy = this.orientation.y - p1.orientation.y;
         ddz = this.orientation.z - p1.orientation.z;
 
-        return Math.sqrt(dx*dx + dy*dy + dz*dz +dw*dw + ddx*ddx + ddy*ddy + ddz*ddz);
+        return Math.sqrt(dx*dx + dy*dy + dz*dz + dw*dw + 10*ddx*ddx + 10*ddy*ddy + 10*ddz*ddz);
       }
 
+	public boolean epsilonEquals(OrientedTimePoint other, double epsilon) {
+		return super.epsilonEquals(other, epsilon) && orientation.epsilonEquals(other.orientation, epsilon);
+	}
+	
+    /**
+     * An angle between two vectors, adapted the implementation from VecMath to return angle in range [-PI and PI]
+     */
+    public static double angle(Vector2d a, Vector2d b)
+    {
+
+       double vDot = a.dot(b) / ( a.length()*b.length() );
+       if( vDot < -1.0) vDot = -1.0;
+       if( vDot >  1.0) vDot =  1.0;
+
+       double angle = Math.atan2( a.x*b.y - a.y*b.x, a.x*b.x + a.y*b.y );
+
+       return(angle);
+    }
+	
+      
+      
 }
