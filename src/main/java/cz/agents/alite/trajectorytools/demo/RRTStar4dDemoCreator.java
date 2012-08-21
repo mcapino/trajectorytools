@@ -16,11 +16,12 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.OrientedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
+import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
@@ -37,19 +38,21 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class RRTStar4dDemoCreator implements Creator {
 
-    RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
+    RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver> rrtstar;
 
-    TimePoint initialPoint = new TimePoint(100, 500, 50, 0);
+    TimePoint initialTimePoint = new TimePoint(500, 500, 50, 0);
     Vector3d initialHeading = new Vector3d(0,1,0);
+    OrientedTimePoint initialState = new OrientedTimePoint(initialTimePoint, initialHeading);
+
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 10, 0), new TimePoint(1000, 1000, 70, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
     SpatialPoint target = new SpatialPoint(120, 500, 50);
-    double targetReachedTolerance = 5;
+    double targetReachedTolerance = 15;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
-    double gamma = 3300;
+    double gamma = 150;
 
     @Override
     public void init(String[] args) {
@@ -73,8 +76,11 @@ public class RRTStar4dDemoCreator implements Creator {
         }*/
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new ProcerusStraightLineDomain(bounds, initialPoint, initialHeading, obstacles, target, targetReachedTolerance, 12,15,30, 45, 100, 100, new Random(1));
-        rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
+        Domain<OrientedTimePoint, SpatioTemporalManeuver> domain = new OrientedStraightLineDomain(
+                bounds, initialState,
+                obstacles, target, targetReachedTolerance, 12, 15, 30, 50, 100, 45, new Random(1));
+        rrtstar = new RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver>(domain, initialState, gamma);
+
         createVisualization();
 
         double bestCost = Double.POSITIVE_INFINITY;
@@ -85,8 +91,8 @@ public class RRTStar4dDemoCreator implements Creator {
             if (rrtstar.getBestVertex() != null && rrtstar.getBestVertex().getCostFromRoot() < bestCost) {
                 bestCost = rrtstar.getBestVertex().getCostFromRoot();
                 System.out.println("Iteration: " + i + " Best path cost: " + bestCost);
-                GraphPath<TimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
-                trajectory = new SpatioTemporalManeuverTrajectory<TimePoint, SpatioTemporalManeuver>(path, path.getWeight());
+                GraphPath<OrientedTimePoint, SpatioTemporalManeuver> path = rrtstar.getBestPath();
+                trajectory = new SpatioTemporalManeuverTrajectory<OrientedTimePoint, SpatioTemporalManeuver>(path, path.getWeight());
                 //trajectory =  new SampledTrajectory(trajectory, 100);
 
                 for (SpatioTemporalManeuver maneuver : path.getEdgeList()) {

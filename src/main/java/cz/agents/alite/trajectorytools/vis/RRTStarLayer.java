@@ -28,7 +28,7 @@ public class RRTStarLayer extends AbstractLayer {
     RRTStarLayer() {
     }
 
-    public static <V> VisLayer create(final RRTStarPlanner<V,?> rrtstar, final ProjectionTo2d<V> projection, final Color edgeColor, final Color vertexColor,
+    public static <V> VisLayer create(final RRTStarPlanner<V,?> rrtstar, final ProjectionTo2d<? super V> projection, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
@@ -43,7 +43,7 @@ public class RRTStarLayer extends AbstractLayer {
                 queue.add(rrtstar.getRoot());
 
                 while(!queue.isEmpty()) {
-                    Vertex<V,?> current = queue.poll();
+                   Vertex<V,?> current = queue.poll();
                    for (Vertex<V,?> child : current.getChildren()) {
                         queue.offer(child);
 
