@@ -6,9 +6,12 @@ import java.util.Queue;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector4d;
 
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
+import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.Point;
@@ -104,6 +107,50 @@ public class RRTStarLayer extends AbstractLayer {
             @Override
             public Color getColor() {
                 return vertexColor;
+            }
+
+        }));
+
+        // vertices (orientation) HACK!!!
+        group.addSubLayer(LineLayer.create(new LineElements() {
+
+            @Override
+            public Iterable<Line> getLines() {
+                LinkedList<Line> lines = new LinkedList<Line>();
+
+                Queue<Vertex<V,?>> queue = new LinkedList<Vertex<V,?>>();
+                queue.add(rrtstar.getRoot());
+
+                while(!queue.isEmpty()) {
+                    Vertex<V,?> current = queue.poll();
+
+                    if (current.getState() instanceof OrientedTimePoint) {
+                        OrientedTimePoint point = (OrientedTimePoint) current.getState();
+
+                        Point2d start = projection.project((V) point);
+                        TimePoint endTimePoint = new TimePoint(point);
+                        endTimePoint.add(new Vector4d(point.orientation.x, point.orientation.y, point.orientation.z, 1));
+                        Point2d end = projection.project((V) endTimePoint);
+                        lines.add(new LineImpl(new Point3d(start.x, start.y, 0), new Point3d(end.x, end.y, 0)));
+
+                    }
+
+                    for (Vertex<V,?> child : current.getChildren()) {
+                        queue.offer(child);
+                    }
+
+                }
+                return lines;
+            }
+
+            @Override
+            public int getStrokeWidth() {
+                return edgeStrokeWidth;
+            }
+
+            @Override
+            public Color getColor() {
+                return Color.BLUE;
             }
 
         }));

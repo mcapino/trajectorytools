@@ -15,10 +15,8 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedOrientedStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.OrientedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
@@ -48,13 +46,13 @@ public class RRTStar4dDemoCreator implements Creator {
 
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 60, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(80, 100, 50);
+    SpatialPoint target = new SpatialPoint(110, 300, 60);
     double targetReachedTolerance = 15;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
-    double gamma = 650;
+    double gamma = 1250;
 
     @Override
     public void init(String[] args) {
@@ -63,11 +61,11 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        
+
         //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
         //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 400, 20),80));
         //obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
-    
+
         // Add obstacles
         /*
         for(int x=5; x < 8; x++) {
@@ -80,7 +78,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
         Domain<OrientedTimePoint, SpatioTemporalManeuver> domain = new GuidedOrientedStraightLineDomain(
                 bounds, initialState,
-                obstacles, target, targetReachedTolerance, 15, 15, 15, 50, 30, 45, new Random(1));
+                obstacles, target, targetReachedTolerance, 14, 15, 16, 50, 50, 45, new Random(1));
         rrtstar = new RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver>(domain, initialState, gamma);
 
         createVisualization();
@@ -105,9 +103,10 @@ public class RRTStar4dDemoCreator implements Creator {
                 }
 
             }
-            
+
+
             try {
-                Thread.sleep(1);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

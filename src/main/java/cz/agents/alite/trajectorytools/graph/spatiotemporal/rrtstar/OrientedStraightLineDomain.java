@@ -38,7 +38,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
 
     double segmentDistance;
     double maxAbsPitchRad;
-	double minTurnRadius;
+    double minTurnRadius;
 
 
     Random random;
@@ -77,7 +77,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
             // angle
             double dx = random.nextDouble()*2 - 1;
             double dy = random.nextDouble()*2 - 1;
-            double dz = random.nextDouble()*2 - 1;
+            double dz = 0;
             point = new OrientedTimePoint(new TimePoint(x, y, z, t), new Vector(dx, dy, dz) );
         } while (!isInFreeSpace(point));
         return point;
@@ -89,7 +89,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
             OrientedTimePoint from, OrientedTimePoint to) {
 
         double requiredDistance = from.getSpatialPoint().distance(to.getSpatialPoint());
-        
+
         if (requiredDistance < 0.001) return null;
 
         // Compute required speed
@@ -99,28 +99,28 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
         Vector2d toVector = new Vector2d(horizontal(to.getSpatialPoint()));
         toVector.sub(horizontal(from.getSpatialPoint()));
         double requiredYawChangeToReachTargetPoint = angle(horizontal(from.orientation), toVector);
-        
+
         // Compute yaw step needed to reach "to" orientation
         double requiredYawChangeToReachTargetOrientation  = angle(horizontal(from.orientation), horizontal(to.orientation));
-        
+
         // Compute pitch step needed
         double verticalDistance = to.z - from.z;
         double horizontalDistance = horizontal(from.getSpatialPoint()).distance(horizontal(to.getSpatialPoint()));
         double requiredPitchAngleInRad = horizontalDistance != 0 ? Math.atan(verticalDistance / horizontalDistance) : 0;
 
         double maxYawChangeInSegment = Math.min(requiredDistance / (2 * minTurnRadius),  segmentDistance / (2 * minTurnRadius));
-        
+
         double distance;
         if (Math.abs(requiredYawChangeToReachTargetPoint) <= maxYawChangeInSegment  &&
             Math.abs(requiredPitchAngleInRad) <= maxAbsPitchRad &&
-            requiredSpeed >= minSpeed && requiredSpeed <= maxSpeed            
+            requiredSpeed >= minSpeed && requiredSpeed <= maxSpeed
             ) {
             // spatially exact segment is possible
             distance = requiredDistance;
         } else {
-        	// spatially exact segment is not possible
-        	distance = Math.min(requiredDistance, segmentDistance);
-        	maxYawChangeInSegment = distance / (2 * minTurnRadius);
+            // spatially exact segment is not possible
+            distance = Math.min(requiredDistance, segmentDistance);
+            maxYawChangeInSegment = distance / (2 * minTurnRadius);
         }
 
         // Clamp to kinematic limits
@@ -139,13 +139,13 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
         edgeVector.scale(distance);
         Point3d targetSpatialPoint = from.getSpatialPoint();
         targetSpatialPoint.add(edgeVector);
-        
+
         // compute target orientation
         Vector2d fromHorizontalOrientation = horizontal(from.orientation);
         fromHorizontalOrientation = rotateYaw(fromHorizontalOrientation, yawChangeToTargetOrientationInRad);
         fromHorizontalOrientation.normalize();
 
-        double targetOrientationPitchRad = Math.asin(to.orientation.z); 
+        double targetOrientationPitchRad = Math.asin(to.orientation.z);
         Vector3d targetOrientation = new Vector3d(horizontalOrientation.x, horizontalOrientation.y, Math.tan(targetOrientationPitchRad));
         targetOrientation.normalize();
 
@@ -169,7 +169,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
         return new Extension<OrientedTimePoint, SpatioTemporalManeuver>(from, target, maneuver, cost, exact);
 
    }
-   
+
    @Override
    public Extension<OrientedTimePoint, SpatioTemporalManeuver> extendTo(
            OrientedTimePoint from, OrientedTimePoint to) {
@@ -180,7 +180,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
             OrientedTimePoint from, OrientedTimePoint to) {
 
         Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = steer(from, to);
-        
+
         if (extension != null && !intersectsObstacles(extension.source, extension.target)) {
             return extension;
         } else {
@@ -194,9 +194,9 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
 
         Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = steer(from, to);
         if (extension != null) {
-        	return new ExtensionEstimate(extension.cost, extension.exact);
+            return new ExtensionEstimate(extension.cost, extension.exact);
         } else {
-        	return null;
+            return null;
         }
     }
 

@@ -59,31 +59,44 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         // 1. Sample a new state
         S randomSample = domain.sampleState();
 
-        // 2. Compute the set of all near vertices
-        Collection<Vertex<S,E>> nearVertices = getNear(randomSample, nSamples);
+        Vertex<S,E> nearestVertex =  getNearestVertex(randomSample);
+        Extension<S, E> extensionToNear = domain.extendTo(nearestVertex.getState(), randomSample);
 
-        // 3. Find the best parent and extend from that parent
-        BestParentSearchResult result = null;
-        if(nearVertices.isEmpty()) {
-            // 3.a Extend the nearest
-            Vertex<S,E> parent = getNearestVertex(randomSample);
-            Extension<S, E> extension = domain.extendTo(parent.getState(), randomSample);
-            if (extension != null) {
-                result = new BestParentSearchResult(parent, extension);
+        if (extensionToNear != null) {
+            S newSample = extensionToNear.target;
+
+            // 2. Compute the set of all near vertices
+            Collection<Vertex<S,E>> nearVertices = getNear(newSample, nSamples);
+
+            // 3. Find the best parent and extend from that parent
+            BestParentSearchResult result = null;
+            if(nearVertices.isEmpty()) {
+                // 3.a Extend the nearest
+                Vertex<S,E> parent = getNearestVertex(randomSample);
+                Extension<S, E> extension = domain.extendTo(parent.getState(), randomSample);
+                if (extension != null) {
+                    result = new BestParentSearchResult(parent, extension);
+                }
+            } else {
+                // 3.b Extend the best parent within the near vertices
+                result = findBestParent(newSample, nearVertices);
             }
-        } else {
-            // 3.b Extend the best parent within the near vertices
-            result = findBestParent(randomSample, nearVertices);
+
+            if (result != null) {
+                // 3.c add the trajectory from the best parent to the tree
+                Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
+                if (newVertex != null) {
+                    // 4. rewire the tree
+                    rewire(newVertex, nearVertices);
+                }
+            }
+
         }
 
-        if (result != null) {
-            // 3.c add the trajectory from the best parent to the tree
-            Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
-            if (newVertex != null) {
-                // 4. rewire the tree
-                //rewire(newVertex, nearVertices);
-            }
-        }
+
+
+
+
 
     }
 
@@ -196,7 +209,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         for (VertexCost vertexCost : vertexCosts) {
             Vertex<S,E> vertex = vertexCost.vertex;
             Extension<S, E> extension = domain.extendTo(vertex.getState(), randomSample);
-            if (extension != null) {
+            if (extension != null && extension.exact) {
                 return new BestParentSearchResult(vertex, extension);
             }
         }
