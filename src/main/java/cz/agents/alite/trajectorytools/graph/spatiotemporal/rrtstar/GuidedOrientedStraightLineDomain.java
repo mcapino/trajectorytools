@@ -7,8 +7,10 @@ import java.util.Random;
 
 import javax.vecmath.Vector3d;
 
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
@@ -69,6 +71,24 @@ public class GuidedOrientedStraightLineDomain extends OrientedStraightLineDomain
         return samplesPool.poll();
 
     }
+
+
+
+
+	@Override
+	public Extension<OrientedTimePoint, SpatioTemporalManeuver> extendTo(
+			OrientedTimePoint from, OrientedTimePoint to) {
+		Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = super.extendTo(from, to);
+		
+		if (extension != null) {
+			if (Math.random() < 0.05)
+				samplesPool.add(getTargetSample(extension.target));
+		}
+		
+		return extension;
+	}
+    
+    
 
 
 

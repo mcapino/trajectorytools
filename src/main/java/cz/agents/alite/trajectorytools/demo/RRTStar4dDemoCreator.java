@@ -15,6 +15,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedOrientedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
@@ -46,13 +47,13 @@ public class RRTStar4dDemoCreator implements Creator {
 
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 60, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(110, 300, 60);
+    SpatialPoint target = new SpatialPoint(50, 800, 60);
     double targetReachedTolerance = 15;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
-    double gamma = 1250;
+    double gamma = 250;
 
     @Override
     public void init(String[] args) {
@@ -64,7 +65,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
         //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
         //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 400, 20),80));
-        //obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
 
         // Add obstacles
         /*
@@ -106,7 +107,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
