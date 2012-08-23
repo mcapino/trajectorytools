@@ -54,7 +54,7 @@ public class GuidedOrientedStraightLineDomain extends OrientedStraightLineDomain
             samplesPool.offer(randomSample);
 
             // Bias towards goal at optimal speed
-            samplesPool.offer(getTargetSample(randomSample));
+            //samplesPool.offer(getTargetSample(randomSample));
 
             // Bias towards random sample from initial point at optimal speed
             double optTime = initialPoint.getTime() +

@@ -65,7 +65,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
         //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z)));
         //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 400, 20),80));
-        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,850,bounds.getCorner2().z)));
 
         // Add obstacles
         /*
