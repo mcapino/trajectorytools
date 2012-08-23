@@ -28,7 +28,7 @@ public class ConcatenatedTrajectory implements Trajectory {
 		trajectories = new LinkedList<Trajectory>(inputTrajectories);
 		
 		minTime = trajectories.getFirst().getMinTime();
-		maxTime = trajectories.getLast().getMinTime();
+		maxTime = trajectories.getLast().getMaxTime();
 		
 		//check consistency
 		double t = minTime;
