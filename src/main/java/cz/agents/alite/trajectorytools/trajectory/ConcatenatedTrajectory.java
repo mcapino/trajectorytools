@@ -21,6 +21,10 @@ public class ConcatenatedTrajectory implements Trajectory {
 	
 	public ConcatenatedTrajectory(List<Trajectory> inputTrajectories){
 		
+		if(inputTrajectories.isEmpty()){
+			throw new IllegalArgumentException("Empty list of trajectories!");
+		}
+		
 		trajectories = new LinkedList<Trajectory>(inputTrajectories);
 		
 		minTime = trajectories.getFirst().getMinTime();
