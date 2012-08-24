@@ -21,7 +21,7 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
-public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, SpatioTemporalManeuver> {
+public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, SpatioTemporalManeuver> {
 
     private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
 
@@ -43,7 +43,7 @@ public class OrientedStraightLineDomain implements Domain<OrientedTimePoint, Spa
 
     Random random;
 
-    public OrientedStraightLineDomain(Box4dRegion bounds, OrientedTimePoint initialPoint,
+    public KinematicStraightLineDomain(Box4dRegion bounds, OrientedTimePoint initialPoint,
             Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double minSegmentDistance, double minTurnRadius, double maxPitchDeg, Random random) {
         super();

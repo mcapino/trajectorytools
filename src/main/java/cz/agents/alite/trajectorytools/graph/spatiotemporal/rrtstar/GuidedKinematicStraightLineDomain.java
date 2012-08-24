@@ -15,11 +15,11 @@ import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class GuidedOrientedStraightLineDomain extends OrientedStraightLineDomain {
+public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDomain {
 	
 	Queue<OrientedTimePoint> samplesPool = new LinkedList<OrientedTimePoint>();
 
-    public GuidedOrientedStraightLineDomain(Box4dRegion bounds,
+    public GuidedKinematicStraightLineDomain(Box4dRegion bounds,
 			OrientedTimePoint initialPoint, Collection<Region> obstacles,
 			SpatialPoint target, double targetReachedTolerance,
 			double minSpeed, double optSpeed, double maxSpeed,
