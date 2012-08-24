@@ -46,7 +46,7 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 60, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(50, 400, 60);
+    SpatialPoint target = new SpatialPoint(500, 100, 60);
     double targetReachedTolerance = 15;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
@@ -121,12 +121,12 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
             @Override
             public Point2d getDefaultLookAt() {
-                return new Point2d(0,0);
+                return new Point2d(500, 500);
             }
 
             @Override
             public double getDefaultZoomFactor() {
-                return 1.0;
+                return 0.38;
             }
 
         });
