@@ -30,6 +30,11 @@ public class WaypointStraightLineTrajectory implements Trajectory {
     @Override
     public OrientedPoint getPosition(double t) {
         assert(t >= getMinTime() && t <= getMaxTime());
+        
+        if(t == getMinTime() && waypoints.size() == 1){
+        	TimePoint start = waypoints.get(0);
+        	return new OrientedPoint(start.getSpatialPoint(), new Vector(0,1,0));
+        }
 
         for (int i=0; i < waypoints.size()-1; i++) {
             TimePoint start = waypoints.get(i);
