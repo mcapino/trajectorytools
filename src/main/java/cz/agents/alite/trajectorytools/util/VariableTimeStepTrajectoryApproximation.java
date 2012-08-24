@@ -16,6 +16,11 @@ public class VariableTimeStepTrajectoryApproximation {
 	 * @param maxAngle Maximal angle which is ignored. 
 	 * @return
 	 */
+
+	public static List<TimePoint> approximate(Trajectory trajectory){
+		return approximate(trajectory, trajectory.getMinTime(), trajectory.getMaxTime(), 0.5, Math.PI/8);
+	}
+
 	public static List<TimePoint> approximate(Trajectory trajectory, double minTime, double maxTime, double sampleStep, double maxAngle){
 		
 		if(minTime < trajectory.getMinTime())minTime = trajectory.getMinTime();
