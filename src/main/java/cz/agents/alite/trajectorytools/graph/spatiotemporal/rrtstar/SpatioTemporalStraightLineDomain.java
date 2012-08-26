@@ -55,7 +55,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         this.random = random;
 
         if (!isInFreeSpace(initialPoint)) {
-            throw new IllegalArgumentException("Initial point is not in free space");
+            throw new IllegalArgumentException("Initial point " + initialPoint + "is not in free space");
         }
     }
 

@@ -1,6 +1,7 @@
 package cz.agents.alite.trajectorytools.vis;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,15 +14,19 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
 import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
+import cz.agents.alite.vis.element.Circle;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.Point;
+import cz.agents.alite.vis.element.aggregation.CircleElements;
 import cz.agents.alite.vis.element.aggregation.LineElements;
 import cz.agents.alite.vis.element.aggregation.PointElements;
+import cz.agents.alite.vis.element.implemetation.CircleImpl;
 import cz.agents.alite.vis.element.implemetation.LineImpl;
 import cz.agents.alite.vis.element.implemetation.PointImpl;
 import cz.agents.alite.vis.layer.AbstractLayer;
 import cz.agents.alite.vis.layer.GroupLayer;
 import cz.agents.alite.vis.layer.VisLayer;
+import cz.agents.alite.vis.layer.terminal.CircleLayer;
 import cz.agents.alite.vis.layer.terminal.LineLayer;
 import cz.agents.alite.vis.layer.terminal.PointLayer;
 
@@ -154,8 +159,88 @@ public class RRTStarLayer extends AbstractLayer {
             }
 
         }));
+        
+        // random sample
+        group.addSubLayer(PointLayer.create(new PointElements() {
 
+            @Override
+            public Iterable<Point> getPoints() {
+                LinkedList<Point> points = new LinkedList<Point>();
+                V lastSample = rrtstar.getLastSample();
+
+                if (lastSample != null) {
+                	Point2d point = projection.project(lastSample);
+                	points.add(new PointImpl(new Point3d(point.x, point.y, 0)));
+                }
+                return points;
+            }
+
+            @Override
+            public int getStrokeWidth() {
+                return 10;
+            }
+
+            @Override
+            public Color getColor() {
+                return Color.RED;
+            }
+
+        }));
+        
+        // new sample
+        group.addSubLayer(PointLayer.create(new PointElements() {
+
+            @Override
+            public Iterable<Point> getPoints() {
+                LinkedList<Point> points = new LinkedList<Point>();
+                V newSample = rrtstar.getNewSample();
+
+                if (newSample != null) {
+                	Point2d point = projection.project(newSample);
+                	points.add(new PointImpl(new Point3d(point.x, point.y, 0)));
+                }
+                return points;
+            }
+
+            @Override
+            public int getStrokeWidth() {
+                return 6;
+            }
+
+            @Override
+            public Color getColor() {
+                return Color.MAGENTA;
+            }
+
+        }));
+
+        group.addSubLayer(CircleLayer.create(new CircleElements() {
+			
+			@Override
+			public int getStrokeWidth() {
+				return 1;
+			}
+			
+			@Override
+			public Color getColor() {
+				return Color.MAGENTA;
+			}
+			
+			@Override
+			public Iterable<? extends Circle> getCircles() {
+				ArrayList<Circle> circles = new ArrayList<Circle>();
+				
+				V newSample = rrtstar.getNewSample();
+
+	            if (newSample != null) {
+	            	Point2d point = projection.project(newSample);
+	                circles.add(new CircleImpl(new Point3d(point.x, point.y, 0), rrtstar.getNearBallRadius()));
+	            }
+				
+				return circles;
+			}
+		}));
+        
         return group;
     }
-
 }

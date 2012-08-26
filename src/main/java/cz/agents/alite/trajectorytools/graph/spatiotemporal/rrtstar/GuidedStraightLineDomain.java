@@ -25,16 +25,11 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
     }
 
 
-
-
     private TimePoint getTargetSample(TimePoint from) {
         double duration = from.getSpatialPoint().distance(target) / optSpeed;
         return new TimePoint(target, from.getTime() + duration);
     }
-
-
-
-
+    
     @Override
     public TimePoint sampleState() {
         if (samplesPool.isEmpty()) {
@@ -58,11 +53,5 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
         }
 
         return samplesPool.poll();
-
     }
-
-
-
-
-
 }

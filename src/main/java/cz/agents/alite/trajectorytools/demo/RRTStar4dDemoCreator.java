@@ -32,6 +32,7 @@ import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
@@ -41,9 +42,9 @@ public class RRTStar4dDemoCreator implements Creator {
     RRTStarPlanner<TimePoint, SpatioTemporalManeuver> rrtstar;
 
     TimePoint initialPoint = new TimePoint(100, 100, 50, 0);
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 49, 0), new TimePoint(1000, 1000, 55, 200));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 100, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(900, 760, 50);
+    SpatialPoint target = new SpatialPoint(500, 760, 50);
     double targetReachedTolerance = 5;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
@@ -58,21 +59,19 @@ public class RRTStar4dDemoCreator implements Creator {
 
     @Override
     public void create() {
-        //obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z*0.9)));
-
-        //obstacles.add(new BoxRegion(new Point(100, 100, 0), new Point(200,200,750)));
-
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z*1.0)));
         //obstacles.add(new StaticSphereRegion(new SpatialPoint(400, 100, 0),80));
-        //obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
+        obstacles.add(new StaticBoxRegion(new SpatialPoint(100, 200, 0), new SpatialPoint(230,950,bounds.getCorner2().z)));
 
         // Add obstacles
 
+    	/*
         for(int x=5; x < 20; x++) {
             for (int y=5; y < 20; y++) {
                 int z = (int) (Math.random() * bounds.getCorner2().z / 2);
                 obstacles.add(new StaticBoxRegion(new SpatialPoint(x*50, y*50, z), new SpatialPoint(x*50+30, y*50+30, z + bounds.getCorner2().z/2)));
             }
-        }
+        } */
 
 
         Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, new Random(1));
@@ -99,20 +98,33 @@ public class RRTStar4dDemoCreator implements Creator {
                 }
 
             }
-
-            /*
+            
+            
+            
             try {
-                Thread.sleep(10);
+                Thread.sleep(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
 
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
-        VisManager.setPanningBounds(new Rectangle(-4000, -4000, 10000, 10000));
+        VisManager.setSceneParam(new SceneParams() {
+
+			@Override
+			public Point2d getDefaultLookAt() {
+				return new Point2d(500, 500);
+			}
+
+			@Override
+			public double getDefaultZoomFactor() {
+				return 0.4;
+			}
+        	
+        });
         VisManager.init();
 
         Vis.setPosition(50, 50, 1);

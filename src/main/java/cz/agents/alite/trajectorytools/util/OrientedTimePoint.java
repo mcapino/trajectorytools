@@ -10,7 +10,22 @@ public class OrientedTimePoint extends TimePoint {
 
     // A vector representing the orientation
     public Vector3d orientation;
-
+    
+    public OrientedTimePoint(double x, double y, double z, double t, double dx, double dy, double dz) {
+        this(new TimePoint(x,y,z,t), new Vector3d(dx,dy,dz));
+    }
+    
+    /**
+     * Creates an oriented point from a timepoint and yaw rotation. 
+     * Assuming coordinate systems, where x-axis goes from noth to southe, 
+     * where higher values are more south, and y-axis goes from east to west.
+     * 
+     * @param yaw cw rotation in z-axis, 0 is north, PI/2 is east and  -PI/2 (or 3/2PI) is west.
+     */
+    public OrientedTimePoint(TimePoint point, double yaw) {
+        this(point, new Vector3d(Math.sin(yaw), Math.cos(yaw), 0)); 
+    }
+    
     public OrientedTimePoint(TimePoint point, Vector3d orientation) {
         super(point);
         if (orientation == null) {

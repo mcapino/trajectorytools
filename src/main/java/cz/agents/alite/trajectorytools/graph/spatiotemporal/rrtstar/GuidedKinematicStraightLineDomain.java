@@ -38,7 +38,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
         double duration = from.getSpatialPoint().distance(target) / optSpeed;
         Vector3d orientation = new Vector3d(target);
         orientation.sub(from.getSpatialPoint());
-        orientation.setZ(0.0);
+        orientation.z = 0.0;
         orientation.normalize();
         return new OrientedTimePoint(new TimePoint(target, from.getTime() + duration), orientation);
     }
@@ -81,7 +81,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 		Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = super.extendTo(from, to);
 		
 		if (extension != null) {
-			if (Math.random() < 0.05)
+			if (random.nextFloat() < 0.1)
 				samplesPool.add(getTargetSample(extension.target));
 		}
 		

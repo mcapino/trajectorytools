@@ -30,6 +30,7 @@ import cz.agents.alite.trajectorytools.vis.projection.DefaultProjection;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
@@ -55,7 +56,7 @@ public class RRTStar2dDemoCreator implements Creator {
     @Override
     public void create() {
 
-        createObstacles(455, 80);
+        createObstacles(200, 80);
 
         Domain<SpatialPoint, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
         rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain, initialPoint, 1300);
@@ -72,12 +73,12 @@ public class RRTStar2dDemoCreator implements Creator {
                 //trajectory =  new SampledTrajectory(trajectory, 100);
             }
 
-            /*
+            
             try {
-                Thread.sleep(5);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
@@ -98,7 +99,17 @@ public class RRTStar2dDemoCreator implements Creator {
 
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 2000, 2000);
-        VisManager.setPanningBounds(new Rectangle(-2000, -2000, 5000, 5000));
+        VisManager.setSceneParam(new SceneParams(){
+
+			@Override
+			public Point2d getDefaultLookAt() {
+				return new Point2d(500, 500);
+			}
+			
+			@Override
+			public double getDefaultZoomFactor() {
+				return 0.5;
+			} });
         VisManager.init();
 
         Vis.setPosition(50, 50, 1);
