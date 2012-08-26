@@ -75,7 +75,7 @@ public class RRTStar2dDemoCreator implements Creator {
 
             
             try {
-                Thread.sleep(10);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

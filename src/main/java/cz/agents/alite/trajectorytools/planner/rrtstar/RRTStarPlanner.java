@@ -73,22 +73,13 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             S newSample = extensionToNear.target;
             lastNewSample = newSample;
 
-            // 2. Compute the set of all near vertices
+            // 2. Compute the set of all near vertices in the ball 
             Collection<Vertex<S,E>> nearVertices = getNear(newSample);
+            nearVertices.add(nearestVertex);
 
             // 3. Find the best parent and extend from that parent
             BestParentSearchResult result = null;
-            if(nearVertices.isEmpty()) {
-                // 3.a Extend the nearest
-                Vertex<S,E> parent = getNearestVertex(randomSample);
-                Extension<S, E> extension = domain.extendTo(parent.getState(), randomSample);
-                if (extension != null) {
-                    result = new BestParentSearchResult(parent, extension);
-                }
-            } else {
-                // 3.b Extend the best parent within the near vertices
-                result = findBestParent(newSample, nearVertices);
-            }
+            result = findBestParent(newSample, nearVertices);
 
             if (result != null) {
                 // 3.c add the trajectory from the best parent to the tree

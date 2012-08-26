@@ -54,7 +54,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
             samplesPool.offer(randomSample);
 
             // Bias towards goal at optimal speed
-            //samplesPool.offer(getTargetSample(randomSample));
+            samplesPool.offer(getTargetSample(randomSample));
 
             // Bias towards random sample from initial point at optimal speed
             double optTime = initialPoint.getTime() +
@@ -79,11 +79,6 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 	public Extension<OrientedTimePoint, SpatioTemporalManeuver> extendTo(
 			OrientedTimePoint from, OrientedTimePoint to) {
 		Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = super.extendTo(from, to);
-		
-		if (extension != null) {
-			if (random.nextFloat() < 0.1)
-				samplesPool.add(getTargetSample(extension.target));
-		}
 		
 		return extension;
 	}

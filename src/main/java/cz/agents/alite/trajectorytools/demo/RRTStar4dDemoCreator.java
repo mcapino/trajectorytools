@@ -2,6 +2,7 @@ package cz.agents.alite.trajectorytools.demo;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
@@ -99,13 +100,17 @@ public class RRTStar4dDemoCreator implements Creator {
 
             }
             
-            
-            
+            /*
+            try {
+            	System.in.read();
+            }
+            catch (Exception e) {}; */
+            /*
             try {
                 Thread.sleep(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
     }

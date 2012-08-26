@@ -8,6 +8,8 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
+import org.lwjgl.Sys;
+
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -157,7 +159,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         double cost = evaluateFuelCost(from.getSpatialPoint(), target.getSpatialPoint(), speed);
 
         boolean exact;
-        if (target.epsilonEquals(to, 0.001)) {
+        if (target.epsilonEquals(to, 0.0001)) {
             target = to;
             exact = true;
         } else {
