@@ -23,12 +23,7 @@ public class VariableTimeStepTrajectoryApproximation {
 
 	public static List<TimePoint> approximate(Trajectory trajectory, double minTime, double maxTime, double sampleStep, double maxAngle){
 		
-		if(minTime < trajectory.getMinTime())minTime = trajectory.getMinTime();
-		if(maxTime > trajectory.getMaxTime())maxTime = trajectory.getMaxTime();
-		
-		
 		List<TimePoint> output = new LinkedList<TimePoint>();
-		
 		
 		OrientedPoint prev = trajectory.getPosition(minTime);
 		
