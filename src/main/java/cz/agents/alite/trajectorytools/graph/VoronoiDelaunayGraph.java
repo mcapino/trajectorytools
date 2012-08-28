@@ -15,6 +15,7 @@ import org.jgrapht.graph.SimpleGraph;
 import cz.agents.alite.trajectorytools.graph.delaunay.Pnt;
 import cz.agents.alite.trajectorytools.graph.delaunay.Triangle;
 import cz.agents.alite.trajectorytools.graph.delaunay.Triangulation;
+import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class VoronoiDelaunayGraph {
@@ -32,8 +33,6 @@ public class VoronoiDelaunayGraph {
             new Pnt( INITIAL_SIZE, -INITIAL_SIZE),
             new Pnt(           0,  INITIAL_SIZE));  // Initial triangle
     private Triangulation dt;                      // Delaunay triangulation
-
-    private static int order = 1000;
 
     private Set<SpatialPoint> obstacles;
 
@@ -69,14 +68,12 @@ public class VoronoiDelaunayGraph {
     public Graph<SpatialPoint, DefaultWeightedEdge> getVoronoiGraph(List<SpatialPoint> border) {
         Graph<SpatialPoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
-        order = 0;
-
         Map<Triangle, SpatialPoint> vertexes = new HashMap<Triangle, SpatialPoint>(); 
         
         for (Triangle triangle : dt) {
             Pnt circumcenter = triangle.getCircumcenter();
             
-            SpatialPoint vertex = new SpatialPoint(order++, circumcenter.coord(0), circumcenter.coord(1));
+            SpatialPoint vertex = circumcenter.toPoint();
             vertexes.put(triangle, vertex);
             graph.addVertex( vertex );
         }
@@ -127,11 +124,10 @@ public class VoronoiDelaunayGraph {
         
         Graph<SpatialPoint, DefaultWeightedEdge> graph = new SimpleGraph<SpatialPoint, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
-        order = 0;
         delaunayVertexes.clear(); 
         for (Triangle triangle : dt) {
             for (Pnt pnt : triangle) {
-                SpatialPoint vertex = new SpatialPoint(order++, pnt.coord(0), pnt.coord(1));
+                SpatialPoint vertex = pnt.toPoint();
                 graph.addVertex(vertex);
                 delaunayVertexes.put(pnt, vertex);
             }
@@ -149,11 +145,18 @@ public class VoronoiDelaunayGraph {
 
     public void removeDualEdges(Graph<SpatialPoint, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
         for (DefaultWeightedEdge maneuver : edgeList) {
-            for (DefaultWeightedEdge edge : dualEdges.get(maneuver)) {
-                graph.removeEdge(edge);
+            for (DefaultWeightedEdge edge : getDualEdge(maneuver)) {
+                if (!graph.removeEdge(edge)) {
+                	System.out.println("Edge should be in the graph!" + edge);
+                }
             }
         }
     }
+
+
+	public List<DefaultWeightedEdge> getDualEdge(DefaultWeightedEdge edge) {
+		return dualEdges.get(edge);
+	}
     
     private List<DefaultWeightedEdge> addDelaunayEdges(Graph<SpatialPoint, DefaultWeightedEdge> graph, PlanarGraph voronoiPlanarGraph, DefaultWeightedEdge edge) {
 
@@ -166,15 +169,15 @@ public class VoronoiDelaunayGraph {
         } else {
             // it's a border edge
             SpatialPoint center = new SpatialPoint(
-                    (graph.getEdgeSource(edge).x + graph.getEdgeTarget(edge).x / 2.0), 
-                    (graph.getEdgeSource(edge).y + graph.getEdgeTarget(edge).y / 2.0),
+                    (graph.getEdgeSource(edge).x + graph.getEdgeTarget(edge).x) / 2.0, 
+                    (graph.getEdgeSource(edge).y + graph.getEdgeTarget(edge).y) / 2.0,
                     0
                     );
             graph.addVertex(center);
 
             for (SpatialPoint obstacle : obstacles) {
                 if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
-                    newEdges.add( graph.addEdge(center, obstacle) );
+                    newEdges.add( graph.addEdge(center, SpatialGraphs.getNearestVertex(graph, obstacle )) );
                 }
             }
         }
@@ -340,7 +343,7 @@ public class VoronoiDelaunayGraph {
           return null;
         }
 
-        return new SpatialPoint(order++, ((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new SpatialPoint(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom, 0.0);
     }
 
     private static boolean same_sign(double a, double b){

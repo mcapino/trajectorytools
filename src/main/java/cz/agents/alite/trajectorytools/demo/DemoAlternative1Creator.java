@@ -32,8 +32,8 @@ import cz.agents.alite.trajectorytools.trajectorymetrics.TrajectorySetMetrics;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
-import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
@@ -94,7 +94,7 @@ public class DemoAlternative1Creator implements Creator {
                 );
     }
 
-    private static final int CURRENT_PLANNER = 5;
+    private int currentPlanner = 0;
     @Override
     public void init(String[] args) {
     }
@@ -115,10 +115,17 @@ public class DemoAlternative1Creator implements Creator {
 
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 20, 20);
-        VisManager.setPanningBounds(new Rectangle(-500, -500, 1600, 1600));
+        VisManager.setSceneParam(new SceneParams() {
+        	@Override
+        	public Rectangle getWorldBounds() {
+        		return new Rectangle(-492, -495, 1000, 1000);
+        	}
+        	@Override
+        	public double getDefaultZoomFactor() {
+        		return 50;
+        	}
+        });
         VisManager.init();
-
-        Vis.setPosition(50, 50, 1);
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
@@ -129,6 +136,19 @@ public class DemoAlternative1Creator implements Creator {
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(graph, paths, 2, 4));
 
+        String[] plannerNames = new String[alternativePlanners.size()];
+        for (int i=0; i<alternativePlanners.size(); i++) {
+        	plannerNames[i] = alternativePlanners.get(i).getName();
+        }
+        
+        VisManager.registerLayer(ListLayer.create(plannerNames, new ListLayer.SelectionListener() {
+			@Override
+			public void selectedIndex(int index) {
+				currentPlanner = index;
+				replan();				
+			}
+		}, 700, 100, 350, 150));
+        
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
     }
@@ -140,7 +160,7 @@ public class DemoAlternative1Creator implements Creator {
                 long startTime = System.currentTimeMillis();
 
                 paths.addAll(
-                        alternativePlanners.get(CURRENT_PLANNER).planPath(
+                        alternativePlanners.get(currentPlanner).planPath(
                                 graph,
                                 SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
                                 SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0))

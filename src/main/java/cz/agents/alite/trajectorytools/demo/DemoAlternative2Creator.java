@@ -2,6 +2,8 @@ package cz.agents.alite.trajectorytools.demo;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,45 +27,34 @@ import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
-import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative2Creator implements Creator {
 
-    private static final int NUM_OF_RANDOM_OBSTACLES = 8;
+    private static final int NUM_OF_RANDOM_OBSTACLES = 0;
 
     private static final int WORLD_SIZE = 10;
 
     // shows one trajectory with voronoi and delaunay graphs
-    private static final boolean DEBUG_VIEW = false;
+    private static final boolean DEBUG_VIEW = true;
+    private int currentPath = 0;
 
     private ObstacleGraphView graph;
     private List<PlannedPath<SpatialPoint, DefaultWeightedEdge>> paths = new ArrayList<PlannedPath<SpatialPoint, DefaultWeightedEdge>>();
-    private List<PlannedPath<SpatialPoint, DefaultWeightedEdge>> maneuverPaths = new ArrayList<PlannedPath<SpatialPoint, DefaultWeightedEdge>>();
-
 
     VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
     GraphHolder<SpatialPoint, DefaultWeightedEdge> voronoiGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
     GraphHolder<SpatialPoint, DefaultWeightedEdge> delaunayGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
     GraphHolder<SpatialPoint, DefaultWeightedEdge> otherGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
 
-    private static final AStarPlanner<Waypoint, DefaultWeightedEdge> planner = new AStarPlanner<Waypoint, DefaultWeightedEdge>();
+    private static final AStarPlanner<SpatialPoint, DefaultWeightedEdge> planner = new AStarPlanner<SpatialPoint, DefaultWeightedEdge>();
     {
-        planner.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
+        planner.setHeuristicFunction(new HeuristicFunction<SpatialPoint>() {
         @Override
-            public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
-                return current.distance(goal) + ( current.x > current.y ? 0.1 : -0.1 );
-            }
-        });
-    }
-
-    private static final AStarPlanner<SpatialPoint, DefaultWeightedEdge> maneuverPlanner = new AStarPlanner<SpatialPoint, DefaultWeightedEdge>();
-    {
-        planner.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
-        @Override
-            public double getHeuristicEstimate(Waypoint current, Waypoint goal) {
+            public double getHeuristicEstimate(SpatialPoint current, SpatialPoint goal) {
                 return current.distance(goal) + ( current.x > current.y ? 0.1 : -0.1 );
             }
         });
@@ -95,6 +86,7 @@ public class DemoAlternative2Creator implements Creator {
         graph = ObstacleGraphView.createFromGraph(originalGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
+            	currentPath = 0;
                 replan();
             }
         } );
@@ -103,7 +95,7 @@ public class DemoAlternative2Creator implements Creator {
 
         List<SpatialPoint> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
         for (SpatialPoint obstacle : obstacles) {
-            graph.addObstacle(obstacle);
+            graph.addObstacle(SpatialGraphs.getNearestVertex(graph, obstacle));
         }
     }
 
@@ -118,10 +110,17 @@ public class DemoAlternative2Creator implements Creator {
 
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 20, 20);
-        VisManager.setPanningBounds(new Rectangle(-500, -500, 1600, 1600));
+        VisManager.setSceneParam(new SceneParams() {
+        	@Override
+        	public Rectangle getWorldBounds() {
+        		return new Rectangle(-492, -495, 1000, 1000);
+        	}
+        	@Override
+        	public double getDefaultZoomFactor() {
+        		return 50;
+        	}
+        });
         VisManager.init();
-
-        Vis.setPosition(50, 50, 1);
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
@@ -138,9 +137,15 @@ public class DemoAlternative2Creator implements Creator {
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(voronoiGraph, paths, 2, 4));
 
-        // draw the shortest path
-        VisManager.registerLayer(GraphPathLayer.create(graph, maneuverPaths, 2, 4));
-
+        VisManager.registerLayer(ButtonLayer.create("Next trajectory", new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+            	currentPath ++;
+                replan();
+			}
+		}, 800, 100, 150, 40));
+        
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
     }
@@ -154,26 +159,30 @@ public class DemoAlternative2Creator implements Creator {
 
         otherGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
 
-
         paths.clear();
 
         SpatialPoint startVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0));
+        SpatialPoint startVertexVor = SpatialGraphs.getNearestVertex(voronoiGraph.graph, new SpatialPoint(0, 0, 0));
         SpatialPoint targetVertex =  SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0));
+        SpatialPoint targetVertexVor =  SpatialGraphs.getNearestVertex(voronoiGraph.graph, new SpatialPoint(10, 10, 0));
 
+        if (startVertexVor == null) {
+        	System.out.println("No vertexes in the Voronoi graph!");
+        }
+        
         AllPathsIterator<SpatialPoint, DefaultWeightedEdge> pathsIt
             = new AllPathsIterator<SpatialPoint, DefaultWeightedEdge>(voronoiGraph.graph,
-                startVertex,
-                targetVertex
+                startVertexVor,
+                targetVertexVor
                 );
 
         while (pathsIt.hasNext()) {
-            if (DEBUG_VIEW) {
+            for (int i=0; i<currentPath; i++) {
                 if (pathsIt.hasNext()) pathsIt.next();
-                if (pathsIt.hasNext()) pathsIt.next();
-                if (pathsIt.hasNext()) pathsIt.next();
-                if (!pathsIt.hasNext()) {
-                    break;
-                }
+            }
+
+            if (!pathsIt.hasNext()) {
+                break;
             }
 
             PlannedPath<SpatialPoint, DefaultWeightedEdge> planPath = pathsIt.next();
@@ -183,35 +192,21 @@ public class DemoAlternative2Creator implements Creator {
 
             delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
 
-            voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
-
-//            PlanarGraph<DefaultWeightedEdge> planarGraphDelaunay = new PlanarGraph<DefaultWeightedEdge>(delaunayGraph.graph);
-//
-//            delaunayGraph.graph.removeVertex(startVertex);
-//            delaunayGraph.graph.removeVertex(targetVertex);
-//
-//            for (DefaultWeightedEdge voronoiEdge: planPath.getEdgeList()) {
-//                planarGraphDelaunay.removeCrossingEdges(planarGraphDelaunay.getEdgeSource(voronoiEdge),planarGraphDelaunay.getEdgeTarget(voronoiEdge));
-//            }
-//
-//            delaunayGraph.graph = planarGraphDelaunay;
-
-            graph.refresh();
-
-//            PlanarGraph planarGraph = PlanarGraph.createPlanarGraphCopy(graph);
-
-            for (DefaultWeightedEdge edge : delaunayGraph.graph.edgeSet()) {
-                graph.removeCrossingEdges(delaunayGraph.graph.getEdgeSource(edge), delaunayGraph.graph.getEdgeTarget(edge));
+            if (delaunayGraph.graph != null) {
+	            voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, planPath.getEdgeList());
+	
+	            graph.refresh();
+	
+	            for (DefaultWeightedEdge edge : delaunayGraph.graph.edgeSet()) {
+	                graph.removeCrossingEdges(delaunayGraph.graph.getEdgeSource(edge), delaunayGraph.graph.getEdgeTarget(edge));
+	            }
             }
-
-            PlannedPath<SpatialPoint, DefaultWeightedEdge> result = maneuverPlanner.planPath(graph,
+            
+            planPath = planner.planPath(graph,
                     startVertex,
                     targetVertex
                     );
 
-            if (result != null) {
-                maneuverPaths.add(result);
-            }
 
 
             if ( planPath!= null ) {
