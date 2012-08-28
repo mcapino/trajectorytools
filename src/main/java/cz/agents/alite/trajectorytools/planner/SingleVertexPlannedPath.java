@@ -55,4 +55,14 @@ public class SingleVertexPlannedPath<V, E> implements
     public double getPathLength() {
         return 0;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj instanceof SingleVertexPlannedPath) {
+    		SingleVertexPlannedPath<?, ?> path = (SingleVertexPlannedPath<?, ?>) obj;
+    		return vertex.equals(path.vertex);
+    	} else {
+    		return false;
+    	}
+    }
 }
