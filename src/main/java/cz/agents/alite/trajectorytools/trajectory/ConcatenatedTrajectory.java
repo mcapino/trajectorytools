@@ -1,5 +1,6 @@
 package cz.agents.alite.trajectorytools.trajectory;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,10 @@ public class ConcatenatedTrajectory implements Trajectory {
 	
 	private final double minTime;
 	private final double maxTime;
+	
+	public ConcatenatedTrajectory(Trajectory t1, Trajectory t2){
+		this(Arrays.asList(t1,t2));
+	}
 	
 	public ConcatenatedTrajectory(List<Trajectory> inputTrajectories){
 		

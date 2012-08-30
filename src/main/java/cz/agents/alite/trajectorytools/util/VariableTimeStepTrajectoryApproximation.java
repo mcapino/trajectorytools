@@ -36,7 +36,7 @@ public class VariableTimeStepTrajectoryApproximation {
 		for(double t = minTime+sampleStep; t < maxTime; t += sampleStep){
 			OrientedPoint cur = trajectory.getPosition(t);
 			
-			if(Math.abs(prev.getAngle()-cur.getAngle()) > maxAngle){
+			if(Math.abs(prev.orientation.angle(cur.orientation)) > maxAngle){
 				output.add(new TimePoint(cur,t));
 				
 				prev = cur;
