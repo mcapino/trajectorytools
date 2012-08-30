@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.graph.spatiotemporal.region;
 
+import java.util.Arrays;
+
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
@@ -125,6 +127,11 @@ public class PolygonRegion implements Region {
 		return points;
 	}
 
+	@Override
+	public String toString() {
+		return "Poly"+Arrays.toString( points );
+	}
+		
 	interface Projection {
 		double getX(Point3d point);
 		double getY(Point3d point);

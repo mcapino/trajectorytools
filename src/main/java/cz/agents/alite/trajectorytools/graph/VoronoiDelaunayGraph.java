@@ -175,16 +175,22 @@ public class VoronoiDelaunayGraph {
                     );
             graph.addVertex(center);
 
+            double minDist = Double.MAX_VALUE;
+            SpatialPoint minObstacle = null;
             for (SpatialPoint obstacle : obstacles) {
-                if (voronoiPlanarGraph.countCrossingEdges(center, obstacle) <= 1) {
-                    newEdges.add( graph.addEdge(center, SpatialGraphs.getNearestVertex(graph, obstacle )) );
-                }
+            	if (minDist > center.distance(obstacle)) {
+            		minDist = center.distance(obstacle);
+            		minObstacle = obstacle;
+            	}
+            }
+            if (minObstacle != null) {
+            	newEdges.add( graph.addEdge(center, SpatialGraphs.getNearestVertex(graph, minObstacle )) );
             }
         }
-        
+
         return newEdges;
     }
-    
+
     private class TemporaryEdge {
         SpatialPoint source;
         SpatialPoint target;

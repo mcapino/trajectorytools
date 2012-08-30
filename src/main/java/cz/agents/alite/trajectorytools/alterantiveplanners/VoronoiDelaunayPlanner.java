@@ -13,7 +13,7 @@ import cz.agents.alite.trajectorytools.graph.PlanarGraph;
 import cz.agents.alite.trajectorytools.graph.VoronoiDelaunayGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.planner.AStarPlanner;
+import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
@@ -21,9 +21,9 @@ import cz.agents.alite.trajectorytools.vis.GraphHolder;
 public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements AlternativePathPlanner<V, E> {
     private static int MAX_WORLD_SIZE = 10000;
 
-    private final AStarPlanner<V, E> planner;
+    private final PathPlanner<V, E> planner;
 
-    public VoronoiDelaunayPlanner( AStarPlanner<V, E> planner ) {
+    public VoronoiDelaunayPlanner( PathPlanner<V, E> planner ) {
         this.planner = planner;
     }
 
