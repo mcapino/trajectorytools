@@ -14,7 +14,15 @@ public class WaypointStraightLineTrajectory implements Trajectory {
 
     public WaypointStraightLineTrajectory(List<TimePoint> waypoint) {
         assert(waypoint.size() > 0);
+        
+        if(waypoint.size() < 1){
+        	throw new IllegalArgumentException("Empty list of waypoints is not a valid trajectory! " + waypoint);
+        }
+        
         this.waypoints = new ArrayList<TimePoint>(waypoint);
+        
+        
+        
     }
 
     @Override
