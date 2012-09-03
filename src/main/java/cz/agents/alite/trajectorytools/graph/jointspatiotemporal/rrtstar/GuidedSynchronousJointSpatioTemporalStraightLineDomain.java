@@ -191,6 +191,9 @@ public class GuidedSynchronousJointSpatioTemporalStraightLineDomain implements D
         return true;
     }
 
+	@Override
+	public void notifyNewVertex(JointState s) {}
+
 
 
 }

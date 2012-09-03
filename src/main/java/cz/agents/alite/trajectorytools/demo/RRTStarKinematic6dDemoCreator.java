@@ -44,10 +44,10 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
     Vector3d initialHeading = new Vector3d(0,1,0);
     OrientedTimePoint initialState = new OrientedTimePoint(initialTimePoint, initialHeading);
 
-    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 60, 200));
+    Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 50, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
-    SpatialPoint target = new SpatialPoint(500, 400, 60);
-    double targetReachedTolerance = 15;
+    SpatialPoint target = new SpatialPoint(480, 480, 45);
+    double targetReachedTolerance = 25;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
@@ -78,7 +78,12 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
         Domain<OrientedTimePoint, SpatioTemporalManeuver> domain = new GuidedKinematicStraightLineDomain(
                 bounds, initialState,
-                obstacles, target, targetReachedTolerance, 14, 15, 16, 50, 50, 45, new Random(1));
+                obstacles, target, targetReachedTolerance, 
+                14, 15, 16, 
+                50, 50, 
+                45, 
+                new Random(1));
+        
         rrtstar = new RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver>(domain, initialState, gamma);
 
         createVisualization();
@@ -106,7 +111,7 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -121,12 +126,12 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
             @Override
             public Point2d getDefaultLookAt() {
-                return new Point2d(0,0);
+                return new Point2d(500,500);
             }
 
             @Override
             public double getDefaultZoomFactor() {
-                return 1.0;
+                return 0.35;
             }
 
         });

@@ -91,12 +91,6 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             }
 
         }
-
-
-
-
-
-
     }
 
 
@@ -146,6 +140,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         edgeSources.put(extension.edge, parent.getState());
         edgeTargets.put(extension.edge, target.getState());
         incomingEdges.put(target.getState(), extension.edge);
+        
+        domain.notifyNewVertex(target.getState());
     }
 
     class BestParentSearchResult{

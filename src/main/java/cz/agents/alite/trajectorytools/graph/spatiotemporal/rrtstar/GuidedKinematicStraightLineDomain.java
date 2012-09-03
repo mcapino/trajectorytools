@@ -23,10 +23,10 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 			OrientedTimePoint initialPoint, Collection<Region> obstacles,
 			SpatialPoint target, double targetReachedTolerance,
 			double minSpeed, double optSpeed, double maxSpeed,
-			double minSegmentDistance, double minTurnRadius,
+			double segmentDistance, double minTurnRadius,
 			double maxPitchDeg, Random random) {
 		super(bounds, initialPoint, obstacles, target, targetReachedTolerance,
-				minSpeed, optSpeed, maxSpeed, minSegmentDistance, minTurnRadius,
+				minSpeed, optSpeed, maxSpeed, segmentDistance, minTurnRadius,
 				maxPitchDeg, random);
 		samplesPool.add(getTargetSample(initialPoint));
 	}

@@ -8,8 +8,14 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
-import org.lwjgl.Sys;
-
+import cz.agents.alite.planner.spatialmaneuver.PathFindSpecification;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuver;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuverType;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuvers;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.ManeuverSpecification;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.SmoothManeuver;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.ManeuverSpecification.LevelConstants;
+import cz.agents.alite.planner.spatialmaneuver.zone.EmptyZone;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -18,9 +24,11 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
 import cz.agents.alite.trajectorytools.util.MathUtil;
+import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
+import cz.agents.alite.trajectorytools.util.VecUtil;
 import cz.agents.alite.trajectorytools.util.Vector;
 
 public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, SpatioTemporalManeuver> {
@@ -98,16 +106,16 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         double requiredSpeed = requiredDistance / (to.getTime() - from.getTime());
 
         // Compute yaw step needed to reach "to" point spatially
-        Vector2d toVector = new Vector2d(horizontal(to.getSpatialPoint()));
-        toVector.sub(horizontal(from.getSpatialPoint()));
-        double requiredYawChangeToReachTargetPoint = angle(horizontal(from.orientation), toVector);
+        Vector2d toVector = new Vector2d(VecUtil.horizontal(to.getSpatialPoint()));
+        toVector.sub(VecUtil.horizontal(from.getSpatialPoint()));
+        double requiredYawChangeToReachTargetPoint = VecUtil.angle(VecUtil.horizontal(from.orientation), toVector);
 
         // Compute yaw step needed to reach "to" orientation
-        double requiredYawChangeToReachTargetOrientation  = angle(horizontal(from.orientation), horizontal(to.orientation));
+        double requiredYawChangeToReachTargetOrientation  = VecUtil.angle(VecUtil.horizontal(from.orientation), VecUtil.horizontal(to.orientation));
 
         // Compute pitch step needed
         double verticalDistance = to.z - from.z;
-        double horizontalDistance = horizontal(from.getSpatialPoint()).distance(horizontal(to.getSpatialPoint()));
+        double horizontalDistance = VecUtil.horizontal(from.getSpatialPoint()).distance(VecUtil.horizontal(to.getSpatialPoint()));
         double requiredPitchAngleInRad = horizontalDistance != 0 ? Math.atan(verticalDistance / horizontalDistance) : 0;
 
         double maxYawChangeInSegment = Math.min(requiredDistance / (2 * minTurnRadius),  segmentDistance / (2 * minTurnRadius));
@@ -132,8 +140,8 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         double pitchRad = MathUtil.clamp(requiredPitchAngleInRad, -maxAbsPitchRad, maxAbsPitchRad);
 
         // Compute the target point
-        Vector2d horizontalOrientation = horizontal(from.orientation);
-        horizontalOrientation = rotateYaw(horizontalOrientation, yawChangeToTargetPointInRad);
+        Vector2d horizontalOrientation = VecUtil.horizontal(from.orientation);
+        horizontalOrientation = VecUtil.rotateYaw(horizontalOrientation, yawChangeToTargetPointInRad);
         horizontalOrientation.normalize();
 
         Vector3d edgeVector = new Vector3d(horizontalOrientation.x, horizontalOrientation.y, Math.tan(pitchRad));
@@ -143,8 +151,8 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         targetSpatialPoint.add(edgeVector);
 
         // compute target orientation
-        Vector2d fromHorizontalOrientation = horizontal(from.orientation);
-        fromHorizontalOrientation = rotateYaw(fromHorizontalOrientation, yawChangeToTargetOrientationInRad);
+        Vector2d fromHorizontalOrientation = VecUtil.horizontal(from.orientation);
+        fromHorizontalOrientation = VecUtil.rotateYaw(fromHorizontalOrientation, yawChangeToTargetOrientationInRad);
         fromHorizontalOrientation.normalize();
 
         double targetOrientationPitchRad = Math.asin(to.orientation.z);
@@ -169,7 +177,6 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         assert(satisfiesDynamicLimits(from, target));
 
         return new Extension<OrientedTimePoint, SpatioTemporalManeuver>(from, target, maneuver, cost, exact);
-
    }
 
    @Override
@@ -208,8 +215,9 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
     }
 
     @Override
-    public double distance(OrientedTimePoint p1, OrientedTimePoint p2) {
-        return p1.distance(p2);
+    public double distance(OrientedTimePoint from, OrientedTimePoint to) {
+        return dubins3dDistance(from, to, optSpeed);
+    	//return p1.distance(p2);
     }
 
     @Override
@@ -271,36 +279,41 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
         return true;
     }
 
-    private Point2d horizontal(Point3d p) {
-        return new Point2d(p.x, p.y);
+
+    public double dubins3dDistance(OrientedTimePoint from, OrientedTimePoint to, double speed) {
+    	
+    	double mainSegmentDistance = dubins3dDistance(from.getOrientedPoint(), to.getOrientedPoint());
+    	double mainSegmentDuration = mainSegmentDistance/speed;
+    	
+    	if ((to.getTime() - from.getTime()) - mainSegmentDuration > 0) {
+    		double loopDistance = ((to.getTime() - from.getTime()) - mainSegmentDuration) * speed; 
+    		if (loopDistance >= 2*Math.PI*minTurnRadius) {
+    			return mainSegmentDistance + loopDistance;
+    		}
+    	} else {
+    		// The main segment cannot be constructed in the available time
+    	}
+    	return Double.POSITIVE_INFINITY;
+    	
+    }
+    
+    public double dubins3dDistance(OrientedPoint from, OrientedPoint to) {
+    	
+        // plan trajectory constants
+        LevelConstants[] levelConstants =  new LevelConstants[2];
+        levelConstants[0] = new LevelConstants(2, 12, 8);
+        
+        ExpandManeuvers expandManeuvers = new ExpandManeuvers();
+        expandManeuvers.getManeuver().add(new ExpandManeuver(ExpandManeuverType.STRAIGHT));
+    	
+    	ManeuverSpecification maneuverSpecification = new ManeuverSpecification(null, levelConstants, expandManeuvers);
+		PathFindSpecification specification = new PathFindSpecification(minTurnRadius, new EmptyZone(), maneuverSpecification );
+		SmoothManeuver smooth = new SmoothManeuver(from, from.orientation, 0, to, to.orientation, specification);
+		
+		return smooth.getLength();
     }
 
-    private Vector2d horizontal(Vector3d p) {
-        return new Vector2d(p.x, p.y);
-    }
-
-    /**
-     * An angle between two vectors, adapted the implementation from VecMath to return angle in range [-PI and PI]
-     */
-    public double angle(Vector2d a, Vector2d b)
-    {
-
-       double vDot = a.dot(b) / ( a.length()*b.length() );
-       if( vDot < -1.0) vDot = -1.0;
-       if( vDot >  1.0) vDot =  1.0;
-
-       double angle = Math.atan2( a.x*b.y - a.y*b.x, a.x*b.x + a.y*b.y );
-
-       return(angle);
-    }
-
-    public Vector2d rotateYaw(Vector2d vector, double yawInRad)
-    {
-        double rx = (vector.x * Math.cos(yawInRad)) - (vector.y * Math.sin(yawInRad));
-        double ry = (vector.x * Math.sin(yawInRad)) + (vector.y * Math.cos(yawInRad));
-        return new Vector2d(rx, ry);
-    }
-
-
+	@Override
+	public void notifyNewVertex(OrientedTimePoint s) {}
 
 }

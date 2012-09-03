@@ -26,7 +26,7 @@ public class JointState {
         }
 
         for (int i = 0 ; i < this.nAgents(); i++) {
-            dist += this.get(i).distance(other.get(i));
+            dist += this.get(i).getSpatialPoint().distance(other.get(i).getSpatialPoint());
         }
 
         return dist;

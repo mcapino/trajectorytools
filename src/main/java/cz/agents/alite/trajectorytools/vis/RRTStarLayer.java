@@ -134,7 +134,11 @@ public class RRTStarLayer extends AbstractLayer {
 
                         Point2d start = projection.project((V) point);
                         TimePoint endTimePoint = new TimePoint(point);
-                        endTimePoint.add(new Vector4d(point.orientation.x, point.orientation.y, point.orientation.z, 1));
+                        
+                        Vector4d vector = new Vector4d(point.orientation.x, point.orientation.y, point.orientation.z, 1);
+                        vector.scale(10);
+                        
+                        endTimePoint.add(vector);
                         Point2d end = projection.project((V) endTimePoint);
                         lines.add(new LineImpl(new Point3d(start.x, start.y, 0), new Point3d(end.x, end.y, 0)));
 

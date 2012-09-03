@@ -18,6 +18,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.BiasedStraightLineDomain;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
@@ -75,7 +76,9 @@ public class RRTStar4dDemoCreator implements Creator {
         } */
 
 
-        Domain<TimePoint, SpatioTemporalManeuver> domain = new GuidedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12,15,30, 45, new Random(1));
+		Domain<TimePoint, SpatioTemporalManeuver> domain = new BiasedStraightLineDomain(
+				bounds, initialPoint, obstacles, target,
+				targetReachedTolerance, 12, 15, 30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
 
@@ -100,17 +103,17 @@ public class RRTStar4dDemoCreator implements Creator {
 
             }
             
-            /*
+            
+//            try {
+//            	System.in.read();
+//            }
+//            catch (Exception e) {};
+            
             try {
-            	System.in.read();
-            }
-            catch (Exception e) {}; */
-            /*
-            try {
-                Thread.sleep(2);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }

@@ -106,6 +106,10 @@ public class OrientedTimePoint extends TimePoint {
 
        return(angle);
     }
+    
+    public OrientedPoint getOrientedPoint() {
+    	return new OrientedPoint(this.getSpatialPoint(), new Vector(orientation));
+    }
 	
       
       
