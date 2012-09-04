@@ -8,7 +8,7 @@ import javax.vecmath.Vector3d;
 import cz.agents.alite.planner.spatialmaneuver.zone.BoxZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.TransformZone;
 import cz.agents.alite.planner.spatialmaneuver.zone.Zone;
-import cz.agents.alite.trajectorytools.graph.ObstacleGraphView;
+import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
@@ -20,12 +20,12 @@ public class ObstacleAvoidanceMetric<V extends SpatialPoint,E> implements Trajec
             PlannedPath<V,E> path,
             PlannedPath<V,E> otherPath) {
         
-        if (! (path.getGraph() instanceof ObstacleGraphView )) {
+        if (! (path.getGraph() instanceof GraphWithObstacles )) {
             System.out.println(path.getGraph().getClass().getName() + " is not compatible with the Obstacle avoidance metric!");
             return 0;
         }
 
-        Set<SpatialPoint> obstacles = ((ObstacleGraphView) path.getGraph()).getObstacles();
+        Set<? extends SpatialPoint> obstacles = ((GraphWithObstacles<? extends SpatialPoint, E>) path.getGraph()).getObstacles();
 
         if (obstacles.isEmpty()) {
             return 0;
