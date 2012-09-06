@@ -1,6 +1,7 @@
 package cz.agents.alite.trajectorytools.trajectory;
 
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
+import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class TimeOffsetTrajectory implements Trajectory {
 	
@@ -29,5 +30,16 @@ public class TimeOffsetTrajectory implements Trajectory {
 		if(to > trajectory.getMaxTime())to = trajectory.getMaxTime();
 		return trajectory.getPosition(to);
 	}
+	
+	public String toString(){
+    	StringBuilder sb = new StringBuilder();
+        sb.append("TO(");
+
+		sb.append(trajectory);
+		sb.append(", timeOffset:" + timeOffset);
+		
+        sb.append(" )");
+        return sb.toString();
+    }
 
 }

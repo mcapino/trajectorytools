@@ -66,5 +66,18 @@ public class WaypointStraightLineTrajectory implements Trajectory {
 
         throw new RuntimeException("Requesting position for time "+t+", which is undefined in this trajectory. tmin: " + waypoints.get(0) + ", tmax: " + waypoints.get(waypoints.size()-1));
     }
+    
+    
+    public String toString(){
+    	StringBuilder sb = new StringBuilder();
+        sb.append("WPT(");
+
+		for(TimePoint tp : waypoints){
+			sb.append(tp);
+		}
+		
+        sb.append(" )");
+        return sb.toString();
+    }
 
 }

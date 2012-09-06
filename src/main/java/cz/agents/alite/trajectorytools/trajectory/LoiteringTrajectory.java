@@ -55,7 +55,19 @@ public class LoiteringTrajectory implements Trajectory {
 		return new OrientedPoint(new SpatialPoint(pos),orientation);
 	}
 	
-	
+	public String toString(){
+    	StringBuilder sb = new StringBuilder();
+        sb.append("L(");
+
+		sb.append("origin: " + loiteringOrigin);
+		sb.append(", startPoint: " + startPoint);
+		sb.append(", startTime: " + startTime);
+		sb.append(", speed: " + loiteringSpeed);
+		sb.append(", radius: " + loiteringRadius);
+		
+        sb.append(" )");
+        return sb.toString();
+    }
 	
 	
 	
