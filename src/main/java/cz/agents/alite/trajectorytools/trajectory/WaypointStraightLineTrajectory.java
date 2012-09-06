@@ -63,8 +63,17 @@ public class WaypointStraightLineTrajectory implements Trajectory {
                 return new OrientedPoint(pos, dir);
             }
         }
+        
+        //TODO: temporarily disabled exceptions
+        if(t <= getMinTime()){
+        	return new OrientedPoint(waypoints.get(0).getSpatialPoint(), new Vector(0,1,0));
+        }else if( t >= getMaxTime()){
+        	return new OrientedPoint(waypoints.get(waypoints.size()-1).getSpatialPoint(), new Vector(0,1,0));
+        }
 
         throw new RuntimeException("Requesting position for time "+t+", which is undefined in this trajectory. tmin: " + waypoints.get(0) + ", tmax: " + waypoints.get(waypoints.size()-1));
+        
+        
     }
 
 }
