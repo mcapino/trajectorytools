@@ -24,41 +24,7 @@ public class Straight extends SpatioTemporalManeuver {
 
     @Override
     public Trajectory getTrajectory() {
-
-        return new Trajectory() {
-
-            @Override
-            public OrientedPoint getPosition(double t) {
-                if (t < start.getTime() || t > end.getTime())
-                    throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory. Length: " + getDistance() + ". Trajectory defined for interval (" + start.getTime() + ", " + end.getTime() + ")");
-
-                double alpha = (t - start.getTime()) / (end.getTime() - start.getTime());
-                assert(alpha >= -0.00001 && alpha <= 1.00001);
-
-                SpatialPoint pos = SpatialPoint.interpolate(start.getSpatialPoint(), end.getSpatialPoint(), alpha);
-                Vector dir;
-                if (!end.getSpatialPoint().equals(start.getSpatialPoint())) {
-                    dir = Vector.subtract(end.getSpatialPoint(), start.getSpatialPoint());
-                    dir.normalize();
-                } else {
-                    dir = new Vector(0,1,0);
-                }
-
-                return new OrientedPoint(pos, dir);
-            }
-
-            @Override
-            public double getMinTime() {
-                return start.getTime();
-            }
-
-            @Override
-            public double getMaxTime() {
-                return end.getTime();
-            }
-        };
-
-        //return spatialStraight.getTrajectory(start.getTime());
+        return spatialStraight.getTrajectory(start.getTime());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package cz.agents.alite.trajectorytools.graph.jointspatiotemporal;
 
+import java.util.Arrays;
+
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class JointState {
@@ -31,4 +33,27 @@ public class JointState {
 
         return dist;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(agentStates);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JointState other = (JointState) obj;
+		if (!Arrays.equals(agentStates, other.agentStates))
+			return false;
+		return true;
+	}
+    
 }
