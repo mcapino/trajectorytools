@@ -35,9 +35,18 @@ public class RRTStarLayer extends AbstractLayer {
 
     RRTStarLayer() {
     }
+    
+	public static <V> VisLayer create(final RRTStarPlanner<V, ?> rrtstar,
+			final ProjectionTo2d<? super V> projection, final Color edgeColor,
+			final Color vertexColor, final int edgeStrokeWidth,
+			final int vertexStrokeWidth) {
+		return create(rrtstar, projection, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, false);
+	}
 
-    public static <V> VisLayer create(final RRTStarPlanner<V,?> rrtstar, final ProjectionTo2d<? super V> projection, final Color edgeColor, final Color vertexColor,
-            final int edgeStrokeWidth, final int vertexStrokeWidth) {
+	public static <V> VisLayer create(final RRTStarPlanner<V, ?> rrtstar,
+			final ProjectionTo2d<? super V> projection, final Color edgeColor,
+			final Color vertexColor, final int edgeStrokeWidth,
+			final int vertexStrokeWidth, final boolean visualizeSearch) {
         GroupLayer group = GroupLayer.create();
 
         // edges
@@ -169,7 +178,10 @@ public class RRTStarLayer extends AbstractLayer {
 
             @Override
             public Iterable<Point> getPoints() {
-                LinkedList<Point> points = new LinkedList<Point>();
+            	LinkedList<Point> points = new LinkedList<Point>();
+
+            	if (!visualizeSearch) return points;
+            	
                 V lastSample = rrtstar.getLastSample();
 
                 if (lastSample != null) {
@@ -197,6 +209,9 @@ public class RRTStarLayer extends AbstractLayer {
             @Override
             public Iterable<Point> getPoints() {
                 LinkedList<Point> points = new LinkedList<Point>();
+                
+                if (!visualizeSearch) return points;
+                
                 V newSample = rrtstar.getNewSample();
 
                 if (newSample != null) {
@@ -233,6 +248,8 @@ public class RRTStarLayer extends AbstractLayer {
 			@Override
 			public Iterable<? extends Circle> getCircles() {
 				ArrayList<Circle> circles = new ArrayList<Circle>();
+				
+				if (!visualizeSearch) return circles;
 				
 				V newSample = rrtstar.getNewSample();
 

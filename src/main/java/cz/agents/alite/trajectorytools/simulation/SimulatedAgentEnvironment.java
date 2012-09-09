@@ -78,6 +78,7 @@ public class SimulatedAgentEnvironment {
             @Override
             public void run() {
                 simulation.run();
+                simulation.setSimulationSpeed(1.0);
             }
 
         }.start();

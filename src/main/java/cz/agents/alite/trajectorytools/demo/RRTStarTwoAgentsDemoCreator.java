@@ -15,6 +15,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingCylinderSafeRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.BiasedStraightLineDomain;
@@ -55,7 +56,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 0, 0), new TimePoint(1000, 1000, 150, 200));
     Collection<Region> obstacles = new LinkedList<Region>();
     SpatialPoint target = new SpatialPoint(900, 500, 50);
-    double targetReachedTolerance = 50;
+    double targetReachedTolerance = 10;
     Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory t1 = null;
@@ -75,7 +76,8 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
         t2 = (new Straight(new TimePoint(500, 900, 50, 0), new TimePoint(500, 100, 50, 53))).getTrajectory();
 
-        obstacles.add(new MovingCylinderSafeRegion(t2, SEPARATION, HALFHEIGHT, 0.5));
+        //obstacles.add(new MovingCylinderSafeRegion(t2, SEPARATION, HALFHEIGHT, 0.5));
+        obstacles.add(new MovingSphereSafeRegion(t2, SEPARATION, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
         	= new BiasedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 45, new Random(1));
@@ -86,7 +88,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         simulation.updateTrajectory("t2", t2);
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=100000;
+        int n=1;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
@@ -108,12 +110,12 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
                 simulation.updateTrajectory("t1", t1);
             }
 
-            
+            /*
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            } */
         }
 
     }
