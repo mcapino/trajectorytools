@@ -5,7 +5,6 @@ import java.util.Random;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
 import org.apache.log4j.Logger;
@@ -19,17 +18,16 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
 import cz.agents.alite.trajectorytools.util.MathUtil;
-import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, SpatioTemporalManeuver> {
-	
-	private static final Logger LOGGER = Logger.getLogger(SpatioTemporalStraightLineDomain.class);
-	
-    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
+
+    private static final Logger LOGGER = Logger.getLogger(SpatioTemporalStraightLineDomain.class);
+
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 5.0;
     private static final double CLIMB_PENALTY_COEF = 1.0;
-    
+
     Box4dRegion bounds;
     Collection<Region> obstacles;
 
@@ -120,7 +118,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         }
    }
 
-    
+
     public Extension<TimePoint, SpatioTemporalManeuver> extendMaintainSpatialPoint(
             TimePoint from, TimePoint to) {
 
@@ -210,15 +208,15 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     @Override
     public double distance(TimePoint p1, TimePoint p2) {
-        
-    	//return p1.distance(p2);
-    	
-    	double speed = p1.getSpatialPoint().distance(p2.getSpatialPoint()) / Math.abs(p2.getTime() - p1.getTime());
-        
+
+        //return p1.distance(p2);
+
+        double speed = p1.getSpatialPoint().distance(p2.getSpatialPoint()) / Math.abs(p2.getTime() - p1.getTime());
+
         if (speed >= minSpeed && speed <= maxSpeed) {
-        	return evaluateFuelCost(p1.getSpatialPoint(), p2.getSpatialPoint(), speed);
+            return evaluateFuelCost(p1.getSpatialPoint(), p2.getSpatialPoint(), speed);
         } else {
-        	return Double.POSITIVE_INFINITY;
+            return Double.POSITIVE_INFINITY;
         }
     }
 
@@ -283,7 +281,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         return true;
     }
 
-	@Override
-	public void notifyNewVertex(TimePoint s) {}
+    @Override
+    public void notifyNewVertex(TimePoint s) {}
 
 }

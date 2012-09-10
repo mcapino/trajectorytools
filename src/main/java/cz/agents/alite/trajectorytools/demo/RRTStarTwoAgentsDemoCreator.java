@@ -14,13 +14,10 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingCylinderSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.BiasedStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.KinematicStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.SpatioTemporalStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentEnvironment;
@@ -80,7 +77,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         obstacles.add(new MovingSphereSafeRegion(t2, SEPARATION, 0.5));
 
         Domain<TimePoint, SpatioTemporalManeuver> domain
-        	= new BiasedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 45, new Random(1));
+            = new BiasedStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 5, 15, 30, 45, new Random(1));
         //= new KinematicStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 50, 50, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
@@ -88,7 +85,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         simulation.updateTrajectory("t2", t2);
 
         double bestCost = Double.POSITIVE_INFINITY;
-        int n=1;
+        int n=5000;
         for (int i=0; i<n; i++) {
             rrtstar.iterate();
 
