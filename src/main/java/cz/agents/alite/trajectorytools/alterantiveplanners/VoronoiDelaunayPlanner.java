@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jgrapht.Graph;
 import org.jgrapht.alg.AllPathsIterator;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
@@ -12,7 +13,7 @@ import cz.agents.alite.trajectorytools.graph.PlanarGraph;
 import cz.agents.alite.trajectorytools.graph.VoronoiDelaunayGraph;
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
-import cz.agents.alite.trajectorytools.planner.AStarPlanner;
+import cz.agents.alite.trajectorytools.planner.PathPlanner;
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.vis.GraphHolder;
@@ -20,9 +21,9 @@ import cz.agents.alite.trajectorytools.vis.GraphHolder;
 public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements AlternativePathPlanner<V, E> {
     private static int MAX_WORLD_SIZE = 10000;
 
-    private final AStarPlanner<V, E> planner;
+    private final PathPlanner<V, E> planner;
 
-    public VoronoiDelaunayPlanner( AStarPlanner<V, E> planner ) {
+    public VoronoiDelaunayPlanner( PathPlanner<V, E> planner ) {
         this.planner = planner;
     }
 
@@ -40,7 +41,7 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
                 SpatialGraphs.getNearestVertex(graph,new SpatialPoint( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
         });
 
-        PlanarGraph planarGraph = PlanarGraph.createPlanarGraphCopy(graph);
+        PlanarGraph planarGraph = PlanarGraph.createPlanarGraphView((Graph<SpatialPoint, DefaultWeightedEdge>) graph);
 
         GraphHolder<SpatialPoint, DefaultWeightedEdge> voronoiGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
         GraphHolder<SpatialPoint, DefaultWeightedEdge> delaunayGraph = new GraphHolder<SpatialPoint, DefaultWeightedEdge>();
@@ -60,10 +61,7 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
                 );
 
         while (pathsIt.hasNext()) {
-
             PlannedPath<SpatialPoint, DefaultWeightedEdge> voronoiPath = pathsIt.next();
-
-            delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
 
             voronoiGraphAlg.removeDualEdges(delaunayGraph.graph, voronoiPath.getEdgeList());
 
@@ -80,13 +78,11 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
 //
 //            delaunayGraph.graph = planarGraphDelaunay;
 
-            graph.refresh();
-
             for (DefaultWeightedEdge edge : delaunayGraph.graph.edgeSet()) {
                 planarGraph.removeCrossingEdges(delaunayGraph.graph.getEdgeSource(edge), delaunayGraph.graph.getEdgeTarget(edge));
             }
 
-            PlannedPath<V, E> plannedPath = planner.planPath(graph,
+            PlannedPath<V, E> plannedPath = planner.planPath((Graph<V, E>) planarGraph,
                     startVertex,
                     endVertex
                     );
@@ -96,6 +92,10 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
                     paths.add(plannedPath);
                 }
             }
+
+            graph.refresh();
+            delaunayGraph.graph = voronoiGraphAlg.getDelaunayGraph(border);
+
         }
 
         return paths;

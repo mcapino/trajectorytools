@@ -5,7 +5,10 @@ import java.util.Random;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
+
+import org.apache.log4j.Logger;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
@@ -16,13 +19,17 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
 import cz.agents.alite.trajectorytools.util.MathUtil;
+import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, SpatioTemporalManeuver> {
-
-    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.01;
-
+	
+	private static final Logger LOGGER = Logger.getLogger(SpatioTemporalStraightLineDomain.class);
+	
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
+    private static final double CLIMB_PENALTY_COEF = 1.0;
+    
     Box4dRegion bounds;
     Collection<Region> obstacles;
 
@@ -55,7 +62,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         this.random = random;
 
         if (!isInFreeSpace(initialPoint)) {
-            throw new IllegalArgumentException("Initial point is not in free space");
+            throw new IllegalArgumentException("Initial point " + initialPoint + "is not in free space");
         }
     }
 
@@ -89,6 +96,31 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         return extendMaintainSpatialPoint(from, to);
    }
 
+    public Extension<TimePoint, SpatioTemporalManeuver> steerMaintainSpatialPoint(
+            TimePoint from, TimePoint to) {
+
+        double distance = from.getSpatialPoint().distance(to.getSpatialPoint());
+        double requiredSpeed = distance / (to.getTime() - from.getTime());
+        boolean exact = false;
+        double actualSpeed = MathUtil.clamp(requiredSpeed, minSpeed, maxSpeed);
+        TimePoint extensionTarget = new TimePoint(to.getSpatialPoint(), from.getTime() + distance / actualSpeed);
+        SpatioTemporalManeuver maneuver = new Straight(from, extensionTarget);
+        double cost = evaluateFuelCost(from.getSpatialPoint(), extensionTarget.getSpatialPoint(), actualSpeed);
+
+        if (extensionTarget.epsilonEquals(to, 0.001)) {
+            extensionTarget = to;
+            exact = true;
+        }
+
+        if (satisfiesDynamicLimits(from, extensionTarget)) {
+            return new Extension<TimePoint, SpatioTemporalManeuver>(from, extensionTarget,
+                       maneuver, cost, exact);
+        } else {
+            return null;
+        }
+   }
+
+    
     public Extension<TimePoint, SpatioTemporalManeuver> extendMaintainSpatialPoint(
             TimePoint from, TimePoint to) {
 
@@ -178,7 +210,16 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     @Override
     public double distance(TimePoint p1, TimePoint p2) {
-        return p1.distance(p2);
+        
+    	//return p1.distance(p2);
+    	
+    	double speed = p1.getSpatialPoint().distance(p2.getSpatialPoint()) / Math.abs(p2.getTime() - p1.getTime());
+        
+        if (speed >= minSpeed && speed <= maxSpeed) {
+        	return evaluateFuelCost(p1.getSpatialPoint(), p2.getSpatialPoint(), speed);
+        } else {
+        	return Double.POSITIVE_INFINITY;
+        }
     }
 
     @Override
@@ -206,7 +247,9 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     // Simple approximation that should force the planner to use optimal cruise speed
     protected double evaluateFuelCost(SpatialPoint start, SpatialPoint end, double speed) {
-        return start.distance(end) * ((Math.abs(speed - optSpeed) / optSpeed) * NONOPTIMAL_SPEED_PENALTY_COEF + 1.0);
+        double cost =  start.distance(end) * ((Math.abs(speed - optSpeed) / optSpeed) * NONOPTIMAL_SPEED_PENALTY_COEF + 1.0);
+        double climbPenalty = MathUtil.clamp(end.z - start.z, 0, Double.POSITIVE_INFINITY) * CLIMB_PENALTY_COEF;
+        return cost + climbPenalty;
     }
 
     protected boolean intersectsObstacles(TimePoint p1, TimePoint p2) {
@@ -239,5 +282,8 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
         return true;
     }
+
+	@Override
+	public void notifyNewVertex(TimePoint s) {}
 
 }

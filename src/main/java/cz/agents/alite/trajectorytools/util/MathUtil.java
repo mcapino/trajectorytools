@@ -19,4 +19,5 @@ public class MathUtil {
       public static long clamp (long i, long low, long high) {
         return java.lang.Math.max (java.lang.Math.min (i, high), low);
       }
+      
 }

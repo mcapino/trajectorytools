@@ -1,5 +1,9 @@
 package cz.agents.alite.trajectorytools.graph.spatial;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
@@ -22,27 +26,49 @@ public class SpatialGraphs {
     }
 
     public static <V, E> Graph<V, E>  clone(Graph<V, E> other) {
-        DirectedWeightedMultigraph<V, E> graph = new DirectedWeightedMultigraph<V,E>(
-            new EdgeFactory<V,E>() {
+    	SimpleGraphWithObstacles<V, E> graph = new SimpleGraphWithObstacles<V,E>(other.getEdgeFactory());
 
-                @Override
-                public E createEdge(V sourceVertex,
-                        V targetVertex) {
-                    throw new RuntimeException("Should not be reached");
-                }}
-        );
+    	for (V vertex : other.vertexSet()) {
+    		graph.addVertex(vertex);
+    	}
 
-        for (V vertex : other.vertexSet()) {
-            graph.addVertex(vertex);
-        }
+    	for (E edge : other.edgeSet()) {
+    		graph.addEdge(other.getEdgeSource(edge), other.getEdgeTarget(edge), edge);
+    	}
 
-        for (E edge : other.edgeSet()) {
-            graph.addEdge(other.getEdgeSource(edge), other.getEdgeTarget(edge), edge);
-        }
-
-        return graph;
+    	if (other instanceof GraphWithObstacles) {
+    		graph.addObstacles(((GraphWithObstacles<V, ?>) other).getObstacles() );
+    	} 
+    	return graph;
     }
+}
 
+class SimpleGraphWithObstacles<V, E> extends DirectedWeightedMultigraph<V, E> implements GraphWithObstacles<V, E> {
+	private static final long serialVersionUID = 1L;
 
+	Set<V> obstacles = new HashSet<V>();
+	
+	public SimpleGraphWithObstacles(EdgeFactory<V, E> edgeFactory) {
+		super(edgeFactory);
+	}
+	
+	@Override
+	public Set<V> getObstacles() {
+		return obstacles;
+	}
 
+	@Override
+	public void addObstacle(V obstacle) {
+		obstacles.add(obstacle);
+	}
+
+	public void addObstacles(Collection<V> obstacle) {
+		obstacles.addAll(obstacle);
+	}
+
+	@Override
+	public void refresh() {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
 }

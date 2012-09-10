@@ -9,6 +9,10 @@ public class TimePoint extends Point4d {
 
     public TimePoint(double x, double y, double z, double time) {
         super(x,y,z,time);
+        
+        if(time == Double.NaN){
+        	throw new IllegalArgumentException("Time must be a number! " + time);
+        }
     }
 
     public TimePoint(Point3d p, double time) {

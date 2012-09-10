@@ -102,4 +102,7 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
     public double estimateCostToGo(SpatialPoint p1) {
         return 0.0;
     }
+
+	@Override
+	public void notifyNewVertex(SpatialPoint s) {}
 }

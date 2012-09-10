@@ -23,10 +23,10 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 			OrientedTimePoint initialPoint, Collection<Region> obstacles,
 			SpatialPoint target, double targetReachedTolerance,
 			double minSpeed, double optSpeed, double maxSpeed,
-			double minSegmentDistance, double minTurnRadius,
+			double segmentDistance, double minTurnRadius,
 			double maxPitchDeg, Random random) {
 		super(bounds, initialPoint, obstacles, target, targetReachedTolerance,
-				minSpeed, optSpeed, maxSpeed, minSegmentDistance, minTurnRadius,
+				minSpeed, optSpeed, maxSpeed, segmentDistance, minTurnRadius,
 				maxPitchDeg, random);
 		samplesPool.add(getTargetSample(initialPoint));
 	}
@@ -38,7 +38,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
         double duration = from.getSpatialPoint().distance(target) / optSpeed;
         Vector3d orientation = new Vector3d(target);
         orientation.sub(from.getSpatialPoint());
-        orientation.setZ(0.0);
+        orientation.z = 0.0;
         orientation.normalize();
         return new OrientedTimePoint(new TimePoint(target, from.getTime() + duration), orientation);
     }
@@ -54,7 +54,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
             samplesPool.offer(randomSample);
 
             // Bias towards goal at optimal speed
-            //samplesPool.offer(getTargetSample(randomSample));
+            samplesPool.offer(getTargetSample(randomSample));
 
             // Bias towards random sample from initial point at optimal speed
             double optTime = initialPoint.getTime() +
@@ -79,11 +79,6 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 	public Extension<OrientedTimePoint, SpatioTemporalManeuver> extendTo(
 			OrientedTimePoint from, OrientedTimePoint to) {
 		Extension<OrientedTimePoint, SpatioTemporalManeuver> extension = super.extendTo(from, to);
-		
-		if (extension != null) {
-			if (Math.random() < 0.05)
-				samplesPool.add(getTargetSample(extension.target));
-		}
 		
 		return extension;
 	}

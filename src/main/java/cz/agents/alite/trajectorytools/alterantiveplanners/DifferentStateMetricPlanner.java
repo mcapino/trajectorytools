@@ -64,5 +64,4 @@ public class DifferentStateMetricPlanner<V extends SpatialPoint, E> implements A
     public String getName() {
         return "Different States Metric Planner";
     }
-
 }

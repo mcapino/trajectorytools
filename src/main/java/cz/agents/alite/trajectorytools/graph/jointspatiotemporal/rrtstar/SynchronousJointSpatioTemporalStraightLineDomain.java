@@ -168,6 +168,9 @@ public class SynchronousJointSpatioTemporalStraightLineDomain implements Domain<
         return true;
     }
 
+	@Override
+	public void notifyNewVertex(JointState s) {}
+
 
 
 }

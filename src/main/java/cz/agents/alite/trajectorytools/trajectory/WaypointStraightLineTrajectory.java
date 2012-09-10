@@ -14,7 +14,15 @@ public class WaypointStraightLineTrajectory implements Trajectory {
 
     public WaypointStraightLineTrajectory(List<TimePoint> waypoint) {
         assert(waypoint.size() > 0);
+        
+        if(waypoint.size() < 1){
+        	throw new IllegalArgumentException("Empty list of waypoints is not a valid trajectory! " + waypoint);
+        }
+        
         this.waypoints = new ArrayList<TimePoint>(waypoint);
+        
+        
+        
     }
 
     @Override
@@ -57,6 +65,19 @@ public class WaypointStraightLineTrajectory implements Trajectory {
         }
 
         throw new RuntimeException("Requesting position for time "+t+", which is undefined in this trajectory. tmin: " + waypoints.get(0) + ", tmax: " + waypoints.get(waypoints.size()-1));
+    }
+    
+    
+    public String toString(){
+    	StringBuilder sb = new StringBuilder();
+        sb.append("WPT(");
+
+		for(TimePoint tp : waypoints){
+			sb.append(tp);
+		}
+		
+        sb.append(" )");
+        return sb.toString();
     }
 
 }

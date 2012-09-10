@@ -78,7 +78,12 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
         Domain<OrientedTimePoint, SpatioTemporalManeuver> domain = new GuidedKinematicStraightLineDomain(
                 bounds, initialState,
-                obstacles, target, targetReachedTolerance, 14, 15, 16, 50, 50, 45, new Random(1));
+                obstacles, target, targetReachedTolerance, 
+                14, 15, 16, 
+                50, 50, 
+                45, 
+                new Random(1));
+        
         rrtstar = new RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver>(domain, initialState, gamma);
 
         createVisualization();

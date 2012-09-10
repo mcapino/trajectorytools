@@ -60,7 +60,7 @@ public class MovingCylinderSafeRegion implements Region {
         if (p.getTime() >= trajectory.getMinTime() && p.getTime() <= trajectory.getMaxTime()) {
         	SpatialPoint trajPos = trajectory.getPosition(p.getTime());
         	if ((new Point2d(trajPos.x,trajPos.y)).distance(new Point2d(p.x, p.y)) <= radius && 
-                	Math.abs(trajPos.z - p.z) < halfHeight) {
+                	Math.abs(trajPos.z - p.z) <= halfHeight) {
                     return true;
                 } else {
                 	return false;

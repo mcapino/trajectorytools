@@ -1,7 +1,10 @@
 package cz.agents.alite.trajectorytools.trajectory;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 
@@ -14,10 +17,16 @@ import cz.agents.alite.trajectorytools.util.OrientedPoint;
 
 public class ConcatenatedTrajectory implements Trajectory {
 	
+	private static final Logger LOGGER = Logger.getLogger(ConcatenatedTrajectory.class);
+	
 	private final LinkedList<Trajectory> trajectories;
 	
 	private final double minTime;
 	private final double maxTime;
+	
+	public ConcatenatedTrajectory(Trajectory t1, Trajectory t2){
+		this(Arrays.asList(t1,t2));
+	}
 	
 	public ConcatenatedTrajectory(List<Trajectory> inputTrajectories){
 		
@@ -30,6 +39,10 @@ public class ConcatenatedTrajectory implements Trajectory {
 		minTime = trajectories.getFirst().getMinTime();
 		maxTime = trajectories.getLast().getMaxTime();
 		
+		if(Double.isNaN(minTime) || Double.isNaN(maxTime)){
+			throw new IllegalArgumentException("Trajectory minTime or maxTime must be a number! - minTime:"+minTime+", maxTime:"+maxTime);
+		}
+		
 		//check consistency
 		double t = minTime;
 		
@@ -40,6 +53,11 @@ public class ConcatenatedTrajectory implements Trajectory {
 			
 			t = trajectory.getMaxTime();
 		}
+		
+		if(Double.isNaN(t)){
+			throw new IllegalArgumentException("Trajectory maxTime must be a number! - t:"+t);
+		}
+		
 		
 	}
 
@@ -55,7 +73,8 @@ public class ConcatenatedTrajectory implements Trajectory {
 
 	@Override
 	public OrientedPoint getPosition(double t) {
-		if(t < minTime || t > maxTime){
+		if(Double.isNaN(t) || t < minTime || t > maxTime){
+			LOGGER.warn("Time point out of range! t:"+t+" - minTime:"+minTime+", maxTime:"+maxTime);
 			return null;
 		}
 		
@@ -65,7 +84,9 @@ public class ConcatenatedTrajectory implements Trajectory {
 			}
 		}
 		
-		throw new RuntimeException("Time point not found! Underlying trajectories must have changed illegaly!");
+		LOGGER.warn("Time point not found! t:"+t+" - minTime:"+minTime+", maxTime:"+maxTime);
+		
+		throw new RuntimeException("Time point t:"+t+" not found! - minTime:"+minTime+", maxTime:"+maxTime);
 		
 	}
 

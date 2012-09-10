@@ -66,27 +66,27 @@ public class AlternativePlanners1Creator implements Creator {
     
     private static final List<AlternativePathPlanner<SpatialPoint, DefaultWeightedEdge>> alternativePlanners = new ArrayList<AlternativePathPlanner<SpatialPoint,DefaultWeightedEdge>>();
     {
-        alternativePlanners.add( 
-                new DifferentStateMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
-                );
-        alternativePlanners.add( 
-                new TrajectoryDistanceMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
-                );
-        alternativePlanners.add( 
-                new TrajectoryDistanceMaxMinMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
-                );
+//        alternativePlanners.add( 
+//                new DifferentStateMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT )
+//                );
+//        alternativePlanners.add( 
+//                new TrajectoryDistanceMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2)
+//                );
+//        alternativePlanners.add( 
+//                new TrajectoryDistanceMaxMinMetricPlanner<SpatialPoint, DefaultWeightedEdge>( planner, PATH_SOLUTION_LIMIT, 2 )
+//                );
         alternativePlanners.add( 
                 new ObstacleExtensions<SpatialPoint, DefaultWeightedEdge>(planner) 
                 );
-        alternativePlanners.add( 
-                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new ObstacleExtensions<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
-                );
-        alternativePlanners.add( 
-                new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>( planner )
-                );
-        alternativePlanners.add( 
-                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
-                );
+//        alternativePlanners.add( 
+//                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new ObstacleExtensions<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+//                );
+//        alternativePlanners.add( 
+//                new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>( planner )
+//                );
+//        alternativePlanners.add( 
+//                new AlternativePlannerSelector<SpatialPoint, DefaultWeightedEdge>( new VoronoiDelaunayPlanner<SpatialPoint, DefaultWeightedEdge>(planner), PATH_SOLUTION_LIMIT)
+//                );
     }
 
     private static final List<TrajectoryMetric<SpatialPoint, DefaultWeightedEdge>> trajectoryMetrics = new ArrayList<TrajectoryMetric<SpatialPoint,DefaultWeightedEdge>>();

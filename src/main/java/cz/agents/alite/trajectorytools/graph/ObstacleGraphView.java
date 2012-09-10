@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.vecmath.Point3d;
+
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
@@ -92,6 +94,10 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
             public void interactVisually(double x, double y, MouseEvent e) {
                 // find the closest point of the Graph
                 SpatialPoint point = SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(x, y, 0));
+                
+                if (point.distance(new Point3d (x, y, 0)) > 1) {
+                	return;
+                }
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     addObstacle(point);

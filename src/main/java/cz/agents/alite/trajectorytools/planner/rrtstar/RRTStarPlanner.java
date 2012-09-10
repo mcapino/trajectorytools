@@ -15,7 +15,6 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphPathImpl;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.ProcerusStraightLineDomain;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
@@ -32,6 +31,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     Map<E,S> edgeSources = new HashMap<E,S>();
     Map<E,S> edgeTargets = new HashMap<E,S>();
     Map<S,E> incomingEdges = new HashMap<S,E>();
+    
+    // Stores last random sample drawn from the domain -  only for debugging purposes
+    S lastSampleDrawn = null;
+    S lastNewSample = null;
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
         super();
@@ -56,31 +59,27 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
     public void iterate() {
+    	lastSampleDrawn = null;
+    	lastNewSample = null;
+    	
         // 1. Sample a new state
         S randomSample = domain.sampleState();
-
+        lastSampleDrawn = randomSample;
+ 
         Vertex<S,E> nearestVertex =  getNearestVertex(randomSample);
         Extension<S, E> extensionToNear = domain.extendTo(nearestVertex.getState(), randomSample);
 
         if (extensionToNear != null) {
             S newSample = extensionToNear.target;
+            lastNewSample = newSample;
 
-            // 2. Compute the set of all near vertices
-            Collection<Vertex<S,E>> nearVertices = getNear(newSample, nSamples);
+            // 2. Compute the set of all near vertices in the ball 
+            Collection<Vertex<S,E>> nearVertices = getNear(newSample);
+            nearVertices.add(nearestVertex);
 
             // 3. Find the best parent and extend from that parent
             BestParentSearchResult result = null;
-            if(nearVertices.isEmpty()) {
-                // 3.a Extend the nearest
-                Vertex<S,E> parent = getNearestVertex(randomSample);
-                Extension<S, E> extension = domain.extendTo(parent.getState(), randomSample);
-                if (extension != null) {
-                    result = new BestParentSearchResult(parent, extension);
-                }
-            } else {
-                // 3.b Extend the best parent within the near vertices
-                result = findBestParent(newSample, nearVertices);
-            }
+            result = findBestParent(newSample, nearVertices);
 
             if (result != null) {
                 // 3.c add the trajectory from the best parent to the tree
@@ -92,12 +91,6 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             }
 
         }
-
-
-
-
-
-
     }
 
 
@@ -140,16 +133,6 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             assert(straight.getEnd().distance((TimePoint) target.getState()) <= 0.001);
         }
 
-        if (domain instanceof ProcerusStraightLineDomain) {
-            ProcerusStraightLineDomain psld = (ProcerusStraightLineDomain) domain;
-            TimePoint storedParent = psld.parents.get(target.getState());
-
-            if (parent != null) {
-                assert(storedParent != null);
-                assert(storedParent.equals(parent.getState()));
-            }
-        }
-
         ////////
 
         checkBestVertex(target);
@@ -157,6 +140,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         edgeSources.put(extension.edge, parent.getState());
         edgeTargets.put(extension.edge, target.getState());
         incomingEdges.put(target.getState(), extension.edge);
+        
+        domain.notifyNewVertex(target.getState());
     }
 
     class BestParentSearchResult{
@@ -171,8 +156,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     private BestParentSearchResult findBestParent(S randomSample, Collection<Vertex<S,E>> nearVertices) {
 
         class VertexCost implements Comparable<VertexCost> {
-            Vertex<S,E> vertex;
-            double cost;
+            final Vertex<S,E> vertex;
+            final double cost;
 
             public VertexCost(Vertex<S,E> vertex, double cost) {
                 super();
@@ -183,7 +168,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             @Override
             public int compareTo(VertexCost other) {
                 // Smallest cost will be first
-                return (int) Math.signum(this.cost - other.cost);
+                return Double.compare(this.cost , other.cost);
             }
 
             @Override
@@ -194,7 +179,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         // Sort according to the cost of nearby vertices
         List<VertexCost> vertexCosts = new LinkedList<VertexCost>();
-
+        
         for (Vertex<S,E> vertex : nearVertices) {
             ExtensionEstimate extensionEst = domain.estimateExtension(vertex.getState(), randomSample);
             if (extensionEst != null) {
@@ -254,13 +239,15 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-
-    private Collection<Vertex<S,E>> getNear(S x, int n) {
-        double radius = gamma * Math.pow(Math.log(n+1)/(n+1),1/domain.nDimensions());
+    private Collection<Vertex<S,E>> getNear(S x) {
+        double radius = getNearBallRadius();
         return dfsNearSearch(x, radius);
     }
 
-
+    public double getNearBallRadius() {
+    	int n = nSamples; 
+    	return gamma * Math.pow(Math.log(n+1)/(n+1),1 / domain.nDimensions());
+    }
 
     private Vertex<S,E>  getNearestVertex(S x) {
         return dfsNearestSearch(x);
@@ -466,5 +453,14 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     public Set<S> vertexSet() {
          throw new NotImplementedException();
     }
+
+
+	public S getLastSample() {
+		return lastSampleDrawn;
+	}
+	
+	public S getNewSample() {
+		return lastNewSample;
+	}
 
 }
