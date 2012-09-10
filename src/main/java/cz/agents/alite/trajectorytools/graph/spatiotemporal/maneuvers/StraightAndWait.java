@@ -6,25 +6,62 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
-public class Straight extends SpatioTemporalManeuver {
+public class StraightAndWait extends SpatioTemporalManeuver {
     private static final long serialVersionUID = -2519868162204278196L;
     private cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight
         spatialStraight;
 
     TimePoint start;
     TimePoint end;
+    double endArrivalTime;
+    double speed;
 
-    public Straight(TimePoint start, TimePoint end) {
+    public StraightAndWait(TimePoint start, TimePoint end, double speed) {
         super();
+        
         this.start = start;
         this.end = end;
-        double speed = start.getSpatialPoint().distance(end.getSpatialPoint()) / (end.getTime() - start.getTime());
+        this.speed = speed;
         this.spatialStraight = new cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight(start.getSpatialPoint(), end.getSpatialPoint(), speed);
+        this.endArrivalTime = start.getTime() + spatialStraight.getDuration();
+
+        // assert that we can make it to the end waypoint before the time specified in end waypoint
+        assert(
+        		endArrivalTime
+        		- end.getTime()
+        		>= -0.001
+        		);
+
     }
 
     @Override
     public Trajectory getTrajectory() {
-        return spatialStraight.getTrajectory(start.getTime());
+    	return new Trajectory() {
+			
+			@Override
+			public OrientedPoint getPosition(double t) {
+				if (t <= endArrivalTime) {
+					return spatialStraight.getTrajectory(start.getTime()).getPosition(t);
+				}
+				else if (t > endArrivalTime) {
+					// wait at destination
+					return new OrientedPoint(end.getSpatialPoint(), new Vector(0,1,0));
+				} else {
+					throw new RuntimeException("Illegal time given");
+				}
+			}
+			
+			@Override
+			public double getMinTime() {
+				return start.getTime();
+			}
+			
+			@Override
+			public double getMaxTime() {
+				return end.getTime();
+			}
+		};
+		
     }
 
     @Override
@@ -43,7 +80,7 @@ public class Straight extends SpatioTemporalManeuver {
     }
 
     public double getSpeed() {
-        return getDistance()/getDuration();
+    	return speed;
     }
 
     @Override
@@ -63,7 +100,7 @@ public class Straight extends SpatioTemporalManeuver {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Straight other = (Straight) obj;
+        StraightAndWait other = (StraightAndWait) obj;
         if (end == null) {
             if (other.end != null)
                 return false;
@@ -79,7 +116,7 @@ public class Straight extends SpatioTemporalManeuver {
 
     @Override
     public String toString() {
-        return "[" + start + "=>" + end + " spped:" + spatialStraight.getSpeed() + " m/s ]";
+        return "[" + start + "=>" + end + " speed:" + speed + " m/s ]";
     }
 
     public TimePoint getStart() {
