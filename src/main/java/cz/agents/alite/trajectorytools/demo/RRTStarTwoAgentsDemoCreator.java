@@ -109,7 +109,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
             /*
             try {
-                Thread.sleep(1);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } */
@@ -120,15 +120,20 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
         VisManager.setSceneParam(new SceneParams() {
 
-            @Override
-            public Rectangle getWorldBounds() {
-                return new Rectangle(-1000, -1000, 3000, 3000);
-            }
+			@Override
+			public Point2d getDefaultLookAt() {
+				return new Point2d(500,500);
+			}
+
+			@Override
+			public double getDefaultZoomFactor() {
+				return 0.42;
+			}
+        	
 
         });
         VisManager.init();
 
-        Vis.setPosition(50, 50, 1);
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
