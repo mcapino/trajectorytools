@@ -21,6 +21,7 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     Domain<S,E> domain;
+    List<Listener<S>> listeners;
 
     int nSamples;
     Vertex<S,E> root;
@@ -31,15 +32,13 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     Map<E,S> edgeSources = new HashMap<E,S>();
     Map<E,S> edgeTargets = new HashMap<E,S>();
     Map<S,E> incomingEdges = new HashMap<S,E>();
-    
-    // Stores last random sample drawn from the domain -  only for debugging purposes
+
+    // Stores last random sample drawn from the domain -  only for debugging/visualisation purposes
     S lastSampleDrawn = null;
     S lastNewSample = null;
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
         super();
-
-        // Check if the initialState is in free space
 
         this.domain = domain;
         this.gamma = gamma;
@@ -47,6 +46,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         this.nSamples = 1;
 
         this.bestVertex = null;
+        this.listeners =  new LinkedList<Listener<S>>();
     }
 
 
@@ -59,13 +59,13 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
     public void iterate() {
-    	lastSampleDrawn = null;
-    	lastNewSample = null;
-    	
+        lastSampleDrawn = null;
+        lastNewSample = null;
+
         // 1. Sample a new state
         S randomSample = domain.sampleState();
         lastSampleDrawn = randomSample;
- 
+
         Vertex<S,E> nearestVertex =  getNearestVertex(randomSample);
         Extension<S, E> extensionToNear = domain.extendTo(nearestVertex.getState(), randomSample);
 
@@ -73,7 +73,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             S newSample = extensionToNear.target;
             lastNewSample = newSample;
 
-            // 2. Compute the set of all near vertices in the ball 
+            // 2. Compute the set of all near vertices in the ball
             Collection<Vertex<S,E>> nearVertices = getNear(newSample);
             nearVertices.add(nearestVertex);
 
@@ -140,8 +140,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         edgeSources.put(extension.edge, parent.getState());
         edgeTargets.put(extension.edge, target.getState());
         incomingEdges.put(target.getState(), extension.edge);
-        
-        domain.notifyNewVertex(target.getState());
+
+        for (Listener<S> listener : listeners) {
+            listener.notifyNewVertex(target.getState());
+        }
     }
 
     class BestParentSearchResult{
@@ -179,7 +181,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         // Sort according to the cost of nearby vertices
         List<VertexCost> vertexCosts = new LinkedList<VertexCost>();
-        
+
         for (Vertex<S,E> vertex : nearVertices) {
             ExtensionEstimate extensionEst = domain.estimateExtension(vertex.getState(), randomSample);
             if (extensionEst != null) {
@@ -245,8 +247,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
     public double getNearBallRadius() {
-    	int n = nSamples; 
-    	return gamma * Math.pow(Math.log(n+1)/(n+1),1 / domain.nDimensions());
+        int n = nSamples;
+        return gamma * Math.pow(Math.log(n+1)/(n+1),1 / domain.nDimensions());
     }
 
     private Vertex<S,E>  getNearestVertex(S x) {
@@ -328,6 +330,9 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return bestVertex != null;
     }
 
+    public void registerListener(Listener<S> listener) {
+        listeners.add(listener);
+    }
 
     @Override
     public E addEdge(S arg0, S arg1) {
@@ -455,12 +460,12 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
 
-	public S getLastSample() {
-		return lastSampleDrawn;
-	}
-	
-	public S getNewSample() {
-		return lastNewSample;
-	}
+    public S getLastSample() {
+        return lastSampleDrawn;
+    }
+
+    public S getNewSample() {
+        return lastNewSample;
+    }
 
 }

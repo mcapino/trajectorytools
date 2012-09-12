@@ -5,16 +5,15 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-import javax.vecmath.Vector2d;
-
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
+import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
+public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain implements Listener<TimePoint> {
 
 
     Queue<TimePoint> samplesPool = new LinkedList<TimePoint>();
@@ -33,15 +32,15 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
         double duration = from.getSpatialPoint().distance(target) / optSpeed;
         return new TimePoint(target, from.getTime() + duration);
     }
-    
+
     @Override
     public TimePoint sampleState() {
         if (samplesPool.isEmpty()) {
             // generate new random sample
             TimePoint randomSample = super.sampleState();
             samplesPool.offer(randomSample);
-            
-            
+
+
             // Bias towards goal at optimal speed
             samplesPool.offer(getTargetSample(randomSample));
 
@@ -55,19 +54,19 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
             samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, randomSample.getTime()));
             // Bias towards start altitude and optimal speed
             samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, optTime));
-        	
+
         }
 
         return samplesPool.poll();
     }
-    
-	@Override
-	public void notifyNewVertex(TimePoint s) {
-		double distance = s.getSpatialPoint().distance(target);
-		double timeAtTarget = s.getTime() + (distance / optSpeed);
-		
-		
-		/*
+
+    @Override
+    public void notifyNewVertex(TimePoint s) {
+        double distance = s.getSpatialPoint().distance(target);
+        double timeAtTarget = s.getTime() + (distance / optSpeed);
+
+
+        /*
         // Bias towards goal at optimal speed
         samplesPool.offer(getTargetSample(randomSample));
 
@@ -81,14 +80,14 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
         samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, randomSample.getTime()));
         // Bias towards start altitude and optimal speed
         samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, optTime));
-		*/
-		
-		
-		Extension<TimePoint, SpatioTemporalManeuver> extension 
-			= steerMaintainSpatialPoint(s, new TimePoint(target, timeAtTarget));
-		
-		if (extension != null) {
-			samplesPool.offer(extension.target);
-		}
-	}
+        */
+
+
+        Extension<TimePoint, SpatioTemporalManeuver> extension
+            = steerMaintainSpatialPoint(s, new TimePoint(target, timeAtTarget));
+
+        if (extension != null) {
+            samplesPool.offer(extension.target);
+        }
+    }
 }

@@ -53,8 +53,8 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
     }
 
     private boolean isVisible(SpatialPoint p1, SpatialPoint p2) {
-    	
-    	
+
+
 
         // check obstacles
         for (Region obstacle : obstacles) {
@@ -102,7 +102,4 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
     public double estimateCostToGo(SpatialPoint p1) {
         return 0.0;
     }
-
-	@Override
-	public void notifyNewVertex(SpatialPoint s) {}
 }

@@ -19,6 +19,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.BiasedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
+import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentEnvironment;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
@@ -68,6 +69,7 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void create() {
 
@@ -81,6 +83,10 @@ public class RRTStarTwoAgentsDemoCreator implements Creator {
         //= new KinematicStraightLineDomain(bounds, initialPoint, obstacles, target, targetReachedTolerance, 12, 15, 18, 50, 50, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
+
+        if (domain instanceof Listener) {
+            rrtstar.registerListener((Listener<TimePoint>) domain);
+        }
 
         simulation.updateTrajectory("t2", t2);
 

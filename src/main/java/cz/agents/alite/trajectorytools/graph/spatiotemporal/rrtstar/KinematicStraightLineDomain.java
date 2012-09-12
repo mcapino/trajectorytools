@@ -13,8 +13,8 @@ import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuver;
 import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuverType;
 import cz.agents.alite.planner.spatialmaneuver.maneuver.ExpandManeuvers;
 import cz.agents.alite.planner.spatialmaneuver.maneuver.ManeuverSpecification;
-import cz.agents.alite.planner.spatialmaneuver.maneuver.SmoothManeuver;
 import cz.agents.alite.planner.spatialmaneuver.maneuver.ManeuverSpecification.LevelConstants;
+import cz.agents.alite.planner.spatialmaneuver.maneuver.SmoothManeuver;
 import cz.agents.alite.planner.spatialmaneuver.zone.EmptyZone;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
@@ -217,7 +217,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
     @Override
     public double distance(OrientedTimePoint from, OrientedTimePoint to) {
         return dubins3dDistance(from, to, optSpeed);
-    	//return p1.distance(p2);
+        //return p1.distance(p2);
     }
 
     @Override
@@ -281,39 +281,36 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
 
 
     public double dubins3dDistance(OrientedTimePoint from, OrientedTimePoint to, double speed) {
-    	
-    	double mainSegmentDistance = dubins3dDistance(from.getOrientedPoint(), to.getOrientedPoint());
-    	double mainSegmentDuration = mainSegmentDistance/speed;
-    	
-    	if ((to.getTime() - from.getTime()) - mainSegmentDuration > 0) {
-    		double loopDistance = ((to.getTime() - from.getTime()) - mainSegmentDuration) * speed; 
-    		if (loopDistance >= 2*Math.PI*minTurnRadius) {
-    			return mainSegmentDistance + loopDistance;
-    		}
-    	} else {
-    		// The main segment cannot be constructed in the available time
-    	}
-    	return Double.POSITIVE_INFINITY;
-    	
+
+        double mainSegmentDistance = dubins3dDistance(from.getOrientedPoint(), to.getOrientedPoint());
+        double mainSegmentDuration = mainSegmentDistance/speed;
+
+        if ((to.getTime() - from.getTime()) - mainSegmentDuration > 0) {
+            double loopDistance = ((to.getTime() - from.getTime()) - mainSegmentDuration) * speed;
+            if (loopDistance >= 2*Math.PI*minTurnRadius) {
+                return mainSegmentDistance + loopDistance;
+            }
+        } else {
+            // The main segment cannot be constructed in the available time
+        }
+        return Double.POSITIVE_INFINITY;
+
     }
-    
+
     public double dubins3dDistance(OrientedPoint from, OrientedPoint to) {
-    	
+
         // plan trajectory constants
         LevelConstants[] levelConstants =  new LevelConstants[2];
         levelConstants[0] = new LevelConstants(2, 12, 8);
-        
+
         ExpandManeuvers expandManeuvers = new ExpandManeuvers();
         expandManeuvers.getManeuver().add(new ExpandManeuver(ExpandManeuverType.STRAIGHT));
-    	
-    	ManeuverSpecification maneuverSpecification = new ManeuverSpecification(null, levelConstants, expandManeuvers);
-		PathFindSpecification specification = new PathFindSpecification(minTurnRadius, new EmptyZone(), maneuverSpecification );
-		SmoothManeuver smooth = new SmoothManeuver(from, from.orientation, 0, to, to.orientation, specification);
-		
-		return smooth.getLength();
-    }
 
-	@Override
-	public void notifyNewVertex(OrientedTimePoint s) {}
+        ManeuverSpecification maneuverSpecification = new ManeuverSpecification(null, levelConstants, expandManeuvers);
+        PathFindSpecification specification = new PathFindSpecification(minTurnRadius, new EmptyZone(), maneuverSpecification );
+        SmoothManeuver smooth = new SmoothManeuver(from, from.orientation, 0, to, to.orientation, specification);
+
+        return smooth.getLength();
+    }
 
 }

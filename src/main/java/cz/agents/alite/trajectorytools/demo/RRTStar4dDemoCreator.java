@@ -1,8 +1,6 @@
 package cz.agents.alite.trajectorytools.demo;
 
 import java.awt.Color;
-import java.awt.Rectangle;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
@@ -19,8 +17,8 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.BiasedStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
+import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatioTemporalManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
@@ -59,6 +57,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void create() {
         obstacles.add(new StaticBoxRegion(new SpatialPoint(250, 250, 0), new SpatialPoint(750,750,bounds.getCorner2().z*1.0)));
@@ -67,7 +66,7 @@ public class RRTStar4dDemoCreator implements Creator {
 
         // Add obstacles
 
-    	/*
+        /*
         for(int x=5; x < 20; x++) {
             for (int y=5; y < 20; y++) {
                 int z = (int) (Math.random() * bounds.getCorner2().z / 2);
@@ -76,11 +75,15 @@ public class RRTStar4dDemoCreator implements Creator {
         } */
 
 
-		Domain<TimePoint, SpatioTemporalManeuver> domain = new BiasedStraightLineDomain(
-				bounds, initialPoint, obstacles, target,
-				targetReachedTolerance, 12, 15, 30, 45, new Random(1));
+        Domain<TimePoint, SpatioTemporalManeuver> domain = new BiasedStraightLineDomain(
+                bounds, initialPoint, obstacles, target,
+                targetReachedTolerance, 12, 15, 30, 45, new Random(1));
         rrtstar = new RRTStarPlanner<TimePoint, SpatioTemporalManeuver>(domain, initialPoint, gamma);
         createVisualization();
+
+        if (domain instanceof Listener) {
+            rrtstar.registerListener((Listener<TimePoint>) domain);
+        }
 
         double bestCost = Double.POSITIVE_INFINITY;
         int n=100000;
@@ -102,13 +105,13 @@ public class RRTStar4dDemoCreator implements Creator {
                 }
 
             }
-            
-            
+
+
 //            try {
 //            	System.in.read();
 //            }
 //            catch (Exception e) {};
-            
+
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -122,16 +125,16 @@ public class RRTStar4dDemoCreator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 4000, 4000);
         VisManager.setSceneParam(new SceneParams() {
 
-			@Override
-			public Point2d getDefaultLookAt() {
-				return new Point2d(500, 500);
-			}
+            @Override
+            public Point2d getDefaultLookAt() {
+                return new Point2d(500, 500);
+            }
 
-			@Override
-			public double getDefaultZoomFactor() {
-				return 0.4;
-			}
-        	
+            @Override
+            public double getDefaultZoomFactor() {
+                return 0.4;
+            }
+
         });
         VisManager.init();
 

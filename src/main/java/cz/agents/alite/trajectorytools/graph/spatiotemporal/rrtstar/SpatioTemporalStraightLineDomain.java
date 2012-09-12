@@ -281,7 +281,4 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
         return true;
     }
 
-    @Override
-    public void notifyNewVertex(TimePoint s) {}
-
 }
