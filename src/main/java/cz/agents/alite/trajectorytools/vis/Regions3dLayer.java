@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
-import cz.agents.alite.trajectorytools.graph.spatial.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -18,7 +18,7 @@ import cz.agents.alite.vis.layer.terminal.LineLayer;
 public class Regions3dLayer extends AbstractLayer {
 
     public static interface RegionsProvider {
-         Collection<Region> getRegions();
+         Collection<SpaceRegion> getRegions();
     }
 
     Regions3dLayer() {
@@ -32,10 +32,10 @@ public class Regions3dLayer extends AbstractLayer {
 
             @Override
             public Iterable<Line> getLines() {
-                Collection<Region> regions = regionsProvider.getRegions();
+                Collection<SpaceRegion> regions = regionsProvider.getRegions();
                 LinkedList<Line> lines = new LinkedList<Line>();
 
-                for (Region region : regions) {
+                for (SpaceRegion region : regions) {
                     if (region instanceof BoxRegion) {
                         BoxRegion box = (BoxRegion) region;
 

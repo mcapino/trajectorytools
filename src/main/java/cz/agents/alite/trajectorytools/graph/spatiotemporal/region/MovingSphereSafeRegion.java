@@ -4,7 +4,7 @@ import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class MovingSphereSafeRegion implements Region {
+public class MovingSphereSafeRegion implements SpaceTimeRegion {
     double samplingInterval;
     Trajectory trajectory;
     double radius;

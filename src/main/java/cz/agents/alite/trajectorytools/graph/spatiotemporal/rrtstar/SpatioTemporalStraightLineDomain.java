@@ -13,7 +13,7 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Wait;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
@@ -29,7 +29,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
     private static final double CLIMB_PENALTY_COEF = 1.0;
 
     Box4dRegion bounds;
-    Collection<Region> obstacles;
+    Collection<SpaceTimeRegion> obstacles;
 
     TimePoint initialPoint;
     SpatialPoint target;
@@ -44,7 +44,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
     Random random;
 
     public SpatioTemporalStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
-            Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
+            Collection<SpaceTimeRegion> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double maxPitch, Random random) {
         super();
 
@@ -232,7 +232,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     protected boolean isInFreeSpace(TimePoint p) {
         if (bounds.isInside(p)) {
-            for (Region obstacle : obstacles) {
+            for (SpaceTimeRegion obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
                     return false;
                 }
@@ -252,7 +252,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     protected boolean intersectsObstacles(TimePoint p1, TimePoint p2) {
             // check obstacles
-            for (Region obstacle : obstacles) {
+            for (SpaceTimeRegion obstacle : obstacles) {
                 if (obstacle.intersectsLine(p1, p2)) {
                     return true;
                 }

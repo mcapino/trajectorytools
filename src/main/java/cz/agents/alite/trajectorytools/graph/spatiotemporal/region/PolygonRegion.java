@@ -8,7 +8,7 @@ import javax.vecmath.Vector3d;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class PolygonRegion implements Region {
+public class PolygonRegion implements SpaceTimeRegion {
 
 	private static final double SMALL_NUM = 1e-6;
 	private final SpatialPoint [] points;

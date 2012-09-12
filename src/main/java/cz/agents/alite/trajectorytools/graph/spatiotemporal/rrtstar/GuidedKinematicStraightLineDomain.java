@@ -9,7 +9,7 @@ import javax.vecmath.Vector3d;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
@@ -20,7 +20,7 @@ public class GuidedKinematicStraightLineDomain extends KinematicStraightLineDoma
 	Queue<OrientedTimePoint> samplesPool = new LinkedList<OrientedTimePoint>();
 
     public GuidedKinematicStraightLineDomain(Box4dRegion bounds,
-			OrientedTimePoint initialPoint, Collection<Region> obstacles,
+			OrientedTimePoint initialPoint, Collection<SpaceTimeRegion> obstacles,
 			SpatialPoint target, double targetReachedTolerance,
 			double minSpeed, double optSpeed, double maxSpeed,
 			double segmentDistance, double minTurnRadius,

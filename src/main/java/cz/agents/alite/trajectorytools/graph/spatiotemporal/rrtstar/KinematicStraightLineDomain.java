@@ -19,7 +19,7 @@ import cz.agents.alite.planner.spatialmaneuver.zone.EmptyZone;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
@@ -36,7 +36,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
     private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 0.1;
 
     Box4dRegion bounds;
-    Collection<Region> obstacles;
+    Collection<SpaceTimeRegion> obstacles;
 
     OrientedTimePoint initialPoint;
     SpatialPoint target;
@@ -54,7 +54,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
     Random random;
 
     public KinematicStraightLineDomain(Box4dRegion bounds, OrientedTimePoint initialPoint,
-            Collection<Region> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
+            Collection<SpaceTimeRegion> obstacles, SpatialPoint target, double targetReachedTolerance, double minSpeed,
             double optSpeed, double maxSpeed, double minSegmentDistance, double minTurnRadius, double maxPitchDeg, Random random) {
         super();
 
@@ -232,7 +232,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
 
     protected boolean isInFreeSpace(TimePoint p) {
         if (bounds.isInside(p)) {
-            for (Region obstacle : obstacles) {
+            for (SpaceTimeRegion obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
                     return false;
                 }
@@ -250,7 +250,7 @@ public class KinematicStraightLineDomain implements Domain<OrientedTimePoint, Sp
 
     protected boolean intersectsObstacles(TimePoint p1, TimePoint p2) {
             // check obstacles
-            for (Region obstacle : obstacles) {
+            for (SpaceTimeRegion obstacle : obstacles) {
                 if (obstacle.intersectsLine(p1, p2)) {
                     return true;
                 }

@@ -5,7 +5,7 @@ import javax.vecmath.Point4d;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class Box4dRegion implements Region {
+public class Box4dRegion implements SpaceTimeRegion {
 
     Point4d corner1;
     Point4d corner2;

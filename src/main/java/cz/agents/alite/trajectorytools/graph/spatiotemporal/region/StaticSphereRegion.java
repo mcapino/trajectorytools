@@ -5,7 +5,7 @@ import javax.vecmath.Point3d;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class StaticSphereRegion implements Region {
+public class StaticSphereRegion implements SpaceTimeRegion {
 
     Point3d center;
     double radius;

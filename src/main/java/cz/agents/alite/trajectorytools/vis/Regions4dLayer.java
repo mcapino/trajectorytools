@@ -8,7 +8,7 @@ import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
@@ -30,7 +30,7 @@ import cz.agents.alite.vis.layer.terminal.LineLayer;
 public class Regions4dLayer extends AbstractLayer {
 
     public static interface RegionsProvider {
-         Collection<Region> getRegions();
+         Collection<SpaceTimeRegion> getRegions();
     }
 
     Regions4dLayer() {
@@ -44,10 +44,10 @@ public class Regions4dLayer extends AbstractLayer {
 
             @Override
             public Iterable<Line> getLines() {
-                Collection<Region> regions = regionsProvider.getRegions();
+                Collection<SpaceTimeRegion> regions = regionsProvider.getRegions();
                 LinkedList<Line> lines = new LinkedList<Line>();
 
-                for (Region region : regions) {
+                for (SpaceTimeRegion region : regions) {
                     if (region instanceof StaticBoxRegion) {
                         StaticBoxRegion box = (StaticBoxRegion) region;
 
@@ -140,10 +140,10 @@ public class Regions4dLayer extends AbstractLayer {
 
             @Override
             public Iterable<Circle> getCircles() {
-                Collection<Region> regions = regionsProvider.getRegions();
+                Collection<SpaceTimeRegion> regions = regionsProvider.getRegions();
                 LinkedList<Circle> circles = new LinkedList<Circle>();
 
-                for (Region region : regions) {
+                for (SpaceTimeRegion region : regions) {
                     if (region instanceof StaticSphereRegion) {
                         StaticSphereRegion sphere = (StaticSphereRegion) region;
                         Point2d center1 = projection.project(new TimePoint(sphere.getCenter().x,sphere.getCenter().y,sphere.getCenter().z,0.0));

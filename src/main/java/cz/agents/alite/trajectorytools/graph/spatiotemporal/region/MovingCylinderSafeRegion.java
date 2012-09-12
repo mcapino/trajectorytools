@@ -6,7 +6,7 @@ import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class MovingCylinderSafeRegion implements Region {
+public class MovingCylinderSafeRegion implements SpaceTimeRegion {
     double samplingInterval;
     Trajectory trajectory;
     private double halfHeight;

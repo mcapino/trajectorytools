@@ -13,7 +13,7 @@ import org.jgrapht.GraphPath;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
-import cz.agents.alite.trajectorytools.graph.spatial.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.rrtstar.SpatialStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
@@ -41,8 +41,8 @@ public class RRTStar2dDemoCreator implements Creator {
 
     SpatialPoint initialPoint = new SpatialPoint(100, 100, 0);
     BoxRegion bounds = new BoxRegion(new SpatialPoint(0, 0, 0), new SpatialPoint(1000, 1000, 1000));
-    Collection<Region> obstacles = new LinkedList<Region>();
-    Region target = new BoxRegion(new SpatialPoint(500, 850, -1000), new SpatialPoint(600, 870, 1000));
+    Collection<SpaceRegion> obstacles = new LinkedList<SpaceRegion>();
+    SpaceRegion target = new BoxRegion(new SpatialPoint(500, 850, -1000), new SpatialPoint(600, 870, 1000));
 
     Trajectory trajectory = null;
 
@@ -90,7 +90,7 @@ public class RRTStar2dDemoCreator implements Creator {
             double size = random.nextDouble() * maxSize;
             double x = bounds.getCorner1().x + random.nextDouble() *  (bounds.getCorner2().x - bounds.getCorner1().x);
             double y = bounds.getCorner1().y + random.nextDouble() *  (bounds.getCorner2().y - bounds.getCorner1().y);
-            Region obstacle = new BoxRegion(new SpatialPoint(x, y, 0), new SpatialPoint(x+size,y+size,750));
+            SpaceRegion obstacle = new BoxRegion(new SpatialPoint(x, y, 0), new SpatialPoint(x+size,y+size,750));
             if (!obstacle.isInside(initialPoint)) {
                 obstacles.add(obstacle);
             }
@@ -123,8 +123,8 @@ public class RRTStar2dDemoCreator implements Creator {
         VisManager.registerLayer(Regions3dLayer.create(new RegionsProvider() {
 
             @Override
-            public Collection<Region> getRegions() {
-                LinkedList<Region> regions = new LinkedList<Region>();
+            public Collection<SpaceRegion> getRegions() {
+                LinkedList<SpaceRegion> regions = new LinkedList<SpaceRegion>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
                 regions.add(target);

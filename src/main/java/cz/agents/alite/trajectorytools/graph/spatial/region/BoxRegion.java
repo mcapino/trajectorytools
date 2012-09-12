@@ -4,7 +4,7 @@ import javax.vecmath.Point3d;
 
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
-public class BoxRegion implements Region {
+public class BoxRegion implements SpaceRegion {
 
     SpatialPoint corner1;
     SpatialPoint corner2;

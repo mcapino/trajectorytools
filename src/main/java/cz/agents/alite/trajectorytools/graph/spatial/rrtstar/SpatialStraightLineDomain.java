@@ -6,7 +6,7 @@ import java.util.Random;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
-import cz.agents.alite.trajectorytools.graph.spatial.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
@@ -15,12 +15,12 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialManeuver> {
 
     BoxRegion bounds;
-    Collection<Region> obstacles;
-    Region target;
+    Collection<SpaceRegion> obstacles;
+    SpaceRegion target;
     Random random;
     double speed;
 
-    public SpatialStraightLineDomain(BoxRegion bounds, Collection<Region> obstacles, Region target, double speed) {
+    public SpatialStraightLineDomain(BoxRegion bounds, Collection<SpaceRegion> obstacles, SpaceRegion target, double speed) {
         super();
         this.bounds = bounds;
         this.obstacles = obstacles;
@@ -57,7 +57,7 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
 
 
         // check obstacles
-        for (Region obstacle : obstacles) {
+        for (SpaceRegion obstacle : obstacles) {
             if (obstacle.intersectsLine(p1, p2)) {
                 return false;
             }
@@ -67,7 +67,7 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
 
     private boolean isInFreeSpace(SpatialPoint p) {
         if (bounds.isInside(p)) {
-            for (Region obstacle : obstacles) {
+            for (SpaceRegion obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
                     return false;
                 }

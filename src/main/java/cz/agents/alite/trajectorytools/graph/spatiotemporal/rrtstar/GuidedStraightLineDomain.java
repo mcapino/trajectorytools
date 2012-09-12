@@ -7,7 +7,7 @@ import java.util.Random;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
@@ -19,7 +19,7 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain i
     Queue<TimePoint> samplesPool = new LinkedList<TimePoint>();
 
     public GuidedStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
-            Collection<Region> obstacles, SpatialPoint target,
+            Collection<SpaceTimeRegion> obstacles, SpatialPoint target,
             double targetReachedTolerance, double minSpeed, double optSpeed,
             double maxSpeed, double maxPitch, Random random) {
         super(bounds, initialPoint, obstacles, target, targetReachedTolerance,

@@ -11,7 +11,7 @@ public class PolygonRegionTest {
 
 	@Test
 	public void testIntersectsLineXY() {
-		Region region = new PolygonRegion(new SpatialPoint[] {
+		SpaceTimeRegion region = new PolygonRegion(new SpatialPoint[] {
 				new SpatialPoint( -1, -1, 0 ),
 				new SpatialPoint( -1, 1, 0 ),
 				new SpatialPoint( 1, 1, 0 ),
@@ -28,7 +28,7 @@ public class PolygonRegionTest {
 
 	@Test
 	public void testIsInsideXY() {
-		Region region = new PolygonRegion(new SpatialPoint[] {
+		SpaceTimeRegion region = new PolygonRegion(new SpatialPoint[] {
 				new SpatialPoint( -1, -1, 0 ),
 				new SpatialPoint( -1, 1, 0 ),
 				new SpatialPoint( 1, 1, 0 ),

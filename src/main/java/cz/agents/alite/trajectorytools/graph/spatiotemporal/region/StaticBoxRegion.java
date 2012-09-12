@@ -5,7 +5,7 @@ import javax.vecmath.Point3d;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class StaticBoxRegion implements Region {
+public class StaticBoxRegion implements SpaceTimeRegion {
 
     SpatialPoint corner1;
     SpatialPoint corner2;

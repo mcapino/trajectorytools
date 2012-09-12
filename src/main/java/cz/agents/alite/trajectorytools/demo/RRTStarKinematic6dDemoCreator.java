@@ -14,7 +14,7 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.rrtstar.GuidedKinematicStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
@@ -45,10 +45,10 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
     OrientedTimePoint initialState = new OrientedTimePoint(initialTimePoint, initialHeading);
 
     Box4dRegion bounds = new Box4dRegion(new TimePoint(0, 0, 40, 0), new TimePoint(1000, 1000, 60, 200));
-    Collection<Region> obstacles = new LinkedList<Region>();
+    Collection<SpaceTimeRegion> obstacles = new LinkedList<SpaceTimeRegion>();
     SpatialPoint target = new SpatialPoint(500, 100, 60);
     double targetReachedTolerance = 15;
-    Region targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
+    SpaceTimeRegion targetRegion =	new StaticSphereRegion(target, targetReachedTolerance);
 
     Trajectory trajectory = null;
 
@@ -214,8 +214,8 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
         VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
 
             @Override
-            public Collection<Region> getRegions() {
-                LinkedList<Region> regions = new LinkedList<Region>();
+            public Collection<SpaceTimeRegion> getRegions() {
+                LinkedList<SpaceTimeRegion> regions = new LinkedList<SpaceTimeRegion>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
                 regions.add(targetRegion);

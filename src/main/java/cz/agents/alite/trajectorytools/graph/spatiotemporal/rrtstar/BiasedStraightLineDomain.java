@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.util.MathUtil;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
@@ -20,7 +20,7 @@ public class BiasedStraightLineDomain extends SpatioTemporalStraightLineDomain {
     Queue<TimePoint> samplesPool = new LinkedList<TimePoint>();
 
     public BiasedStraightLineDomain(Box4dRegion bounds, TimePoint initialPoint,
-            Collection<Region> obstacles, SpatialPoint target,
+            Collection<SpaceTimeRegion> obstacles, SpatialPoint target,
             double targetReachedTolerance, double minSpeed, double optSpeed,
             double maxSpeed, double maxPitch, Random random) {
         super(bounds, initialPoint, obstacles, target, targetReachedTolerance,
