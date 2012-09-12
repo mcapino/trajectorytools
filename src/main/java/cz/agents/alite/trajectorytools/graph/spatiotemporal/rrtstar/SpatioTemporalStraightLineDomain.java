@@ -25,7 +25,7 @@ public class SpatioTemporalStraightLineDomain implements Domain<TimePoint, Spati
 
     private static final Logger LOGGER = Logger.getLogger(SpatioTemporalStraightLineDomain.class);
 
-    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 5.0;
+    private static final double NONOPTIMAL_SPEED_PENALTY_COEF = 5.0; /*0.5 1.5 5.0*/
     private static final double CLIMB_PENALTY_COEF = 1.0;
 
     Box4dRegion bounds;
