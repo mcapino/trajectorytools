@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Region;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 
 public class VariableTimeStepTrajectoryApproximation {
@@ -21,15 +21,15 @@ public class VariableTimeStepTrajectoryApproximation {
 	 * @return
 	 */
 
-	public static List<TimePoint> approximate(Trajectory trajectory, Collection<Region> regions){
+	public static List<TimePoint> approximate(Trajectory trajectory, Collection<SpaceTimeRegion> regions){
 		return approximate(trajectory, trajectory.getMinTime(), trajectory.getMaxTime(), 0.5, Math.PI/8, regions);
 	}
 
 	public static List<TimePoint> approximate(Trajectory trajectory, double minTime, double maxTime, double sampleStep, double maxAngle){
-		return approximate(trajectory, minTime, maxTime, sampleStep, maxAngle, new ArrayList<Region>());
+		return approximate(trajectory, minTime, maxTime, sampleStep, maxAngle, new ArrayList<SpaceTimeRegion>());
 	}
 
-	public static List<TimePoint> approximate(Trajectory trajectory, double minTime, double maxTime, double sampleStep, double maxAngle, Collection<Region> regions){
+	public static List<TimePoint> approximate(Trajectory trajectory, double minTime, double maxTime, double sampleStep, double maxAngle, Collection<SpaceTimeRegion> regions){
 		
 		List<TimePoint> output = new LinkedList<TimePoint>();
 		
@@ -63,8 +63,8 @@ public class VariableTimeStepTrajectoryApproximation {
 		
 	}
 
-	private static boolean isInCollision(TimePoint p1, TimePoint p2, Collection<Region> regions) {
-		for (Region region : regions) {
+	private static boolean isInCollision(TimePoint p1, TimePoint p2, Collection<SpaceTimeRegion> regions) {
+		for (SpaceTimeRegion region : regions) {
 			if (region.intersectsLine(p1, p2)) {
 				return true;
 			}
