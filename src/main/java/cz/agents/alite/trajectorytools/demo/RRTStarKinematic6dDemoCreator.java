@@ -11,6 +11,7 @@ import javax.vecmath.Vector3d;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -25,8 +26,8 @@ import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
-import cz.agents.alite.trajectorytools.vis.Regions4dLayer;
-import cz.agents.alite.trajectorytools.vis.Regions4dLayer.RegionsProvider;
+import cz.agents.alite.trajectorytools.vis.RegionsLayer;
+import cz.agents.alite.trajectorytools.vis.RegionsLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
@@ -78,12 +79,12 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
 
         Domain<OrientedTimePoint, SpatioTemporalManeuver> domain = new GuidedKinematicStraightLineDomain(
                 bounds, initialState,
-                obstacles, target, targetReachedTolerance, 
-                14, 15, 16, 
-                50, 50, 
-                45, 
+                obstacles, target, targetReachedTolerance,
+                14, 15, 16,
+                50, 50,
+                45,
                 new Random(1));
-        
+
         rrtstar = new RRTStarPlanner<OrientedTimePoint, SpatioTemporalManeuver>(domain, initialState, gamma);
 
         createVisualization();
@@ -211,15 +212,20 @@ public class RRTStarKinematic6dDemoCreator implements Creator {
             }
         }, projection, Color.BLUE, 0.5, bounds.getCorner2().w, 't'));
 
-        VisManager.registerLayer(Regions4dLayer.create(new RegionsProvider() {
+        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
             @Override
-            public Collection<SpaceTimeRegion> getRegions() {
+            public Collection<SpaceTimeRegion> getSpaceTimeRegions() {
                 LinkedList<SpaceTimeRegion> regions = new LinkedList<SpaceTimeRegion>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
                 regions.add(targetRegion);
                 return regions;
+            }
+
+            @Override
+            public Collection<SpaceRegion> getSpaceRegions() {
+                return new LinkedList<SpaceRegion>();
             }
         },
         projection,

@@ -15,9 +15,11 @@ public class SimulatedAgentEnvironment {
     private SimulatedAgentStorage agentStorage;
     private Map<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
     private Simulation simulation;
+    //private defaultSpeed = 1.0;
 
     public SimulatedAgentEnvironment() {
         this.simulation = new Simulation();
+        this.simulation.setSimulationSpeed(0.1);
         agentStorage = new SimulatedAgentStorage();
     }
 
@@ -65,7 +67,7 @@ public class SimulatedAgentEnvironment {
     public void startFlightSimulation(double samplingInterval) {
         simulation.clearQueue();
         simulation = new Simulation();
-        simulation.setSimulationSpeed(1.0);
+        simulation.setSimulationSpeed(0.1);
         //simulation.setSimulationSpeed(samplingInterval);
         //simulation.clearQueue();
 

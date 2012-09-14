@@ -7,11 +7,13 @@ import java.util.LinkedList;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.MovingSphereSafeRegion;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
@@ -27,13 +29,14 @@ import cz.agents.alite.vis.layer.VisLayer;
 import cz.agents.alite.vis.layer.terminal.CircleLayer;
 import cz.agents.alite.vis.layer.terminal.LineLayer;
 
-public class Regions4dLayer extends AbstractLayer {
+public class RegionsLayer extends AbstractLayer {
 
     public static interface RegionsProvider {
-         Collection<SpaceTimeRegion> getRegions();
+        Collection<SpaceRegion> getSpaceRegions();
+        Collection<SpaceTimeRegion> getSpaceTimeRegions();
     }
 
-    Regions4dLayer() {
+    RegionsLayer() {
     }
 
     public static VisLayer create(final RegionsProvider regionsProvider, final ProjectionTo2d<TimePoint> projection,  final Color edgeColor, final int edgeStrokeWidth) {
@@ -44,10 +47,32 @@ public class Regions4dLayer extends AbstractLayer {
 
             @Override
             public Iterable<Line> getLines() {
-                Collection<SpaceTimeRegion> regions = regionsProvider.getRegions();
+                Collection<SpaceTimeRegion> regions4d = regionsProvider.getSpaceTimeRegions();
+                Collection<SpaceRegion> regions3d = regionsProvider.getSpaceRegions();
+
                 LinkedList<Line> lines = new LinkedList<Line>();
 
-                for (SpaceTimeRegion region : regions) {
+                for (SpaceRegion region : regions3d) {
+                    if (region instanceof BoxRegion) {
+                        BoxRegion box = (BoxRegion) region;
+
+                        Point2d corner1 = projection.project(new TimePoint(box.getCorner1(), 0));
+                        Point2d corner2 = projection.project(new TimePoint(box.getCorner2(), Double.POSITIVE_INFINITY ));
+
+                        double x1 = corner1.x;
+                        double y1 = corner1.y;
+
+                        double x2 = corner2.x;
+                        double y2 = corner2.y;
+
+                        lines.add(new LineImpl(new Point3d(x1,y1,0), new Point3d(x1,y2,0)));
+                        lines.add(new LineImpl(new Point3d(x2,y1,0), new Point3d(x2,y2,0)));
+                        lines.add(new LineImpl(new Point3d(x1,y1,0), new Point3d(x2,y1,0)));
+                        lines.add(new LineImpl(new Point3d(x1,y2,0), new Point3d(x2,y2,0)));
+                    }
+                }
+
+                for (SpaceTimeRegion region : regions4d) {
                     if (region instanceof StaticBoxRegion) {
                         StaticBoxRegion box = (StaticBoxRegion) region;
 
@@ -140,7 +165,7 @@ public class Regions4dLayer extends AbstractLayer {
 
             @Override
             public Iterable<Circle> getCircles() {
-                Collection<SpaceTimeRegion> regions = regionsProvider.getRegions();
+                Collection<SpaceTimeRegion> regions = regionsProvider.getSpaceTimeRegions();
                 LinkedList<Circle> circles = new LinkedList<Circle>();
 
                 for (SpaceTimeRegion region : regions) {

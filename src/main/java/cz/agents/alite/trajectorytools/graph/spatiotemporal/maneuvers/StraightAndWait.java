@@ -2,7 +2,6 @@ package cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers;
 
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
-import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
@@ -18,7 +17,7 @@ public class StraightAndWait extends SpatioTemporalManeuver {
 
     public StraightAndWait(TimePoint start, TimePoint end, double speed) {
         super();
-        
+
         this.start = start;
         this.end = end;
         this.speed = speed;
@@ -26,42 +25,38 @@ public class StraightAndWait extends SpatioTemporalManeuver {
         this.endArrivalTime = start.getTime() + spatialStraight.getDuration();
 
         // assert that we can make it to the end waypoint before the time specified in end waypoint
-        assert(
-        		endArrivalTime
-        		- end.getTime()
-        		>= -0.001
-        		);
+        assert((end.getTime() - endArrivalTime)  >= -0.001 );
 
     }
 
     @Override
     public Trajectory getTrajectory() {
-    	return new Trajectory() {
-			
-			@Override
-			public OrientedPoint getPosition(double t) {
-				if (t <= endArrivalTime) {
-					return spatialStraight.getTrajectory(start.getTime()).getPosition(t);
-				}
-				else if (t > endArrivalTime) {
-					// wait at destination
-					return new OrientedPoint(end.getSpatialPoint(), new Vector(0,1,0));
-				} else {
-					throw new RuntimeException("Illegal time given");
-				}
-			}
-			
-			@Override
-			public double getMinTime() {
-				return start.getTime();
-			}
-			
-			@Override
-			public double getMaxTime() {
-				return end.getTime();
-			}
-		};
-		
+        return new Trajectory() {
+
+            @Override
+            public OrientedPoint getPosition(double t) {
+                if (t <= endArrivalTime) {
+                    return spatialStraight.getTrajectory(start.getTime()).getPosition(t);
+                }
+                else if (t > endArrivalTime) {
+                    // wait at destination
+                    return new OrientedPoint(end.getSpatialPoint(), new Vector(0,1,0));
+                } else {
+                    throw new RuntimeException("Illegal time given");
+                }
+            }
+
+            @Override
+            public double getMinTime() {
+                return start.getTime();
+            }
+
+            @Override
+            public double getMaxTime() {
+                return end.getTime();
+            }
+        };
+
     }
 
     @Override
@@ -80,7 +75,7 @@ public class StraightAndWait extends SpatioTemporalManeuver {
     }
 
     public double getSpeed() {
-    	return speed;
+        return speed;
     }
 
     @Override

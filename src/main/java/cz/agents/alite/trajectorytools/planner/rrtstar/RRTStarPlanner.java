@@ -283,7 +283,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         while(!queue.isEmpty()) {
             Vertex<S,E> current = queue.poll();
-            double distance = domain.distance(center, current.getState());
+            double distance = domain.distance(current.getState(), center);
             if (distance <= minDist) {
                 minDistVertex = current;
                 minDist = distance;

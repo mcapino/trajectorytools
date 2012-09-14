@@ -1,7 +1,6 @@
 package cz.agents.alite.trajectorytools.demo;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
@@ -15,6 +14,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.rrtstar.SpatialStraightLineDomain;
+import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
@@ -22,8 +22,8 @@ import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.RRTStarLayer;
-import cz.agents.alite.trajectorytools.vis.Regions3dLayer;
-import cz.agents.alite.trajectorytools.vis.Regions3dLayer.RegionsProvider;
+import cz.agents.alite.trajectorytools.vis.RegionsLayer;
+import cz.agents.alite.trajectorytools.vis.RegionsLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.DefaultProjection;
@@ -73,7 +73,7 @@ public class RRTStar2dDemoCreator implements Creator {
                 //trajectory =  new SampledTrajectory(trajectory, 100);
             }
 
-            
+
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
@@ -101,15 +101,15 @@ public class RRTStar2dDemoCreator implements Creator {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 2000, 2000);
         VisManager.setSceneParam(new SceneParams(){
 
-			@Override
-			public Point2d getDefaultLookAt() {
-				return new Point2d(500, 500);
-			}
-			
-			@Override
-			public double getDefaultZoomFactor() {
-				return 0.5;
-			} });
+            @Override
+            public Point2d getDefaultLookAt() {
+                return new Point2d(500, 500);
+            }
+
+            @Override
+            public double getDefaultZoomFactor() {
+                return 0.5;
+            } });
         VisManager.init();
 
         Vis.setPosition(50, 50, 1);
@@ -118,17 +118,28 @@ public class RRTStar2dDemoCreator implements Creator {
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
         // graph
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.GRAY, Color.GRAY, 1, 4));
+        VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.GRAY, Color.GRAY, 1, 4, true));
 
-        VisManager.registerLayer(Regions3dLayer.create(new RegionsProvider() {
+        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
             @Override
-            public Collection<SpaceRegion> getRegions() {
+            public Collection<SpaceRegion> getSpaceRegions() {
                 LinkedList<SpaceRegion> regions = new LinkedList<SpaceRegion>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
                 regions.add(target);
                 return regions;
+            }
+
+            @Override
+            public Collection<SpaceTimeRegion> getSpaceTimeRegions() {
+                return new LinkedList<SpaceTimeRegion>();
+            }
+        }, new ProjectionTo2d<TimePoint>() {
+
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
             }
         }, Color.BLACK, 1));
 

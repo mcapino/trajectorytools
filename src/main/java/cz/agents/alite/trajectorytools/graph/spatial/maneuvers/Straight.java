@@ -36,19 +36,24 @@ public class Straight extends SpatialManeuver {
                 if (t < startTime || t > startTime + getDuration())
                     throw new IllegalArgumentException("The position for time " + t + " which is undefined for this trajectory. Length: " + getDistance() + ". Trajectory defined for interval (" + startTime + ", " + (startTime + getDuration()) + ")");
 
-                double alpha = (t - startTime) / getDuration();
-                assert(alpha >= -0.00001 && alpha <= 1.00001);
+                if (getDuration() > 0) {
+                    double alpha = (t - startTime) / getDuration();
+                    assert(alpha >= -0.00001 && alpha <= 1.00001);
 
-                SpatialPoint pos = SpatialPoint.interpolate(start, end, alpha);
-                Vector dir;
-                if (!end.equals(start)) {
-                    dir = Vector.subtract(end, start);
-                    dir.normalize();
+                    SpatialPoint pos = SpatialPoint.interpolate(start, end, alpha);
+                    Vector dir;
+                    if (!end.equals(start)) {
+                        dir = Vector.subtract(end, start);
+                        dir.normalize();
+                    } else {
+                        dir = new Vector(0,1,0);
+                    }
+                    return new OrientedPoint(pos, dir);
                 } else {
-                    dir = new Vector(0,1,0);
+                    return new OrientedPoint(start, new Vector(0,1,0));
                 }
 
-                return new OrientedPoint(pos, dir);
+
             }
 
             @Override
