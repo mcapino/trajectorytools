@@ -2,12 +2,19 @@ package cz.agents.alite.trajectorytools.graph.spatial;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.jgrapht.graph.GraphPathImpl;
 
+import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class SpatialGraphs {
@@ -23,6 +30,32 @@ public class SpatialGraphs {
         }
 
         return nearestVertex;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static <V extends SpatialPoint, E> V getRandomVertex(Graph<V, E> graph, Random random) {
+    	int n = random.nextInt(graph.vertexSet().size());
+    	return (V) graph.vertexSet().toArray()[n];
+    }
+    
+    public static <V extends SpatialPoint, E> GraphPath<V,E> greedySearch(Graph<V, E> graph, V start, V target, HeuristicFunction<V> h, double maxCost) { 
+    	List<E> edges = new LinkedList<E>();
+    	
+    	V current = start;
+    	double cost = 0.0;
+    	
+    	while (!current.equals(target) && cost < maxCost) {
+    		Set<E> outgoingEdges = graph.edgesOf(target);
+    		
+    		E bestEdge = null;
+    		// TODO: find an edge that leads to a vertex having the highest heuristic value
+    		
+    		for (E edge : outgoingEdges) {
+    			Graphs.getOppositeVertex(graph, edge, current);
+    		}
+    	}
+    	
+    	return new GraphPathImpl(graph, start, end, edges, cost);
     }
 
     public static <V, E> Graph<V, E>  clone(Graph<V, E> other) {
