@@ -13,7 +13,7 @@ import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain implements Listener<TimePoint> {
+public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
 
 
     Queue<TimePoint> samplesPool = new LinkedList<TimePoint>();
@@ -60,34 +60,36 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain i
         return samplesPool.poll();
     }
 
-    @Override
-    public void notifyNewVertex(TimePoint s) {
-        double distance = s.getSpatialPoint().distance(target);
-        double timeAtTarget = s.getTime() + (distance / optSpeed);
+    Listener<TimePoint> listener = new Listener<TimePoint>() {
+        @Override
+        public void notifyNewVertex(TimePoint s) {
+            double distance = s.getSpatialPoint().distance(target);
+            double timeAtTarget = s.getTime() + (distance / optSpeed);
 
 
-        /*
-        // Bias towards goal at optimal speed
-        samplesPool.offer(getTargetSample(randomSample));
+            /*
+            // Bias towards goal at optimal speed
+            samplesPool.offer(getTargetSample(randomSample));
 
-        // Bias towards random sample from initial point at optimal speed
-        double optTime = initialPoint.getTime() +
-                         initialPoint.getSpatialPoint().distance(randomSample.getSpatialPoint())
-                         / optSpeed;
+            // Bias towards random sample from initial point at optimal speed
+            double optTime = initialPoint.getTime() +
+                             initialPoint.getSpatialPoint().distance(randomSample.getSpatialPoint())
+                             / optSpeed;
 
-        samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, randomSample.z, optTime));
-        // Bias towards start altitude
-        samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, randomSample.getTime()));
-        // Bias towards start altitude and optimal speed
-        samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, optTime));
-        */
+            samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, randomSample.z, optTime));
+            // Bias towards start altitude
+            samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, randomSample.getTime()));
+            // Bias towards start altitude and optimal speed
+            samplesPool.offer(new TimePoint(randomSample.x, randomSample.y, initialPoint.z, optTime));
+            */
 
 
-        Extension<TimePoint, SpatioTemporalManeuver> extension
-            = steerMaintainSpatialPoint(s, new TimePoint(target, timeAtTarget));
+            Extension<TimePoint, SpatioTemporalManeuver> extension
+                = steerMaintainSpatialPoint(s, new TimePoint(target, timeAtTarget));
 
-        if (extension != null) {
-            samplesPool.offer(extension.target);
+            if (extension != null) {
+                samplesPool.offer(extension.target);
+            }
         }
-    }
+    };
 }

@@ -64,12 +64,10 @@ public class SimulatedAgentEnvironment {
         }
     }
 
-    public void startFlightSimulation(double samplingInterval) {
+    public void startFlightSimulation(double samplingInterval, final double simulationSpeed) {
         simulation.clearQueue();
         simulation = new Simulation();
-        simulation.setSimulationSpeed(0.1);
-        //simulation.setSimulationSpeed(samplingInterval);
-        //simulation.clearQueue();
+        simulation.clearQueue();
 
         for(String agentName : trajectories.keySet()) {
             simulateFlight(agentName, trajectories.get(agentName), samplingInterval);
@@ -79,8 +77,8 @@ public class SimulatedAgentEnvironment {
 
             @Override
             public void run() {
+                simulation.setSimulationSpeed(simulationSpeed);
                 simulation.run();
-                simulation.setSimulationSpeed(1.0);
             }
 
         }.start();

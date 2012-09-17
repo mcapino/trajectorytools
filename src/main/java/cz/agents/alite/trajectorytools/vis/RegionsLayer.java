@@ -31,9 +31,9 @@ import cz.agents.alite.vis.layer.terminal.LineLayer;
 
 public class RegionsLayer extends AbstractLayer {
 
-    public static interface RegionsProvider {
-        Collection<SpaceRegion> getSpaceRegions();
-        Collection<SpaceTimeRegion> getSpaceTimeRegions();
+    public static class RegionsProvider {
+        public Collection<SpaceRegion> getSpaceRegions() { return new LinkedList<SpaceRegion>(); };
+        public Collection<SpaceTimeRegion> getSpaceTimeRegions() { return new LinkedList<SpaceTimeRegion>(); };
     }
 
     RegionsLayer() {

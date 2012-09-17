@@ -10,7 +10,6 @@ import javax.vecmath.Point2d;
 import org.jgrapht.GraphPath;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -227,13 +226,10 @@ public class RRTStar4dDemoCreator implements Creator {
                 return regions;
             }
 
-            @Override
-            public Collection<SpaceRegion> getSpaceRegions() {
-                return new LinkedList<SpaceRegion>();
-            }
         },
         projection,
         Color.BLACK, 1));
+
     }
 
 
