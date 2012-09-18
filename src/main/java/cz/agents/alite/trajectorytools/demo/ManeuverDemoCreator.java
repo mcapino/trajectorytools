@@ -14,6 +14,7 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
+import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.trajectory.SampledTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
@@ -22,7 +23,6 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
-import cz.agents.alite.trajectorytools.vis.PathHolder;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
@@ -36,10 +36,11 @@ public class ManeuverDemoCreator implements Creator {
 
     private Graph<Waypoint, SpatialManeuver> graph;
     private Trajectory trajectory;
-    private PathHolder<Waypoint, SpatialManeuver> path = new PathHolder<Waypoint, SpatialManeuver>();
+    private PlannedPath<Waypoint, SpatialManeuver> plannedPath;
 
     @Override
     public void init(String[] args) {
+
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ManeuverDemoCreator implements Creator {
         graph = SpatialGridFactory.create4WayGrid(10, 10, 10, 10, 1.0);
 
         replan();
-        trajectory =  new SpatialManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, path.plannedPath, path.plannedPath.getWeight());
+        trajectory =  new SpatialManeuverTrajectory<Waypoint, SpatialManeuver>(0.0, plannedPath, plannedPath.getWeight());
         trajectory =  new SampledTrajectory(trajectory, 0.9);
         createVisualization();
     }
@@ -63,7 +64,7 @@ public class ManeuverDemoCreator implements Creator {
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
 
         // graph
-        VisManager.registerLayer(GraphLayer.create( new GraphProvider<Waypoint, SpatialManeuver>() {
+        VisManager.registerLayer(GraphLayer.create(new GraphProvider<Waypoint, SpatialManeuver>() {
 
             @Override
             public Graph<Waypoint, SpatialManeuver> getGraph() {
@@ -97,7 +98,8 @@ public class ManeuverDemoCreator implements Creator {
     protected void replan() {
 
         try {
-            PathPlanner<Waypoint, SpatialManeuver> aStar = new AStarPlanner<Waypoint, SpatialManeuver>();
+            PathPlanner<Waypoint, SpatialManeuver> aStar
+                = new AStarPlanner<Waypoint, SpatialManeuver>();
 
             aStar.setHeuristicFunction(new HeuristicFunction<Waypoint>() {
             @Override
@@ -106,7 +108,7 @@ public class ManeuverDemoCreator implements Creator {
                 }
             });
 
-            path.plannedPath = aStar.planPath(
+            plannedPath = aStar.planPath(
                     graph,
                     SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
                     SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0))
@@ -114,7 +116,7 @@ public class ManeuverDemoCreator implements Creator {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
-            path.plannedPath = null;
+            plannedPath = null;
         }
     }
 }
