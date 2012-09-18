@@ -47,8 +47,8 @@ public class RRTStar2dGraphDemoCreator implements Creator {
 
     double width = 1000;
     double height = 1000;
-    int cols  = 80;
-    int rows = 80;
+    int cols  = 70;
+    int rows = 70;
 
     private Graph<Waypoint, SpatialManeuver> graph;
     RRTStarPlanner<Waypoint, GraphPath<Waypoint, SpatialManeuver>> rrtstar;
@@ -75,7 +75,7 @@ public class RRTStar2dGraphDemoCreator implements Creator {
                     SpatialGridFactory.create4WayGrid(width, height, cols, rows, 1.0));
         bounds = new BoxRegion(new SpatialPoint(0,0,0), new SpatialPoint(width, height, 1.0));
 
-        createObstacles(25, 120);
+        createObstacles(75, 120);
         SpatialGraphs.cutOutObstacles(graph, obstacles);
 
         start  = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0,0,0));
@@ -160,7 +160,7 @@ public class RRTStar2dGraphDemoCreator implements Creator {
         }, Color.GRAY, Color.GRAY, 1, 4));
 
         // RRT
-        VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.BLUE, Color.BLUE, 2, 4, true));
+        VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.MAGENTA, Color.BLUE, 2, 8, true));
 
 //        VisManager.registerLayer(RRTStarSpatialGraphLayer.create(rrtstar,
 //                new DefaultProjection<SpatialPoint>(), Color.BLUE, Color.BLUE,
