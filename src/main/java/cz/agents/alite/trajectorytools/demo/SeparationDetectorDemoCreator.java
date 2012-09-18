@@ -25,7 +25,7 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.ConflictsLayer;
-import cz.agents.alite.trajectorytools.vis.ConflictsLayer.ConflictsHolder;
+import cz.agents.alite.trajectorytools.vis.ConflictsLayer.ConflictsProvider;
 import cz.agents.alite.trajectorytools.vis.GraphLayer;
 import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
@@ -127,7 +127,14 @@ public class SeparationDetectorDemoCreator implements Creator {
 
                 }, projection,  Color.YELLOW, 0.1, 100.0, 't'));
 
-        VisManager.registerLayer(ConflictsLayer.create(new ConflictsHolder(conflicts), 1.0));
+        VisManager.registerLayer(ConflictsLayer.create(new ConflictsProvider(){
+
+			@Override
+			public List<TimePoint> getConflicts() {
+				return conflicts;
+			}
+        	
+        }, 1.0));
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());

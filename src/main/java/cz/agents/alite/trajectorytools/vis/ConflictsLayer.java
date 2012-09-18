@@ -15,16 +15,11 @@ import cz.agents.alite.vis.layer.terminal.CircleLayer;
 
 public class ConflictsLayer extends CommonLayer {
 
-    public static class ConflictsHolder {
-        public List<TimePoint> conflicts;
-
-        public ConflictsHolder(List<TimePoint> conflicts) {
-            super();
-            this.conflicts = conflicts;
-        }
+    public interface ConflictsProvider {
+        public List<TimePoint> getConflicts();
     }
 
-    public static VisLayer create(final ConflictsHolder conflictsHolder, final double separation) {
+    public static VisLayer create(final ConflictsProvider conflictsProvider, final double separation) {
         GroupLayer group = GroupLayer.create();
 
         group.addSubLayer(CircleLayer.create(new CircleElements() {
@@ -33,7 +28,7 @@ public class ConflictsLayer extends CommonLayer {
             public Iterable<? extends Circle> getCircles() {
                 ArrayList<Circle> circles = new ArrayList<Circle>();
 
-                for (TimePoint conflict : conflictsHolder.conflicts) {
+                for (TimePoint conflict : conflictsProvider.getConflicts()) {
                     circles.add(new CircleImpl(conflict.getSpatialPoint(), separation/2.0));
                 }
 
