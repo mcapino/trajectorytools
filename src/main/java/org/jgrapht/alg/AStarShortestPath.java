@@ -1,12 +1,19 @@
 package org.jgrapht.alg;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.specifics.DirectedSpecifics;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.specifics.Specifics;
-import org.jgrapht.alg.specifics.UndirectedSpecifics;
-import org.jgrapht.graph.*;
+import org.jgrapht.alg.specifics.SpecificsFactory;
+import org.jgrapht.graph.GraphPathImpl;
 
 
 
@@ -29,9 +36,9 @@ public final class AStarShortestPath<V, E>
     Map<V,Double> gScores = new HashMap<V,Double>();
     Map<V,Double> hScores = new HashMap<V,Double>();
     Map<V,Double> fScores = new HashMap<V,Double>();
-    
+
     Specifics<V, E> specifics;
-    
+
     PriorityQueue<V> open = new PriorityQueue<V>(100,new Comparator<V>() {
 
         @Override
@@ -64,8 +71,8 @@ public final class AStarShortestPath<V, E>
             throw new IllegalArgumentException(
                     "graph must contain the end vertex");
         }
-        
-        specifics = createGraphSpecifics(graph);
+
+        specifics = SpecificsFactory.create(graph);
 
         open.add(startVertex);
 
@@ -98,10 +105,10 @@ public final class AStarShortestPath<V, E>
             closed.add(current);
 
             Set<? extends E> neighborEdges = specifics.edgesOf(current);
-            
+
             for (E edge : neighborEdges) {
                 V next;
-                if (graph.getEdgeSource(edge).equals(current)) {    
+                if (graph.getEdgeSource(edge).equals(current)) {
                     next = graph.getEdgeTarget(edge);
                 } else if (graph.getEdgeTarget(edge).equals(current)) {
                     next = graph.getEdgeSource(edge);
@@ -112,7 +119,7 @@ public final class AStarShortestPath<V, E>
                 if (closed.contains(next)) {
                     continue;
                 }
-	
+
                 double tentativeGScore = gScores.get(current)
                         + graph.getEdgeWeight(edge);
 
@@ -133,27 +140,27 @@ public final class AStarShortestPath<V, E>
                     open.remove(next);
                     open.add(next);
                 }
-        	}
+            }
         }
     }
 
     private List<E> reconstructEdgeList(V startVertex, V endVertex) {
         LinkedList<E> edgeList = new LinkedList<E>();
-    	V current = endVertex; 
-    	
-    	while (!current.equals(startVertex)) {
-    		E edge = cameFrom.get(current);
-    		edgeList.addFirst(edge);
-    		if (current.equals(graph.getEdgeTarget(edge))) {
-    		    current = graph.getEdgeSource(edge);
-    		} else if (current.equals(graph.getEdgeSource(edge))) {
-    		    current = graph.getEdgeTarget(edge);
-    		} else {
-    		    throw new Error("!!!");
-    		}
-    	}
-    	
-    	return edgeList;
+        V current = endVertex;
+
+        while (!current.equals(startVertex)) {
+            E edge = cameFrom.get(current);
+            edgeList.addFirst(edge);
+            if (current.equals(graph.getEdgeTarget(edge))) {
+                current = graph.getEdgeSource(edge);
+            } else if (current.equals(graph.getEdgeSource(edge))) {
+                current = graph.getEdgeTarget(edge);
+            } else {
+                throw new Error("!!!");
+            }
+        }
+
+        return edgeList;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -195,7 +202,7 @@ public final class AStarShortestPath<V, E>
             return getPath().getWeight();
         }
     }
-    
+
     /**
      * Convenience method to find the shortest path via a single static method
      * call. If you need a more advanced search (e.g. limited by radius, or
@@ -222,13 +229,5 @@ public final class AStarShortestPath<V, E>
 
         return alg.getPathEdgeList();
     }
-    
-    static <V, E> Specifics<V, E> createGraphSpecifics(Graph<V, E> g)
-    {
-        if (g instanceof DirectedGraph<?, ?>) {
-            return new DirectedSpecifics<V, E>((DirectedGraph<V, E>) g);
-        } else {
-            return new UndirectedSpecifics<V, E>(g);
-        }
-    }
+
 }

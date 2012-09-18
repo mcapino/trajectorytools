@@ -15,10 +15,11 @@ import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
 import cz.agents.alite.trajectorytools.planner.PathPlanner;
+import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
-import cz.agents.alite.trajectorytools.vis.PathHolder;
+import cz.agents.alite.trajectorytools.vis.GraphPathLayer.PathProvider;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -28,7 +29,7 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 public class Demo1Creator implements Creator {
 
     private ObstacleGraphView graph;
-    private PathHolder<SpatialPoint, DefaultWeightedEdge> path = new PathHolder<SpatialPoint, DefaultWeightedEdge>();
+    private PlannedPath<SpatialPoint, DefaultWeightedEdge> plannedPath;
 
     @Override
     public void init(String[] args) {
@@ -62,7 +63,12 @@ public class Demo1Creator implements Creator {
         graph.createVisualization();
 
         // draw the shortest path
-        VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
+        VisManager.registerLayer(GraphPathLayer.create(new PathProvider<SpatialPoint, DefaultWeightedEdge>() {
+
+            @Override
+            public PlannedPath<SpatialPoint, DefaultWeightedEdge> getPath() {
+                return plannedPath;
+            }  }, Color.RED, Color.RED.darker(), 2, 4));
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
@@ -80,7 +86,7 @@ public class Demo1Creator implements Creator {
                 }
             });
 
-            path.plannedPath = aStar.planPath(
+            plannedPath = aStar.planPath(
                     graph,
                     SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
                     SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0))
@@ -88,7 +94,7 @@ public class Demo1Creator implements Creator {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
-            path.plannedPath = null;
+            plannedPath = null;
         }
     }
 }

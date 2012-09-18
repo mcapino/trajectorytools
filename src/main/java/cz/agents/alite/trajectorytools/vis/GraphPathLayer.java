@@ -32,15 +32,21 @@ import cz.agents.alite.vis.layer.terminal.StyledPointLayer;
 
 public class GraphPathLayer extends AbstractLayer {
 
+
+    public interface PathProvider<V extends SpatialPoint, E > {
+        GraphPath<V, E> getPath();
+    }
+
     private static final double PATH_OFFSET = 1/40.0;
     static private Color[] pathColors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.ORANGE, Color.PINK, Color.YELLOW};
 
     GraphPathLayer() {
     }
 
-    public static <V extends SpatialPoint,E> VisLayer create(final Graph<V, E> graph, final PathHolder<V, E> pathHolder, final Color edgeColor, final Color vertexColor,
+    public static <V extends SpatialPoint, E> VisLayer create(final PathProvider<V, E> pathProvider, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
+        final Graph<V, E> graph = pathProvider.getPath().getGraph();
 
         // edges
         group.addSubLayer(LineLayer.create(new LineElements() {
@@ -48,7 +54,7 @@ public class GraphPathLayer extends AbstractLayer {
             @Override
             public Iterable<Line> getLines() {
                 Collection<Line> lines = new ArrayList<Line>();
-                GraphPath<V,E> path = pathHolder.plannedPath;
+                GraphPath<V,E> path = pathProvider.getPath();
                 if (path != null) {
                     for (E edge : path.getEdgeList()) {
                         lines.add(new LineImpl(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
@@ -75,7 +81,7 @@ public class GraphPathLayer extends AbstractLayer {
             @Override
             public Iterable<SpatialPoint> getPoints() {
                 Collection<SpatialPoint> points = new ArrayList<SpatialPoint>();
-                GraphPath<V,E> path = pathHolder.plannedPath;
+                GraphPath<V,E> path = pathProvider.getPath();
                 if (path != null) {
                     for (E edge : path.getEdgeList()) {
                         points.add(graph.getEdgeSource(edge));
@@ -124,7 +130,7 @@ public class GraphPathLayer extends AbstractLayer {
                         Point3d target = new Point3d( graphHolder.graph.getEdgeTarget(edge) );
                         target.add(transition);
                         lines.add(new StyledLineImpl(
-                                source, 
+                                source,
                                 target,
                                 color,
                                 edgeStrokeWidth));

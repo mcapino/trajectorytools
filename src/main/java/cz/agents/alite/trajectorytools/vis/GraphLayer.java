@@ -8,7 +8,6 @@ import javax.vecmath.Vector3d;
 
 import org.jgrapht.Graph;
 
-import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -22,10 +21,10 @@ import cz.agents.alite.vis.layer.terminal.PointLayer;
 
 public class GraphLayer extends AbstractLayer {
 
-    public static interface GraphProvider<V, E> {
-    	Graph<V, E> getGraph();
+    public static interface GraphProvider<V extends SpatialPoint, E> {
+        Graph<V, E> getGraph();
     }
-	
+
     GraphLayer() {
     }
 
@@ -42,7 +41,7 @@ public class GraphLayer extends AbstractLayer {
 
             @Override
             public Iterable<Line> getLines() {
-            	Graph<V, E> graph = graphProvider.getGraph();
+                Graph<V, E> graph = graphProvider.getGraph();
                 LinkedList<Line> lines = new LinkedList<Line>();
                 Vector3d transition = new Vector3d(offset, offset, 0);
                 for (E edge : graph.edgeSet()) {
@@ -69,13 +68,13 @@ public class GraphLayer extends AbstractLayer {
 
         // vertices
         group.addSubLayer(PointLayer.create(new PointElements() {
-        	
-        	
-        	
+
+
+
             @Override
             public Iterable<SpatialPoint> getPoints() {
-            	Graph<V, E> graph = graphProvider.getGraph();
-            	
+                Graph<V, E> graph = graphProvider.getGraph();
+
                 LinkedList<SpatialPoint> points = new LinkedList<SpatialPoint>();
                 for (SpatialPoint vertex : graph.vertexSet()) {
                     points.add(vertex);
@@ -98,11 +97,20 @@ public class GraphLayer extends AbstractLayer {
         return group;
     }
 
+
+    /**
+     * @deprecated use creator that uses GraphProvider instead
+     */
+    @Deprecated
     public static <V extends SpatialPoint,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         return create(graphHolder, edgeColor, vertexColor, edgeStrokeWidth, vertexStrokeWidth, 0);
     }
 
+    /**
+     * @deprecated use creator that uses GraphProvider instead
+     */
+    @Deprecated
     public static <V extends SpatialPoint,E> VisLayer create(final GraphHolder<V, E> graphHolder, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth, final double offset) {
         GroupLayer group = GroupLayer.create();
@@ -122,7 +130,7 @@ public class GraphLayer extends AbstractLayer {
                         target.add(transition);
                         lines.add(new LineImpl(source, target));
                     }
-                } 
+                }
                 return lines;
             }
 
