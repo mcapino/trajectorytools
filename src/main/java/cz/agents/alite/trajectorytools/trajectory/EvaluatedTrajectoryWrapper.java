@@ -6,12 +6,12 @@ import cz.agents.alite.trajectorytools.util.OrientedPoint;
  * A trajectory having a certain cost. Typically used as
  * a wrapper of a non-valued trajectory.
  */
-public class ValuedTrajectory implements Trajectory {
+public class EvaluatedTrajectoryWrapper implements EvaluatedTrajectory {
 
     Trajectory trajectory;
     double cost;
 
-    public ValuedTrajectory(Trajectory trajectory, double cost) {
+    public EvaluatedTrajectoryWrapper(Trajectory trajectory, double cost) {
         super();
         this.trajectory = trajectory;
         this.cost = cost;
@@ -32,6 +32,7 @@ public class ValuedTrajectory implements Trajectory {
         return trajectory.getPosition(t);
     }
 
+    @Override
     public double getCost() {
         return cost;
     }
