@@ -34,6 +34,7 @@ public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends Spatial
     private double startTime;
     private double duration = Double.POSITIVE_INFINITY;
 
+
     public SpatialManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();

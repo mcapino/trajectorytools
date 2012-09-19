@@ -71,7 +71,7 @@ public class SimulationControlLayer extends AbstractLayer {
                         environment.getSimulation().setRunning(true);
                     }
                 } else if (e.getKeyChar() == 'f') {
-                    environment.startFlightSimulation(0.2, 0.1);
+                    environment.startFlightSimulation(0.2, 1.0);
                     environment.getSimulation().setRunning(true);
                 }
 
