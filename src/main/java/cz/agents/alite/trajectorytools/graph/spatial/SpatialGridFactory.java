@@ -114,9 +114,11 @@ public class SpatialGridFactory {
        }
 
 
+    static public Graph<Waypoint, SpatialManeuver> create4WayGrid(double sizeX, double sizeY, int gridX, int gridY, double speed) {
+        return create4WayGridAsDirectedGraph(sizeX, sizeY, gridX, gridY, speed);
+    }
 
-
-    static public DirectedGraph<Waypoint, SpatialManeuver> create4WayGrid(double sizeX, double sizeY,
+    static public DirectedGraph<Waypoint, SpatialManeuver> create4WayGridAsDirectedGraph(double sizeX, double sizeY,
             int gridX, int gridY, double speed) {
 
         final int[][] EDGE_PATTERN = {           {0,-1},
@@ -127,7 +129,11 @@ public class SpatialGridFactory {
         return createNWayGrid(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, true);
     }
 
-    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayGrid(double sizeX, double sizeY,
+    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayGrid(double sizeX, double sizeY, int gridX, int gridY, double speed) {
+        return create8WayGridAsDirectedGraph(sizeX, sizeY, gridX, gridY, speed);
+    }
+
+    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayGridAsDirectedGraph(double sizeX, double sizeY,
             int gridX, int gridY, double speed) {
 
         final int[][] EDGE_PATTERN = {{-1,-1}, {0,-1}, { 1,-1},
@@ -138,8 +144,7 @@ public class SpatialGridFactory {
         return createNWayGrid(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, true);
     }
 
-    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayUnitStepGrid(double sizeX, double sizeY,
-            int gridX, int gridY) {
+    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayUnitStepGridAsDirectedGraph(double sizeX, double sizeY, int gridX, int gridY) {
 
         final int[][] EDGE_PATTERN = {{-1,-1}, {0,-1}, { 1,-1},
                                        {-1, 0},         { 1, 0},
@@ -149,7 +154,7 @@ public class SpatialGridFactory {
         return createNWayUnitStepGrid(sizeX, sizeY, gridX, gridY, EDGE_PATTERN, true);
     }
 
-    static public Graph<Waypoint, SpatialManeuver> create(double sizeX, double sizeY, int gridX, int gridY, double speed) {
+    static public Graph<Waypoint, SpatialManeuver> createCompleteGraph(double sizeX, double sizeY, int gridX, int gridY, double speed) {
         Graph<Waypoint, SpatialManeuver> graph = new DirectedWeightedMultigraph<Waypoint, SpatialManeuver>(new DummyEdgeFactory<Waypoint, SpatialManeuver>());
         Waypoint waypoints[][] = new Waypoint[gridX+1][gridY+1];
         int waypointCounter = 0;
