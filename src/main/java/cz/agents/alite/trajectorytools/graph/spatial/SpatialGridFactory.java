@@ -64,18 +64,15 @@ public class SpatialGridFactory {
             return graph;
         }
 
-       public static DirectedGraph<Waypoint, SpatialManeuver> createNWayUnitStepGrid(double sizeX, double sizeY, int gridX, int gridY, int[][] edgePattern, boolean allowWaitManeuver) {
+       public static DirectedGraph<Waypoint, SpatialManeuver> createNWayUnitStepGrid(int cols, int rows, int[][] edgePattern, boolean allowWaitManeuver) {
            DirectedGraph<Waypoint, SpatialManeuver> graph 	= new DirectedWeightedMultigraph<Waypoint, SpatialManeuver>(new DummyEdgeFactory<Waypoint, SpatialManeuver>());
-           Waypoint waypoints[][] = new Waypoint[gridX+1][gridY+1];
+           Waypoint waypoints[][] = new Waypoint[cols][rows];
            int waypointCounter = 0;
 
-           double xStep = sizeX/gridX;
-           double yStep = sizeY/gridY;
-
            // Generate vertices
-           for (int x=0; x <= gridX; x++) {
-               for (int y=0; y <= gridY; y++) {
-                   Waypoint w = new Waypoint(waypointCounter++, x*xStep, y*yStep);
+           for (int x=0; x < cols; x++) {
+               for (int y=0; y < rows; y++) {
+                   Waypoint w = new Waypoint(waypointCounter++, x, y);
                    waypoints[x][y] = w;
                    graph.addVertex(w);
                    if (allowWaitManeuver) {
@@ -87,14 +84,14 @@ public class SpatialGridFactory {
            }
 
            // Generate edges
-           for (int x=0; x <= gridX; x++) {
-               for (int y=0; y <= gridY; y++) {
+           for (int x=0; x < cols; x++) {
+               for (int y=0; y < rows; y++) {
                    Waypoint v1 = waypoints[x][y];
                         for (int[] edgeOffset : edgePattern) {
                             int destX = x + edgeOffset[0];
                             int destY = y + edgeOffset[1];
 
-                            if (destX >= 0 && destX <= gridX && destY >= 0 && destY <= gridY) {
+                            if (destX >= 0 && destX < cols && destY >= 0 && destY < rows) {
                                    Waypoint v2 = waypoints[destX][destY];
 
                                    if (!graph.containsEdge(v1, v2)) {
@@ -144,14 +141,14 @@ public class SpatialGridFactory {
         return createNWayGrid(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, true);
     }
 
-    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayUnitStepGridAsDirectedGraph(double sizeX, double sizeY, int gridX, int gridY) {
+    static public DirectedGraph<Waypoint, SpatialManeuver> create8WayUnitStepGridAsDirectedGraph(int cols, int rows) {
 
         final int[][] EDGE_PATTERN = {{-1,-1}, {0,-1}, { 1,-1},
                                        {-1, 0},         { 1, 0},
                                        {-1, 1}, {0, 1}, { 1, 1}};
 
 
-        return createNWayUnitStepGrid(sizeX, sizeY, gridX, gridY, EDGE_PATTERN, true);
+        return createNWayUnitStepGrid(cols, rows, EDGE_PATTERN, true);
     }
 
     static public Graph<Waypoint, SpatialManeuver> createCompleteGraph(double sizeX, double sizeY, int gridX, int gridY, double speed) {

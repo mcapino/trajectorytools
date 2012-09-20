@@ -38,4 +38,21 @@ public class Box4dRegion implements SpaceTimeRegion {
         return corner2;
     }
 
+    public double getXSize() {
+        return corner2.x - corner1.x;
+    }
+
+    public double getYSize() {
+        return corner2.y - corner1.y;
+    }
+
+
+    public double getZSize() {
+        return corner2.z - corner1.z;
+    }
+
+    public double getTSize() {
+        return corner2.w - corner1.w;
+    }
+
 }

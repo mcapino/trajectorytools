@@ -116,7 +116,7 @@ public class SimulatedCylindricAgentLayer extends CommonLayer {
 
         }));
 
-        //group.addSubLayer(AgentIdLayer.create(agentStorage, Color.BLACK, 1, "a"));
+        group.addSubLayer(AgentIdLayer.create(agentStorage, Color.BLACK, 1, "a"));
         return group;
     }
 }
