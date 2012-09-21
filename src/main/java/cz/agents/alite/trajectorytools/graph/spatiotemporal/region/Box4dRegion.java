@@ -55,4 +55,11 @@ public class Box4dRegion implements SpaceTimeRegion {
         return corner2.w - corner1.w;
     }
 
+    public TimePoint getCenter() {
+        return new TimePoint(corner1.getX() + getXSize()/2,
+                                corner1.getY() + getYSize()/2,
+                                corner1.getZ() + getZSize()/2,
+                                corner1.getW() + getTSize()/2);
+    }
+
 }
