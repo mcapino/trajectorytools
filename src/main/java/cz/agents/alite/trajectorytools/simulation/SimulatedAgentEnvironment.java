@@ -26,6 +26,10 @@ public class SimulatedAgentEnvironment {
     public SimulatedAgentStorage getAgentStorage() {
         return agentStorage;
     }
+    
+    public void clearTrajectories() {
+    	trajectories = new HashMap<String, Trajectory>();
+    }
 
     public void updateTrajectory(String name, Trajectory trajectory) {
         trajectories.put(name, trajectory);

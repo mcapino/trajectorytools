@@ -36,4 +36,12 @@ public class EvaluatedTrajectoryWrapper implements EvaluatedTrajectory {
     public double getCost() {
         return cost;
     }
+
+	@Override
+	public String toString() {
+		return "EvaluatedTrajectoryWrapper [trajectory=" + trajectory
+				+ ", cost=" + cost + "]";
+	}
+    
+    
 }

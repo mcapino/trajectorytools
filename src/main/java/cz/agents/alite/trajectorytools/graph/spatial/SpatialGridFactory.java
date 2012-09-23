@@ -150,6 +150,16 @@ public class SpatialGridFactory {
 
         return createNWayUnitStepGrid(cols, rows, EDGE_PATTERN, true);
     }
+    
+    static public DirectedGraph<Waypoint, SpatialManeuver> create4WayUnitStepGridAsDirectedGraph(int cols, int rows) {
+
+        final int[][] EDGE_PATTERN = {          {0,-1},
+        								{-1, 0},         { 1, 0},
+        										 {0, 1},          };
+
+
+        return createNWayUnitStepGrid(cols, rows, EDGE_PATTERN, true);
+    }
 
     static public Graph<Waypoint, SpatialManeuver> createCompleteGraph(double sizeX, double sizeY, int gridX, int gridY, double speed) {
         Graph<Waypoint, SpatialManeuver> graph = new DirectedWeightedMultigraph<Waypoint, SpatialManeuver>(new DummyEdgeFactory<Waypoint, SpatialManeuver>());
