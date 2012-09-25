@@ -47,8 +47,8 @@ public class RRTStar2dGraphDemoCreator implements Creator {
 
     double width = 1000;
     double height = 1000;
-    int cols  = 70;
-    int rows = 70;
+    int cols  = 30;
+    int rows = 30;
 
     private Graph<Waypoint, SpatialManeuver> graph;
     RRTStarPlanner<Waypoint, GraphPath<Waypoint, SpatialManeuver>> rrtstar;
@@ -162,7 +162,7 @@ public class RRTStar2dGraphDemoCreator implements Creator {
         // RRT
         VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.MAGENTA, Color.BLUE, 2, 8, true));
 
-//        VisManager.registerLayer(RRTStarSpatialGraphLayer.create(rrtstar,
+//      VisManager.registerLayer(RRTStarSpatialGraphLayer.create(rrtstar,
 //                new DefaultProjection<SpatialPoint>(), Color.BLUE, Color.BLUE,
 //                2, 4, true));
 

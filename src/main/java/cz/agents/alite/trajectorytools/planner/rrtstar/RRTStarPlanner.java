@@ -26,6 +26,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     int nSamples;
     Vertex<S,E> root;
     double gamma;
+    double eta;
 
     Vertex<S,E> bestVertex;
 
@@ -38,10 +39,15 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     S lastNewSample = null;
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
+        this(domain, initialState, gamma, Double.POSITIVE_INFINITY);
+    }
+
+    public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma, double eta) {
         super();
 
         this.domain = domain;
         this.gamma = gamma;
+        this.eta = eta;
         this.root = new Vertex<S,E>(initialState);
         this.nSamples = 1;
 
@@ -248,7 +254,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     public double getNearBallRadius() {
         int n = nSamples;
-        return gamma * Math.pow(Math.log(n+1)/(n+1),1 / domain.nDimensions());
+        return Math.min(gamma * Math.pow(Math.log(n+1)/(n+1), 1 / domain.nDimensions()), eta);
     }
 
     private Vertex<S,E>  getNearestVertex(S x) {
