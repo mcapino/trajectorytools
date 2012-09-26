@@ -162,10 +162,6 @@ public class RRTStar2dGraphDemoCreator implements Creator {
         // RRT
         VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.MAGENTA, Color.BLUE, 2, 8, true));
 
-//      VisManager.registerLayer(RRTStarSpatialGraphLayer.create(rrtstar,
-//                new DefaultProjection<SpatialPoint>(), Color.BLUE, Color.BLUE,
-//                2, 4, true));
-
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
             @Override
