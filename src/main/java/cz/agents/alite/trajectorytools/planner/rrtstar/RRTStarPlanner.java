@@ -264,7 +264,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return dfsNearSearch( new NearCondition<S>() {
             @Override
             public boolean isNear(S examined) {
-                return (domain.distance(x, examined) <= radius);
+                return (!x.equals(examined) && domain.distance(x, examined) <= radius);
             }
         });
     }
