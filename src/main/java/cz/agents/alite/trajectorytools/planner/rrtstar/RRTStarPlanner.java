@@ -80,7 +80,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
             lastNewSample = newSample;
 
             // 2. Compute the set of all near vertices in the ball
-            Collection<Vertex<S,E>> nearVertices = getNear(newSample);
+            Collection<Vertex<S,E>> nearVertices = getNearParentCandidates(newSample);
             nearVertices.add(nearestVertex);
 
             // 3. Find the best parent and extend from that parent
@@ -92,6 +92,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
                 Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
                 if (newVertex != null) {
                     // 4. rewire the tree
+                    nearVertices = getNearChildrenCandidates(newSample);
                     rewire(newVertex, nearVertices);
                 }
             }
@@ -247,9 +248,25 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-    private Collection<Vertex<S,E>> getNear(S x) {
-        double radius = getNearBallRadius();
-        return dfsNearSearch(x, radius);
+    private Collection<Vertex<S,E>> getNearParentCandidates(final S x) {
+        final double radius = getNearBallRadius();
+        return dfsNearSearch( new NearCondition<S>() {
+            @Override
+            public boolean isNear(S examined) {
+                return (domain.distance(examined, x) <= radius);
+            }
+        });
+    }
+
+
+    private Collection<Vertex<S,E>> getNearChildrenCandidates(final S x) {
+        final double radius = getNearBallRadius();
+        return dfsNearSearch( new NearCondition<S>() {
+            @Override
+            public boolean isNear(S examined) {
+                return (domain.distance(x, examined) <= radius);
+            }
+        });
     }
 
     public double getNearBallRadius() {
@@ -261,14 +278,19 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return dfsNearestSearch(x);
     }
 
-    Collection<Vertex<S,E>> dfsNearSearch(S center, double radius) {
+    protected interface NearCondition<SS> {
+        boolean isNear(SS examinedState);
+
+    }
+
+    Collection<Vertex<S,E>> dfsNearSearch(NearCondition<S> nearCondition) {
         Queue<Vertex<S,E>> queue = new LinkedList<Vertex<S,E>>();
         LinkedList<Vertex<S,E>> result = new LinkedList<Vertex<S,E>>();
         queue.add(root);
 
         while(!queue.isEmpty()) {
             Vertex<S,E> current = queue.poll();
-            if (domain.distance(center, current.getState()) <= radius) {
+            if (nearCondition.isNear(current.getState())) {
                 result.add(current);
             }
 

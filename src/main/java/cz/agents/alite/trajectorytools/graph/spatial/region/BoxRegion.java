@@ -96,5 +96,24 @@ public class BoxRegion implements SpaceRegion {
         return corner2;
     }
 
+    public double getXSize() {
+        return corner2.x - corner1.x;
+    }
+
+    public double getYSize() {
+        return corner2.y - corner1.y;
+    }
+
+
+    public double getZSize() {
+        return corner2.z - corner1.z;
+    }
+
+    public SpatialPoint getCenter() {
+        return new SpatialPoint(corner1.getX() + getXSize()/2,
+                                corner1.getY() + getYSize()/2,
+                                corner1.getZ() + getZSize()/2);
+    }
+
 
 }

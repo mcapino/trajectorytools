@@ -22,7 +22,7 @@ import cz.agents.alite.trajectorytools.util.Vector;
  *
  */
 
-public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends SpatialManeuver> implements Trajectory {
+public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends SpatialManeuver> implements EvaluatedTrajectory {
 
     private List<E> maneuvers = null;
 
@@ -33,6 +33,7 @@ public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends Spatial
 
     private double startTime;
     private double duration = Double.POSITIVE_INFINITY;
+    private double cost;
 
 
     public SpatialManeuverTrajectory(double startTime, GraphPath<V,E> graphPath, double duration) {
@@ -43,6 +44,7 @@ public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends Spatial
         this.startTime = startTime;
         this.duration = duration;
         this.graph = graphPath.getGraph();
+        this.cost = graphPath.getWeight();
     }
 
     @Override
@@ -86,7 +88,9 @@ public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends Spatial
             if (startWaypoint.equals(other.startWaypoint) &&
                     endWaypoint.equals(other.endWaypoint) &&
                     maneuvers.equals(other.maneuvers) &&
-                    Math.abs(startTime - other.startTime) < 0.0001 ) {
+                    Math.abs(startTime - other.startTime) < 0.0001 &&
+                    Math.abs(cost - other.cost) < 0.0001
+                    ) {
                 return true;
             }
         }
@@ -132,4 +136,11 @@ public class SpatialManeuverTrajectory<V extends SpatialPoint, E extends Spatial
     public double getMaxTime() {
         return startTime + duration;
     }
+
+    @Override
+    public double getCost() {
+        return cost;
+    }
+
+
 }
