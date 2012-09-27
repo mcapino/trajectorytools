@@ -9,7 +9,8 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemp
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
-import cz.agents.alite.trajectorytools.planner.rrtstar.Listener;
+import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarListener;
+import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
@@ -60,11 +61,11 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
         return samplesPool.poll();
     }
 
-    Listener<TimePoint> listener = new Listener<TimePoint>() {
+    RRTStarListener<TimePoint, SpatioTemporalManeuver> listener = new RRTStarListener<TimePoint, SpatioTemporalManeuver>() {
         @Override
-        public void notifyNewVertex(TimePoint s) {
-            double distance = s.getSpatialPoint().distance(target);
-            double timeAtTarget = s.getTime() + (distance / optSpeed);
+        public void notifyNewVertexInTree(Vertex<TimePoint, SpatioTemporalManeuver> v) {
+            double distance = v.getState().getSpatialPoint().distance(target);
+            double timeAtTarget = v.getState().getTime() + (distance / optSpeed);
 
 
             /*
@@ -85,7 +86,7 @@ public class GuidedStraightLineDomain extends SpatioTemporalStraightLineDomain {
 
 
             Extension<TimePoint, SpatioTemporalManeuver> extension
-                = steerMaintainSpatialPoint(s, new TimePoint(target, timeAtTarget));
+                = steerMaintainSpatialPoint(v.getState(), new TimePoint(target, timeAtTarget));
 
             if (extension != null) {
                 samplesPool.offer(extension.target);

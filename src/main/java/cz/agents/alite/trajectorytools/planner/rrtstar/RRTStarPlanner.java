@@ -21,7 +21,7 @@ import cz.agents.alite.trajectorytools.util.TimePoint;
 public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     Domain<S,E> domain;
-    List<Listener<S>> listeners;
+    List<RRTStarListener<S,E>> listeners;
 
     int nSamples;
     Vertex<S,E> root;
@@ -52,7 +52,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         this.nSamples = 1;
 
         this.bestVertex = null;
-        this.listeners =  new LinkedList<Listener<S>>();
+        this.listeners =  new LinkedList<RRTStarListener<S,E>>();
     }
 
 
@@ -148,8 +148,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         edgeTargets.put(extension.edge, target.getState());
         incomingEdges.put(target.getState(), extension.edge);
 
-        for (Listener<S> listener : listeners) {
-            listener.notifyNewVertex(target.getState());
+        for (RRTStarListener<S,E> listener : listeners) {
+            listener.notifyNewVertexInTree(target);
         }
     }
 
@@ -250,10 +250,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     private Collection<Vertex<S,E>> getNearParentCandidates(final S x) {
         final double radius = getNearBallRadius();
-        return dfsNearSearch( new NearCondition<S>() {
+        return dfsConditionSearch( new Condition<S,E>() {
             @Override
-            public boolean isNear(S examined) {
-                return (domain.distance(examined, x) <= radius);
+            public boolean satisfiesCondition(Vertex<S,E> examined) {
+                return (domain.distance(examined.getState(), x) <= radius);
             }
         });
     }
@@ -261,10 +261,10 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
     private Collection<Vertex<S,E>> getNearChildrenCandidates(final S x) {
         final double radius = getNearBallRadius();
-        return dfsNearSearch( new NearCondition<S>() {
+        return dfsConditionSearch( new Condition<S,E>() {
             @Override
-            public boolean isNear(S examined) {
-                return (domain.distance(x, examined) <= radius);
+            public boolean satisfiesCondition(Vertex<S,E> examined) {
+                return (domain.distance(x, examined.getState()) <= radius);
             }
         });
     }
@@ -278,19 +278,27 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return dfsNearestSearch(x);
     }
 
-    protected interface NearCondition<SS> {
-        boolean isNear(SS examinedState);
+    public interface Condition<S,E> {
+        boolean satisfiesCondition(Vertex<S,E> examinedVertex);
 
     }
 
-    Collection<Vertex<S,E>> dfsNearSearch(NearCondition<S> nearCondition) {
+    public Collection<Vertex<S,E>> getNearVertices(Condition<S,E> nearCondition) {
+        return dfsConditionSearch(nearCondition);
+    }
+
+    public Collection<Vertex<S,E>> conditionSearch(Condition<S,E> condition) {
+        return dfsConditionSearch(condition);
+    }
+
+    Collection<Vertex<S,E>> dfsConditionSearch(Condition<S,E> condition) {
         Queue<Vertex<S,E>> queue = new LinkedList<Vertex<S,E>>();
         LinkedList<Vertex<S,E>> result = new LinkedList<Vertex<S,E>>();
         queue.add(root);
 
         while(!queue.isEmpty()) {
             Vertex<S,E> current = queue.poll();
-            if (nearCondition.isNear(current.getState())) {
+            if (condition.satisfiesCondition(current)) {
                 result.add(current);
             }
 
@@ -325,6 +333,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return minDistVertex;
     }
 
+
     public Vertex<S,E> getRoot() {
         return root;
     }
@@ -358,7 +367,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return bestVertex != null;
     }
 
-    public void registerListener(Listener<S> listener) {
+    public void registerListener(RRTStarListener<S,E> listener) {
         listeners.add(listener);
     }
 

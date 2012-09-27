@@ -2,7 +2,9 @@ package cz.agents.alite.trajectorytools.graph.spatiotemporal.region;
 
 import javax.vecmath.Point4d;
 
+import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
 public class Box4dRegion implements SpaceTimeRegion {
@@ -60,6 +62,11 @@ public class Box4dRegion implements SpaceTimeRegion {
                                 corner1.getY() + getYSize()/2,
                                 corner1.getZ() + getZSize()/2,
                                 corner1.getW() + getTSize()/2);
+    }
+
+    public BoxRegion get3dBounds() {
+        return new BoxRegion(new SpatialPoint(corner1.x, corner1.y, corner1.z),
+                new SpatialPoint(corner2.x, corner2.y, corner2.z));
     }
 
 }
