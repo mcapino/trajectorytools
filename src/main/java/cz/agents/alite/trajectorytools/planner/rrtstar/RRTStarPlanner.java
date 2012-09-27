@@ -264,7 +264,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return dfsConditionSearch( new Condition<S,E>() {
             @Override
             public boolean satisfiesCondition(Vertex<S,E> examined) {
-                return (domain.distance(x, examined.getState()) <= radius);
+                return (!x.equals(examined.getState()) && domain.distance(x, examined.getState()) <= radius);
             }
         });
     }
