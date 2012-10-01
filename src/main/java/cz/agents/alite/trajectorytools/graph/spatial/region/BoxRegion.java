@@ -115,5 +115,20 @@ public class BoxRegion implements SpaceRegion {
                                 corner1.getZ() + getZSize()/2);
     }
 
+    public boolean isInside(BoxRegion box){
+        // corner 1 .. corner 8
+        SpatialPoint c1 = new SpatialPoint(box.getCorner1().x, box.getCorner1().y, box.getCorner1().z);
+        SpatialPoint c2 = new SpatialPoint(box.getCorner1().x, box.getCorner1().y, box.getCorner2().z);
+        SpatialPoint c3 = new SpatialPoint(box.getCorner2().x, box.getCorner1().y, box.getCorner2().z);
+        SpatialPoint c4 = new SpatialPoint(box.getCorner2().x, box.getCorner2().y, box.getCorner2().z);
+        SpatialPoint c5 = new SpatialPoint(box.getCorner1().x, box.getCorner2().y, box.getCorner2().z);
+        SpatialPoint c6 = new SpatialPoint(box.getCorner1().x, box.getCorner2().y, box.getCorner1().z);
+        SpatialPoint c7 = new SpatialPoint(box.getCorner2().x, box.getCorner2().y, box.getCorner1().z);
+        SpatialPoint c8 = new SpatialPoint(box.getCorner2().x, box.getCorner1().y, box.getCorner1().z);
+
+        return isInside(c1) && isInside(c2) && isInside(c3) && isInside(c4) &&
+               isInside(c5) && isInside(c6) && isInside(c7) && isInside(c8);
+    }
+
 
 }
