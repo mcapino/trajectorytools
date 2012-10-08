@@ -72,11 +72,14 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         S randomSample = domain.sampleState();
         lastSampleDrawn = randomSample;
 
-        Vertex<S,E> nearestVertex =  getNearestVertex(randomSample);
-        Extension<S, E> extensionToNear = domain.extendTo(nearestVertex.getState(), randomSample);
+        if (randomSample == null)
+            return;
 
-        if (extensionToNear != null) {
-            S newSample = extensionToNear.target;
+        Vertex<S,E> nearestVertex =  getNearestParentVertex(randomSample);
+        Extension<S, E> nearestToNew = domain.extendTo(nearestVertex.getState(), randomSample);
+
+        if (nearestToNew != null) {
+            S newSample = nearestToNew.target;
             lastNewSample = newSample;
 
             // 2. Compute the set of all near vertices in the ball
@@ -92,11 +95,54 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
                 Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
                 if (newVertex != null) {
                     // 4. rewire the tree
-                    nearVertices = getNearChildrenCandidates(newSample);
+                    nearVertices = getNearChildrenCandidates(newVertex.getState());
                     rewire(newVertex, nearVertices);
                 }
             }
 
+        }
+    }
+    /**
+     * Alternative implementation, which corresponds more closely to the C++
+     * implementation of RRT* by Karaman.
+     */
+
+    public void iterateAlt() {
+        lastSampleDrawn = null;
+        lastNewSample = null;
+
+        // 1. Sample a new state
+        S randomSample = domain.sampleState();
+        lastSampleDrawn = randomSample;
+
+        if (randomSample == null)
+            return;
+
+        // 2. Compute the set of all near vertices in the ball
+        Collection<Vertex<S,E>> nearVertices = getNearParentCandidates(randomSample);
+
+        // 3. Find the best parent and extend from that parent
+        BestParentSearchResult result = null;
+        if (!nearVertices.isEmpty()) {
+            // a) find best parent
+            result = findBestParent(randomSample, nearVertices);
+        } else {
+            // b) extend from nearest
+            Vertex<S,E> nearestVertex =  getNearestParentVertex(randomSample);
+            Extension<S, E> nearestToNew = domain.extendTo(nearestVertex.getState(), randomSample);
+            if (nearestToNew != null) {
+                result = new BestParentSearchResult(nearestVertex, nearestToNew);
+            }
+        }
+
+        if (result != null) {
+            // 3.c add the trajectory from the best parent to the tree
+            Vertex<S,E> newVertex = insertExtension(result.parent, result.extension);
+            if (newVertex != null) {
+                // 4. rewire the tree
+                nearVertices = getNearChildrenCandidates(newVertex.getState());
+                rewire(newVertex, nearVertices);
+            }
         }
     }
 
@@ -274,8 +320,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return Math.min(gamma * Math.pow(Math.log(n+1)/(n+1), 1 / domain.nDimensions()), eta);
     }
 
-    private Vertex<S,E>  getNearestVertex(S x) {
-        return dfsNearestSearch(x);
+    private Vertex<S,E>  getNearestParentVertex(S x) {
+        return dfsNearestParentSearch(x);
     }
 
     public interface Condition<S,E> {
@@ -310,7 +356,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return result;
     }
 
-    Vertex<S,E> dfsNearestSearch(S center) {
+    Vertex<S,E> dfsNearestParentSearch(S center) {
         Queue<Vertex<S,E>> queue = new LinkedList<Vertex<S,E>>();
         Vertex<S,E> minDistVertex = null;
         double minDist = Double.POSITIVE_INFINITY;
