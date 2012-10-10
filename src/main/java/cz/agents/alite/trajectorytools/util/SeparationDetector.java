@@ -82,6 +82,47 @@ public class SeparationDetector {
         }
         return conflicts;
     }
+    
+    
+    public static boolean hasAnyPairwiseConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
+
+        List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
+
+        double minTime = Double.POSITIVE_INFINITY;
+        for (Trajectory trajectory : trajectories) {
+            if (trajectory.getMinTime() < minTime) {
+                minTime = trajectory.getMinTime();
+            }
+        }
+
+        double maxTime = Double.NEGATIVE_INFINITY;
+        for (Trajectory trajectory : trajectories) {
+            if (trajectory.getMaxTime() > maxTime) {
+                maxTime = trajectory.getMaxTime();
+            }
+        }
+
+        // iterate over all time points
+        for (double t = minTime; t <= maxTime; t += samplingInterval) {
+            // check all pairs of agents for conflicts at timepoint t
+            for(int j=0; j < trajectories.size(); j++) {
+                for (int k=j+1; k < trajectories.size(); k++) {
+                    // check the distance between j and k
+                    Trajectory a = trajectories.get(j);
+                    Trajectory b = trajectories.get(k);
+
+                    if (t >= a.getMinTime() && t <= a.getMaxTime() &&
+                        t >= b.getMinTime() && t <= b.getMaxTime()) {
+                        if (a.getPosition(t).distance(b.getPosition(t)) <= separation) {
+                            return true;
+                        }
+                    }
+
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * finds the first conflicts and returns ids of the two agents involved in the conflict
@@ -130,6 +171,39 @@ public class SeparationDetector {
 
     public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
         return (computeAllPairwiseConflicts(trajectoriesCollection, separation, samplingInterval).size() > 0);
+    }
+    
+    public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval, double maxSpeed) {
+    	if(hasConflictApproximation(trajectoriesCollection, separation, maxSpeed)){
+    		return hasAnyPairwiseConflict(trajectoriesCollection, separation, samplingInterval);
+    	}else{
+    		return false;
+    	}
+        
+    }
+    
+    public static boolean hasConflictApproximation(Collection<Trajectory> trajectoriesCollection, double separation, double maxSpeed) {
+    	if(trajectoriesCollection.isEmpty())return false;
+    	
+    	List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
+    	
+    	Trajectory t = trajectories.get(0);
+    	
+    	double criticalDist = (t.getMaxTime()-t.getMinTime())*maxSpeed + separation;
+    	
+    	for(int j=0; j < trajectories.size(); j++) {
+            for (int k=j+1; k < trajectories.size(); k++) {
+                // check the distance between j and k
+                Trajectory a = trajectories.get(j);
+                Trajectory b = trajectories.get(k);
+                
+    			if(a.getPosition(a.getMinTime()).distance(b.getPosition(b.getMinTime())) < criticalDist){
+    				return true;
+    			}
+    		}
+    	}
+    	
+        return false;
     }
 
     /**
