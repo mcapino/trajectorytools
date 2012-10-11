@@ -37,6 +37,31 @@ public class SeparationDetector {
         }
         return conflicts;
     }
+    
+    public static boolean hasAnyPairwiseConflict(
+            Trajectory thisTrajectory,
+            Collection<Trajectory> otherTrajectoriesCollection,
+            double separation, double samplingInterval) {
+
+
+        List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
+
+        for (double t = thisTrajectory.getMinTime(); t < thisTrajectory.getMaxTime(); t += samplingInterval) {
+            OrientedPoint thisTrajectoryPos = thisTrajectory.getPosition(t);
+            for (int j = 0; j < otherTrajectories.size(); j++) {
+
+                if (otherTrajectories.get(j) != null) {
+                    if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
+                        OrientedPoint otherTrajectoryPos = otherTrajectories.get(j).getPosition(t);
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Computes all pairwise conflicts between all pairs of trajectories from trajectoriesCollection.
@@ -170,7 +195,7 @@ public class SeparationDetector {
     }
 
     public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
-        return (computeAllPairwiseConflicts(trajectoriesCollection, separation, samplingInterval).size() > 0);
+        return hasAnyPairwiseConflict(trajectoriesCollection, separation, samplingInterval);
     }
     
     public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval, double maxSpeed) {
@@ -229,6 +254,49 @@ public class SeparationDetector {
                     }
                 }
             }
+        }
+
+        return false;
+    }
+    
+    /**
+     * Determines if thisTrajectory has conflict with any of the trajectories from otherTrajectoriesCollection.
+     */
+    public static boolean hasConflict(Trajectory thisTrajectory, Collection<Trajectory> otherTrajectoriesCollection, double separation, double samplingInterval, double maxSpeed) {
+
+        assert(thisTrajectory != null);
+        assert(!otherTrajectoriesCollection.contains(null));
+
+        List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
+        
+        double criticalDist = (thisTrajectory.getMaxTime()-thisTrajectory.getMinTime())*maxSpeed + separation;
+        
+        boolean approximateConflict = false;
+        
+        for (int j = 0; j < otherTrajectories.size(); j++) {
+        	Trajectory b = otherTrajectories.get(j); 
+            if (b != null) {
+            	if(thisTrajectory.getPosition(thisTrajectory.getMinTime()).distance(b.getPosition(b.getMinTime())) < criticalDist){
+            		approximateConflict = true;
+    			}
+            }
+        }
+        
+        if(approximateConflict){
+	        for (double t = thisTrajectory.getMinTime(); t < thisTrajectory.getMaxTime(); t += samplingInterval) {
+	            OrientedPoint thisTrajectoryPos = thisTrajectory.getPosition(t);
+	            for (int j = 0; j < otherTrajectories.size(); j++) {
+	
+	                if (otherTrajectories.get(j) != null) {
+	                    if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
+	                        OrientedPoint otherTrajectoryPos = otherTrajectories.get(j).getPosition(t);
+	                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+	                            return true;
+	                        }
+	                    }
+	                }
+	            }
+	        }
         }
 
         return false;
