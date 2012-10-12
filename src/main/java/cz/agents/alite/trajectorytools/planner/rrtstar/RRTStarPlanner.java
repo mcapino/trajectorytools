@@ -37,6 +37,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     // Stores last random sample drawn from the domain -  only for debugging/visualisation purposes
     S lastSampleDrawn = null;
     S lastNewSample = null;
+    
+	public double nearBallRadius = Double.NaN;
 
     public RRTStarPlanner(Domain<S,E> domain, S initialState, double gamma) {
         this(domain, initialState, gamma, Double.POSITIVE_INFINITY);
@@ -71,6 +73,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         // 1. Sample a new state
         S randomSample = domain.sampleState();
         lastSampleDrawn = randomSample;
+        
+        if (randomSample == null) return;
 
         if (randomSample == null)
             return;
@@ -316,9 +320,14 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
     public double getNearBallRadius() {
-        int n = nSamples;
-        return Math.min(gamma * Math.pow(Math.log(n+1)/(n+1), 1 / domain.nDimensions()), eta);
-    }
+    	int n = nSamples;
+    	if (nearBallRadius != Double.NaN) {
+    		return nearBallRadius;
+    	}	
+    	else {	
+    		return Math.min(gamma * Math.pow(Math.log(n+1)/(n+1), 1 / domain.nDimensions()), eta);
+    	}
+   }
 
     private Vertex<S,E>  getNearestParentVertex(S x) {
         return dfsNearestParentSearch(x);
@@ -550,5 +559,8 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     public S getNewSample() {
         return lastNewSample;
     }
-
+    
+    public void setNearBallRadius(double nearBallRadius) {
+		this.nearBallRadius = nearBallRadius;
+	}
 }
