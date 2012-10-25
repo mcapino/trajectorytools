@@ -35,7 +35,7 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
         do {
             double x = bounds.getCorner1().x + (random.nextDouble() * (bounds.getCorner2().x - bounds.getCorner1().x));
             double y = bounds.getCorner1().y + (random.nextDouble() * (bounds.getCorner2().y - bounds.getCorner1().y));
-            double z = 0;
+            double z = bounds.getCorner1().z + (random.nextDouble() * (bounds.getCorner2().z - bounds.getCorner1().z));
             point = new SpatialPoint(x, y, z);
         } while (!isInFreeSpace(point));
         return point;
@@ -65,7 +65,7 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
         return true;
     }
 
-    private boolean isInFreeSpace(SpatialPoint p) {
+    protected boolean isInFreeSpace(SpatialPoint p) {
         if (bounds.isInside(p)) {
             for (SpaceRegion obstacle : obstacles) {
                 if (obstacle.isInside(p)) {
