@@ -5,10 +5,11 @@ import java.util.Arrays;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class PolygonRegion implements SpaceTimeRegion {
+public class PolygonRegion implements SpaceTimeRegion, SpaceRegion {
 
 	private static final double SMALL_NUM = 1e-6;
 	private final SpatialPoint [] points;
@@ -51,6 +52,12 @@ public class PolygonRegion implements SpaceTimeRegion {
 
 	@Override
 	public boolean intersectsLine(TimePoint p1, TimePoint p2) {
+		return intersectsLine(p1.getSpatialPoint(), p2.getSpatialPoint());
+	}
+
+
+	@Override
+	public boolean intersectsLine(SpatialPoint p1, SpatialPoint p2) {
 		Vector3d normal = new Vector3d();
 		Point3d planeIntersection = getPlaneIntersection(points, p1, p2, normal);
 		if (planeIntersection == null) {
@@ -74,8 +81,13 @@ public class PolygonRegion implements SpaceTimeRegion {
 		return isInPolygon(points, planeIntersection, projection);
 	}
 
+	@Override
+	public boolean isInside(SpatialPoint p) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
-	private static Point3d getPlaneIntersection(SpatialPoint[] points, TimePoint p0, TimePoint p1, Vector3d outNormal) {
+	private static Point3d getPlaneIntersection(SpatialPoint[] points, SpatialPoint p0, SpatialPoint p1, Vector3d outNormal) {
 		Vector3d u = new Vector3d(points[1]);
 		u.sub(points[0]);
 		Vector3d v = new Vector3d(points[2]); 
@@ -90,15 +102,15 @@ public class PolygonRegion implements SpaceTimeRegion {
 			return null;                 // do not deal with this case
 		}
 
-		Vector3d dir = new Vector3d(p1.getSpatialPoint());
-		dir.sub(p0.getSpatialPoint());             
-		Vector3d w0 =  new Vector3d(p0.getSpatialPoint());;
+		Vector3d dir = new Vector3d(p1);
+		dir.sub(p0);             
+		Vector3d w0 =  new Vector3d(p0);;
 		w0.sub(points[0]);
 		double a = -outNormal.dot(w0);
 		double b= outNormal.dot(dir);
 		if (Math.abs(b) < SMALL_NUM) {     // ray is parallel to triangle plane
 			if (a == 0) {               // ray lies in triangle plane
-				return p0.getSpatialPoint();
+				return p0;
 			} else { 
 				return null;             // ray disjoint from plane
 			}
@@ -109,7 +121,7 @@ public class PolygonRegion implements SpaceTimeRegion {
 		if (r < 0.0 || r > 1.0) {                   // ray goes away from triangle
 			return null;                  // => no intersect
 		}
-		Point3d intersection = new Point3d(p0.getSpatialPoint());
+		Point3d intersection = new Point3d(p0);
 		dir.scale(r);
 		intersection.add(dir);
 
