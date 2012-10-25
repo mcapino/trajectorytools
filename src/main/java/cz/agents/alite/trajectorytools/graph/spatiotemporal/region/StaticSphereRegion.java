@@ -2,10 +2,11 @@ package cz.agents.alite.trajectorytools.graph.spatiotemporal.region;
 
 import javax.vecmath.Point3d;
 
+import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 
-public class StaticSphereRegion implements SpaceTimeRegion {
+public class StaticSphereRegion implements SpaceTimeRegion, SpaceRegion {
 
     Point3d center;
     double radius;
@@ -26,6 +27,15 @@ public class StaticSphereRegion implements SpaceTimeRegion {
         return center.distance(p.getSpatialPoint()) <= radius;
     }
 
+	@Override
+	public boolean intersectsLine(SpatialPoint p1, SpatialPoint p2) {
+        return findLineSphereIntersection(p1, p2, center, radius) != null;
+	}
+
+	@Override
+	public boolean isInside(SpatialPoint p) {
+        return center.distance(p) <= radius;
+	}
     /**
      * Find an intersection between a line segment and a sphere. Return a waypoint which lies in the center of line segment defined by the
      * intersection points, if there are any. If there is no intersection, or the line is a tangent of the sphere, return null.
