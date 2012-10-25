@@ -10,7 +10,7 @@ import cz.agents.alite.trajectorytools.util.Vector;
 
 public class WaypointStraightLineTrajectory implements Trajectory {
 
-    ArrayList<TimePoint> waypoints;
+    private ArrayList<TimePoint> waypoints;
 
     public WaypointStraightLineTrajectory(List<TimePoint> waypoint) {
         assert(waypoint.size() > 0);
@@ -20,9 +20,6 @@ public class WaypointStraightLineTrajectory implements Trajectory {
         }
         
         this.waypoints = new ArrayList<TimePoint>(waypoint);
-        
-        
-        
     }
 
     @Override
@@ -68,7 +65,11 @@ public class WaypointStraightLineTrajectory implements Trajectory {
     }
     
     
-    public String toString(){
+    public ArrayList<TimePoint> getWaypoints() {
+		return waypoints;
+	}
+
+	public String toString(){
     	StringBuilder sb = new StringBuilder();
         sb.append("WPT(");
 
