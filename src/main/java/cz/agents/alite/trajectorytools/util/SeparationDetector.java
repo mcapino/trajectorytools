@@ -107,8 +107,8 @@ public class SeparationDetector {
         }
         return conflicts;
     }
-    
-    
+
+
     public static boolean hasAnyPairwiseConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
 
         List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
@@ -197,37 +197,38 @@ public class SeparationDetector {
     public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval) {
         return hasAnyPairwiseConflict(trajectoriesCollection, separation, samplingInterval);
     }
-    
+
     public static boolean hasConflict(Collection<Trajectory> trajectoriesCollection, double separation, double samplingInterval, double maxSpeed) {
-    	if(hasConflictApproximation(trajectoriesCollection, separation, maxSpeed)){
-    		return hasAnyPairwiseConflict(trajectoriesCollection, separation, samplingInterval);
-    	}else{
-    		return false;
-    	}
-        
+        if(mayHaveConflict(trajectoriesCollection, separation, maxSpeed)){
+            return hasAnyPairwiseConflict(trajectoriesCollection, separation, samplingInterval);
+        }else{
+            return false;
+        }
+
     }
-    
-    public static boolean hasConflictApproximation(Collection<Trajectory> trajectoriesCollection, double separation, double maxSpeed) {
-    	if(trajectoriesCollection.isEmpty())return false;
-    	
-    	List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
-    	
-    	Trajectory t = trajectories.get(0);
-    	
-    	double criticalDist = (t.getMaxTime()-t.getMinTime())*maxSpeed + separation;
-    	
-    	for(int j=0; j < trajectories.size(); j++) {
+
+    /** Quickly determines if the trajectories are close enough for a conflict to occur. */
+    public static boolean mayHaveConflict(Collection<Trajectory> trajectoriesCollection, double separation, double maxSpeed) {
+        if(trajectoriesCollection.isEmpty())return false;
+
+        List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
+
+        Trajectory t = trajectories.get(0);
+
+        double criticalDist = (t.getMaxTime()-t.getMinTime())*maxSpeed + separation;
+
+        for(int j=0; j < trajectories.size(); j++) {
             for (int k=j+1; k < trajectories.size(); k++) {
                 // check the distance between j and k
                 Trajectory a = trajectories.get(j);
                 Trajectory b = trajectories.get(k);
-                
-    			if(a.getPosition(a.getMinTime()).distance(b.getPosition(b.getMinTime())) < criticalDist){
-    				return true;
-    			}
-    		}
-    	}
-    	
+
+                if(a.getPosition(a.getMinTime()).distance(b.getPosition(b.getMinTime())) < criticalDist){
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 

@@ -102,9 +102,13 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
         }
     }
+
+
     /**
      * Alternative implementation, which corresponds more closely to the C++
-     * implementation of RRT* by Karaman.
+     * implementation of RRT* by Karaman. It works faster in most domains,
+     * however, it differs from the formulation as used in RRT* papers and thus it
+     * probably does not provide its theoretical guarantees.
      */
 
     public void iterateAlt() {
