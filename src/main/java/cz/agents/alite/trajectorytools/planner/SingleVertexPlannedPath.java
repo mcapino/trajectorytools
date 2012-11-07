@@ -65,4 +65,9 @@ public class SingleVertexPlannedPath<V, E> implements
     		return false;
     	}
     }
+    
+    @Override
+    public int hashCode() {
+    	return vertex.hashCode();
+    }
 }

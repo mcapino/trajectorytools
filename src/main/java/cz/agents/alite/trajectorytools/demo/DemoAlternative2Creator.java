@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -34,9 +36,14 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class DemoAlternative2Creator implements Creator {
 
-    private static final int NUM_OF_RANDOM_OBSTACLES = 0;
+    private static final int WORLD_SIZE = 9;
 
-    private static final int WORLD_SIZE = 10;
+//	private static final SpatialPoint START_POINT = new SpatialPoint(0, 0, 0);
+//	private static final SpatialPoint TARGET_POINT = new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0);
+	private static final SpatialPoint START_POINT = new SpatialPoint(WORLD_SIZE/2, 0, 0);
+	private static final SpatialPoint TARGET_POINT = new SpatialPoint(WORLD_SIZE/2, WORLD_SIZE, 0);
+
+	private static final int NUM_OF_RANDOM_OBSTACLES = 0;
 
     // shows one trajectory with voronoi and delaunay graphs
     private static final boolean DEBUG_VIEW = true;
@@ -75,14 +82,6 @@ public class DemoAlternative2Creator implements Creator {
     public void create() {
         Graph<Waypoint, SpatialManeuver> originalGraph = SpatialGridFactory.create4WayGrid(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, WORLD_SIZE, 1.0);
 
-        border = Arrays.asList(new SpatialPoint[] {
-                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint( 0,  0, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint( 0, WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(WORLD_SIZE,  WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(originalGraph, new SpatialPoint(WORLD_SIZE,  0, 0))
-        });
-
-
         graph = ObstacleGraphView.createFromGraph(originalGraph, new ChangeListener() {
             @Override
             public void graphChanged() {
@@ -91,6 +90,20 @@ public class DemoAlternative2Creator implements Creator {
             }
         } );
 
+		border = makeBorder(
+				new SpatialPoint[] {
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( 0,  0, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( WORLD_SIZE,  0, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( WORLD_SIZE,  WORLD_SIZE, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( 0,  WORLD_SIZE, 0))
+		        }, 
+				new SpatialPoint[] {
+		                SpatialGraphs.getNearestVertex(graph, START_POINT),
+		                SpatialGraphs.getNearestVertex(graph, TARGET_POINT)
+				});
+
+		System.out.println("border: " + border);
+		
         createVisualization();
 
         List<SpatialPoint> obstacles = generateRandomObstacles(NUM_OF_RANDOM_OBSTACLES);
@@ -137,15 +150,22 @@ public class DemoAlternative2Creator implements Creator {
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(voronoiGraph, paths, 2, 4));
 
+        VisManager.registerLayer(ButtonLayer.create("Previous trajectory", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+            	currentPath --;
+                replan();
+			}
+		}, 780, 100, 170, 40));
+
         VisManager.registerLayer(ButtonLayer.create("Next trajectory", new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
             	currentPath ++;
                 replan();
 			}
-		}, 800, 100, 150, 40));
-        
+		}, 780, 150, 170, 40));
+
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
     }
@@ -161,19 +181,13 @@ public class DemoAlternative2Creator implements Creator {
 
         paths.clear();
 
-        SpatialPoint startVertex = SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0));
-        SpatialPoint startVertexVor = SpatialGraphs.getNearestVertex(voronoiGraph.graph, new SpatialPoint(0, 0, 0));
-        SpatialPoint targetVertex =  SpatialGraphs.getNearestVertex(graph, new SpatialPoint(10, 10, 0));
-        SpatialPoint targetVertexVor =  SpatialGraphs.getNearestVertex(voronoiGraph.graph, new SpatialPoint(10, 10, 0));
+        SpatialPoint startVertex = SpatialGraphs.getNearestVertex(graph, START_POINT);
+        SpatialPoint targetVertex =  SpatialGraphs.getNearestVertex(graph, TARGET_POINT);
 
-        if (startVertexVor == null) {
-        	System.out.println("No vertexes in the Voronoi graph!");
-        }
-        
         AllPathsIterator<SpatialPoint, DefaultWeightedEdge> pathsIt
             = new AllPathsIterator<SpatialPoint, DefaultWeightedEdge>(voronoiGraph.graph,
-                startVertexVor,
-                targetVertexVor
+                startVertex,
+                targetVertex
                 );
 
         while (pathsIt.hasNext()) {
@@ -223,4 +237,27 @@ public class DemoAlternative2Creator implements Creator {
 
         System.out.println("paths.size(): " + paths.size());
     }
+    
+	private List<SpatialPoint> makeBorder(SpatialPoint[] border, SpatialPoint[] points) {
+		List<SpatialPoint> newBorder = new LinkedList<SpatialPoint>(Arrays.asList(border));
+
+		for (SpatialPoint point : points) {
+			if (!newBorder.contains(point)) {
+				double minDist = Double.MAX_VALUE;
+				int closestEdge = 0;
+				
+				for (int i=0; i<newBorder.size(); i++) {
+					SpatialPoint point1 = newBorder.get(i);
+					SpatialPoint point2 = newBorder.get((i+1) % newBorder.size());
+					double dist = Line2D.ptSegDist(point1.x, point1.y, point2.x, point2.y, point.x, point.y);
+					if (dist < minDist) {
+						minDist = dist;
+						closestEdge = i;
+					}
+				}
+				newBorder.add(closestEdge+1, point);
+			}
+		}
+		return newBorder;
+	}
 }

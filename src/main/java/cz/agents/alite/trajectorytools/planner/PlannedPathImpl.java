@@ -1,7 +1,5 @@
 package cz.agents.alite.trajectorytools.planner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,8 +77,6 @@ public class PlannedPathImpl <V, E> extends GraphPathImpl<V, E> implements Plann
             @SuppressWarnings("unchecked")
             PlannedPath<V, E> path = (PlannedPath<V, E>) obj;
             if (getPathLength() != path.getPathLength()) {
-                return false;
-            } else if (getGraph() != path.getGraph()) {
                 return false;
             } else {
             	Iterator<E> pathIt = path.getEdgeList().iterator(); 

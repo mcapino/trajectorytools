@@ -7,11 +7,13 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.DummyEdgeFactory;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Straight;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.Wait;
+import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 
 public class SpatialGridFactory {
@@ -199,7 +201,6 @@ public class SpatialGridFactory {
         return graph;
     }
 
-
     public static Graph<Waypoint, SpatialManeuver> createRandom(double sizeX, double sizeY, int nPoints, int branchFactor, int seed, double speed) {
         Graph<Waypoint, SpatialManeuver> graph = new DirectedWeightedMultigraph<Waypoint, SpatialManeuver>(new DummyEdgeFactory<Waypoint, SpatialManeuver>());
 
@@ -247,6 +248,68 @@ public class SpatialGridFactory {
         return graph;
     }
 
+    public static Graph<SpatialPoint, DefaultWeightedEdge> createNWayGridSpatial(double sizeX, double sizeY, int gridX, int gridY, double speed, int[][] edgePattern, boolean allowWaitManeuver) {
+    	Graph<SpatialPoint, DefaultWeightedEdge> graph 	= new DirectedWeightedMultigraph<SpatialPoint, DefaultWeightedEdge>(new DummyEdgeFactory<SpatialPoint, DefaultWeightedEdge>());
+    	Waypoint waypoints[][] = new Waypoint[gridX+1][gridY+1];
+    	int waypointCounter = 0;
 
+    	double xStep = sizeX/gridX;
+    	double yStep = sizeY/gridY;
+
+    	// Generate vertices
+    	for (int x=0; x <= gridX; x++) {
+    		for (int y=0; y <= gridY; y++) {
+    			Waypoint w = new Waypoint(waypointCounter++, x*xStep, y*yStep);
+    			waypoints[x][y] = w;
+    			graph.addVertex(w);
+    		}
+    	}
+
+    	// Generate edges
+    	for (int x=0; x <= gridX; x++) {
+    		for (int y=0; y <= gridY; y++) {
+    			Waypoint v1 = waypoints[x][y];
+    			for (int[] edgeOffset : edgePattern) {
+    				int destX = x + edgeOffset[0];
+    				int destY = y + edgeOffset[1];
+
+    				if (destX >= 0 && destX <= gridX && destY >= 0 && destY <= gridY) {
+    					Waypoint v2 = waypoints[destX][destY];
+
+    					if (!graph.containsEdge(v1, v2)) {
+    						SpatialManeuver maneuverForward = new Straight(v1, v2, speed);
+    						graph.addEdge(v1, v2, maneuverForward);
+    					}
+
+    					if (!graph.containsEdge(v2, v1)) {
+    						SpatialManeuver maneuverBack = new Straight(v2, v1, speed);
+    						graph.addEdge(v2, v1, maneuverBack);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return graph;
+    }
+
+    static public Graph<SpatialPoint, DefaultWeightedEdge> create4WayGridSpatial(double sizeX, double sizeY,
+    		int gridX, int gridY, double speed) {
+
+    	final int[][] EDGE_PATTERN = {           {0,-1},
+    			{-1, 0},         { 1, 0},
+    			{0, 1},          };
+
+    	return createNWayGridSpatial(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, false);
+    }
+
+    static public Graph<SpatialPoint, DefaultWeightedEdge> create8WayGridSpatial(double sizeX, double sizeY,
+    		int gridX, int gridY, double speed) {
+
+    	final int[][] EDGE_PATTERN = {{-1,-1}, {0,-1}, { 1,-1},
+    			{-1, 0},         { 1, 0},
+    			{-1, 1}, {0, 1}, { 1, 1}};
+
+    	return createNWayGridSpatial(sizeX, sizeY, gridX, gridY, speed, EDGE_PATTERN, false);
+    }
 }
 

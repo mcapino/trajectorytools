@@ -145,10 +145,13 @@ public class VoronoiDelaunayGraph {
 
     public void removeDualEdges(Graph<SpatialPoint, DefaultWeightedEdge> graph, List<DefaultWeightedEdge> edgeList) {
         for (DefaultWeightedEdge maneuver : edgeList) {
-            for (DefaultWeightedEdge edge : getDualEdge(maneuver)) {
-                if (!graph.removeEdge(edge)) {
-                	System.out.println("Edge should be in the graph!" + edge);
-                }
+            List<DefaultWeightedEdge> dualEdges = getDualEdge(maneuver);
+            if (dualEdges != null) {
+				for (DefaultWeightedEdge edge : dualEdges) {
+	                if (!graph.removeEdge(edge)) {
+	                	System.out.println("Edge should be in the graph!" + edge);
+	                }
+	            }
             }
         }
     }

@@ -1,8 +1,10 @@
 package cz.agents.alite.trajectorytools.alterantiveplanners;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -34,12 +36,17 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
 
         VoronoiDelaunayGraph voronoiGraphAlg = new VoronoiDelaunayGraph();
 
-        List<SpatialPoint> border = Arrays.asList(new SpatialPoint[] {
-                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
-                SpatialGraphs.getNearestVertex(graph,new SpatialPoint( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
-        });
+		List<SpatialPoint> border = makeBorder(
+				new SpatialPoint[] {
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( -MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( MAX_WORLD_SIZE,  -MAX_WORLD_SIZE, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0)),
+		                SpatialGraphs.getNearestVertex(graph, new SpatialPoint( -MAX_WORLD_SIZE,  MAX_WORLD_SIZE, 0))
+		        }, 
+				new SpatialPoint[] {
+		                SpatialGraphs.getNearestVertex(graph, startVertex),
+		                SpatialGraphs.getNearestVertex(graph, endVertex)
+				});
 
         PlanarGraph planarGraph = PlanarGraph.createPlanarGraphView((Graph<SpatialPoint, DefaultWeightedEdge>) graph);
 
@@ -100,6 +107,29 @@ public class VoronoiDelaunayPlanner<V extends SpatialPoint, E> implements Altern
 
         return paths;
     }
+
+	private List<SpatialPoint> makeBorder(SpatialPoint[] border, SpatialPoint[] points) {
+		List<SpatialPoint> newBorder = new LinkedList<SpatialPoint>(Arrays.asList(border));
+
+		for (SpatialPoint point : points) {
+			if (!newBorder.contains(point)) {
+				double minDist = Double.MAX_VALUE;
+				int closestEdge = 0;
+				
+				for (int i=0; i<newBorder.size(); i++) {
+					SpatialPoint point1 = newBorder.get(i);
+					SpatialPoint point2 = newBorder.get((i+1) % newBorder.size());
+					double dist = Line2D.ptSegDist(point1.x, point1.y, point2.x, point2.y, point.x, point.y);
+					if (dist < minDist) {
+						minDist = dist;
+						closestEdge = i;
+					}
+				}
+				newBorder.add(closestEdge+1, point);
+			}
+		}
+		return newBorder;
+	}
 
     @Override
     public String getName() {

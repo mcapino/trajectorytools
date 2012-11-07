@@ -37,7 +37,7 @@ public class VoronoiDelaunayPlannerTest {
 
 	private AlternativePathPlanner<SpatialPoint, DefaultWeightedEdge> altPlanner;
 
-    private static final int WORLD_SIZE = 10;
+    private static final int WORLD_SIZE = 9;
 
 	private GraphWithObstacles<SpatialPoint, DefaultWeightedEdge> graph;
 
@@ -71,7 +71,7 @@ public class VoronoiDelaunayPlannerTest {
     };
 
     @Theory
-	public void testObstacles(TestData data) {
+	public void testObstaclesDiagonal(TestData data) {
 
     	for (SpatialPoint obstacle : data.obstacles) {
 			graph.addObstacle(obstacle);
@@ -81,6 +81,40 @@ public class VoronoiDelaunayPlannerTest {
                 graph,
                 SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, 0, 0)),
                 SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE, 0))
+                );
+        
+        System.out.println("paths: " + paths);
+
+        assertEquals(data.expectedNumberOfPaths, paths.size());
+	}
+
+    @Theory
+	public void testObstaclesHorizontal(TestData data) {
+
+    	for (SpatialPoint obstacle : data.obstacles) {
+			graph.addObstacle(obstacle);
+		}
+    	
+        Collection<PlannedPath<SpatialPoint, DefaultWeightedEdge>> paths = altPlanner.planPath(
+                graph,
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(0, WORLD_SIZE/2, 0)),
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE, WORLD_SIZE/2, 0))
+                );
+
+        assertEquals(data.expectedNumberOfPaths, paths.size());
+	}
+
+    @Theory
+	public void testObstaclesVertical(TestData data) {
+
+    	for (SpatialPoint obstacle : data.obstacles) {
+			graph.addObstacle(obstacle);
+		}
+    	
+        Collection<PlannedPath<SpatialPoint, DefaultWeightedEdge>> paths = altPlanner.planPath(
+                graph,
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE/2, 0, 0)),
+                SpatialGraphs.getNearestVertex(graph, new SpatialPoint(WORLD_SIZE/2, WORLD_SIZE, 0))
                 );
 
         assertEquals(data.expectedNumberOfPaths, paths.size());
