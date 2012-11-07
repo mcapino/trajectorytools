@@ -12,17 +12,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.jgrapht.alg.AllPathsIterator;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.alite.tactical.universe.world.map.UrbanMap;
-import cz.agents.alite.tactical.vis.VisualInteractionLayer;
-import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.VoronoiDelaunayGraph;
-import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.PolygonRegion;
 import cz.agents.alite.trajectorytools.planner.AStarPlanner;
 import cz.agents.alite.trajectorytools.planner.HeuristicFunction;
@@ -43,6 +38,8 @@ import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
 import cz.agents.alite.vis.element.implemetation.LineImpl;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
+import cz.agents.alite.vis.layer.common.VisualInteractionLayer;
+import cz.agents.alite.vis.layer.common.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 import cz.agents.alite.vis.layer.terminal.LineLayer;
 
@@ -182,11 +179,6 @@ public class DemoAlternative3Creator implements Creator {
                 @Override
                 public String getName() {
                     return "Obstacles layer : ClickableObstaclesLayer";
-                }
-
-                @Override
-                public UrbanMap getMap() {
-                    throw new UnsupportedOperationException("!!!!");
                 }
             }));
 

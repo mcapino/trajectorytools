@@ -13,9 +13,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
-import cz.agents.alite.tactical.universe.world.map.UrbanMap;
-import cz.agents.alite.tactical.vis.VisualInteractionLayer;
-import cz.agents.alite.tactical.vis.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.trajectorytools.graph.spatial.GraphWithObstacles;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
@@ -25,6 +22,8 @@ import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.element.FilledStyledCircle;
 import cz.agents.alite.vis.element.aggregation.FilledStyledCircleElements;
 import cz.agents.alite.vis.element.implemetation.FilledStyledCircleImpl;
+import cz.agents.alite.vis.layer.common.VisualInteractionLayer;
+import cz.agents.alite.vis.layer.common.VisualInteractionLayer.VisualInteractionProvidingEntity;
 import cz.agents.alite.vis.layer.terminal.FilledStyledCircleLayer;
 
 public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles<SpatialPoint, DefaultWeightedEdge> {
@@ -116,11 +115,6 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
             public String getName() {
                 return "Obstacles layer : ClickableObstaclesLayer";
             }
-
-            @Override
-            public UrbanMap getMap() {
-                throw new UnsupportedOperationException("!!!!");
-            }
         }));
 
         // drawing obstacles
@@ -153,6 +147,16 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
         }));
     }
 
+    public static ObstacleGraphView refresh(ObstacleGraphView other) {
+        ObstacleGraphView obstacleGraphView = new ObstacleGraphView(other.originalGraph, other.changeListener);
+
+        for (SpatialPoint obstacle : other.getObstacles()) {
+			obstacleGraphView.addObstacle(obstacle);
+		}
+    	System.out.println("this: " + obstacleGraphView);
+        return obstacleGraphView;
+    }
+
     @Override
     public void refresh() {
         removeAllVertices(new ArrayList<SpatialPoint>(vertexSet()));
@@ -162,10 +166,12 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
         }
 
         for (DefaultWeightedEdge edge : originalGraph.edgeSet()) {
-            addEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge));
+        	if (!containsEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge))) {
+        		addEdge(originalGraph.getEdgeSource(edge), originalGraph.getEdgeTarget(edge), edge);
+        	}
         }
 
-        for (SpatialPoint obstacle : obstacles) {
+    	for (SpatialPoint obstacle : obstacles) {
             removeVertex( obstacle );
         }
     }
@@ -183,16 +189,8 @@ public class ObstacleGraphView extends PlanarGraph implements GraphWithObstacles
 
     public void removeObstacle(SpatialPoint point) {
         if ( obstacles.contains(point) ) {
-            addVertex(point);
-            for (DefaultWeightedEdge edge : originalGraph.edgesOf(point)) {
-                SpatialPoint source = originalGraph.getEdgeSource(edge);
-                SpatialPoint target = originalGraph.getEdgeTarget(edge);
-                if (containsVertex(source) && containsVertex(target)) {
-                    addEdge(source, target, edge);
-                }
-            }
-
             obstacles.remove(point);
+            refresh();        	
         }
     }
 
