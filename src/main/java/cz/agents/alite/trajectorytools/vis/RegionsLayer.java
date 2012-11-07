@@ -39,7 +39,9 @@ public class RegionsLayer extends AbstractLayer {
     RegionsLayer() {
     }
 
-    public static VisLayer create(final RegionsProvider regionsProvider, final ProjectionTo2d<TimePoint> projection,  final Color edgeColor, final int edgeStrokeWidth) {
+    public static VisLayer create(final RegionsProvider regionsProvider,
+            final ProjectionTo2d<TimePoint> projection, final Color edgeColor,
+            final int edgeStrokeWidth) {
         GroupLayer group = GroupLayer.create();
 
         // boxes

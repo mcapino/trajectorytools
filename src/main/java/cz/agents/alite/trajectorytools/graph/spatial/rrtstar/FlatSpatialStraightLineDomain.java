@@ -1,6 +1,7 @@
 package cz.agents.alite.trajectorytools.graph.spatial.rrtstar;
 
 import java.util.Collection;
+import java.util.Random;
 
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
@@ -9,25 +10,24 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 public class FlatSpatialStraightLineDomain extends SpatialStraightLineDomain {
 
     private double defaultZ;
-
-    private static final int RETURN_TARGET_FREQ = 10;
-    private int currentReturnTarget = RETURN_TARGET_FREQ;
-
     private SpatialPoint targetPoint;
+    private double sampleTargetProbability;
+    private Random random = new Random(1);
+
 
     public FlatSpatialStraightLineDomain(BoxRegion bounds,
-            Collection<SpaceRegion> obstacles, SpaceRegion targetRegion, SpatialPoint targetPoint, double speed,
-            double defaultZ) {
+            Collection<SpaceRegion> obstacles, SpaceRegion targetRegion,
+            SpatialPoint targetPoint, double speed, double defaultZ, double sampleTargetProbability) {
         super(bounds, obstacles, targetRegion, speed);
         this.targetPoint = targetPoint;
         this.defaultZ = defaultZ;
+        this.sampleTargetProbability = sampleTargetProbability;
     }
 
     @Override
     public SpatialPoint sampleState() {
         SpatialPoint point;
-        if ((--currentReturnTarget) < 0) {
-            currentReturnTarget = RETURN_TARGET_FREQ;
+        if (random.nextDouble() <= sampleTargetProbability) {
             point = targetPoint;
         } else {
             do {

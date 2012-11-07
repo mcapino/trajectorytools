@@ -54,8 +54,6 @@ public class SpatialStraightLineDomain implements Domain<SpatialPoint, SpatialMa
 
     private boolean isVisible(SpatialPoint p1, SpatialPoint p2) {
 
-
-
         // check obstacles
         for (SpaceRegion obstacle : obstacles) {
             if (obstacle.intersectsLine(p1, p2)) {

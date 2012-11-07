@@ -13,8 +13,7 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
-import cz.agents.alite.trajectorytools.graph.spatial.rrtstar.SpatialStraightLineDomain;
-import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.SpaceTimeRegion;
+import cz.agents.alite.trajectorytools.graph.spatial.rrtstar.FlatSpatialStraightLineDomain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.trajectory.SpatialManeuverTrajectory;
@@ -43,6 +42,7 @@ public class RRTStar2dDemoCreator implements Creator {
     BoxRegion bounds = new BoxRegion(new SpatialPoint(0, 0, 0), new SpatialPoint(1000, 1000, 1000));
     Collection<SpaceRegion> obstacles = new LinkedList<SpaceRegion>();
     SpaceRegion target = new BoxRegion(new SpatialPoint(500, 850, -1000), new SpatialPoint(600, 870, 1000));
+    SpatialPoint targetPoint =  new SpatialPoint(550, 860, 0);
 
     Trajectory trajectory = null;
 
@@ -58,7 +58,7 @@ public class RRTStar2dDemoCreator implements Creator {
 
         createObstacles(200, 80);
 
-        Domain<SpatialPoint, SpatialManeuver> domain = new SpatialStraightLineDomain(bounds, obstacles, target, 1.0);
+        Domain<SpatialPoint, SpatialManeuver> domain = new FlatSpatialStraightLineDomain(bounds, obstacles, target, targetPoint, 1.0, 0, 0.1);
         rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain, initialPoint, 1300);
         createVisualization();
 
@@ -70,12 +70,13 @@ public class RRTStar2dDemoCreator implements Creator {
                 //System.out.println("Best vertex: " + rrtstar.getBestVertex());
                 GraphPath<SpatialPoint, SpatialManeuver> path = rrtstar.getBestPath();
                 trajectory = new SpatialManeuverTrajectory<SpatialPoint, SpatialManeuver>(0.0, path, path.getWeight());
-                //trajectory =  new SampledTrajectory(trajectory, 100);
+
+
             }
 
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -90,7 +91,7 @@ public class RRTStar2dDemoCreator implements Creator {
             double size = random.nextDouble() * maxSize;
             double x = bounds.getCorner1().x + random.nextDouble() *  (bounds.getCorner2().x - bounds.getCorner1().x);
             double y = bounds.getCorner1().y + random.nextDouble() *  (bounds.getCorner2().y - bounds.getCorner1().y);
-            SpaceRegion obstacle = new BoxRegion(new SpatialPoint(x, y, 0), new SpatialPoint(x+size,y+size,750));
+            SpaceRegion obstacle = new BoxRegion(new SpatialPoint(x, y, 0), new SpatialPoint(x+size,y+size,bounds.getCorner2().z));
             if (!obstacle.isInside(initialPoint)) {
                 obstacles.add(obstacle);
             }
@@ -121,27 +122,33 @@ public class RRTStar2dDemoCreator implements Creator {
         VisManager.registerLayer(RRTStarLayer.create(rrtstar, new DefaultProjection<SpatialPoint>(),  Color.GRAY, Color.GRAY, 1, 4, true));
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
-
             @Override
             public Collection<SpaceRegion> getSpaceRegions() {
                 LinkedList<SpaceRegion> regions = new LinkedList<SpaceRegion>();
                 regions.add(bounds);
                 regions.addAll(obstacles);
-                regions.add(target);
                 return regions;
             }
-
-            @Override
-            public Collection<SpaceTimeRegion> getSpaceTimeRegions() {
-                return new LinkedList<SpaceTimeRegion>();
-            }
         }, new ProjectionTo2d<TimePoint>() {
-
             @Override
             public Point2d project(TimePoint point) {
                 return new Point2d(point.x, point.y);
             }
         }, Color.BLACK, 1));
+
+        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
+            @Override
+            public Collection<SpaceRegion> getSpaceRegions() {
+                LinkedList<SpaceRegion> regions = new LinkedList<SpaceRegion>();
+                regions.add(target);
+                return regions;
+            }
+        }, new ProjectionTo2d<TimePoint>() {
+            @Override
+            public Point2d project(TimePoint point) {
+                return new Point2d(point.x, point.y);
+            }
+        }, Color.GREEN, 1));
 
         VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider() {
 
