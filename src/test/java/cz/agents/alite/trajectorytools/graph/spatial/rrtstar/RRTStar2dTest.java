@@ -11,6 +11,7 @@ import org.junit.Test;
 import cz.agents.alite.trajectorytools.graph.spatial.maneuvers.SpatialManeuver;
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
+import cz.agents.alite.trajectorytools.graph.spatial.region.SphereRegion;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
@@ -18,7 +19,41 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 public class RRTStar2dTest {
 
     @Test
-    public void test() {
+    public void testSmallPassage() {
+
+        RRTStarPlanner<SpatialPoint, SpatialManeuver> rrtstar;
+
+        SpatialPoint initialPoint = new SpatialPoint(500, 100, 0);
+        BoxRegion bounds = new BoxRegion(new SpatialPoint(0, 0, -1000),
+                new SpatialPoint(1000, 1000, 1000));
+        Collection<SpaceRegion> obstacles = new LinkedList<SpaceRegion>();
+
+        obstacles.add(new BoxRegion(new SpatialPoint(0,490, -1000), new SpatialPoint(990, 510, 1000)));
+
+        SpatialPoint targetPoint = new SpatialPoint(500,900, 0);
+        SpaceRegion targetRegion = new SphereRegion(targetPoint, 50);
+
+        Domain<SpatialPoint, SpatialManeuver> domain = new FlatSpatialStraightLineDomain(
+                bounds, obstacles, targetRegion, targetPoint, 1.0, 0, 0.0);
+
+        rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain,
+                initialPoint, 1300);
+
+        // if the RRT* does not make it in 2000 iterations, something is wrong...
+        int iterations = 2000;
+        for (int i = 0; i < iterations; i++) {
+            rrtstar.iterate();
+        }
+
+
+        double optimum = 1204; // roughly
+        boolean foundSolution = rrtstar.foundSolution();
+        double cost = rrtstar.getBestVertex().getCostFromRoot();
+        assertTrue(foundSolution && cost < optimum*1.3);
+    }
+
+    @Test
+    public void testRandomlyScatteredObstacles() {
 
         RRTStarPlanner<SpatialPoint, SpatialManeuver> rrtstar;
 

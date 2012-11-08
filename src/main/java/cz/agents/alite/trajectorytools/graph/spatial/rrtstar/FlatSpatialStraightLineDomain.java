@@ -15,14 +15,15 @@ public class FlatSpatialStraightLineDomain extends SpatialStraightLineDomain {
     private Random random = new Random(1);
 
 
-    public FlatSpatialStraightLineDomain(BoxRegion bounds,
-            Collection<SpaceRegion> obstacles, SpaceRegion targetRegion,
-            SpatialPoint targetPoint, double speed, double defaultZ, double sampleTargetProbability) {
-        super(bounds, obstacles, targetRegion, speed);
-        this.targetPoint = targetPoint;
-        this.defaultZ = defaultZ;
-        this.sampleTargetProbability = sampleTargetProbability;
-    }
+	public FlatSpatialStraightLineDomain(BoxRegion bounds,
+			Collection<SpaceRegion> obstacles, SpaceRegion targetRegion,
+			SpatialPoint targetPoint, double speed, double defaultZ,
+			double sampleTargetProbability) {
+		super(bounds, obstacles, targetRegion, speed);
+		this.targetPoint = targetPoint;
+		this.defaultZ = defaultZ;
+		this.sampleTargetProbability = sampleTargetProbability;
+	}
 
     @Override
     public SpatialPoint sampleState() {
