@@ -12,7 +12,6 @@ public class LinearPredictor implements PredictiveTrajectory.PredictorInterface 
 
 	@Override
 	public void addObservation(OrientedPoint pos, double time) {
-//		System.out.println("add:"+pos);
 		lo = co;
 		co = pos;
 		lt = ct;
@@ -21,7 +20,6 @@ public class LinearPredictor implements PredictiveTrajectory.PredictorInterface 
 
 	@Override
 	public OrientedPoint predict(double time) {
-		System.out.println("lo:"+lo+", co:"+co);
 		if(co==null){
 			return new OrientedPoint(0,0, 0, 0, 0, 0);
 		}
@@ -37,8 +35,6 @@ public class LinearPredictor implements PredictiveTrajectory.PredictorInterface 
 		SpatialPoint p = (SpatialPoint) lo.clone();
 		double a = (time-lt)/(ct-lt);
 		p.interpolate(co, a);
-		
-		System.out.println("int:"+p);
 		
 		return new OrientedPoint(p,co.orientation);
 	}
