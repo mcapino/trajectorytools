@@ -1,7 +1,6 @@
 package cz.agents.alite.trajectorytools.demo;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 
 import javax.vecmath.Point2d;
 
@@ -26,8 +25,8 @@ import cz.agents.alite.trajectorytools.vis.GraphLayer.GraphProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
-import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
@@ -55,10 +54,18 @@ public class ManeuverDemoCreator implements Creator {
 
     private void createVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 20, 20);
-        VisManager.setPanningBounds(new Rectangle(-500, -500, 1600, 1600));
-        VisManager.init();
+        VisManager.setSceneParam(new SceneParams(){
 
-        Vis.setPosition(50, 50, 1);
+            @Override
+            public Point2d getDefaultLookAt() {
+                return new Point2d(5,5);
+            }
+
+            @Override
+            public double getDefaultZoomFactor() {
+                return 50;
+            } } );
+        VisManager.init();
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
@@ -71,8 +78,6 @@ public class ManeuverDemoCreator implements Creator {
                 return graph;
             }
         }, Color.GRAY, Color.GRAY, 1, 4));
-
-
 
         // draw the shortest path
         //VisManager.registerLayer(GraphPathLayer.create(graph, path, Color.RED, Color.RED.darker(), 2, 4));
