@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
@@ -12,7 +13,9 @@ import org.jgrapht.GraphPath;
 
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
+import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Line;
+import cz.agents.alite.vis.element.Point;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
 import cz.agents.alite.vis.element.aggregation.LineElements;
@@ -20,6 +23,7 @@ import cz.agents.alite.vis.element.aggregation.PointElements;
 import cz.agents.alite.vis.element.aggregation.StyledLineElements;
 import cz.agents.alite.vis.element.aggregation.StyledPointElements;
 import cz.agents.alite.vis.element.implemetation.LineImpl;
+import cz.agents.alite.vis.element.implemetation.PointImpl;
 import cz.agents.alite.vis.element.implemetation.StyledLineImpl;
 import cz.agents.alite.vis.element.implemetation.StyledPointImpl;
 import cz.agents.alite.vis.layer.AbstractLayer;
@@ -32,8 +36,7 @@ import cz.agents.alite.vis.layer.terminal.StyledPointLayer;
 
 public class GraphPathLayer extends AbstractLayer {
 
-
-    public interface PathProvider<V extends SpatialPoint, E > {
+    public interface PathProvider<V, E > {
         GraphPath<V, E> getPath();
     }
 
@@ -43,21 +46,24 @@ public class GraphPathLayer extends AbstractLayer {
     GraphPathLayer() {
     }
 
-    public static <V extends SpatialPoint, E> VisLayer create(final PathProvider<V, E> pathProvider, final Color edgeColor, final Color vertexColor,
+    public static <V, E> VisLayer create(final PathProvider<V, E> pathProvider, final ProjectionTo2d<V> projection, final Color edgeColor, final Color vertexColor,
             final int edgeStrokeWidth, final int vertexStrokeWidth) {
         GroupLayer group = GroupLayer.create();
-        final Graph<V, E> graph = pathProvider.getPath().getGraph();
 
         // edges
         group.addSubLayer(LineLayer.create(new LineElements() {
 
             @Override
             public Iterable<Line> getLines() {
+            	GraphPath<V, E> path = pathProvider.getPath();
                 Collection<Line> lines = new ArrayList<Line>();
-                GraphPath<V,E> path = pathProvider.getPath();
                 if (path != null) {
+                	Graph<V, E> graph = path.getGraph();
                     for (E edge : path.getEdgeList()) {
-                        lines.add(new LineImpl(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+                    	Point2d start = projection.project(graph.getEdgeSource(edge));
+                    	Point2d end = projection.project(graph.getEdgeTarget(edge));
+
+                        lines.add(new LineImpl( new Point3d(start.x, start.y, 0), new Point3d(end.x, end.y, 0)));
                     }
                 }
                 return lines;
@@ -79,14 +85,17 @@ public class GraphPathLayer extends AbstractLayer {
         group.addSubLayer(PointLayer.create(new PointElements() {
 
             @Override
-            public Iterable<SpatialPoint> getPoints() {
-                Collection<SpatialPoint> points = new ArrayList<SpatialPoint>();
-                GraphPath<V,E> path = pathProvider.getPath();
+            public Iterable<Point> getPoints() {
+                Collection<Point> points = new ArrayList<Point>();
+                GraphPath<V, E> path = pathProvider.getPath();
                 if (path != null) {
+                	Graph<V, E> graph = path.getGraph();
                     for (E edge : path.getEdgeList()) {
-                        points.add(graph.getEdgeSource(edge));
+                    	Point2d source = projection.project(graph.getEdgeSource(edge));
+                        points.add(new SpatialPoint(source.x, source.y, 0.0));
                     }
-                    points.add(path.getEndVertex());
+                    Point2d end = projection.project(path.getEndVertex());
+                    points.add(new SpatialPoint(end.x, end.y, 0));
                 }
                 return points;
             }
@@ -102,6 +111,7 @@ public class GraphPathLayer extends AbstractLayer {
             }
 
         }));
+
 
         return group;
     }

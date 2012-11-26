@@ -20,6 +20,7 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Waypoint;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer;
 import cz.agents.alite.trajectorytools.vis.GraphPathLayer.PathProvider;
+import cz.agents.alite.trajectorytools.vis.projection.DefaultProjection;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.layer.common.ColorLayer;
@@ -68,7 +69,7 @@ public class Demo1Creator implements Creator {
             @Override
             public PlannedPath<SpatialPoint, DefaultWeightedEdge> getPath() {
                 return plannedPath;
-            }  }, Color.RED, Color.RED.darker(), 2, 4));
+            }  }, new DefaultProjection<SpatialPoint>(), Color.RED, Color.RED.darker(), 2, 4));
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
