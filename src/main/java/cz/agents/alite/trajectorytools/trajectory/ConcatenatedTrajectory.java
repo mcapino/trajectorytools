@@ -90,4 +90,8 @@ public class ConcatenatedTrajectory implements Trajectory {
 		
 	}
 
+	@Override
+	public String toString() {
+		return trajectories.toString();
+	}
 }
