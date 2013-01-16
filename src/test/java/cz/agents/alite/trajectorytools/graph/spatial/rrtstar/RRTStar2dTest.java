@@ -1,6 +1,6 @@
 package cz.agents.alite.trajectorytools.graph.spatial.rrtstar;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,6 +18,38 @@ import cz.agents.alite.trajectorytools.util.SpatialPoint;
 
 public class RRTStar2dTest {
 
+    @Test
+    public void testNoObstacles() {
+
+        RRTStarPlanner<SpatialPoint, SpatialManeuver> rrtstar;
+
+        SpatialPoint initialPoint = new SpatialPoint(500, 100, 0);
+        BoxRegion bounds = new BoxRegion(new SpatialPoint(0, 0, -1000),
+                new SpatialPoint(1000, 1000, 1000));
+
+        SpatialPoint targetPoint = new SpatialPoint(500,900, 0);
+        SpaceRegion targetRegion = new SphereRegion(targetPoint, 5);
+
+        Domain<SpatialPoint, SpatialManeuver> domain = new FlatSpatialStraightLineDomain(
+                bounds, new LinkedList<SpaceRegion>(), targetRegion, targetPoint, 1.0, 0, 0.0);
+
+        rrtstar = new RRTStarPlanner<SpatialPoint, SpatialManeuver>(domain,
+                initialPoint, 1300);
+
+        // if the RRT* does not make it in 1000 iterations, something is wrong...
+        int iterations = 1000;
+        for (int i = 0; i < iterations; i++) {
+            rrtstar.iterate();
+        }
+
+        double distance = initialPoint.distance(targetPoint);
+        boolean foundSolution = rrtstar.foundSolution();
+        assertTrue("No solution found!", foundSolution);
+        double cost = rrtstar.getBestVertex().getCostFromRoot();
+        assertEquals(distance,  cost, 5);
+    }
+
+	
     @Test
     public void testSmallPassage() {
 
