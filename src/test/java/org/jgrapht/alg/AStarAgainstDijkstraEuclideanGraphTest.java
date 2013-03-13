@@ -49,7 +49,7 @@ import org.jgrapht.alg.AStarShortestPath.Heuristic;
 import org.jgrapht.graph.*;
 import org.junit.Test;
 
-public class AStarAgainstDijkstraTest   
+public class AStarAgainstDijkstraEuclideanGraphTest   
 {
 	
 	// Auxiliary class for creating random graphs that could be interpreted as "webs" in 2D plane
