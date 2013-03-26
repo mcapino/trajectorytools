@@ -3,8 +3,8 @@ package tt.euclid2i.rrtstar;
 import java.util.Collection;
 import java.util.Random;
 
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
-import tt.euclid2i.discretization.Line;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;

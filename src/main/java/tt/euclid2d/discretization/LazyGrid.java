@@ -10,12 +10,13 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import tt.euclid2d.Line;
 import tt.euclid2d.Point;
 import tt.euclid2d.region.Rectangle;
 import tt.euclid2d.region.Region;
 import cz.agents.alite.trajectorytools.util.NotImplementedException;
 
-public class LazyGrid implements DirectedGraph<Point, Straight2d> {
+public class LazyGrid implements DirectedGraph<Point, Line> {
 
     private static final double SPEED = 1.0;
     private Point initialPoint;
@@ -37,12 +38,12 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public Straight2d addEdge(Point arg0, Point arg1) {
+    public Line addEdge(Point arg0, Point arg1) {
        throw new NotImplementedException();
     }
 
     @Override
-    public boolean addEdge(Point arg0, Point arg1, Straight2d arg2) {
+    public boolean addEdge(Point arg0, Point arg1, Line arg2) {
         throw new NotImplementedException();
     }
 
@@ -52,7 +53,7 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public boolean containsEdge(Straight2d arg0) {
+    public boolean containsEdge(Line arg0) {
         throw new NotImplementedException();
     }
 
@@ -67,64 +68,64 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public Set<Straight2d> edgeSet() {
+    public Set<Line> edgeSet() {
         throw new NotImplementedException();
     }
 
     @Override
-    public Set<Straight2d> edgesOf(Point vertex) {
-        Set<Straight2d> edges = new HashSet<Straight2d>();
+    public Set<Line> edgesOf(Point vertex) {
+        Set<Line> edges = new HashSet<Line>();
         edges.addAll(incomingEdgesOf(vertex));
         edges.addAll(outgoingEdgesOf(vertex));
         return edges;
     }
 
     @Override
-    public Set<Straight2d> getAllEdges(Point start, Point end) {
-        Set<Straight2d> edges = new HashSet<Straight2d>();
-        edges.add(new Straight2d(start, end, SPEED) );
-        edges.add(new Straight2d(end, start, SPEED) );
+    public Set<Line> getAllEdges(Point start, Point end) {
+        Set<Line> edges = new HashSet<Line>();
+        edges.add(new Line(start, end, SPEED) );
+        edges.add(new Line(end, start, SPEED) );
         return edges;
     }
 
     @Override
-    public Straight2d getEdge(Point start, Point end) {
-        return new Straight2d(start, end, SPEED);
+    public Line getEdge(Point start, Point end) {
+        return new Line(start, end, SPEED);
     }
 
     @Override
-    public EdgeFactory<Point, Straight2d> getEdgeFactory() {
+    public EdgeFactory<Point, Line> getEdgeFactory() {
         return null;
     }
 
     @Override
-    public Point getEdgeSource(Straight2d edge) {
+    public Point getEdgeSource(Line edge) {
         return edge.getStart();
     }
 
     @Override
-    public Point getEdgeTarget(Straight2d edge) {
+    public Point getEdgeTarget(Line edge) {
         return edge.getEnd();
     }
 
     @Override
-    public double getEdgeWeight(Straight2d edge) {
+    public double getEdgeWeight(Line edge) {
         return edge.getDuration();
     }
 
 
     @Override
-    public Set<Straight2d> removeAllEdges(Point arg0, Point arg1) {
+    public Set<Line> removeAllEdges(Point arg0, Point arg1) {
         throw new NotImplementedException();
     }
 
     @Override
-    public boolean removeEdge(Straight2d arg0) {
+    public boolean removeEdge(Line arg0) {
         throw new NotImplementedException();
     }
 
     @Override
-    public Straight2d removeEdge(Point arg0, Point arg1) {
+    public Line removeEdge(Point arg0, Point arg1) {
         throw new NotImplementedException();
     }
 
@@ -144,7 +145,7 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public Set<Straight2d> incomingEdgesOf(Point vertex) {
+    public Set<Line> incomingEdgesOf(Point vertex) {
         Set<Point> children = new HashSet<Point>();
 
         for (double[] offset : pattern) {
@@ -154,9 +155,9 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
             }
         }
 
-        Set<Straight2d> edges = new HashSet<Straight2d>();
+        Set<Line> edges = new HashSet<Line>();
         for (Point child : children) {
-            edges.add(new Straight2d(child, vertex, SPEED));
+            edges.add(new Line(child, vertex, SPEED));
         }
 
         return edges;
@@ -168,7 +169,7 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public Set<Straight2d> outgoingEdgesOf(Point vertex) {
+    public Set<Line> outgoingEdgesOf(Point vertex) {
         Set<Point> children = new HashSet<Point>();
 
         for (double[] offset : pattern) {
@@ -178,9 +179,9 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
             }
         }
 
-        Set<Straight2d> edges = new HashSet<Straight2d>();
+        Set<Line> edges = new HashSet<Line>();
         for (Point child : children) {
-            edges.add(new Straight2d(vertex, child, SPEED));
+            edges.add(new Line(vertex, child, SPEED));
         }
 
         return edges;
@@ -207,7 +208,7 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
     }
 
     @Override
-    public boolean removeAllEdges(Collection<? extends Straight2d> arg0) {
+    public boolean removeAllEdges(Collection<? extends Line> arg0) {
         throw new NotImplementedException();
     }
 
@@ -216,14 +217,14 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
         throw new NotImplementedException();
     }
 
-    public DirectedGraph<Point, Straight2d> generateFullGraph() {
-        DefaultDirectedGraph<Point, Straight2d> fullGraph
-            = new DefaultDirectedGraph<Point, Straight2d>( new EdgeFactory<Point, Straight2d>() {
+    public DirectedGraph<Point, Line> generateFullGraph() {
+        DefaultDirectedGraph<Point, Line> fullGraph
+            = new DefaultDirectedGraph<Point, Line>( new EdgeFactory<Point, Line>() {
 
                 @Override
-                public Straight2d createEdge(Point sourceVertex,
+                public Line createEdge(Point sourceVertex,
                         Point targetVertex) {
-                    return new Straight2d(sourceVertex, targetVertex, SPEED);
+                    return new Line(sourceVertex, targetVertex, SPEED);
                 }
             });
 
@@ -238,8 +239,8 @@ public class LazyGrid implements DirectedGraph<Point, Straight2d> {
             Point current = open.poll();
             fullGraph.addVertex(current);
 
-            Set<Straight2d> outEdges = outgoingEdgesOf(current);
-            for (Straight2d edge : outEdges) {
+            Set<Line> outEdges = outgoingEdgesOf(current);
+            for (Line edge : outEdges) {
                 Point target = getEdgeTarget(edge);
                 fullGraph.addVertex(target);
                 fullGraph.addEdge(current, target);

@@ -10,6 +10,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;

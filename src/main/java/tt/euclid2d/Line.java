@@ -1,21 +1,21 @@
-package tt.euclid2d.discretization;
+package tt.euclid2d;
 
 import javax.vecmath.Vector2d;
 
-import tt.euclid2d.Point;
+import tt.euclid2d.discretization.MotionPrimitive2d;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
 import cz.agents.alite.trajectorytools.util.Vector;
 
-public class Straight2d extends MotionPrimitive2d{
+public class Line extends MotionPrimitive2d{
     private static final long serialVersionUID = -2519868162204278196L;
 
     private Point start;
     private Point end;
     private double speed;
 
-    public Straight2d(Point start, Point end, double speed) {
+    public Line(Point start, Point end, double speed) {
         super();
         this.start = start;
         this.end = end;
@@ -97,7 +97,7 @@ public class Straight2d extends MotionPrimitive2d{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Straight2d other = (Straight2d) obj;
+        Line other = (Line) obj;
         if (end == null) {
             if (other.end != null)
                 return false;

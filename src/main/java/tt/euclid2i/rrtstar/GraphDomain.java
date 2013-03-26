@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
-import tt.euclid2i.discretization.Line;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
