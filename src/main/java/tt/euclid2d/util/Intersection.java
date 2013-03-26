@@ -4,20 +4,18 @@ import tt.euclid2d.Point;
 
 public class Intersection {
 
-    public static boolean linesIntersect(Point line1Start, Point line1End,
-            Point line2Start, Point line2End,
+    /**
+     * Determines if a line segment of two line segments (x1,y1)-->(x2,y2) and (x1,y1)-->(x2,y2) intersect.
+     * If parameter closed is set to true, the extreme points are also considered part of the line segment.
+     *
+     * @return true if the line segments intersect or overlap
+     */
+    public static boolean linesIntersect(
+            double x1, double y1,
+            double x2, double y2,
+            double x3, double y3,
+            double x4, double y4,
             boolean closed) {
-        double x1 = line1Start.x;
-        double y1 = line1Start.y;
-
-        double x2 = line1End.x;
-        double y2 = line1End.y;
-
-        double x3 = line2Start.x;
-        double y3 = line2Start.y;
-
-        double x4 = line2End.x;
-        double y4 = line2End.y;
 
         if (boxesOverlap(x1,y1,x2,y2, x3,y3,x4,y4, closed)) {
             double det = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
@@ -34,6 +32,24 @@ public class Intersection {
         }
 
         return false;
+    }
+
+    public static boolean linesIntersect(Point line1Start, Point line1End,
+            Point line2Start, Point line2End,
+            boolean closed) {
+        double x1 = line1Start.x;
+        double y1 = line1Start.y;
+
+        double x2 = line1End.x;
+        double y2 = line1End.y;
+
+        double x3 = line2Start.x;
+        double y3 = line2Start.y;
+
+        double x4 = line2End.x;
+        double y4 = line2End.y;
+
+        return linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4, closed);
     }
 
     public static boolean linesOverlap(Point line1Start, Point line1End,
