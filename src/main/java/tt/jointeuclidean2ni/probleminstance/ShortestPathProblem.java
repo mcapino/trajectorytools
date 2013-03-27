@@ -9,7 +9,7 @@ import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
 
-public class JointEuclidean2niShortestPathProblem {
+public class ShortestPathProblem {
 
     public static class CannotPlaceAgentsException extends RuntimeException {};
 
@@ -23,8 +23,7 @@ public class JointEuclidean2niShortestPathProblem {
     protected Point targetPoints[];
     private Random random;
 
-
-    public JointEuclidean2niShortestPathProblem(int nAgents, int agentSizeRadius, int seed) {
+    public ShortestPathProblem(int nAgents, int agentSizeRadius, int seed) {
         this.seed = seed;
         this.nAgents = nAgents;
         this.agentSizeRadius = agentSizeRadius;
@@ -98,6 +97,10 @@ public class JointEuclidean2niShortestPathProblem {
         return targetPoints[i];
     }
 
+    public Region getTargetRegions(int i) {
+        return targetRegions[i];
+    }
+
     public Region[] getTargetRegions() {
         return targetRegions;
     }
@@ -121,6 +124,10 @@ public class JointEuclidean2niShortestPathProblem {
 
     public int getTargetRegionRadius() {
         return targetRegionSide / 2;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
     }
 
 }

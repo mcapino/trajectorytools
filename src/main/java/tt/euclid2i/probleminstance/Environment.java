@@ -14,14 +14,12 @@ public class Environment {
     protected Rectangle bounds;
     protected Collection<Region> obstacles = new LinkedList<Region>();
 
-
     public Environment(int n, int maxSize, int seed) {
         Random random = new Random(seed);
         bounds = new Rectangle(new Point(0,0), new Point(1000,1000));
         this.seed = seed;
         createObstacles(n, maxSize, random);
     }
-
 
     private void createObstacles(int n, int maxSize, Random random) {
         for (int i=0; i<n; i++) {
