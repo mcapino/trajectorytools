@@ -9,6 +9,8 @@ import javax.vecmath.Point2d;
 
 import org.jgrapht.GraphPath;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.maneuvers.SpatioTemporalManeuver;
@@ -35,7 +37,6 @@ import cz.agents.alite.trajectorytools.vis.SimulatedCylindricAgentLayer.TimeProv
 import cz.agents.alite.trajectorytools.vis.SimulationControlLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;

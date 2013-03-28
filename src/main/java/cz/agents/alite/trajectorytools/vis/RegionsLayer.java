@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.trajectorytools.graph.spatial.region.BoxRegion;
 import cz.agents.alite.trajectorytools.graph.spatial.region.SpaceRegion;
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.Box4dRegion;
@@ -16,7 +18,6 @@ import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticBoxRegi
 import cz.agents.alite.trajectorytools.graph.spatiotemporal.region.StaticSphereRegion;
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.TimePoint;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Circle;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.aggregation.CircleElements;

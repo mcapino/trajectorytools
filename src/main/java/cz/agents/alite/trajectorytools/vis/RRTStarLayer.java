@@ -9,11 +9,12 @@ import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector4d;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.trajectorytools.planner.rrtstar.RRTStarPlanner;
 import cz.agents.alite.trajectorytools.planner.rrtstar.Vertex;
 import cz.agents.alite.trajectorytools.util.OrientedTimePoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Circle;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.Point;

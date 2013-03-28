@@ -11,9 +11,10 @@ import javax.vecmath.Vector3d;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.trajectorytools.planner.PlannedPath;
 import cz.agents.alite.trajectorytools.util.SpatialPoint;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Line;
 import cz.agents.alite.vis.element.Point;
 import cz.agents.alite.vis.element.StyledLine;

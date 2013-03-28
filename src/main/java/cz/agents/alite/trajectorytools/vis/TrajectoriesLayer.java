@@ -8,11 +8,13 @@ import javax.vecmath.Point3d;
 
 import org.apache.log4j.Logger;
 
+import tt.euclid2i.vis.AgentColors;
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.trajectorytools.trajectory.Trajectory;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
 import cz.agents.alite.vis.element.aggregation.StyledLineElements;

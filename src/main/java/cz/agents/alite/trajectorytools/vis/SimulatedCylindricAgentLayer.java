@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.trajectorytools.simulation.SimulatedAgentStorage;
 import cz.agents.alite.trajectorytools.util.OrientedPoint;
 import cz.agents.alite.trajectorytools.util.TimePoint;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.element.Circle;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;

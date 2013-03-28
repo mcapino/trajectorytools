@@ -11,6 +11,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.GraphPaths;
 
+import tt.vis.ProjectionTo2d;
+
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGraphs;
 import cz.agents.alite.trajectorytools.graph.spatial.SpatialGridFactory;
@@ -36,7 +38,6 @@ import cz.agents.alite.trajectorytools.vis.RegionsLayer.RegionsProvider;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer;
 import cz.agents.alite.trajectorytools.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.trajectorytools.vis.projection.DefaultProjection;
-import cz.agents.alite.trajectorytools.vis.projection.ProjectionTo2d;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;

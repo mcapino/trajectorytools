@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.vis.projection;
+package tt.vis;
 
 import javax.vecmath.Point2d;
 

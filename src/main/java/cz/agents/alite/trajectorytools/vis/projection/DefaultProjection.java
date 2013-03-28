@@ -3,6 +3,8 @@ package cz.agents.alite.trajectorytools.vis.projection;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import tt.vis.ProjectionTo2d;
+
 public class DefaultProjection<P extends Point3d> implements ProjectionTo2d<P> {
 
     @Override

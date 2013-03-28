@@ -1,4 +1,4 @@
-package cz.agents.alite.trajectorytools.vis;
+package tt.euclid2i.vis;
 
 import java.awt.Color;
 import java.util.Random;
