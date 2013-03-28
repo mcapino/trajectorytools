@@ -15,7 +15,7 @@ import tt.euclid2i.Point;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
-import cz.agents.alite.trajectorytools.util.NotImplementedException;
+import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 

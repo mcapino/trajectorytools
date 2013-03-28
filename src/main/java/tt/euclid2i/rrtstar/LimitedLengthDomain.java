@@ -9,7 +9,7 @@ import tt.euclid2i.Point;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
-import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
+import tt.planner.rrtstar.Extension;
 
 public class LimitedLengthDomain extends
         StraightLineDomain {

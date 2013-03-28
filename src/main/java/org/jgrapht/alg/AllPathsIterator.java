@@ -11,13 +11,14 @@ import java.util.Queue;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
-import org.jgrapht.alg.specifics.*;
+import org.jgrapht.alg.specifics.DirectedSpecifics;
+import org.jgrapht.alg.specifics.Specifics;
+import org.jgrapht.alg.specifics.UndirectedSpecifics;
+import org.jgrapht.graph.GraphPathImpl;
 
-import cz.agents.alite.trajectorytools.planner.PlannedPath;
-import cz.agents.alite.trajectorytools.planner.PlannedPathImpl;
-
-public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
+public class AllPathsIterator<V, E> implements Iterator<GraphPath<V, E>>{
 
     /*
      * Key is a visited edge (part of the path)
@@ -30,7 +31,7 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
     private final Graph<V, E> graph;
     private final V startVertex;
     private final V endVertex;
-    
+
     private Deque<E> currentPath;
     private Deque<V> currentPathV;
 
@@ -40,36 +41,36 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
         this.graph = graph;
         this.startVertex = startVertex;
         this.endVertex = endVertex;
-        
+
         specifics = createGraphSpecifics(graph);
-        
+
         currentPath = new LinkedList<E>();
         currentPathV = new LinkedList<V>();
         findFirstPath(startVertex);
         isCurrentPathUsed = false;
     }
-    
+
     private boolean findFirstPath(V vertex) {
         if (seen.containsKey(vertex)) {
             return false;
         }
 
         currentPathV.add(vertex);
-        
+
         if (vertex.equals(endVertex)) {
             return true;
         }
-        
+
         Queue<E> edges = new LinkedList<E>( specifics.edgesOf(vertex) );
         seen.put(vertex, edges);
-        
+
         while (!edges.isEmpty()) {
             E edge = edges.poll();
-            
+
             currentPath.add(edge);
-            
+
             V oppositeV = Graphs.getOppositeVertex(graph, edge, vertex);
-            
+
             if ( findFirstPath(oppositeV) ) {
                 return true;
             } else {
@@ -90,16 +91,16 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
             seen.remove(vertex);
 
             V lastVertex = currentPathV.getLast();
-            
+
             Queue<E> edges = seen.get(lastVertex);
 
             while (!edges.isEmpty()) {
                 E edge = edges.poll();
-                
+
                 currentPath.add(edge);
-                
+
                 V oppositeV = Graphs.getOppositeVertex(graph, edge, lastVertex);
-                
+
                 if ( findFirstPath(oppositeV) ) {
                     return;
                 } else {
@@ -120,17 +121,17 @@ public class AllPathsIterator<V, E> implements Iterator<PlannedPath<V, E>>{
     }
 
     @Override
-    public PlannedPath<V, E> next() {
+    public GraphPath<V, E> next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
         isCurrentPathUsed = true;
-        return new PlannedPathImpl<V, E>(graph, startVertex, endVertex, new ArrayList<E>(currentPath), 0.0);
+        return new GraphPathImpl<V, E>(graph, startVertex, endVertex, new ArrayList<E>(currentPath), 0.0);
     }
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException(); 
+        throw new UnsupportedOperationException();
     }
 
     static <V, E> Specifics<V, E> createGraphSpecifics(Graph<V, E> g)

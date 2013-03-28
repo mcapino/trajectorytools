@@ -8,9 +8,9 @@ import tt.euclid2i.Point;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
-import cz.agents.alite.trajectorytools.planner.rrtstar.Domain;
-import cz.agents.alite.trajectorytools.planner.rrtstar.Extension;
-import cz.agents.alite.trajectorytools.planner.rrtstar.ExtensionEstimate;
+import tt.planner.rrtstar.Domain;
+import tt.planner.rrtstar.Extension;
+import tt.planner.rrtstar.ExtensionEstimate;
 
 public class StraightLineDomain implements Domain<Point, Line> {
 

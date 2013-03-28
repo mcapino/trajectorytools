@@ -14,7 +14,7 @@ import tt.euclid2d.Line;
 import tt.euclid2d.Point;
 import tt.euclid2d.region.Rectangle;
 import tt.euclid2d.region.Region;
-import cz.agents.alite.trajectorytools.util.NotImplementedException;
+import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 
@@ -110,7 +110,7 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public double getEdgeWeight(Line edge) {
-        return edge.getDuration();
+        return edge.getDistance();
     }
 
 

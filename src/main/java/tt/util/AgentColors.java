@@ -1,4 +1,4 @@
-package tt.euclid2i.vis;
+package tt.util;
 
 import java.awt.Color;
 import java.util.Random;
