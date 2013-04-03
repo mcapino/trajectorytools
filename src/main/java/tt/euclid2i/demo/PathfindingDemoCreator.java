@@ -88,6 +88,7 @@ public class PathfindingDemoCreator implements Creator {
             public double getDefaultZoomFactor() {
                 return 5;
             } } );
+
         VisManager.init();
 
         // background
