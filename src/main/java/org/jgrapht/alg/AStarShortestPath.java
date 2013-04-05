@@ -1,233 +1,113 @@
 package org.jgrapht.alg;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.specifics.Specifics;
-import org.jgrapht.alg.specifics.SpecificsFactory;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.GraphPathImpl;
-
-
+import org.jgrapht.traverse.ClosestFirstIterator;
+import org.jgrapht.traverse.HeuristicIterator;
+import org.jgrapht.util.Goal;
+import org.jgrapht.util.Heuristic;
 
 /**
- * An implementation of <a href="http://en.wikipedia.org/wiki/A*_search_algorithm">A* search algorithm</a>.
- *
- * @author Michal Cap
- * @since Apr 16, 2012
+ * An implementation of <a
+ * href="http://en.wikipedia.org/wiki/A*_search_algorithm">A* search
+ * algorithm</a>.
  */
-public final class AStarShortestPath<V, E>
-{
-    public static interface Heuristic<V> {
-        double getHeuristicEstimate(V current, V goal);
-    }
-
-    //~ Instance fields --------------------------------------------------------
-
-    Set<V> closed = new HashSet<V>();
-
-    Map<V,Double> gScores = new HashMap<V,Double>();
-    Map<V,Double> hScores = new HashMap<V,Double>();
-    Map<V,Double> fScores = new HashMap<V,Double>();
-
-    Specifics<V, E> specifics;
-
-    PriorityQueue<V> open = new PriorityQueue<V>(100,new Comparator<V>() {
-
-        @Override
-        public int compare(V o1, V o2) {
-            return (int) Math.signum(fScores.get(o1) - fScores.get(o2));
-        }
-    });
-
-    Map<V,E> cameFrom = new HashMap<V,E>();
+public class AStarShortestPath<V, E> {
 
     private Graph<V, E> graph;
+    private Heuristic<V> heuristic;
+    private V startVertex;
+    private Goal<V> goal;
+    private double radius;
     private GraphPath<V, E> path;
 
-    //~ Constructors -----------------------------------------------------------
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
+            Heuristic<V> heuristic, V startVertex, final V endVertex) {
 
-    /**
-     * Creates and executes a new AStarShortestPath algorithm instance. An
-     * instance is only good for a single search; after construction, it can be
-     * accessed to retrieve information about the path found.
-     *
-     * @param graph the graph to be searched
-     * @param startVertex the vertex at which the path should start
-     * @param endVertex the vertex at which the path should end
-     */
-    public AStarShortestPath(Graph<V, E> graph, V startVertex,
-                                   V endVertex, Heuristic<V> h) {
+        return findPathBetween(graph, heuristic, startVertex, endVertex, Double.POSITIVE_INFINITY);
+    }
+
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
+            Heuristic<V> heuristic, V startVertex, Goal<V> goal) {
+
+        return findPathBetween(graph, heuristic, startVertex, goal, Double.POSITIVE_INFINITY);
+    }
+
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
+            Heuristic<V> heuristic, V startVertex, final V endVertex, double radius) {
+
+        return findPathBetween(graph, heuristic, startVertex, new Goal<V>() {
+            @Override
+            public boolean isGoal(V current) {
+                return current.equals(endVertex);
+            }
+        }, radius);
+    }
+
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, Heuristic<V> heuristic,
+            V startVertex, Goal<V> goal, double radius) {
+
+        AStarShortestPath<V, E> alg = new AStarShortestPath<V, E>(graph,
+                heuristic, startVertex, goal, radius);
+        alg.findPath();
+
+        return alg.path;
+    }
+
+    private AStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+            Goal<V> goalChecker, double radius) {
         this.graph = graph;
+        this.heuristic = heuristic;
+        this.startVertex = startVertex;
+        this.goal = goalChecker;
+        this.radius = radius;
+    }
 
-        if (!graph.containsVertex(endVertex)) {
-            throw new IllegalArgumentException(
-                    "graph must contain the end vertex");
-        }
+    private void findPath() {
+        HeuristicIterator<V, E> iter =
+                new HeuristicIterator<V, E>(graph, heuristic, startVertex, radius);
 
-        specifics = SpecificsFactory.create(graph);
+        while (iter.hasNext()) {
+            V vertex = iter.next();
 
-        open.add(startVertex);
-
-        double hScoreStart = h.getHeuristicEstimate(startVertex, endVertex);
-        gScores.put(startVertex, 0.0);
-        hScores.put(startVertex, hScoreStart);
-        fScores.put(startVertex, hScoreStart);
-
-        while (!open.isEmpty()) {
-            V current = open.poll();
-
-            if (current.equals(endVertex)) {
-                List<E> edgeList = reconstructEdgeList(startVertex, endVertex);
-
-                double length = 0.0;
-                for (E edge : edgeList) {
-                    length += graph.getEdgeWeight(edge);
-                }
-
-                path = new GraphPathImpl<V, E>(
-                    graph,
-                    startVertex,
-                    endVertex,
-                    edgeList,
-                    length);
-
+            if (goal.isGoal(vertex)) {
+                path = reconstructGraphPath(graph, iter, startVertex, vertex);
                 return;
             }
+        }
 
-            closed.add(current);
+        path = null;
+    }
 
-            Set<? extends E> neighborEdges = specifics.edgesOf(current);
+    private static <V, E> GraphPath<V, E> reconstructGraphPath(Graph<V, E> graph,
+            ClosestFirstIterator<V, E> iter, V startVertex, V endVertex) {
 
-            for (E edge : neighborEdges) {
-                V next;
-                if (graph.getEdgeSource(edge).equals(current)) {
-                    next = graph.getEdgeTarget(edge);
-                } else if (graph.getEdgeTarget(edge).equals(current)) {
-                    next = graph.getEdgeSource(edge);
-                } else {
-                    throw new Error("Should not happen!!!");
-                }
+        List<E> edgeList = new ArrayList<E>();
+        V v = endVertex;
 
-                if (closed.contains(next)) {
-                    continue;
-                }
+        double pathLength = 0;
 
-                double tentativeGScore = gScores.get(current)
-                        + graph.getEdgeWeight(edge);
+        while (true) {
+            E edge = iter.getSpanningTreeEdge(v);
 
-                if (!open.contains(next)) {
-                    hScores.put(next, h.getHeuristicEstimate(next, endVertex));
-
-                    cameFrom.put(next, edge);
-                    gScores.put(next, tentativeGScore);
-                    fScores.put(next, tentativeGScore + hScores.get(next));
-
-                    open.add(next);
-
-                } else if (tentativeGScore < gScores.get(next)) {
-                    cameFrom.put(next, edge);
-                    gScores.put(next, tentativeGScore);
-                    fScores.put(next, tentativeGScore + hScores.get(next));
-                    // Required to sort the open list again
-                    open.remove(next);
-                    open.add(next);
-                }
+            if (edge == null) {
+                break;
             }
-        }
-    }
 
-    private List<E> reconstructEdgeList(V startVertex, V endVertex) {
-        LinkedList<E> edgeList = new LinkedList<E>();
-        V current = endVertex;
-
-        while (!current.equals(startVertex)) {
-            E edge = cameFrom.get(current);
-            edgeList.addFirst(edge);
-            if (current.equals(graph.getEdgeTarget(edge))) {
-                current = graph.getEdgeSource(edge);
-            } else if (current.equals(graph.getEdgeSource(edge))) {
-                current = graph.getEdgeTarget(edge);
-            } else {
-                throw new Error("!!!");
-            }
+            edgeList.add(edge);
+            pathLength += graph.getEdgeWeight(edge);
+            v = Graphs.getOppositeVertex(graph, edge, v);
         }
 
-        return edgeList;
+        Collections.reverse(edgeList);
+
+        return new GraphPathImpl<V, E>(graph, startVertex,
+                endVertex, edgeList, pathLength);
     }
-
-    //~ Methods ----------------------------------------------------------------
-
-    /**
-     * Return the edges making up the path found.
-     *
-     * @return List of Edges, or null if no path exists
-     */
-    public List<E> getPathEdgeList()
-    {
-        if (path == null) {
-            return null;
-        } else {
-            return path.getEdgeList();
-        }
-    }
-
-    /**
-     * Return the path found.
-     *
-     * @return path representation, or null if no path exists
-     */
-    public GraphPath<V, E> getPath()
-    {
-        return path;
-    }
-
-    /**
-     * Return the length of the path found.
-     *
-     * @return path length, or Double.POSITIVE_INFINITY if no path exists
-     */
-    public double getPathLength()
-    {
-        if (path == null) {
-            return Double.POSITIVE_INFINITY;
-        } else {
-            return getPath().getWeight();
-        }
-    }
-
-    /**
-     * Convenience method to find the shortest path via a single static method
-     * call. If you need a more advanced search (e.g. limited by radius, or
-     * computation of the path length), use the constructor instead.
-     *
-     * @param graph the graph to be searched
-     * @param startVertex the vertex at which the path should start
-     * @param endVertex the vertex at which the path should end
-     *
-     * @return List of Edges, or null if no path exists
-     */
-    public static <V, E> List<E> findPathBetween(
-            Graph<V, E> graph,
-            V startVertex,
-            V endVertex,
-            Heuristic<V> heuristic)
-    {
-        AStarShortestPath<V, E> alg =
-            new AStarShortestPath<V, E>(
-                graph,
-                startVertex,
-                endVertex,
-                heuristic);
-
-        return alg.getPathEdgeList();
-    }
-
 }
