@@ -8,7 +8,7 @@ import javax.vecmath.Point2d;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.AStarShortestPath;
+import org.jgrapht.alg.AStarShortestPathSimple;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
@@ -42,7 +42,8 @@ public class PathfindingDemoCreator implements Creator {
         final DirectedGraph<Point, Line> graph = new LazyGrid(new Point(0,0), new LinkedList<Region>(), new Rectangle(new Point(-50,-50), new Point(50,50)), 10);
 
         // plan the shortest path
-        final AStarShortestPath<Point, Line> astar = new AStarShortestPath<Point, Line>(graph, new Point(0,0), new Point(30,40), new AStarShortestPath.Heuristic<Point>() {
+        //FIXME use the new A*
+        final AStarShortestPathSimple<Point, Line> astar = new AStarShortestPathSimple<Point, Line>(graph, new Point(0,0), new Point(30,40), new AStarShortestPathSimple.Heuristic<Point>() {
             @Override
             public double getHeuristicEstimate(Point current, Point goal) {
                 return current.distance(goal);

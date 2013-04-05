@@ -49,7 +49,7 @@ import org.jgrapht.graph.*;
 import org.jgrapht.util.Heuristic;
 import org.junit.Test;
 
-public class FibanacciVsPrioritiQeueConTest {
+public class AStarFibanacciVsPrioritiQeueTest {
 
     // Auxiliary class for creating random graphs that could be interpreted as "webs" in 2D plane
     class Point {
@@ -125,7 +125,7 @@ public class FibanacciVsPrioritiQeueConTest {
         long aStarNewOverallTime = 0;
 
         for (int seed = 0; seed < trials; seed++) {
-            System.out.printf("Trial %d/%d \n", seed, trials);
+            //System.out.printf("Trial %d/%d \n", seed, trials);
             Random random = new Random(seed);
             Graph<Point, DefaultWeightedEdge> graph = createRandomGraph(directed, nvertices, nedges, random);
 
@@ -135,7 +135,7 @@ public class FibanacciVsPrioritiQeueConTest {
             Point endVertex = vertices[random.nextInt(vertices.length)];
 
             startTimer();
-            GraphPath<Point, DefaultWeightedEdge> aStarOldPath = new AStarShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex, new org.jgrapht.alg.AStarShortestPath.Heuristic<Point>() {
+            GraphPath<Point, DefaultWeightedEdge> aStarOldPath = new AStarShortestPathSimple<Point, DefaultWeightedEdge>(graph, startVertex, endVertex, new org.jgrapht.alg.AStarShortestPathSimple.Heuristic<Point>() {
                 @Override
                 public double getHeuristicEstimate(Point current, Point goal) {
                     return Math.sqrt(Math.pow(current.x - goal.x, 2) + Math.pow(current.y - goal.y, 2));
@@ -144,7 +144,7 @@ public class FibanacciVsPrioritiQeueConTest {
             aStarOldOverallTime += stopTimer();
 
             startTimer();
-            GraphPath<Point, DefaultWeightedEdge> aStarNewPath = AStarShortestPathFibanacci.findPathBetween(graph, new EuclideanDistanceHeuristic(endVertex), startVertex, endVertex);
+            GraphPath<Point, DefaultWeightedEdge> aStarNewPath = AStarShortestPath.findPathBetween(graph, new EuclideanDistanceHeuristic(endVertex), startVertex, endVertex);
             aStarNewOverallTime += stopTimer();
 
             assertFalse(aStarNewPath == null && aStarOldPath != null);
@@ -158,9 +158,9 @@ public class FibanacciVsPrioritiQeueConTest {
 
     @Test
     public void test() {
-        final int TRIALS = 25;
-        final int VERTICES = 10000;
-        final int EDGES = 50000;
+        final int TRIALS = 100;
+        final int VERTICES = 100;
+        final int EDGES = 200;
 
         // Check directed
         assertAStarAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
