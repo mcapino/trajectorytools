@@ -43,62 +43,56 @@ package org.jgrapht.alg;
 import java.util.*;
 
 import org.jgrapht.*;
-import org.jgrapht.alg.AStarShortestPath.Heuristic;
+import org.jgrapht.alg.AStarShortestPathSimple.Heuristic;
 import org.jgrapht.graph.*;
 
 /**
- * 
+ *
  *
  * @author John V. Sichi
  */
 public class AStarShortestPathTest
-    extends ShortestPathTestCase
-{
+        extends ShortestPathTestCase {
     //~ Methods ----------------------------------------------------------------
-		
-    public void testConstructor()
-    {
-        AStarShortestPath<String, DefaultWeightedEdge> path;
+
+    public void testConstructor() {
+        AStarShortestPathSimple<String, DefaultWeightedEdge> path;
         Graph<String, DefaultWeightedEdge> g = create();
 
         path =
-            new AStarShortestPath<String, DefaultWeightedEdge>(
+                new AStarShortestPathSimple<String, DefaultWeightedEdge>(
                 g,
                 V3,
                 V4,
                 new Heuristic<String>() {
+            @Override
+            public double getHeuristicEstimate(String current,
+                    String goal) {
+                return 0;
+            }
+        });
 
-					@Override
-					public double getHeuristicEstimate(String current,
-							String goal) {
-						return 0;
-					}
-					
-                });
-        
         assertEquals(
-            Arrays.asList(
-                new DefaultEdge[] {
-                    e13,
-                    e12,
-                    e24
-                }),
-            path.getPathEdgeList());
+                Arrays.asList(
+                new DefaultEdge[]{
+            e13,
+            e12,
+            e24
+        }),
+                path.getPathEdgeList());
         assertEquals(10.0, path.getPathLength(), 0);
     }
 
     protected List findPathBetween(
-        Graph<String, DefaultWeightedEdge> g,
-        String src,
-        String dest)
-    {
-        return AStarShortestPath.findPathBetween(g, src, dest, new Heuristic<String>() {
-
-			@Override
-			public double getHeuristicEstimate(String current, String goal) {
-				return 0;
-			}
-		});
+            Graph<String, DefaultWeightedEdge> g,
+            String src,
+            String dest) {
+        return AStarShortestPathSimple.findPathBetween(g, src, dest, new Heuristic<String>() {
+            @Override
+            public double getHeuristicEstimate(String current, String goal) {
+                return 0;
+            }
+        });
     }
 }
 

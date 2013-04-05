@@ -48,17 +48,16 @@ import java.util.Random;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.WeightedGraph;
-import org.jgrapht.alg.AStarShortestPath.Heuristic;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.WeightedPseudograph;
 import org.junit.Test;
 
-public class AStarAgainstDijkstraGeneralGraphTest
-{
+public class AStarAgainstDijkstraGeneralGraphTest {
 
     // Auxiliary class for creating random graphs
     class Node {
+
         int id;
 
         public Node(int id) {
@@ -73,8 +72,6 @@ public class AStarAgainstDijkstraGeneralGraphTest
     }
 
     //~ Methods ----------------------------------------------------------------
-
-
     Graph<Node, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
         WeightedGraph<Node, DefaultWeightedEdge> graph;
         if (directed) {
@@ -82,13 +79,13 @@ public class AStarAgainstDijkstraGeneralGraphTest
         } else {
             graph = new WeightedPseudograph<Node, DefaultWeightedEdge>(DefaultWeightedEdge.class);
         }
-        for (int i=0; i<nVertices; i++) {
+        for (int i = 0; i < nVertices; i++) {
             graph.addVertex(new Node(i));
         }
 
         Node[] vertices = graph.vertexSet().toArray(new Node[nVertices]);
 
-        for (int i=0; i<nEdges; i++) {
+        for (int i = 0; i < nEdges; i++) {
             Node startVertex = vertices[random.nextInt(vertices.length)];
             Node endVertex = vertices[random.nextInt(vertices.length)];
             DefaultWeightedEdge edge = graph.addEdge(startVertex, endVertex);
@@ -99,8 +96,10 @@ public class AStarAgainstDijkstraGeneralGraphTest
     }
 
     void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
-           // Test directed graphs
+        // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
+            //System.out.printf("Trial %d/%d \n", seed, trials);
+
             Random random = new Random(seed);
             Graph<Node, DefaultWeightedEdge> graph = createRandomGraph(directed, nvertices, nedges, random);
 
@@ -109,35 +108,32 @@ public class AStarAgainstDijkstraGeneralGraphTest
             Node startVertex = vertices[random.nextInt(vertices.length)];
             Node endVertex = vertices[random.nextInt(vertices.length)];
 
-            GraphPath<Node, DefaultWeightedEdge> aStarPath = new AStarShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex, new Heuristic<Node>() {
+            GraphPath<Node, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
+            GraphPath<Node, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new org.jgrapht.util.Heuristic<Node>() {
                 @Override
-                public double getHeuristicEstimate(Node current, Node goal) {
+                public double getCostToGoalEstimate(Node current) {
                     return 0;
                 }
-            }).getPath();
+            }, startVertex, endVertex);
 
-            GraphPath<Node, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-
-            assertFalse(aStarPath == null && dijkstraPath != null);
-            assertFalse(aStarPath != null && dijkstraPath == null);
-
-            assertTrue(aStarPath == dijkstraPath || Math.abs(aStarPath.getWeight() - dijkstraPath.getWeight()) < 0.01);
+            assertFalse(aStarFibanaci == null && dijkstraPath != null);
+            assertFalse(aStarFibanaci != null && dijkstraPath == null);
+            assertTrue(aStarFibanaci == dijkstraPath || Math.abs(aStarFibanaci.getWeight() - dijkstraPath.getWeight()) < 0.01);
         }
     }
 
     @Test
-    public void test()
-    {
-        final int TRIALS = 5000;
-        final int VERTICES = 500;
-        final int EDGES = 250;
+    public void test() {
+        final int TRIALS = 100;
+        final int VERTICES = 100;
+        final int EDGES = 200;
 
         // Check directed
         assertAStarAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
 
         // Check undirected
         assertAStarAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
-     }
+    }
 }
 
 // End DijkstraShortestPathTest.java
