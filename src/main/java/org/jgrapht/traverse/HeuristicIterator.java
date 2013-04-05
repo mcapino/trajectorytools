@@ -1,15 +1,12 @@
 package org.jgrapht.traverse;
 
 import java.util.HashMap;
+
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.util.FibonacciHeapNode;
 import org.jgrapht.util.Heuristic;
 
-/**
- *
- * @author Vojtech Letal <letalvoj@fel.cvut.cz>
- */
 public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
 
     private final Heuristic<V> heuristic;
@@ -31,18 +28,17 @@ public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
         double heuristicEstimate;
 
         if (edge == null) {
-            shortestPathLength = 0; //TODO why?
-            heuristicEstimate = 0;
+            shortestPathLength = 0; //vertex is a starting vertex
         } else {
             shortestPathLength = calculatePathLength(vertex, edge);
-            heuristicEstimate = heuristic.getCostToGoalEstimate(vertex);
         }
+        heuristicEstimate = heuristic.getCostToGoalEstimate(vertex);
 
         double key = shortestPathLength + heuristicEstimate;
 
         FibonacciHeapNode<QueueEntry<V, E>> node = createSeenData(vertex, edge);
         putSeenData(vertex, node);
-        savePathLenght(vertex, shortestPathLength);
+        savePathLength(vertex, shortestPathLength);
         heap.insert(node, key);
     }
 
@@ -60,8 +56,9 @@ public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
 
         if (candidateKey < node.getKey()) {
             node.getData().spanningTreeEdge = edge;
+            node.getData().vertex = vertex;
             heap.decreaseKey(node, candidateKey);
-            savePathLenght(vertex, candidatePathLength);
+            savePathLength(vertex, candidatePathLength);
         }
     }
 
@@ -69,13 +66,11 @@ public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
         assertNonNegativeEdge(edge);
 
         V otherVertex = Graphs.getOppositeVertex(getGraph(), edge, vertex);
-
-
         return shortestPathLengths.get(otherVertex)
                 + getGraph().getEdgeWeight(edge);
     }
 
-    private void savePathLenght(V vertex, double length) {
+    private void savePathLength(V vertex, double length) {
         shortestPathLengths.put(vertex, length);
     }
 }
