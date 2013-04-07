@@ -44,8 +44,11 @@ public class GraphLayer extends AbstractLayer {
                     Point2d source = projection.project( graph.getEdgeSource(edge) );
                     Point2d target = projection.project( graph.getEdgeTarget(edge) );
 
-                    lines.add(new LineImpl(new Point3d(source.x, source.y, 0), new Point3d(target.x, target.y, 0)));
-                }
+					if (source != null && target != null) {
+						lines.add(new LineImpl(new Point3d(source.x, source.y,
+								0), new Point3d(target.x, target.y, 0)));
+					}
+                 }
                 return lines;
             }
 
@@ -64,8 +67,6 @@ public class GraphLayer extends AbstractLayer {
         // vertices
         group.addSubLayer(PointLayer.create(new PointElements() {
 
-
-
             @Override
             public Iterable<Point> getPoints() {
                 Graph<V, E> graph = graphProvider.getGraph();
@@ -73,7 +74,9 @@ public class GraphLayer extends AbstractLayer {
                 LinkedList<Point> points = new LinkedList<Point>();
                 for (V vertex : graph.vertexSet()) {
                     Point2d p = projection.project(vertex);
-                    points.add(new PointImpl(new Point3d(p.x, p.y, 0.0)));
+                    if (p != null) {
+                    	points.add(new PointImpl(new Point3d(p.x, p.y, 0.0)));
+                    }
                 }
                 return points;
             }

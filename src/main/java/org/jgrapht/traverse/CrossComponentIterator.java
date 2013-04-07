@@ -151,13 +151,13 @@ public abstract class CrossComponentIterator<V, E, D>
         graph = g;
 
         specifics = createGraphSpecifics(g);
-        vertexIterator = g.vertexSet().iterator();
         setCrossComponentTraversal(startVertex == null);
 
         reusableEdgeEvent = new FlyweightEdgeEvent<V, E>(this, null);
         reusableVertexEvent = new FlyweightVertexEvent<V>(this, null);
 
         if (startVertex == null) {
+        	vertexIterator = g.vertexSet().iterator();
             // pick a start vertex if graph not empty
             if (vertexIterator.hasNext()) {
                 this.startVertex = vertexIterator.next();

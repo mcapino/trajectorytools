@@ -26,9 +26,6 @@ public class GraphPathLayer extends AbstractLayer {
         GraphPath<V, E> getPath();
     }
 
-    private static final double PATH_OFFSET = 1/40.0;
-    static private Color[] pathColors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.ORANGE, Color.PINK, Color.YELLOW};
-
     GraphPathLayer() {
     }
 
@@ -49,8 +46,10 @@ public class GraphPathLayer extends AbstractLayer {
                         Point2d start = projection.project(graph.getEdgeSource(edge));
                         Point2d end = projection.project(graph.getEdgeTarget(edge));
 
-                        lines.add(new LineImpl( new Point3d(start.x, start.y, 0), new Point3d(end.x, end.y, 0)));
-                    }
+                        if (start != null && end != null) {
+                        	lines.add(new LineImpl( new Point3d(start.x, start.y, 0), new Point3d(end.x, end.y, 0)));
+                        }
+                     }
                 }
                 return lines;
             }
@@ -91,10 +90,14 @@ public class GraphPathLayer extends AbstractLayer {
                     Graph<V, E> graph = path.getGraph();
                     for (E edge : path.getEdgeList()) {
                         Point2d source = projection.project(graph.getEdgeSource(edge));
-                        points.add(new VisPoint(source.x, source.y, 0.0));
+                        if (source != null) {
+                        	points.add(new VisPoint(source.x, source.y, 0.0));
+                        }
                     }
                     Point2d end = projection.project(path.getEndVertex());
-                    points.add(new VisPoint(end.x, end.y, 0));
+                    if (end != null) {
+                    	points.add(new VisPoint(end.x, end.y, 0));
+                    }
                 }
                 return points;
             }

@@ -62,17 +62,17 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
         if (maneuvers != null)  {
             for (E maneuver: maneuvers) {
                 Point nextWaypoint = graph.getEdgeTarget(maneuver);
-                double duration  = maneuver.getDistance()/speed;
-                double nextWaypointTime = currentWaypointTime + duration;
+                double maneuverDuration  = maneuver.getDistance()/speed;
+                double nextWaypointTime = currentWaypointTime + maneuverDuration;
 
                 if ( currentWaypointTime <= t && t <= nextWaypointTime) {
                     // linear approximation
 
-                    double alpha = (t - currentWaypointTime) / duration;
+                    double alpha = (t - currentWaypointTime) / maneuverDuration;
                     assert(alpha >= -0.00001 && alpha <= 1.00001);
 
                     tt.euclid2d.Point pos = tt.euclid2d.Point.interpolate(new tt.euclid2d.Point(currentWaypoint.x, currentWaypoint.y), new tt.euclid2d.Point(nextWaypoint.x, nextWaypoint.y), alpha);
-                    return new Point((int) pos.x, (int) pos.y);
+                    return new Point((int) Math.round(pos.x), (int) Math.round(pos.y));
                 }
                 currentWaypoint = nextWaypoint;
                 currentWaypointTime = nextWaypointTime;

@@ -226,15 +226,13 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
                 fullGraph.addVertex(target);
                 fullGraph.addEdge(current, target);
 
-                if (!closed.contains(target)) { // it must mean that this closed.contains(target) is always true
+                if (!closed.contains(target)) {
                     closed.add(target);
                     open.offer(target);
                 }
             }
         }
 
-        System.out.println("iterations:" + iterations);
-        System.out.println("closed:" + closed.size());
         return fullGraph;
     }
 }
