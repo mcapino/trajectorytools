@@ -3,19 +3,15 @@ package tt.euclidtime3i.vis;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import javax.vecmath.Point2d;
-import javax.vecmath.Point3d;
 
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.region.Region;
 import tt.vis.ProjectionTo2d;
-
 import cz.agents.alite.vis.Vis;
-import cz.agents.alite.vis.element.implemetation.StyledPointImpl;
 import cz.agents.alite.vis.layer.AbstractLayer;
 import cz.agents.alite.vis.layer.VisLayer;
 
@@ -25,12 +21,12 @@ public class RegionsLayer extends AbstractLayer {
         public Collection<Region> getRegions();
     }
 
-	private static final double samplingInterval = 1.0;
+    private static final double samplingInterval = 1.0;
 
     private RegionsProvider regionsProvider;
     private Color edgeColor;
     private Color fillColor;
-	private ProjectionTo2d<Point> projection;
+    private ProjectionTo2d<Point> projection;
 
     RegionsLayer() {
     }
@@ -60,25 +56,25 @@ public class RegionsLayer extends AbstractLayer {
                         Point2d projectedPoint = projection.project(new Point(pos.x, pos.y, (int) Math.round(time)));
                         if (projectedPoint != null) {
 
-							if (fillColor != null) {
-								canvas.setColor(fillColor);
-								canvas.fillOval(
-										Vis.transX(projectedPoint.x
-												- movingCirc.getRadius()),
-										Vis.transY(projectedPoint.y
-												- movingCirc.getRadius()),
-										Vis.transH(movingCirc.getRadius()*2),
-										Vis.transW(movingCirc.getRadius()*2));
-							}
+                            if (fillColor != null) {
+                                canvas.setColor(fillColor);
+                                canvas.fillOval(
+                                        Vis.transX(projectedPoint.x
+                                                - movingCirc.getRadius()),
+                                        Vis.transY(projectedPoint.y
+                                                - movingCirc.getRadius()),
+                                        Vis.transH(movingCirc.getRadius()*2),
+                                        Vis.transW(movingCirc.getRadius()*2));
+                            }
 
-							canvas.setColor(edgeColor);
-							canvas.fillOval(
-									Vis.transX(projectedPoint.x
-											- movingCirc.getRadius()),
-									Vis.transY(projectedPoint.y
-											- movingCirc.getRadius()),
-									Vis.transH(movingCirc.getRadius()*2),
-									Vis.transW(movingCirc.getRadius()*2));
+                            canvas.setColor(edgeColor);
+                            canvas.fillOval(
+                                    Vis.transX(projectedPoint.x
+                                            - movingCirc.getRadius()),
+                                    Vis.transY(projectedPoint.y
+                                            - movingCirc.getRadius()),
+                                    Vis.transH(movingCirc.getRadius()*2),
+                                    Vis.transW(movingCirc.getRadius()*2));
                        }
                     } else {
                         throw new RuntimeException("Position for time " + time + "s is null in trajectory " + traj);
