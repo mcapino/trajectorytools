@@ -1,7 +1,6 @@
 package tt.euclidtime3i.demo;
 
 import java.awt.Color;
-import java.lang.invoke.ConstantCallSite;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -10,9 +9,7 @@ import javax.vecmath.Point2d;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.SingleEdgeGraphPath;
 import org.jgrapht.alg.AStarShortestPath;
-import org.jgrapht.alg.AStarShortestPathSimple;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.Heuristic;
 
@@ -26,7 +23,6 @@ import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.region.Region;
 import tt.euclidtime3i.vis.RegionsLayer;
 import tt.euclidtime3i.vis.RegionsLayer.RegionsProvider;
-import tt.euclidtime3i.vis.SpatialProjectionTo2d;
 import tt.euclidtime3i.vis.TimeParameter;
 import tt.euclidtime3i.vis.TimeParameterProjectionTo2d;
 import tt.vis.GraphLayer;
@@ -60,11 +56,11 @@ public class PathfindingDemoCreator implements Creator {
 
         // create discretization
         final DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph
-        	= new LazyGrid(new tt.euclid2i.Point(0,0),
-        			new LinkedList<tt.euclid2i.region.Region>(),
-        			new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-50,-50),
-        			new tt.euclid2i.Point(50,50)),
-        			10);
+            = new LazyGrid(new tt.euclid2i.Point(0,0),
+                    new LinkedList<tt.euclid2i.region.Region>(),
+                    new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-50,-50),
+                    new tt.euclid2i.Point(50,50)),
+                    10);
 
         // create dynamic obstacles
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
@@ -72,29 +68,29 @@ public class PathfindingDemoCreator implements Creator {
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
-			@Override
-			public Collection<Region> getRegions() {
-				return dynamicObstacles;
-			}
-		}, new TimeParameterProjectionTo2d(time), Color.RED, Color.GRAY));
+            @Override
+            public Collection<Region> getRegions() {
+                return dynamicObstacles;
+            }
+        }, new TimeParameterProjectionTo2d(time), Color.RED, Color.GRAY));
 
 
         // create spatio-temporal graph
         TimeExtendedGraph spatioTemporalGraph = new TimeExtendedGraph(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
 
-		final GraphPath<Point, Straight> path = AStarShortestPath
-				.findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {
-					@Override
-					public double getCostToGoalEstimate(Point current) {
-						return (current.getPosition())
-								.distance(new tt.euclid2i.Point(0, 10));
-					}
-				}, new Point(0, -10, 0), new Goal<Point>() {
-					@Override
-					public boolean isGoal(Point current) {
-						return current.x == 0 && current.y == 10;
-					}
-				});
+        final GraphPath<Point, Straight> path = AStarShortestPath
+                .findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {
+                    @Override
+                    public double getCostToGoalEstimate(Point current) {
+                        return (current.getPosition())
+                                .distance(new tt.euclid2i.Point(0, 10));
+                    }
+                }, new Point(0, -10, 0), new Goal<Point>() {
+                    @Override
+                    public boolean isGoal(Point current) {
+                        return current.x == 0 && current.y == 10;
+                    }
+                });
 
         // graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {
@@ -116,39 +112,39 @@ public class PathfindingDemoCreator implements Creator {
         },  new TimeParameterProjectionTo2d(time),Color.RED, Color.RED, 2, 8));
     }
 
-	private Region createMovingObstacle(
-			Graph<tt.euclid2i.Point, tt.euclid2i.Line> graph,
-			final tt.euclid2i.Point start, final tt.euclid2i.Point target,
-			int radius) {
+    private Region createMovingObstacle(
+            Graph<tt.euclid2i.Point, tt.euclid2i.Line> graph,
+            final tt.euclid2i.Point start, final tt.euclid2i.Point target,
+            int radius) {
 
-		GraphPath<tt.euclid2i.Point, tt.euclid2i.Line> path = AStarShortestPath
-				.findPathBetween(graph, new Heuristic<tt.euclid2i.Point>() {
+        GraphPath<tt.euclid2i.Point, tt.euclid2i.Line> path = AStarShortestPath
+                .findPathBetween(graph, new Heuristic<tt.euclid2i.Point>() {
 
-					@Override
-					public double getCostToGoalEstimate(tt.euclid2i.Point current) {
-						return current.distance(target);
-					}
-				}, start, target);
+                    @Override
+                    public double getCostToGoalEstimate(tt.euclid2i.Point current) {
+                        return current.distance(target);
+                    }
+                }, start, target);
 
-		final Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
-				0, path, 1, path.getWeight());
+        final Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
+                0, path, 1, path.getWeight());
 
-		VisManager.registerLayer(TrajectoryLayer.create(
-				new TrajectoryProvider<tt.euclid2i.Point>() {
-					@Override
-					public tt.Trajectory<tt.euclid2i.Point> getTrajectory() {
-						return trajectory;
-					}
-				}, new tt.euclid2i.vis.ProjectionTo2d(), Color.RED,
-				1.0,
-				100,
-				't'));
+        VisManager.registerLayer(TrajectoryLayer.create(
+                new TrajectoryProvider<tt.euclid2i.Point>() {
+                    @Override
+                    public tt.Trajectory<tt.euclid2i.Point> getTrajectory() {
+                        return trajectory;
+                    }
+                }, new tt.euclid2i.vis.ProjectionTo2d(), Color.RED,
+                1.0,
+                100,
+                't'));
 
 
-		return new MovingCircle(trajectory, radius, (int) radius / 4);
-	}
+        return new MovingCircle(trajectory, radius, (int) radius / 4);
+    }
 
-	private void initVisualization() {
+    private void initVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 200, 200);
         VisManager.setSceneParam(new SceneParams(){
 
