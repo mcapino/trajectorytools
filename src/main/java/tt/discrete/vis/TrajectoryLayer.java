@@ -8,6 +8,7 @@ import javax.vecmath.Point3d;
 
 import org.apache.log4j.Logger;
 
+import tt.discrete.Trajectory;
 import tt.vis.ProjectionTo2d;
 import cz.agents.alite.vis.element.StyledLine;
 import cz.agents.alite.vis.element.StyledPoint;
@@ -26,10 +27,10 @@ public class TrajectoryLayer extends CommonLayer {
     static Logger LOGGER = Logger.getLogger(TrajectoryLayer.class);
 
     public static interface TrajectoryProvider<PP> {
-        tt.discrete.Trajectory<PP> getTrajectory();
+        Trajectory<PP> getTrajectory();
     }
 
-    public static <X> VisLayer create(final TrajectoryProvider<X> trajectoryProvider, final ProjectionTo2d<X> projection, final Color color, final double samplingInterval, final double maxTimeArg, final char toggleKey) {
+    public static <X> VisLayer create(final TrajectoryProvider<X> trajectoryProvider, final ProjectionTo2d<X> projection, final Color color, final int samplingInterval, final int maxTimeArg, final char toggleKey) {
         GroupLayer group = GroupLayer.create();
 
         group.addSubLayer(StyledPointLayer.create(new StyledPointElements() {
@@ -40,7 +41,7 @@ public class TrajectoryLayer extends CommonLayer {
                 Trajectory<X> traj = trajectoryProvider.getTrajectory();
 
                 if (traj != null) {
-                    double maxTime = Math.min(traj.getMaxTime(), maxTimeArg);
+                    int maxTime = Math.min(traj.getMaxTime(), maxTimeArg);
 
                     Point2d start = projection.project(traj.get(traj.getMinTime()));
                     Point2d target = projection.project(traj.get(maxTime));
@@ -53,7 +54,7 @@ public class TrajectoryLayer extends CommonLayer {
                         points.add(new StyledPointImpl( new Point3d(target.x, target.y, 0), color, 6));
                     }
 
-                    for (double time = traj.getMinTime(); time < maxTime; time += samplingInterval) {
+                    for (int time = traj.getMinTime(); time < maxTime; time += samplingInterval) {
                         X pos = traj.get(time);
                         if (pos != null) {
                             Point2d point = projection.project(pos);

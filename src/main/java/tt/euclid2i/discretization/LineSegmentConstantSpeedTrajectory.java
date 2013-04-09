@@ -31,13 +31,13 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
 
     Graph<V,E> graph;
 
-    private double startTime;
-    private double duration = Double.POSITIVE_INFINITY;
+    private int startTime;
+    private int duration = Integer.MAX_VALUE;
     private double cost;
-    private double speed;
+    private int speed;
 
 
-    public LineSegmentConstantSpeedTrajectory(double startTime, GraphPath<V,E> graphPath, double speed, double duration) {
+    public LineSegmentConstantSpeedTrajectory(int startTime, GraphPath<V,E> graphPath, int speed, int duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
         this.maneuvers = graphPath.getEdgeList();
@@ -50,9 +50,9 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
     }
 
     @Override
-    public Point get(double t) {
+    public Point get(int t) {
         Point currentWaypoint = startWaypoint;
-        double currentWaypointTime = startTime;
+        int currentWaypointTime = startTime;
 
         if (t < startTime && t > startTime + duration) {
             return null;
@@ -62,8 +62,8 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
         if (maneuvers != null)  {
             for (E maneuver: maneuvers) {
                 Point nextWaypoint = graph.getEdgeTarget(maneuver);
-                double maneuverDuration  = maneuver.getDistance()/speed;
-                double nextWaypointTime = currentWaypointTime + maneuverDuration;
+                int maneuverDuration  = (int) Math.round(maneuver.getDistance() / speed);
+                int nextWaypointTime = currentWaypointTime + maneuverDuration;
 
                 if ( currentWaypointTime <= t && t <= nextWaypointTime) {
                     // linear approximation
@@ -142,12 +142,12 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
     }
 
     @Override
-    public double getMinTime() {
+    public int getMinTime() {
         return startTime;
     }
 
     @Override
-    public double getMaxTime() {
+    public int getMaxTime() {
         return startTime + duration;
     }
 
