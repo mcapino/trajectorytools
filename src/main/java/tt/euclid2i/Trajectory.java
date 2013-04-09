@@ -1,3 +1,3 @@
 package tt.euclid2i;
 
-public interface Trajectory extends tt.Trajectory<tt.euclid2i.Point> {}
+public interface Trajectory extends tt.discrete.Τrajectory<tt.euclid2i.Point> {}

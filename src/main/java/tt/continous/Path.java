@@ -1,4 +1,4 @@
-package tt;
+package tt.continous;
 
 /**
  * This class represents the general concept of path in some space X.

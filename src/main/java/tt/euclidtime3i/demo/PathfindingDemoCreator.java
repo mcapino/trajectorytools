@@ -13,14 +13,18 @@ import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.Heuristic;
 
-import tt.euclid2i.Trajectory;
+import tt.discrete.vis.TrajectoryLayer;
+import tt.discrete.vis.TrajectoryLayer.TrajectoryProvider;
 import tt.euclid2i.discretization.LazyGrid;
 import tt.euclid2i.discretization.LineSegmentConstantSpeedTrajectory;
+import tt.euclid2i.trajectory.StraightSegmentTrajectory;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.discretization.TimeExtendedGraph;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.region.Region;
+import tt.euclidtime3i.trajectory.TimeExtendedTrajectory;
 import tt.euclidtime3i.vis.RegionsLayer;
 import tt.euclidtime3i.vis.RegionsLayer.RegionsProvider;
 import tt.euclidtime3i.vis.TimeParameter;
@@ -30,8 +34,6 @@ import tt.vis.GraphLayer.GraphProvider;
 import tt.vis.GraphPathLayer;
 import tt.vis.GraphPathLayer.PathProvider;
 import tt.vis.ParameterControlLayer;
-import tt.vis.TrajectoryLayer;
-import tt.vis.TrajectoryLayer.TrajectoryProvider;
 import cz.agents.alite.creator.Creator;
 import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.VisManager.SceneParams;
@@ -92,6 +94,8 @@ public class PathfindingDemoCreator implements Creator {
                     }
                 });
 
+        final Trajectory trajectory = new TimeExtendedTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
+
         // graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {
 
@@ -100,6 +104,15 @@ public class PathfindingDemoCreator implements Creator {
                 return ((LazyGrid) spatialGraph).generateFullGraph();
             }
         }, new tt.euclid2i.vis.ProjectionTo2d(), Color.GRAY, Color.GRAY, 1, 4));
+
+
+        VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider<Point>() {
+
+            @Override
+            public tt.continous.Trajectory<Point> getTrajectory() {
+                return trajectory;
+            }
+        }, new TimeParameterProjectionTo2d(time), Color.BLUE, 1.0, 100, 's'));
 
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(new PathProvider<Point, Straight>() {
@@ -126,20 +139,8 @@ public class PathfindingDemoCreator implements Creator {
                     }
                 }, start, target);
 
-        final Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
+        final tt.euclid2i.Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
                 0, path, 1, path.getWeight());
-
-        VisManager.registerLayer(TrajectoryLayer.create(
-                new TrajectoryProvider<tt.euclid2i.Point>() {
-                    @Override
-                    public tt.Trajectory<tt.euclid2i.Point> getTrajectory() {
-                        return trajectory;
-                    }
-                }, new tt.euclid2i.vis.ProjectionTo2d(), Color.RED,
-                1.0,
-                100,
-                't'));
-
 
         return new MovingCircle(trajectory, radius, (int) radius / 4);
     }

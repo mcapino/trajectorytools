@@ -1,4 +1,4 @@
-package tt;
+package tt.continous;
 
 /**
  * This class represents a generalization of the concept of trajectory as understood in kinematics.

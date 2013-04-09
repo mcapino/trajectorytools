@@ -1,4 +1,4 @@
-package tt;
+package tt.continous;
 
 /**
  * A path that is assigned a cost.
