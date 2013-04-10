@@ -21,18 +21,18 @@ public class TimeExtendedTrajectory implements EvaluatedTrajectory {
     }
 
     @Override
-    public double getMinTime() {
+    public int getMinTime() {
         return traj.getMinTime();
     }
 
     @Override
-    public double getMaxTime() {
+    public int getMaxTime() {
         return traj.getMaxTime();
     }
 
     @Override
-    public Point get(double t) {
+    public Point get(int t) {
         tt.euclid2i.Point pos = traj.get(t);
-        return new Point(pos.x, pos.y, (int) Math.round(t));
+        return new Point(pos.x, pos.y, t);
     }
 }

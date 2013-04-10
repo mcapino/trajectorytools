@@ -29,8 +29,8 @@ public class MovingCircle implements Region {
             end = p1;
         }
 
-        int tmin = Math.max((int) trajectory.getMinTime(), start.getTime());
-        int tmax = Math.min((int) trajectory.getMaxTime(), end.getTime());
+        int tmin = Math.max(trajectory.getMinTime(), start.getTime());
+        int tmax = Math.min(trajectory.getMaxTime(), end.getTime());
 
         for (int t = tmin; t <= tmax; t += samplingInterval) {
             double alpha = (t - start.getTime())
@@ -41,7 +41,7 @@ public class MovingCircle implements Region {
                     new tt.euclid2d.Point(start.x, start.y),
                     new tt.euclid2d.Point(end.x, end.y), alpha);
 
-            if (trajectory.get((double) t).distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) <= radius) {
+            if (trajectory.get(t).distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) <= radius) {
                 return true;
             }
         }
@@ -53,7 +53,7 @@ public class MovingCircle implements Region {
     @Override
     public boolean isInside(Point p) {
         if (p.getTime() >= trajectory.getMinTime() && p.getTime() <= trajectory.getMaxTime()) {
-            return (p.getPosition().distance(trajectory.get((double) p.getTime())) <= radius);
+            return (p.getPosition().distance(trajectory.get(p.getTime())) <= radius);
         } else {
             return false;
         }

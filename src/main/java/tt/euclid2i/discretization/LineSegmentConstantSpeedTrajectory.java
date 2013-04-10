@@ -68,7 +68,7 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
                 if ( currentWaypointTime <= t && t <= nextWaypointTime) {
                     // linear approximation
 
-                    double alpha = (t - currentWaypointTime) / maneuverDuration;
+                    double alpha = (double) (t - currentWaypointTime) / (double) maneuverDuration;
                     assert(alpha >= -0.00001 && alpha <= 1.00001);
 
                     tt.euclid2d.Point pos = tt.euclid2d.Point.interpolate(new tt.euclid2d.Point(currentWaypoint.x, currentWaypoint.y), new tt.euclid2d.Point(nextWaypoint.x, nextWaypoint.y), alpha);

@@ -21,7 +21,7 @@ public class RegionsLayer extends AbstractLayer {
         public Collection<Region> getRegions();
     }
 
-    private static final double samplingInterval = 1.0;
+    private static final int samplingInterval = 1;
 
     private RegionsProvider regionsProvider;
     private Color edgeColor;
@@ -50,10 +50,10 @@ public class RegionsLayer extends AbstractLayer {
                 MovingCircle movingCirc = (MovingCircle) region;
                 Trajectory traj = movingCirc.getTrajectory();
 
-                for (double time = traj.getMinTime(); time < traj.getMaxTime(); time += samplingInterval) {
+                for (int time = traj.getMinTime(); time < traj.getMaxTime(); time += samplingInterval) {
                     tt.euclid2i.Point pos = traj.get(time);
                     if (pos != null) {
-                        Point2d projectedPoint = projection.project(new Point(pos.x, pos.y, (int) Math.round(time)));
+                        Point2d projectedPoint = projection.project(new Point(pos.x, pos.y, time));
                         if (projectedPoint != null) {
 
                             if (fillColor != null) {

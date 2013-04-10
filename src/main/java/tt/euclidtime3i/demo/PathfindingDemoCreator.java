@@ -109,10 +109,10 @@ public class PathfindingDemoCreator implements Creator {
         VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider<Point>() {
 
             @Override
-            public tt.continous.Trajectory<Point> getTrajectory() {
+            public tt.discrete.Trajectory<Point> getTrajectory() {
                 return trajectory;
             }
-        }, new TimeParameterProjectionTo2d(time), Color.BLUE, 1.0, 100, 's'));
+        }, new TimeParameterProjectionTo2d(time), Color.BLUE, 1, 100, 's'));
 
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(new PathProvider<Point, Straight>() {
@@ -140,7 +140,7 @@ public class PathfindingDemoCreator implements Creator {
                 }, start, target);
 
         final tt.euclid2i.Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
-                0, path, 1, path.getWeight());
+                0, path, 1, (int) path.getWeight());
 
         return new MovingCircle(trajectory, radius, (int) radius / 4);
     }
