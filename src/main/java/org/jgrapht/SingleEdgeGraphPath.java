@@ -3,9 +3,6 @@ package org.jgrapht;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-
 public class SingleEdgeGraphPath<V,E> implements GraphPath<V, E> {
     Graph<V, E> graph;
     private V start;
@@ -20,6 +17,15 @@ public class SingleEdgeGraphPath<V,E> implements GraphPath<V, E> {
         this.start = start;
         this.end = end;
         this.weight = weight;
+    }
+
+    public SingleEdgeGraphPath(Graph<V, E> graph, E edge) {
+        super();
+        this.graph = graph;
+        this.edge = edge;
+        this.start = graph.getEdgeSource(edge);
+        this.end = graph.getEdgeTarget(edge);
+        this.weight = graph.getEdgeWeight(edge);
     }
 
     @Override
