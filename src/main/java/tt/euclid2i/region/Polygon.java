@@ -2,6 +2,7 @@ package tt.euclid2i.region;
 
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 
 public class Polygon implements Region{
 

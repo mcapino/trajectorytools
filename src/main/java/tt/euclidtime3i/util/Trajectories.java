@@ -69,4 +69,57 @@ public class Trajectories {
 
         };
     }
+
+    public static tt.euclid2i.EvaluatedTrajectory converetToEuclid2iTrajectory(final EvaluatedTrajectory traj) {
+        return new tt.euclid2i.EvaluatedTrajectory() {
+
+            @Override
+            public double getCost() {
+                return traj.getCost();
+            }
+
+            @Override
+            public int getMinTime() {
+                return traj.getMinTime();
+            }
+
+            @Override
+            public int getMaxTime() {
+                return traj.getMaxTime();
+            }
+
+            @Override
+            public tt.euclid2i.Point get(int t) {
+                Point timePoint = traj.get(t);
+                return new tt.euclid2i.Point(timePoint.x, timePoint.y);
+            }
+
+        };
+    }
+
+    public static EvaluatedTrajectory convertFromEuclid2iTrajectory(final tt.euclid2i.EvaluatedTrajectory traj) {
+        return new EvaluatedTrajectory() {
+
+            @Override
+            public double getCost() {
+                return traj.getCost();
+            }
+
+            @Override
+            public int getMinTime() {
+                return traj.getMinTime();
+            }
+
+            @Override
+            public int getMaxTime() {
+                return traj.getMaxTime();
+            }
+
+            @Override
+            public Point get(int t) {
+                tt.euclid2i.Point pos = traj.get(t);
+                return new Point(pos.x, pos.y, t);
+            }
+        };
+    }
 }

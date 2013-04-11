@@ -8,8 +8,8 @@ import javax.vecmath.Point2d;
 
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Region;
 import tt.euclidtime3i.region.MovingCircle;
-import tt.euclidtime3i.region.Region;
 import tt.vis.ProjectionTo2d;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;

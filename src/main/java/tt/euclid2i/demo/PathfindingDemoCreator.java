@@ -12,9 +12,9 @@ import org.jgrapht.alg.AStarShortestPathSimple;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.discretization.LazyGrid;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import tt.euclid2i.vis.ProjectionTo2d;
 import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;

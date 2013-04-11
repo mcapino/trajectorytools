@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;
 import cz.agents.alite.vis.layer.VisLayer;

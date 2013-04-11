@@ -7,8 +7,8 @@ import org.jgrapht.DirectedGraph;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import tt.planner.rrtstar.Extension;
 
 public class GraphDomain extends StraightLineDomain {

@@ -14,7 +14,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import tt.euclid2i.Line;
 import tt.euclid2i.util.Util;
 import tt.euclidtime3i.Point;
-import tt.euclidtime3i.region.Region;
+import tt.euclidtime3i.Region;
 import tt.util.NotImplementedException;
 
 public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {

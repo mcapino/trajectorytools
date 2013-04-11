@@ -5,8 +5,8 @@ import java.util.Random;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
 import tt.planner.rrtstar.Domain;
 import tt.planner.rrtstar.Extension;
