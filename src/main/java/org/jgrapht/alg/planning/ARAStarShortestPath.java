@@ -138,20 +138,19 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         } else {
             path = null;
         }
-        
+
         result = new Result(path, suboptimalityScale);
     }
 
     private void encounterVertex(V vertex, E edge, double distanceToVertex) {
+        setShortestDistanceToVertex(vertex, distanceToVertex);
+        setShortestPathTreeEdge(vertex, edge);
+
         if (closed.contains(vertex)) {
             inconsistent.add(vertex);
         } else {
             queue.add(new QueueEntry<V, Double>(vertex, calculateKey(vertex)));
-            closed.add(vertex);
         }
-
-        setShortestDistanceToVertex(vertex, distanceToVertex);
-        setShortestPathTreeEdge(vertex, edge);
     }
 
     public class Result<V, E> {
