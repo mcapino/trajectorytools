@@ -3,24 +3,21 @@ package org.jgrapht.alg.specifics;
 import java.util.Set;
 
 import org.jgrapht.Graph;
-import org.jgrapht.traverse.CrossComponentIterator;
 
 /**
- * An implementation of {@link Specifics} in which edge direction (if any)
- * is ignored.
+ * An implementation of {@link Specifics} in which edge direction (if any) is
+ * ignored.
  */
-public class UndirectedSpecifics<VV, EE>
-    extends Specifics<VV, EE>
-{
-    private Graph<VV, EE> graph;
+public class UndirectedSpecifics<V, E> extends Specifics<V, E> {
+
+    private Graph<V, E> graph;
 
     /**
      * Creates a new UndirectedSpecifics object.
      *
      * @param g the graph for which this specifics object to be created.
      */
-    public UndirectedSpecifics(Graph<VV, EE> g)
-    {
+    public UndirectedSpecifics(Graph<V, E> g) {
         graph = g;
     }
 
@@ -28,8 +25,17 @@ public class UndirectedSpecifics<VV, EE>
      * @see CrossComponentIterator.Specifics#edgesOf(Object)
      */
     @Override
-    public Set<EE> edgesOf(VV vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return graph.edgesOf(vertex);
+    }
+
+    @Override
+    public Set<E> incomingEdgesOf(V vertex) {
+        return graph.edgesOf(vertex);
+    }
+
+    @Override
+    Graph<V, E> getGraph() {
+        return graph;
     }
 }

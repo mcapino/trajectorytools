@@ -3,32 +3,37 @@ package org.jgrapht.alg.specifics;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.traverse.CrossComponentIterator;
+import org.jgrapht.Graph;
 
 /**
  * An implementation of {@link Specifics} for a directed graph.
  */
-public class DirectedSpecifics<VV, EE>
-    extends Specifics<VV, EE>
-{
-    private DirectedGraph<VV, EE> graph;
+public class DirectedSpecifics<V, E>
+        extends Specifics<V, E> {
+
+    private DirectedGraph<V, E> graph;
 
     /**
      * Creates a new DirectedSpecifics object.
      *
      * @param g the graph for which this specifics object to be created.
      */
-    public DirectedSpecifics(DirectedGraph<VV, EE> g)
-    {
+    public DirectedSpecifics(DirectedGraph<V, E> g) {
         graph = g;
     }
 
-    /**
-     * @see CrossComponentIterator.Specifics#edgesOf(Object)
-     */
     @Override
-    public Set<? extends EE> edgesOf(VV vertex)
-    {
+    public Set<E> outgoingEdgesOf(V vertex) {
         return graph.outgoingEdgesOf(vertex);
+    }
+
+    @Override
+    public Set<E> incomingEdgesOf(V vertex) {
+        return graph.incomingEdgesOf(vertex);
+    }
+
+    @Override
+    Graph<V, E> getGraph() {
+        return graph;
     }
 }
