@@ -51,6 +51,7 @@ import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.WeightedPseudograph;
+import org.jgrapht.util.Heuristic;
 import org.junit.Test;
 
 public class AStarAgainstDijkstraGeneralGraphTest {
@@ -109,7 +110,7 @@ public class AStarAgainstDijkstraGeneralGraphTest {
             Node endVertex = vertices[random.nextInt(vertices.length)];
 
             GraphPath<Node, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-            GraphPath<Node, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new org.jgrapht.util.Heuristic<Node>() {
+            GraphPath<Node, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new Heuristic<Node>() {
                 @Override
                 public double getCostToGoalEstimate(Node current) {
                     return 0;

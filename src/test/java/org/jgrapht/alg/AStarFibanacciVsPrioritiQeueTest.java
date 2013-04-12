@@ -153,7 +153,6 @@ public class AStarFibanacciVsPrioritiQeueTest {
             assertTrue(aStarNewPath == aStarOldPath || Math.abs(aStarNewPath.getWeight() - aStarOldPath.getWeight()) < 0.1);
 
         }
-        System.out.printf("OLD: %d, NEW: %d \n", aStarOldOverallTime, aStarNewOverallTime);
     }
 
     @Test

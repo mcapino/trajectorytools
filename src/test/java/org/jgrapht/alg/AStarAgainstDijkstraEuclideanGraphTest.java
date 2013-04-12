@@ -73,20 +73,6 @@ public class AStarAgainstDijkstraEuclideanGraphTest {
         }
     }
 
-    class EuclideanDistanceHeuristic implements Heuristic<Point> {
-
-        Point goal;
-
-        public EuclideanDistanceHeuristic(Point goal) {
-            this.goal = goal;
-        }
-
-        @Override
-        public double getCostToGoalEstimate(Point current) {
-            return current.euclideanDistance(goal);
-        }
-    }
-
     //~ Methods ----------------------------------------------------------------
     Graph<Point, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
         WeightedGraph<Point, DefaultWeightedEdge> graph;
@@ -122,10 +108,15 @@ public class AStarAgainstDijkstraEuclideanGraphTest {
             Point[] vertices = graph.vertexSet().toArray(new Point[nvertices]);
 
             Point startVertex = vertices[random.nextInt(vertices.length)];
-            Point endVertex = vertices[random.nextInt(vertices.length)];
+            final Point endVertex = vertices[random.nextInt(vertices.length)];
 
             GraphPath<Point, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-            GraphPath<Point, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new EuclideanDistanceHeuristic(endVertex), startVertex, endVertex);
+            GraphPath<Point, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new Heuristic<Point>() {
+                @Override
+                public double getCostToGoalEstimate(Point current) {
+                    return current.euclideanDistance(endVertex);
+                }
+            }, startVertex, endVertex);
 
             assertFalse(aStarFibanaci == null && dijkstraPath != null);
             assertFalse(aStarFibanaci != null && dijkstraPath == null);
