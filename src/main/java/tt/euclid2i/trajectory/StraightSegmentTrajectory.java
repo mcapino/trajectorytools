@@ -72,15 +72,10 @@ public class StraightSegmentTrajectory<V extends tt.euclidtime3i.Point, E extend
         return null;
     }
 
-
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(duration);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
         result = prime * result
                 + ((maneuvers == null) ? 0 : maneuvers.hashCode());
         return result;
@@ -95,9 +90,6 @@ public class StraightSegmentTrajectory<V extends tt.euclidtime3i.Point, E extend
         if (getClass() != obj.getClass())
             return false;
         StraightSegmentTrajectory other = (StraightSegmentTrajectory) obj;
-        if (Double.doubleToLongBits(duration) != Double
-                .doubleToLongBits(other.duration))
-            return false;
         if (maneuvers == null) {
             if (other.maneuvers != null)
                 return false;
@@ -109,7 +101,7 @@ public class StraightSegmentTrajectory<V extends tt.euclidtime3i.Point, E extend
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("SST(@");
+        sb.append("");
 
         if (!maneuvers.isEmpty()) {
             sb.append(" " + graph.getEdgeSource(maneuvers.get(0)));
@@ -118,7 +110,7 @@ public class StraightSegmentTrajectory<V extends tt.euclidtime3i.Point, E extend
         for (E maneuver: maneuvers) {
             sb.append(" " + graph.getEdgeTarget(maneuver));
         }
-        sb.append(" )");
+        sb.append("");
         return sb.toString();
     }
 

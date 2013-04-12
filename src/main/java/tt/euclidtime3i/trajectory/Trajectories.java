@@ -1,4 +1,4 @@
-package tt.euclidtime3i.util;
+package tt.euclidtime3i.trajectory;
 
 import tt.euclidtime3i.EvaluatedTrajectory;
 import tt.euclidtime3i.Point;
@@ -10,64 +10,11 @@ public class Trajectories {
             throw new RuntimeException("The trajectories are not aligned.");
         }
 
-        EvaluatedTrajectory result = new EvaluatedTrajectory() {
-
-            @Override
-            public int getMinTime() {
-                return traj1.getMinTime();
-            }
-
-            @Override
-            public int getMaxTime() {
-                return traj2.getMaxTime();
-            }
-
-            @Override
-            public Point get(int t) {
-                if (t >= traj1.getMinTime() && t <= traj1.getMaxTime()) {
-                    if (t < traj1.getMaxTime()) {
-                        return traj1.get(t);
-                    } else {
-                        return traj2.get(t);
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            public double getCost() {
-                return traj1.getCost() + traj2.getCost();
-            }
-
-        };
-
-        return result;
+        return new ConcatenatedTrajectory(traj1, traj2);
     }
 
     public static  EvaluatedTrajectory createSinglePointTrajectory(final Point point, final int time, final double cost) {
-        return new EvaluatedTrajectory() {
-
-            @Override
-            public int getMinTime() {
-                return time;
-            }
-
-            @Override
-            public int getMaxTime() {
-                return time;
-            }
-
-            @Override
-            public Point get(int t) {
-                return point;
-            }
-
-            @Override
-            public double getCost() {
-                return cost;
-            }
-
-        };
+        return new SinglePointTrajectory(point, time, cost);
     }
 
     public static tt.euclid2i.EvaluatedTrajectory converetToEuclid2iTrajectory(final EvaluatedTrajectory traj) {
@@ -92,6 +39,21 @@ public class Trajectories {
             public tt.euclid2i.Point get(int t) {
                 Point timePoint = traj.get(t);
                 return new tt.euclid2i.Point(timePoint.x, timePoint.y);
+            }
+
+            @Override
+            public int hashCode() {
+                return traj.hashCode();
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return traj.equals(obj);
+            }
+
+            @Override
+            public String toString() {
+                return traj.toString();
             }
 
         };
@@ -120,6 +82,22 @@ public class Trajectories {
                 tt.euclid2i.Point pos = traj.get(t);
                 return new Point(pos.x, pos.y, t);
             }
+
+            @Override
+            public int hashCode() {
+                return traj.hashCode();
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return traj.equals(obj);
+            }
+
+            @Override
+            public String toString() {
+                return traj.toString();
+            }
+
         };
     }
 }

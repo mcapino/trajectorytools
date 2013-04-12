@@ -24,7 +24,7 @@ import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.discretization.TimeExtendedGraph;
 import tt.euclidtime3i.region.MovingCircle;
-import tt.euclidtime3i.util.Trajectories;
+import tt.euclidtime3i.trajectory.Trajectories;
 import tt.euclidtime3i.vis.RegionsLayer;
 import tt.euclidtime3i.vis.RegionsLayer.RegionsProvider;
 import tt.euclidtime3i.vis.TimeParameter;

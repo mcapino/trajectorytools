@@ -19,7 +19,6 @@ import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 
-    private static final double SPEED = 1.0;
     private Point initialPoint;
     private Rectangle bounds;
     private int step;
@@ -65,7 +64,7 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public boolean containsVertex(Point p) {
-        return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0;
+        return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0 && bounds.isInside(p);
     }
 
     @Override
