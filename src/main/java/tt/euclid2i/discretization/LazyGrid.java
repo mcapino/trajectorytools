@@ -19,22 +19,40 @@ import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 
+	public static int[][] PATTERN_4_WAY =  {           {0,-1},
+											 {-1, 0},         { 1, 0},
+													  {0, 1},          };
+
+	public static int[][] PATTERN_4_WAY_WAIT =  {      {0,-1},
+											 {-1, 0},  {0, 0}, { 1, 0},
+													   {0, 1},          };
+
+	public static int[][] PATTERN_8_WAY =  {  {-1,-1},   {0,-1},    {1,-1},
+		 									  {-1, 0},              {1, 0},
+		 									  {-1, 1},   {0, 1},    {1, 1}};
+
+	public static int[][] PATTERN_8_WAY_WAIT =  {  {-1,-1},   {0,-1},    {1,-1},
+												  {-1, 0},    {0, 0},    {1, 0},
+												  {-1, 1},    {0, 1},    {1, 1}};
+
     private Point initialPoint;
     private Rectangle bounds;
     private int step;
     private int[][] pattern;
     private Collection<Region> obstacles;
 
-    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int step) {
+    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int[][] pattern, int step) {
         this.initialPoint = initialPoint;
         this.bounds = bounds;
         this.obstacles = obstacles;
         this.step = step;
 
-
-        this.pattern = new int[][] {           {0,-step},
-                                        {-step, 0},         { step, 0},
-                                                  {0, step},          };
+        // scale the pattern by step parameter
+        this.pattern = new int[pattern.length][2];
+        for (int i = 0; i < pattern.length; i++) {
+        	this.pattern[i][0] = pattern[i][0] * step;
+        	this.pattern[i][1] = pattern[i][1] * step;
+		}
     }
 
     @Override

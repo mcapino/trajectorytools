@@ -22,7 +22,7 @@ import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
-import tt.euclidtime3i.discretization.TimeExtendedGraph;
+import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.trajectory.Trajectories;
 import tt.euclidtime3i.vis.RegionsLayer;
@@ -62,6 +62,7 @@ public class PathfindingDemoCreator implements Creator {
                     new LinkedList<tt.euclid2i.Region>(),
                     new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-50,-50),
                     new tt.euclid2i.Point(50,50)),
+                    LazyGrid.PATTERN_8_WAY,
                     10);
 
         // create dynamic obstacles
@@ -78,7 +79,7 @@ public class PathfindingDemoCreator implements Creator {
 
 
         // create spatio-temporal graph
-        TimeExtendedGraph spatioTemporalGraph = new TimeExtendedGraph(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
+        ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {

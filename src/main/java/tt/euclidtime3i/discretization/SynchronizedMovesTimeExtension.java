@@ -12,21 +12,20 @@ import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.util.NotImplementedException;
 
-public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
+public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Straight> {
 
     private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
     private int maxTime;
-    private int[] speeds;
+    private int timeStepDuration;
     private Collection<Region> dynamicObstacles;
 
-
-    public TimeExtendedGraph(
+    public SynchronizedMovesTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, Collection<Region> dynamicObstacles) {
+            int timeStepDuration, Collection<Region> dynamicObstacles) {
         super();
         this.spatialGraph = spatialGraph;
         this.maxTime = maxTime;
-        this.speeds = speeds;
+        this.timeStepDuration = timeStepDuration;
         this.dynamicObstacles = dynamicObstacles;
     }
 
@@ -154,14 +153,11 @@ public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
 
         Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
         for (Line spatialEdge : spatialEdges) {
-            for (int speed : speeds) {
-                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance()/speed));
+                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + timeStepDuration);
                 if (child.getTime() < maxTime && isVisible(vertex, child, dynamicObstacles)) {
                     children.add(child);
                 }
-            }
         }
-
 
         Set<Straight> edges = new HashSet<Straight>();
         for (Point child : children) {
