@@ -28,6 +28,10 @@ public class AStarShortestPath<V, E> {
     private double radius;
     private GraphPath<V, E> path;
 
+    public long expandedStates = 0;
+    public long searchRuntime = 0;
+
+
     private static final long INF = Long.MAX_VALUE;
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
@@ -63,7 +67,7 @@ public class AStarShortestPath<V, E> {
         return alg.path;
     }
 
-    private AStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public AStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
             Goal<V> goalChecker, double radius) {
         this.graph = graph;
         this.heuristic = heuristic;
@@ -72,22 +76,26 @@ public class AStarShortestPath<V, E> {
         this.radius = radius;
     }
 
-    private void findPath(long timeoutNs) {
+    public GraphPath<V, E> findPath(long timeoutNs) {
         HeuristicIterator<V, E> iter =
                 new HeuristicIterator<V, E>(graph, heuristic, startVertex, radius);
 
-        long interruptAt = System.nanoTime() + timeoutNs;
+        long startTimeNs = System.nanoTime();
 
-        while (iter.hasNext() && System.nanoTime() >= interruptAt) {
+        while (iter.hasNext() && (System.nanoTime() - startTimeNs) < timeoutNs) {
             V vertex = iter.next();
+            expandedStates++;
 
             if (goal.isGoal(vertex)) {
                 path = reconstructGraphPath(graph, iter, startVertex, vertex);
-                return;
+                searchRuntime += System.nanoTime() - startTimeNs;
+                return path;
             }
         }
 
+        searchRuntime += System.nanoTime() - startTimeNs;
         path = null;
+        return path;
     }
 
     protected static <V, E> GraphPath<V, E> reconstructGraphPath(Graph<V, E> graph,

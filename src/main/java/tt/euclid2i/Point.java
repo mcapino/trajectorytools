@@ -13,4 +13,8 @@ public class Point extends Point2i {
         return new Point2d(x,y).distance(new Point2d(other.x,other.y));
     }
 
+    public double distanceL1(Point2i other) {
+        return new Point2d(x,y).distanceL1(new Point2d(other.x,other.y));
+    }
+
 }
