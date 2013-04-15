@@ -1,6 +1,5 @@
 package org.jgrapht.alg;
 
-import org.jgrapht.alg.planning.ARAStarShortestPath;
 import static org.junit.Assert.*;
 
 import java.util.*;

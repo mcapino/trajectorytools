@@ -12,30 +12,47 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 
-    private static final double SPEED = 1.0;
+	public static int[][] PATTERN_4_WAY =  {           {0,-1},
+											 {-1, 0},         { 1, 0},
+													  {0, 1},          };
+
+	public static int[][] PATTERN_4_WAY_WAIT =  {      {0,-1},
+											 {-1, 0},  {0, 0}, { 1, 0},
+													   {0, 1},          };
+
+	public static int[][] PATTERN_8_WAY =  {  {-1,-1},   {0,-1},    {1,-1},
+		 									  {-1, 0},              {1, 0},
+		 									  {-1, 1},   {0, 1},    {1, 1}};
+
+	public static int[][] PATTERN_8_WAY_WAIT =  {  {-1,-1},   {0,-1},    {1,-1},
+												  {-1, 0},    {0, 0},    {1, 0},
+												  {-1, 1},    {0, 1},    {1, 1}};
+
     private Point initialPoint;
     private Rectangle bounds;
     private int step;
     private int[][] pattern;
     private Collection<Region> obstacles;
 
-    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int step) {
+    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int[][] pattern, int step) {
         this.initialPoint = initialPoint;
         this.bounds = bounds;
         this.obstacles = obstacles;
         this.step = step;
 
-
-        this.pattern = new int[][] {           {0,-step},
-                                        {-step, 0},         { step, 0},
-                                                  {0, step},          };
+        // scale the pattern by step parameter
+        this.pattern = new int[pattern.length][2];
+        for (int i = 0; i < pattern.length; i++) {
+        	this.pattern[i][0] = pattern[i][0] * step;
+        	this.pattern[i][1] = pattern[i][1] * step;
+		}
     }
 
     @Override
@@ -65,7 +82,7 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public boolean containsVertex(Point p) {
-        return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0;
+        return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0 && bounds.isInside(p);
     }
 
     @Override

@@ -2,40 +2,34 @@ package tt.euclidtime3i.discretization;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
-import org.jgrapht.Graphs;
-import org.jgrapht.graph.DefaultDirectedGraph;
 
 import tt.euclid2i.Line;
-import tt.euclid2i.util.Util;
 import tt.euclidtime3i.Point;
-import tt.euclidtime3i.region.Region;
+import tt.euclidtime3i.Region;
 import tt.util.NotImplementedException;
 
-public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
+public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Straight> {
 
-	private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
-	private int maxTime;
-	private int[] speeds;
+    private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
+    private int maxTime;
+    private int timeStepDuration;
     private Collection<Region> dynamicObstacles;
 
+    public SynchronizedMovesTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int timeStepDuration, Collection<Region> dynamicObstacles) {
+        super();
+        this.spatialGraph = spatialGraph;
+        this.maxTime = maxTime;
+        this.timeStepDuration = timeStepDuration;
+        this.dynamicObstacles = dynamicObstacles;
+    }
 
-    public TimeExtendedGraph(
-			DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-			int[] speeds, Collection<Region> dynamicObstacles) {
-		super();
-		this.spatialGraph = spatialGraph;
-		this.maxTime = maxTime;
-		this.speeds = speeds;
-		this.dynamicObstacles = dynamicObstacles;
-	}
-
-	@Override
+    @Override
     public Straight addEdge(Point arg0, Point arg1) {
        throw new NotImplementedException();
     }
@@ -62,8 +56,8 @@ public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
 
     @Override
     public boolean containsVertex(Point p) {
-    	return spatialGraph.containsVertex(p.getPosition()) &&
-    			p.getTime() <= maxTime;
+        return spatialGraph.containsVertex(p.getPosition()) &&
+                p.getTime() <= maxTime;
     }
 
     @Override
@@ -140,12 +134,12 @@ public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
 
     @Override
     public int inDegreeOf(Point vertex) {
-    	 throw new NotImplementedException();
+         throw new NotImplementedException();
     }
 
     @Override
     public Set<Straight> incomingEdgesOf(Point vertex) {
-    	 throw new NotImplementedException();
+         throw new NotImplementedException();
     }
 
     @Override
@@ -159,14 +153,11 @@ public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
 
         Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
         for (Line spatialEdge : spatialEdges) {
-            for (int speed : speeds) {
-                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance()/speed));
+                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + timeStepDuration);
                 if (child.getTime() < maxTime && isVisible(vertex, child, dynamicObstacles)) {
                     children.add(child);
                 }
-            }
         }
-
 
         Set<Straight> edges = new HashSet<Straight>();
         for (Point child : children) {
@@ -177,15 +168,15 @@ public class TimeExtendedGraph implements DirectedGraph<Point, Straight> {
     }
 
     private boolean isVisible(Point start, Point end, Collection<Region> obstacles) {
-		for (Region obstacle : obstacles) {
-			if (obstacle.intersectsLine(start, end)) {
-				return false;
-			}
-		}
-		return true;
-	}
+        for (Region obstacle : obstacles) {
+            if (obstacle.intersectsLine(start, end)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	@Override
+    @Override
     public boolean removeAllEdges(Collection<? extends Straight> arg0) {
         throw new NotImplementedException();
     }

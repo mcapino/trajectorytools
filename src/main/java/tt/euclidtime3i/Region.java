@@ -1,9 +1,8 @@
-package tt.euclid2i.region;
+package tt.euclidtime3i;
 
-import tt.euclid2i.Point;
 
 /**
- * A region in an Euclidean 2d space
+ * A region in an Euclidean 2d spacetime
  */
 public interface Region {
     public boolean intersectsLine(Point p1, Point p2);

@@ -1,4 +1,4 @@
-package tt.euclid2i.discretization;
+package tt.euclid2i.trajectory;
 
 import java.text.DecimalFormat;
 import java.util.List;

@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.jgrapht.*;
-import org.jgrapht.alg.planning.DStarLiteShortestPath;
 import org.jgrapht.graph.*;
 import org.jgrapht.util.Heuristic;
 import org.junit.Test;

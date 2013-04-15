@@ -1,4 +1,4 @@
-package org.jgrapht.alg.planning;
+package org.jgrapht.alg;
 
 import java.util.HashMap;
 import java.util.HashSet;

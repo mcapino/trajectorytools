@@ -47,7 +47,6 @@ import java.util.Random;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.WeightedGraph;
-import org.jgrapht.alg.planning.DStarLiteShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.WeightedPseudograph;

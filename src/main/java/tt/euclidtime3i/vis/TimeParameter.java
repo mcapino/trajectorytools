@@ -5,6 +5,16 @@ import tt.vis.ParameterControlLayer.ParameterProvider;
 public class TimeParameter implements ParameterProvider {
 
 	int time = 0;
+	int timeStep;
+
+	public TimeParameter() {
+		this(1);
+	}
+
+	public TimeParameter(int timeStep) {
+		super();
+		this.timeStep = timeStep;
+	}
 
 	@Override
 	public String getName() {
@@ -28,12 +38,12 @@ public class TimeParameter implements ParameterProvider {
 
 	@Override
 	public void increased() {
-		time++;
+		time += timeStep;
 	}
 
 	@Override
 	public void decreased() {
-		time--;
+		time -= timeStep;
 	}
 
 	public int getTime() {

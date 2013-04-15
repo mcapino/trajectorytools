@@ -12,9 +12,9 @@ import org.jgrapht.alg.AStarShortestPathSimple;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.discretization.LazyGrid;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 import tt.euclid2i.vis.ProjectionTo2d;
 import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;
@@ -39,7 +39,9 @@ public class PathfindingDemoCreator implements Creator {
     public void create() {
 
         // Create discretization
-        final DirectedGraph<Point, Line> graph = new LazyGrid(new Point(0,0), new LinkedList<Region>(), new Rectangle(new Point(-50,-50), new Point(50,50)), 10);
+		final DirectedGraph<Point, Line> graph = new LazyGrid(new Point(0, 0),
+				new LinkedList<Region>(), new Rectangle(new Point(-50, -50),
+						new Point(50, 50)), LazyGrid.PATTERN_4_WAY, 10);
 
         // plan the shortest path
         //FIXME use the new A*

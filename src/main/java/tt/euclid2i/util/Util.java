@@ -10,8 +10,8 @@ import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 
 public class Util {
 

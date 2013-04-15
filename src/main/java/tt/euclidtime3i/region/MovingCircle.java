@@ -2,6 +2,7 @@ package tt.euclidtime3i.region;
 
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Region;
 
 
 public class MovingCircle implements Region {

@@ -1,17 +1,18 @@
-package org.jgrapht.alg.planning;
+package org.jgrapht.alg;
 
-import java.util.Queue;
 import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.Iterator;
 import java.util.Set;
 import org.jgrapht.Graphs;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.Heuristic;
-import org.jgrapht.util.QueueEntry;
+import org.jgrapht.util.PlanningHeapWrapper;
+import org.teneighty.heap.FibonacciHeap;
+import org.teneighty.heap.Heap;
 
-public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
+public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
 
     private Heuristic<V> heuristic;
     private Result result;
@@ -20,9 +21,9 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
     //
     private Set<V> closed;
     private Set<V> inconsistent;
-    private Queue<QueueEntry<V, Double>> queue;
+    private PlanningHeapWrapper<Double, V> heap;
 
-    public ARAStarShortestPathNaive(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public ARAStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
             final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep) {
 
         this(graph, heuristic, startVertex, new Goal<V>() {
@@ -33,7 +34,7 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
         }, suboptimalityScale, suboptimalityDecreaseStep);
     }
 
-    public ARAStarShortestPathNaive(Graph<V, E> graph, Heuristic<V> heuristic,
+    public ARAStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic,
             V startVertex, Goal<V> goal, double suboptimalityScale, double suboptimalityDecreaseStep) {
         super(graph, startVertex, goal);
 
@@ -44,12 +45,12 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     private void initialize() {
-        queue = new PriorityQueue<QueueEntry<V, Double>>();
+        heap = new PlanningHeapWrapper<Double, V>(new FibonacciHeap<Double, V>());
         closed = new HashSet<V>();
         inconsistent = new HashSet<V>();
 
         setShortestDistanceToVertex(startVertex, 0.);
-        queue.add(new QueueEntry<V, Double>(startVertex, calculateKey(startVertex)));
+        heap.insert(calculateKey(startVertex), startVertex);
     }
 
     public void setSuboptimalityDecreseStep(double step) {
@@ -65,24 +66,26 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     private void prepareOpenQueue() {
-        Queue<QueueEntry<V, Double>> previousQueue = queue;
-        queue = new PriorityQueue<QueueEntry<V, Double>>();
+        PlanningHeapWrapper<Double, V> oldheap = heap;
+        heap = new PlanningHeapWrapper<Double, V>(new FibonacciHeap<Double, V>());
 
-        moveVerticesWithUpdatedKeysIntoQueue(previousQueue);
+        moveVerticesWithUpdatedKeysIntoQueue(oldheap);
         moveInconsistendVerticesIntoQueue();
     }
 
-    private void moveVerticesWithUpdatedKeysIntoQueue(Queue<QueueEntry<V, Double>> previousOpen) {
-        for (QueueEntry<V, Double> openEntry : previousOpen) {
-            openEntry.key = calculateKey(openEntry.vertex);
-            queue.add(openEntry);
+    private void moveVerticesWithUpdatedKeysIntoQueue(PlanningHeapWrapper<Double, V> oldheap) {
+        for (Iterator<Heap.Entry<Double, V>> it = oldheap.iterator(); it.hasNext();) {
+            Heap.Entry<Double, V> entry = it.next();
+            V vertex = entry.getValue();
+            double key = calculateKey(vertex);
+            heap.insert(key, vertex);
         }
     }
 
     private void moveInconsistendVerticesIntoQueue() {
         for (V vertex : inconsistent) {
             double key = calculateKey(vertex);
-            queue.add(new QueueEntry<V, Double>(vertex, key));
+            heap.insert(key, vertex);
         }
     }
 
@@ -106,9 +109,9 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
     private void improvePath() {
         V foundGoal = null;
 
-        while (!queue.isEmpty()) {
+        while (!heap.isEmpty()) {
 
-            V vertex = queue.poll().vertex;
+            V vertex = heap.extractMinimum().getValue();
             if (goal.isGoal(vertex)) {
                 inconsistent.add(vertex); //goal state should remain in the queue
                 foundGoal = vertex;
@@ -149,7 +152,7 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
         if (closed.contains(vertex)) {
             inconsistent.add(vertex);
         } else {
-            queue.add(new QueueEntry<V, Double>(vertex, calculateKey(vertex)));
+            heap.insertOrUpdateKey(calculateKey(vertex), vertex);
         }
     }
 

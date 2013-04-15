@@ -8,6 +8,10 @@ public class Point extends Point3i {
         super(x,y,t);
     }
 
+    public Point(tt.euclid2i.Point spatialPoint, int time) {
+        super(spatialPoint.x, spatialPoint.y, time);
+    }
+
     public tt.euclid2i.Point getPosition() {
         return new tt.euclid2i.Point(x, y);
     }

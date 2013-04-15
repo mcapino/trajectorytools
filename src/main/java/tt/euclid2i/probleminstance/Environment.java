@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import tt.euclid2i.Point;
+import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.region.Region;
 
 public class Environment {
 

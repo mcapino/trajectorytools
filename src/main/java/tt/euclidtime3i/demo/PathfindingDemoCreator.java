@@ -16,15 +16,15 @@ import org.jgrapht.util.Heuristic;
 import tt.discrete.vis.TrajectoryLayer;
 import tt.discrete.vis.TrajectoryLayer.TrajectoryProvider;
 import tt.euclid2i.discretization.LazyGrid;
-import tt.euclid2i.discretization.LineSegmentConstantSpeedTrajectory;
+import tt.euclid2i.trajectory.LineSegmentConstantSpeedTrajectory;
 import tt.euclid2i.trajectory.StraightSegmentTrajectory;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Region;
 import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
-import tt.euclidtime3i.discretization.TimeExtendedGraph;
+import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
 import tt.euclidtime3i.region.MovingCircle;
-import tt.euclidtime3i.region.Region;
-import tt.euclidtime3i.trajectory.TimeExtendedTrajectory;
+import tt.euclidtime3i.trajectory.Trajectories;
 import tt.euclidtime3i.vis.RegionsLayer;
 import tt.euclidtime3i.vis.RegionsLayer.RegionsProvider;
 import tt.euclidtime3i.vis.TimeParameter;
@@ -59,9 +59,10 @@ public class PathfindingDemoCreator implements Creator {
         // create discretization
         final DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph
             = new LazyGrid(new tt.euclid2i.Point(0,0),
-                    new LinkedList<tt.euclid2i.region.Region>(),
+                    new LinkedList<tt.euclid2i.Region>(),
                     new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-50,-50),
                     new tt.euclid2i.Point(50,50)),
+                    LazyGrid.PATTERN_8_WAY,
                     10);
 
         // create dynamic obstacles
@@ -78,7 +79,7 @@ public class PathfindingDemoCreator implements Creator {
 
 
         // create spatio-temporal graph
-        TimeExtendedGraph spatioTemporalGraph = new TimeExtendedGraph(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
+        ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {
@@ -94,7 +95,7 @@ public class PathfindingDemoCreator implements Creator {
                     }
                 });
 
-        final Trajectory trajectory = new TimeExtendedTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
+        final Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
 
         // graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {
