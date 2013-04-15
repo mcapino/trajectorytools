@@ -79,7 +79,7 @@ public class ARAStarEuclideanGraphTest {
                 }
             }, startVertex, endVertex, 2, 0.02);
             
-            ARAStarShortestPath<Point, DefaultWeightedEdge>.Result<Point, DefaultWeightedEdge> araResult;
+            ARAStarShortestPath.Result<Point, DefaultWeightedEdge> araResult;
             do {
                 araResult = araStar.iterate();
                 

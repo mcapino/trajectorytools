@@ -40,7 +40,6 @@
  */
 package org.jgrapht.alg;
 
-import org.jgrapht.alg.planning.ARAStarShortestPath;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -50,6 +49,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
+import org.jgrapht.alg.planning.ARAStarShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.WeightedPseudograph;
@@ -117,7 +117,7 @@ public class ARAStarGeneralGraphTest {
                 }
             }, startVertex, endVertex, 2, 0.02);
 
-            ARAStarShortestPath<Node, DefaultWeightedEdge>.Result<Node, DefaultWeightedEdge> araResult;
+            ARAStarShortestPath.Result<Node, DefaultWeightedEdge> araResult;
             do {
                 araResult = araStar.iterate();
 

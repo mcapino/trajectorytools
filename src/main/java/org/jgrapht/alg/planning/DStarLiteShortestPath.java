@@ -1,11 +1,9 @@
 package org.jgrapht.alg.planning;
 
 import java.util.HashMap;
-import java.util.Queue;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 import org.jgrapht.Graphs;
 import org.jgrapht.Graph;
@@ -15,19 +13,20 @@ import org.jgrapht.event.GraphListener;
 import org.jgrapht.event.GraphVertexChangeEvent;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.Heuristic;
-import org.jgrapht.util.QueueEntry;
+import org.jgrapht.util.PlanningHeapWrapper;
+import org.teneighty.heap.FibonacciHeap;
 
 public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> implements GraphListener<V, E> {
 
     private Heuristic<V> heuristic;
     private Set<V> inconsistentGoals;
     private Map<V, Double> rightHandSideValue;
-    private Map<V, E> rightHandSideEdge;
-    private Queue<QueueEntry<V, Key>> open;
+    private Map<V, E> rightHandSideLeastEdge;
+    private PlanningHeapWrapper<Key, V> heap;
     private GraphPath<V, E> path;
     //
-    private V nearestGole;
-    private Key nearestGoleKey;
+    private V leastDistantGole;
+    private Key leastDistantGoleKey;
 
     public DStarLiteShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
             final V endVertex) {
@@ -49,13 +48,13 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
     }
 
     private void initialize() {
-        open = new PriorityQueue<QueueEntry<V, Key>>();
+        heap = new PlanningHeapWrapper<Key, V>(new FibonacciHeap<Key, V>());
         rightHandSideValue = new HashMap<V, Double>();
-        rightHandSideEdge = new HashMap<V, E>();
+        rightHandSideLeastEdge = new HashMap<V, E>();
         inconsistentGoals = new HashSet<V>();
 
         setRightHandSideValue(startVertex, 0.);
-        open.add(new QueueEntry<V, Key>(startVertex, calculateKey(startVertex)));
+        heap.insert(calculateKey(startVertex), startVertex);
     }
 
     public GraphPath<V, E> iterate() {
@@ -76,46 +75,27 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
     private void repareShortestPath() {
         V foundGoal = null;
 
-        while (!open.isEmpty()) {
+        while (!heap.isEmpty()) {
+            V vertex = heap.extractMinimum().getValue();
+            setShortestPathTreeEdge(vertex, getRightHandSideLeastEdge(vertex));
 
-            QueueEntry<V, Key> toEntry = open.poll();
-            V vertex = toEntry.vertex;
-
-            setShortestPathTreeEdge(vertex, getRightHandSideEdge(vertex));
-
-            double distance = getShortestDistanceTo(vertex);
+            double vertexDistance = getShortestDistanceTo(vertex);
             double rightHandSide = getRightHandSideValue(vertex);
 
-            if (distance > rightHandSide) {
+            if (vertexDistance > rightHandSide) {
                 setShortestDistanceToVertex(vertex, rightHandSide);
-
-                if (goal.isGoal(vertex)) {
-                    Key key = calculateKey(vertex);
-                    if (nearestGoleKey == null || key.compareTo(nearestGoleKey) < 0) {
-                        nearestGole = vertex;
-                        nearestGoleKey = key;
-                    }
-                    inconsistentGoals.remove(vertex);
-                }
-
-                for (Iterator<V> it = specifics.succesorVertexIterator(vertex); it.hasNext();) {
-                    V succesor = it.next();
-                    if (succesor != vertex) {
-                        updateVertex(succesor);
-                    }
-                }
+                checkToBeLeastDistantGoal(vertex);
+                updateRightHandSideOfSuccessors(vertex);
 
             } else {
                 setShortestDistanceToVertex(vertex, Double.POSITIVE_INFINITY);
-                updateVertex(vertex);
+                updateRightHandSideOfTheVertex(vertex);
             }
 
-            //TODO clear this terminating condition
-            if (nearestGoleKey != null && (open.isEmpty() || nearestGoleKey.compareTo(calculateKey(open.peek().vertex)) < 0) && inconsistentGoals.isEmpty()) {
-                foundGoal = nearestGole;
+            if (seenGoalsHaveLowerKeyThatTopOfQueue() && allSeenGoalsProcessed()) {
+                foundGoal = leastDistantGole;
                 break;
             }
-
         }
 
         if (foundGoal != null) {
@@ -125,62 +105,91 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         }
     }
 
-    private void updateVertex(V vertex) {
+    private void checkToBeLeastDistantGoal(V vertex) {
+        if (goal.isGoal(vertex)) {
+            Key key = calculateKey(vertex);
+            if (leastDistantGoleKey == null || key.compareTo(leastDistantGoleKey) < 0) {
+                leastDistantGole = vertex;
+                leastDistantGoleKey = key;
+            }
+            inconsistentGoals.remove(vertex);
+        }
+    }
+
+    private void updateRightHandSideOfSuccessors(V vertex) {
+        for (Iterator<V> it = specifics.succesorVertexIterator(vertex); it.hasNext();) {
+            V succesor = it.next();
+            if (succesor != vertex) {
+                updateRightHandSideOfTheVertex(succesor);
+            }
+        }
+    }
+
+    private boolean seenGoalsHaveLowerKeyThatTopOfQueue() {
+        //FIXME rubbish
+        return leastDistantGoleKey != null
+                && (heap.isEmpty() || leastDistantGoleKey.compareTo(calculateKey(heap.peekMinimum().getValue())) < 0);
+    }
+
+    private boolean allSeenGoalsProcessed() {
+        return inconsistentGoals.isEmpty();
+    }
+
+    private void updateRightHandSideOfTheVertex(V vertex) {
         if (vertex != startVertex) {
-            calculateRightHandSide(vertex);
+            findShortestPathThruPredecessors(vertex);
         }
 
-        //FIXME - might be slow, use some "static search instance" of QueueEntry
-        QueueEntry<V, Key> entry = new QueueEntry<V, Key>(vertex, calculateKey(vertex));
-        open.remove(entry);
-
-        if (getShortestDistanceTo(vertex) != getRightHandSideValue(vertex)) {
-            open.add(entry);
-
+        if (getShortestDistanceTo(vertex) == getRightHandSideValue(vertex)) {
+            heap.remove(vertex);
+        } else {
+            heap.insertOrUpdateKey(calculateKey(vertex), vertex);
             if (goal.isGoal(vertex)) {
                 inconsistentGoals.add(vertex);
             }
         }
     }
 
-    private void calculateRightHandSide(V vertex) {
-        //FIXME confusing name / function
+    private void findShortestPathThruPredecessors(V vertex) {
+        //FIXME confusing name of function
         Set<E> edges = specifics.incomingEdgesOf(vertex);
 
-        double minDist = Double.POSITIVE_INFINITY;
+        double minDistance = Double.POSITIVE_INFINITY;
         E minEdge = null;
 
-        for (E edge : edges) {
-            V oposite = Graphs.getOppositeVertex(graph, edge, vertex);
+        for (E incomingEdge : edges) {
+            V opositeVertex = Graphs.getOppositeVertex(graph, incomingEdge, vertex);
 
-            if (oposite == vertex) {
+            if (opositeVertex == vertex) {
                 continue;
             }
 
-            double dist = getShortestDistanceTo(oposite) + graph.getEdgeWeight(edge);
-            if (dist < minDist) {
-                minDist = dist;
-                minEdge = edge;
+            double candidateDistance = getShortestDistanceTo(opositeVertex)
+                    + graph.getEdgeWeight(incomingEdge);
+
+            if (candidateDistance < minDistance) {
+                minDistance = candidateDistance;
+                minEdge = incomingEdge;
             }
         }
 
-        if (!Double.isInfinite(minDist)) {
-            setRightHandSideValue(vertex, minDist);
-            setRightHandSideEdge(vertex, minEdge);
+        if (!Double.isInfinite(minDistance)) {
+            setRightHandSideValue(vertex, minDistance);
+            setRightHandSideLeastEdge(vertex, minEdge);
         }
+    }
+
+    private E getRightHandSideLeastEdge(V vertex) {
+        return rightHandSideLeastEdge.get(vertex);
+    }
+
+    private void setRightHandSideLeastEdge(V vertex, E edge) {
+        rightHandSideLeastEdge.put(vertex, edge);
     }
 
     private Double getRightHandSideValue(V vertex) {
         Double rhs = rightHandSideValue.get(vertex);
         return (rhs == null) ? Double.POSITIVE_INFINITY : rhs;
-    }
-
-    private void setRightHandSideEdge(V vertex, E edge) {
-        rightHandSideEdge.put(vertex, edge);
-    }
-
-    private E getRightHandSideEdge(V vertex) {
-        return rightHandSideEdge.get(vertex);
     }
 
     private void setRightHandSideValue(V vertex, double rhs) {
