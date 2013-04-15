@@ -22,10 +22,6 @@ public class PlanningHeapWrapper<K extends Comparable<K>, V> {
 
     public void remove(V value) {
         Heap.Entry<K, V> entry = entryMap.remove(value);
-        remove(entry);
-    }
-
-    private void remove(Heap.Entry<K, V> entry) {
         if (entry != null) {
             heap.delete(entry);
         }
@@ -42,7 +38,7 @@ public class PlanningHeapWrapper<K extends Comparable<K>, V> {
     }
 
     public void insertOrUpdateKey(K key, V value) {
-        Heap.Entry<K, V> entry = entryMap.remove(value);
+        Heap.Entry<K, V> entry = entryMap.get(value);
 
         if (entry == null) {
             insert(key, value);
@@ -50,9 +46,8 @@ public class PlanningHeapWrapper<K extends Comparable<K>, V> {
             K oldKey = entry.getKey();
             if (key.compareTo(oldKey) < 0) {
                 heap.decreaseKey(entry, key);
-
             } else {
-                remove(entry);
+                remove(value);
                 insert(key, value);
             }
         }
