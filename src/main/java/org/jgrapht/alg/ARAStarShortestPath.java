@@ -49,7 +49,7 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         closed = new HashSet<V>();
         inconsistent = new HashSet<V>();
 
-        setShortestDistanceToVertex(startVertex, 0.);
+        setShortestDistanceTo(startVertex, 0.);
         heap.insert(calculateKey(startVertex), startVertex);
     }
 
@@ -146,7 +146,7 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     private void encounterVertex(V vertex, E edge, double distanceToVertex) {
-        setShortestDistanceToVertex(vertex, distanceToVertex);
+        setShortestDistanceTo(vertex, distanceToVertex);
         setShortestPathTreeEdge(vertex, edge);
 
         if (closed.contains(vertex)) {

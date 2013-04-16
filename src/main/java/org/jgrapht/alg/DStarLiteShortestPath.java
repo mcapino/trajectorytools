@@ -83,12 +83,12 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
             double rightHandSide = getRightHandSideValue(vertex);
 
             if (vertexDistance > rightHandSide) {
-                setShortestDistanceToVertex(vertex, rightHandSide);
+                setShortestDistanceTo(vertex, rightHandSide);
                 checkToBeLeastDistantGoal(vertex);
                 updateRightHandSideOfSuccessors(vertex);
 
             } else {
-                setShortestDistanceToVertex(vertex, Double.POSITIVE_INFINITY);
+                setShortestDistanceTo(vertex, Double.POSITIVE_INFINITY);
                 updateRightHandSideOfTheVertex(vertex);
             }
 

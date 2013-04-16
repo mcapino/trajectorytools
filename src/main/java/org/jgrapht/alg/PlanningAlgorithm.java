@@ -19,7 +19,6 @@ class PlanningAlgorithm<V, E> {
     protected Goal<V> goal;
     protected Specifics<V, E> specifics;
     private Map<V, E> shortestPathTreeEdges;
-    private Map<E, V> startingVerticesOfShortestPathTreeEdges;
     private Map<V, Double> shortestDistanceToVertex;
 
     public PlanningAlgorithm(Graph<V, E> graph, V startVertex, Goal<V> goal) {
@@ -28,7 +27,6 @@ class PlanningAlgorithm<V, E> {
         this.startVertex = startVertex;
         this.goal = goal;
         this.shortestPathTreeEdges = new HashMap<V, E>();
-        this.startingVerticesOfShortestPathTreeEdges = new HashMap<E, V>();
         this.shortestDistanceToVertex = new HashMap<V, Double>();
     }
 
@@ -36,13 +34,8 @@ class PlanningAlgorithm<V, E> {
         return shortestPathTreeEdges.get(v);
     }
 
-    protected V getStartVertexOfShortestPathTreeEdge(E e) {
-        return startingVerticesOfShortestPathTreeEdges.get(e);
-    }
-
     protected void setShortestPathTreeEdge(V v, E e) {
         shortestPathTreeEdges.put(v, e);
-        startingVerticesOfShortestPathTreeEdges.put(e, v);
     }
 
     protected double getShortestDistanceTo(V v) {
@@ -50,7 +43,7 @@ class PlanningAlgorithm<V, E> {
         return (dist == null) ? Double.POSITIVE_INFINITY : dist;
     }
 
-    protected void setShortestDistanceToVertex(V v, double distance) {
+    protected void setShortestDistanceTo(V v, double distance) {
         shortestDistanceToVertex.put(v, distance);
     }
 
