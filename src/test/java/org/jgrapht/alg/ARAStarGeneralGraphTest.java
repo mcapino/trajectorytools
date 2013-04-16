@@ -21,7 +21,7 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
             Graph<Node, DefaultWeightedEdge> graph,
             Node start,
             Node end,
-            GraphPath<Node, DefaultWeightedEdge> dijkstraPath) {
+            GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
         ARAStarShortestPath<Node, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Node, DefaultWeightedEdge>(graph, new Heuristic<Node>() {
             @Override
@@ -34,15 +34,15 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
         do {
             araResult = araStar.iterate();
 
-            assertFalse(araResult.path == null && dijkstraPath != null);
-            assertFalse(araResult.path != null && dijkstraPath == null);
+            assertFalse(araResult.path == null && referencePath != null);
+            assertFalse(araResult.path != null && referencePath == null);
 
-            if (araResult.path == dijkstraPath) {
+            if (araResult.path == referencePath) {
                 break;
             }
 
             assertValidPath(start, end, araResult.path);
-        } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, dijkstraPath));
+        } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, referencePath));
 
         return araResult.path;
     }

@@ -16,7 +16,7 @@ public class DStarLiteGeneralGraphTest extends AbstractGeneralGraphTest {
             Graph<Node, DefaultWeightedEdge> graph,
             Node startVertex,
             Node endVertex,
-            GraphPath<Node, DefaultWeightedEdge> dijkstraPath) {
+            GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
         DStarLiteShortestPath<Node, DefaultWeightedEdge> dStarLite = new DStarLiteShortestPath<Node, DefaultWeightedEdge>(graph, new Heuristic<Node>() {
             @Override

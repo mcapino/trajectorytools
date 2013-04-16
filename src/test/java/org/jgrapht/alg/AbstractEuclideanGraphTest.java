@@ -50,18 +50,37 @@ import org.junit.Test;
 
 public abstract class AbstractEuclideanGraphTest {
 
-    int TRIALS = 500;
-    int VERTICES = 100;
-    int EDGES = 150;
-
-    abstract GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph,
-            Point startVertex,
-            Point endVertex,
-            GraphPath<Point, DefaultWeightedEdge> dijkstraPath);
+    private long timerStarted;
+    protected long referenceOverallTime = 0;
+    protected long testedOverallTime = 0;
+    protected int TRIALS = 500;
+    protected int VERTICES = 100;
+    protected int EDGES = 150;
 
     @Before
     public abstract void initialize();
+
+    protected abstract GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph,
+            Point startVertex,
+            Point endVertex,
+            GraphPath<Point, DefaultWeightedEdge> referencePath);
+
+    protected GraphPath<Point, DefaultWeightedEdge> runReferenceAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph,
+            Point startVertex,
+            Point endVertex) {
+
+        return new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
+    }
+
+    protected void startTimer() {
+        timerStarted = System.currentTimeMillis();
+    }
+
+    protected long stopTimer() {
+        return System.currentTimeMillis() - timerStarted;
+    }
 
     //~ Methods ----------------------------------------------------------------
     private Graph<Point, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
@@ -101,13 +120,22 @@ public abstract class AbstractEuclideanGraphTest {
             Point startVertex = vertices[random.nextInt(vertices.length)];
             final Point endVertex = vertices[random.nextInt(vertices.length)];
 
-            GraphPath<Point, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, dijkstraPath);
+            startTimer();
+            GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(graph, startVertex, endVertex);
+            referenceOverallTime += stopTimer();
 
-            assertFalse(testedAlgPath == null && dijkstraPath != null);
-            assertFalse(testedAlgPath != null && dijkstraPath == null);
-            assertTrue(testedAlgPath == dijkstraPath || hasSameWeight(dijkstraPath, testedAlgPath));
+            startTimer();
+            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, referencePath);
+            testedOverallTime += stopTimer();
+
+            assertFalse(testedAlgPath == null && referencePath != null);
+            assertFalse(testedAlgPath != null && referencePath == null);
+            assertTrue(testedAlgPath == referencePath || hasSameWeight(referencePath, testedAlgPath));
         }
+    }
+
+    protected void printMeasuredTimes() {
+        System.out.println(String.format("Overall times ---- Reference: %d,  Tested: %d", referenceOverallTime, testedOverallTime));
     }
 
     protected boolean hasSameWeight(GraphPath<Point, DefaultWeightedEdge> pathA,

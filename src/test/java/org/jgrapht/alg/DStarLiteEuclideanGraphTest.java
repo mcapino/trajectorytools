@@ -11,7 +11,12 @@ public class DStarLiteEuclideanGraphTest extends AbstractEuclideanGraphTest {
     }
 
     @Override
-    GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(Graph<Point, DefaultWeightedEdge> graph, Point startVertex, final Point endVertex, GraphPath<Point, DefaultWeightedEdge> dijkstraPath) {
+    protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph, 
+            Point startVertex,
+            final Point endVertex, 
+            GraphPath<Point, DefaultWeightedEdge> referencePath) {
+        
         DStarLiteShortestPath<Point, DefaultWeightedEdge> dStarLite = new DStarLiteShortestPath<Point, DefaultWeightedEdge>(graph, new Heuristic<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {

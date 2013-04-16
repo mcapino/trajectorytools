@@ -12,7 +12,12 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
     }
 
     @Override
-    GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(Graph<Point, DefaultWeightedEdge> graph, Point start, final Point end, GraphPath<Point, DefaultWeightedEdge> dijkstraPath) {
+    protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph,
+            Point start,
+            final Point end,
+            GraphPath<Point, DefaultWeightedEdge> referencePath) {
+
         ARAStarShortestPath<Point, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Point, DefaultWeightedEdge>(graph, new Heuristic<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {
@@ -24,15 +29,15 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
         do {
             araResult = araStar.iterate();
 
-            assertFalse(araResult.path == null && dijkstraPath != null);
-            assertFalse(araResult.path != null && dijkstraPath == null);
+            assertFalse(araResult.path == null && referencePath != null);
+            assertFalse(araResult.path != null && referencePath == null);
 
-            if (araResult.path == dijkstraPath) {
+            if (araResult.path == referencePath) {
                 break;
             }
 
             assertValidPath(start, end, araResult.path);
-        } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, dijkstraPath));
+        } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, referencePath));
 
         return araResult.path;
     }

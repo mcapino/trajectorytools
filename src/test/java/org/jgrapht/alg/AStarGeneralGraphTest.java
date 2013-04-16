@@ -9,7 +9,7 @@ import org.jgrapht.util.Heuristic;
  *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
-public class AStarAgainstDijkstraGeneralGraphTest extends AbstractGeneralGraphTest {
+public class AStarGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     public void initialize() {
@@ -20,7 +20,7 @@ public class AStarAgainstDijkstraGeneralGraphTest extends AbstractGeneralGraphTe
             Graph<Node, DefaultWeightedEdge> graph,
             Node start,
             Node end,
-            GraphPath<Node, DefaultWeightedEdge> dijkstraPath) {
+            GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
         return AStarShortestPath.findPathBetween(graph, new Heuristic<Node>() {
             @Override

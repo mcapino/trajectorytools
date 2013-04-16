@@ -9,18 +9,18 @@ import org.jgrapht.util.Heuristic;
  *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
-public class AStarAgainstDijkstraEuclideanGraphTest extends AbstractEuclideanGraphTest {
+public class AStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     public void initialize() {
     }
 
     @Override
-    GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
+    protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
             Graph<Point, DefaultWeightedEdge> graph,
             Point start,
             final Point end,
-            GraphPath<Point, DefaultWeightedEdge> dijkstraPath) {
+            GraphPath<Point, DefaultWeightedEdge> referencePath) {
 
         return AStarShortestPath.findPathBetween(graph, new Heuristic<Point>() {
             @Override
