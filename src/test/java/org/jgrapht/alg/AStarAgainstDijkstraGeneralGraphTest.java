@@ -9,7 +9,7 @@ import org.jgrapht.util.Heuristic;
  *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
-public class AStarAgainstDijkstraGeneralGraphTst extends AbstractGeneralGraphTest {
+public class AStarAgainstDijkstraGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     public void initialize() {
