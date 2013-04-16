@@ -52,28 +52,26 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.WeightedPseudograph;
 import org.jgrapht.util.Heuristic;
+import org.junit.Before;
 import org.junit.Test;
 
-public class AStarAgainstDijkstraGeneralGraphTest {
+public abstract class AbstractGeneralGraphTest {
 
-    // Auxiliary class for creating random graphs
-    class Node {
+    int TRIALS = 500;
+    int VERTICES = 100;
+    int EDGES = 150;
 
-        int id;
+    abstract GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
+            Graph<Node, DefaultWeightedEdge> graph,
+            Node start,
+            Node end,
+            GraphPath<Node, DefaultWeightedEdge> dijkstraPath);
 
-        public Node(int id) {
-            super();
-            this.id = id;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + id + ")";
-        }
-    }
-
+    @Before
+    public abstract void initialize();
     //~ Methods ----------------------------------------------------------------
-    Graph<Node, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
+
+    private Graph<Node, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
         WeightedGraph<Node, DefaultWeightedEdge> graph;
         if (directed) {
             graph = new DirectedWeightedMultigraph<Node, DefaultWeightedEdge>(DefaultWeightedEdge.class);
@@ -96,7 +94,7 @@ public class AStarAgainstDijkstraGeneralGraphTest {
         return graph;
     }
 
-    void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
+    private void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
             //System.out.printf("Trial %d/%d \n", seed, trials);
@@ -110,30 +108,42 @@ public class AStarAgainstDijkstraGeneralGraphTest {
             Node endVertex = vertices[random.nextInt(vertices.length)];
 
             GraphPath<Node, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-            GraphPath<Node, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new Heuristic<Node>() {
-                @Override
-                public double getCostToGoalEstimate(Node current) {
-                    return 0;
-                }
-            }, startVertex, endVertex);
+            GraphPath<Node, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, dijkstraPath);
 
-            assertFalse(aStarFibanaci == null && dijkstraPath != null);
-            assertFalse(aStarFibanaci != null && dijkstraPath == null);
-            assertTrue(aStarFibanaci == dijkstraPath || Math.abs(aStarFibanaci.getWeight() - dijkstraPath.getWeight()) < 0.01);
+            assertFalse(testedAlgPath == null && dijkstraPath != null);
+            assertFalse(testedAlgPath != null && dijkstraPath == null);
+            assertTrue(testedAlgPath == dijkstraPath || hasSameWeight(dijkstraPath, testedAlgPath));
         }
+    }
+
+    protected boolean hasSameWeight(GraphPath<Node, DefaultWeightedEdge> pathA,
+            GraphPath<Node, DefaultWeightedEdge> pathB) {
+        return Math.abs(pathA.getWeight() - pathB.getWeight()) < 0.01;
     }
 
     @Test
     public void test() {
-        final int TRIALS = 100;
-        final int VERTICES = 100;
-        final int EDGES = 200;
-
         // Check directed
         assertAStarAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
 
         // Check undirected
         assertAStarAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
+    }
+
+    // Auxiliary class for creating random graphs
+    protected static class Node {
+
+        int id;
+
+        public Node(int id) {
+            super();
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + id + ")";
+        }
     }
 }
 
