@@ -62,6 +62,7 @@ public abstract class AbstractGeneralGraphTest {
     protected int TRIALS = 500;
     protected int VERTICES = 100;
     protected int EDGES = 150;
+    protected boolean debugOut;
 
     abstract GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
             Graph<Node, DefaultWeightedEdge> graph,
@@ -114,7 +115,9 @@ public abstract class AbstractGeneralGraphTest {
     private void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
-            //System.out.printf("Trial %d/%d \n", seed, trials);
+            if (debugOut) {
+                System.out.printf("Trial %d/%d \n", seed, trials);
+            }
 
             Random random = new Random(seed);
             Graph<Node, DefaultWeightedEdge> graph = createRandomGraph(directed, nvertices, nedges, random);

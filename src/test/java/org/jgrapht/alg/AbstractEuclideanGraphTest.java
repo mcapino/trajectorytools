@@ -56,6 +56,7 @@ public abstract class AbstractEuclideanGraphTest {
     protected int TRIALS = 500;
     protected int VERTICES = 100;
     protected int EDGES = 150;
+    protected boolean debugOut;
 
     @Before
     public abstract void initialize();
@@ -110,7 +111,9 @@ public abstract class AbstractEuclideanGraphTest {
     private void assertTestedAlgorithmAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
-            //System.out.printf("Trial %d/%d \n", seed, trials);
+            if (debugOut) {
+                System.out.printf("Trial %d/%d \n", seed, trials);
+            }
 
             Random random = new Random(seed);
             Graph<Point, DefaultWeightedEdge> graph = createRandomGraph(directed, nvertices, nedges, random);
