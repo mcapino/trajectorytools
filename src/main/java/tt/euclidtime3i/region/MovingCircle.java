@@ -8,7 +8,14 @@ import tt.euclidtime3i.Region;
 public class MovingCircle implements Region {
     double samplingInterval;
     tt.euclid2i.Trajectory trajectory;
-    double radius;
+    int radius;
+
+    public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
+        super();
+        this.trajectory = trajectory;
+        this.radius = radius;
+        this.samplingInterval = radius/4;
+    }
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius, int samplingInterval) {
         super();
@@ -65,8 +72,14 @@ public class MovingCircle implements Region {
         return trajectory;
     }
 
-    public double getRadius() {
+    public int getRadius() {
         return radius;
     }
+
+	@Override
+	public HyperRectangle getBoundingBox() {
+		return new HyperRectangle(new Point(Integer.MIN_VALUE, Integer.MIN_VALUE, getTrajectory().getMinTime()),
+								  new Point(Integer.MAX_VALUE, Integer.MAX_VALUE, getTrajectory().getMaxTime()));
+	}
 
 }

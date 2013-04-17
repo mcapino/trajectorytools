@@ -3,6 +3,7 @@ package tt.euclid2i.region;
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.util.NotImplementedException;
 
 public class Polygon implements Region{
 
@@ -42,4 +43,11 @@ public class Polygon implements Region{
     public Point[] getPoints() {
         return points;
     }
+
+	@Override
+	public Rectangle getBoundingBox() {
+		throw new NotImplementedException();
+	}
+
+
 }
