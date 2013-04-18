@@ -1,6 +1,5 @@
 package org.jgrapht.alg;
 
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.util.Heuristic;
@@ -17,16 +16,14 @@ public class AStarGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Node, DefaultWeightedEdge> graph,
-            Node start,
-            Node end,
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem,
             GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
-        return AStarShortestPath.findPathBetween(graph, new Heuristic<Node>() {
+        return AStarShortestPath.findPathBetween(problem.graph, new Heuristic<Node>() {
             @Override
             public double getCostToGoalEstimate(Node current) {
                 return 0;
             }
-        }, start, end);
+        }, problem.startVertex, problem.endVertex);
     }
 }

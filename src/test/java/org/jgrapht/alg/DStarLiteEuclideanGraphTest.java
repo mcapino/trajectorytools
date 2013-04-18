@@ -12,17 +12,16 @@ public class DStarLiteEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph, 
-            Point startVertex,
-            final Point endVertex, 
+            final ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath) {
-        
-        DStarLiteShortestPath<Point, DefaultWeightedEdge> dStarLite = new DStarLiteShortestPath<Point, DefaultWeightedEdge>(graph, new Heuristic<Point>() {
+
+        DStarLiteShortestPath<Point, DefaultWeightedEdge> dStarLite =
+                new DStarLiteShortestPath<Point, DefaultWeightedEdge>(problem.graph, new Heuristic<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {
-                return current.euclideanDistance(endVertex);
+                return current.euclideanDistance(problem.endVertex);
             }
-        }, startVertex, endVertex);
+        }, problem.startVertex, problem.endVertex);
 
         GraphPath<Point, DefaultWeightedEdge> dStarLitePath = dStarLite.iterate();
 

@@ -1,6 +1,5 @@
 package org.jgrapht.alg;
 
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.util.Heuristic;
@@ -13,17 +12,15 @@ public class DStarLiteGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Node, DefaultWeightedEdge> graph,
-            Node startVertex,
-            Node endVertex,
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem,
             GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
-        DStarLiteShortestPath<Node, DefaultWeightedEdge> dStarLite = new DStarLiteShortestPath<Node, DefaultWeightedEdge>(graph, new Heuristic<Node>() {
+        DStarLiteShortestPath<Node, DefaultWeightedEdge> dStarLite = new DStarLiteShortestPath<Node, DefaultWeightedEdge>(problem.graph, new Heuristic<Node>() {
             @Override
             public double getCostToGoalEstimate(Node current) {
                 return 0;
             }
-        }, startVertex, endVertex);
+        }, problem.startVertex, problem.endVertex);
         GraphPath<Node, DefaultWeightedEdge> dStarLitePath = dStarLite.iterate();
 
         return dStarLitePath;

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.util.Heuristic;
+import org.teneighty.heap.BinaryHeap;
 
 public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
@@ -13,19 +14,18 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph,
-            Point start,
-            final Point end,
+            final ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath) {
 
-        ARAStarShortestPath<Point, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Point, DefaultWeightedEdge>(graph, new Heuristic<Point>() {
+        ARAStarShortestPath<Point, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Point, DefaultWeightedEdge>(problem.graph, new Heuristic<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {
-                return current.euclideanDistance(end);
+                return current.euclideanDistance(problem.endVertex);
             }
-        }, start, end, 2, 0.02);
+        }, problem.startVertex, problem.endVertex, 2, 0.02, new BinaryHeap<Double, Point>());
 
         ARAStarShortestPath.Result<Point, DefaultWeightedEdge> araResult;
+        
         do {
             araResult = araStar.iterate();
 
@@ -36,7 +36,7 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
                 break;
             }
 
-            assertValidPath(start, end, araResult.path);
+            assertValidPath(problem.startVertex, problem.endVertex, araResult.path);
         } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, referencePath));
 
         return araResult.path;

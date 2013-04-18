@@ -17,16 +17,14 @@ public class AStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph,
-            Point start,
-            final Point end,
+            final ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath) {
 
-        return AStarShortestPath.findPathBetween(graph, new Heuristic<Point>() {
+        return AStarShortestPath.findPathBetween(problem.graph, new Heuristic<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {
-                return current.euclideanDistance(end);
+                return current.euclideanDistance(problem.endVertex);
             }
-        }, start, end);
+        }, problem.startVertex, problem.endVertex);
     }
 }

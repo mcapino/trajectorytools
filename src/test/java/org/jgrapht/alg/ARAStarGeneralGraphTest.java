@@ -9,6 +9,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.util.Heuristic;
+import org.teneighty.heap.BinaryHeap;
 
 public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
 
@@ -18,17 +19,15 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Node, DefaultWeightedEdge> graph,
-            Node start,
-            Node end,
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem,
             GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
-        ARAStarShortestPath<Node, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Node, DefaultWeightedEdge>(graph, new Heuristic<Node>() {
+        ARAStarShortestPath<Node, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Node, DefaultWeightedEdge>(problem.graph, new Heuristic<Node>() {
             @Override
             public double getCostToGoalEstimate(Node current) {
                 return 0;
             }
-        }, start, end, 2, 0.02);
+        }, problem.startVertex, problem.endVertex, 2, 0.02, new BinaryHeap<Double, Node>());
 
         ARAStarShortestPath.Result<Node, DefaultWeightedEdge> araResult;
         do {
@@ -41,7 +40,7 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
                 break;
             }
 
-            assertValidPath(start, end, araResult.path);
+            assertValidPath(problem.startVertex, problem.endVertex, araResult.path);
         } while (araResult.suboptimalityScale != 1 && !hasSameWeight(araResult.path, referencePath));
 
         return araResult.path;

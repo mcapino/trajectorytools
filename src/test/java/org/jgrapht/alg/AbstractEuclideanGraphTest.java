@@ -62,17 +62,13 @@ public abstract class AbstractEuclideanGraphTest {
     public abstract void initialize();
 
     protected abstract GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph,
-            Point startVertex,
-            Point endVertex,
+            ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath);
 
     protected GraphPath<Point, DefaultWeightedEdge> runReferenceAlgorithm(
-            Graph<Point, DefaultWeightedEdge> graph,
-            Point startVertex,
-            Point endVertex) {
+            ShortestPathProblem<Point, DefaultWeightedEdge> problem) {
 
-        return new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
+        return new DijkstraShortestPath<Point, DefaultWeightedEdge>(problem.graph, problem.startVertex, problem.endVertex).getPath();
     }
 
     protected void startTimer() {
@@ -123,12 +119,15 @@ public abstract class AbstractEuclideanGraphTest {
             Point startVertex = vertices[random.nextInt(vertices.length)];
             final Point endVertex = vertices[random.nextInt(vertices.length)];
 
+            ShortestPathProblem<Point, DefaultWeightedEdge> problem =
+                    new ShortestPathProblem<Point, DefaultWeightedEdge>(graph, startVertex, endVertex);
+
             startTimer();
-            GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(graph, startVertex, endVertex);
+            GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
             referenceOverallTime += stopTimer();
 
             startTimer();
-            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, referencePath);
+            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
             testedOverallTime += stopTimer();
 
             assertFalse(testedAlgPath == null && referencePath != null);

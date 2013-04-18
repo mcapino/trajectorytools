@@ -65,17 +65,13 @@ public abstract class AbstractGeneralGraphTest {
     protected boolean debugOut;
 
     abstract GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
-            Graph<Node, DefaultWeightedEdge> graph,
-            Node start,
-            Node end,
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem,
             GraphPath<Node, DefaultWeightedEdge> dijkstraPath);
 
     protected GraphPath<Node, DefaultWeightedEdge> runReferenceAlgorithm(
-            Graph<Node, DefaultWeightedEdge> graph,
-            Node startVertex,
-            Node endVertex) {
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem) {
 
-        return new DijkstraShortestPath<Node, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
+        return new DijkstraShortestPath<Node, DefaultWeightedEdge>(problem.graph, problem.startVertex, problem.endVertex).getPath();
     }
 
     @Before
@@ -127,12 +123,16 @@ public abstract class AbstractGeneralGraphTest {
             Node startVertex = vertices[random.nextInt(vertices.length)];
             Node endVertex = vertices[random.nextInt(vertices.length)];
 
+
+            ShortestPathProblem<Node, DefaultWeightedEdge> problem =
+                    new ShortestPathProblem<Node, DefaultWeightedEdge>(graph, startVertex, endVertex);
+
             startTimer();
-            GraphPath<Node, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(graph, startVertex, endVertex);
+            GraphPath<Node, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
             referenceOverallTime += stopTimer();
 
             startTimer();
-            GraphPath<Node, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, referencePath);
+            GraphPath<Node, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
             testedOverallTime += stopTimer();
 
             assertFalse(testedAlgPath == null && referencePath != null);
