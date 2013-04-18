@@ -43,52 +43,48 @@ package org.jgrapht.alg;
 import static org.junit.Assert.*;
 
 import java.util.*;
-
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
-import org.jgrapht.util.Heuristic;
+import org.junit.Before;
 import org.junit.Test;
 
-public class AStarAgainstDijkstraEuclideanGraphTest {
+public abstract class AbstractEuclideanGraphTest {
 
-    // Auxiliary class for creating random graphs that could be interpreted as "webs" in 2D plane
-    class Point {
+    private long timerStarted;
+    protected long referenceOverallTime = 0;
+    protected long testedOverallTime = 0;
+    protected int TRIALS = 500;
+    protected int VERTICES = 100;
+    protected int EDGES = 150;
 
-        double x;
-        double y;
+    @Before
+    public abstract void initialize();
 
-        public Point(double x, double y) {
-            super();
-            this.x = x;
-            this.y = y;
-        }
+    protected abstract GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph,
+            Point startVertex,
+            Point endVertex,
+            GraphPath<Point, DefaultWeightedEdge> referencePath);
 
-        public double euclideanDistance(Point goal) {
-            return Math.sqrt(Math.pow(this.x - goal.x, 2) + Math.pow(this.y - goal.y, 2));
-        }
+    protected GraphPath<Point, DefaultWeightedEdge> runReferenceAlgorithm(
+            Graph<Point, DefaultWeightedEdge> graph,
+            Point startVertex,
+            Point endVertex) {
 
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ")";
-        }
+        return new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
     }
 
-    class EuclideanDistanceHeuristic implements Heuristic<Point> {
+    protected void startTimer() {
+        timerStarted = System.currentTimeMillis();
+    }
 
-        Point goal;
-
-        public EuclideanDistanceHeuristic(Point goal) {
-            this.goal = goal;
-        }
-
-        @Override
-        public double getCostToGoalEstimate(Point current) {
-            return current.euclideanDistance(goal);
-        }
+    protected long stopTimer() {
+        return System.currentTimeMillis() - timerStarted;
     }
 
     //~ Methods ----------------------------------------------------------------
-    Graph<Point, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
+    private Graph<Point, DefaultWeightedEdge> createRandomGraph(boolean directed, int nVertices, int nEdges, Random random) {
+
         WeightedGraph<Point, DefaultWeightedEdge> graph;
         if (directed) {
             graph = new DirectedWeightedMultigraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
@@ -111,7 +107,7 @@ public class AStarAgainstDijkstraEuclideanGraphTest {
         return graph;
     }
 
-    void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
+    private void assertTestedAlgorithmAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
             //System.out.printf("Trial %d/%d \n", seed, trials);
@@ -122,28 +118,60 @@ public class AStarAgainstDijkstraEuclideanGraphTest {
             Point[] vertices = graph.vertexSet().toArray(new Point[nvertices]);
 
             Point startVertex = vertices[random.nextInt(vertices.length)];
-            Point endVertex = vertices[random.nextInt(vertices.length)];
+            final Point endVertex = vertices[random.nextInt(vertices.length)];
 
-            GraphPath<Point, DefaultWeightedEdge> dijkstraPath = new DijkstraShortestPath<Point, DefaultWeightedEdge>(graph, startVertex, endVertex).getPath();
-            GraphPath<Point, DefaultWeightedEdge> aStarFibanaci = AStarShortestPath.findPathBetween(graph, new EuclideanDistanceHeuristic(endVertex), startVertex, endVertex);
+            startTimer();
+            GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(graph, startVertex, endVertex);
+            referenceOverallTime += stopTimer();
 
-            assertFalse(aStarFibanaci == null && dijkstraPath != null);
-            assertFalse(aStarFibanaci != null && dijkstraPath == null);
-            assertTrue(aStarFibanaci == dijkstraPath || Math.abs(aStarFibanaci.getWeight() - dijkstraPath.getWeight()) < 0.01);
+            startTimer();
+            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(graph, startVertex, endVertex, referencePath);
+            testedOverallTime += stopTimer();
+
+            assertFalse(testedAlgPath == null && referencePath != null);
+            assertFalse(testedAlgPath != null && referencePath == null);
+            assertTrue(testedAlgPath == referencePath || hasSameWeight(referencePath, testedAlgPath));
         }
+    }
+
+    protected void printMeasuredTimes() {
+        System.out.println(String.format("Overall times ---- Reference: %d,  Tested: %d", referenceOverallTime, testedOverallTime));
+    }
+
+    protected boolean hasSameWeight(GraphPath<Point, DefaultWeightedEdge> pathA,
+            GraphPath<Point, DefaultWeightedEdge> pathB) {
+        return Math.abs(pathA.getWeight() - pathB.getWeight()) < 0.01;
     }
 
     @Test
     public void test() {
-        final int TRIALS = 500;
-        final int VERTICES = 100;
-        final int EDGES = 150;
-
         // Check directed
-        assertAStarAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
+        assertTestedAlgorithmAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
 
         // Check undirected
-        assertAStarAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
+        assertTestedAlgorithmAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
+    }
+
+    // Auxiliary class for creating random graphs that could be interpreted as "webs" in 2D plane
+    protected static class Point {
+
+        double x;
+        double y;
+
+        public Point(double x, double y) {
+            super();
+            this.x = x;
+            this.y = y;
+        }
+
+        public double euclideanDistance(Point goal) {
+            return Math.sqrt(Math.pow(this.x - goal.x, 2) + Math.pow(this.y - goal.y, 2));
+        }
+
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
     }
 }
 
