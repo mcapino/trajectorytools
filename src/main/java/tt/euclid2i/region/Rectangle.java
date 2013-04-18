@@ -49,4 +49,11 @@ public class Rectangle implements Region {
         return new Rectangle(new Point(minx-inflateBy, miny-inflateBy), new Point(maxx+inflateBy, maxy+inflateBy));
     }
 
+	@Override
+	public Rectangle getBoundingBox() {
+		return this;
+	}
+
+
+
 }

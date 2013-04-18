@@ -16,7 +16,7 @@ import org.jgrapht.util.Heuristic;
 import tt.discrete.vis.TrajectoryLayer;
 import tt.discrete.vis.TrajectoryLayer.TrajectoryProvider;
 import tt.euclid2i.discretization.LazyGrid;
-import tt.euclid2i.trajectory.LineSegmentConstantSpeedTrajectory;
+import tt.euclid2i.trajectory.LineSegmentsConstantSpeedTrajectory;
 import tt.euclid2i.trajectory.StraightSegmentTrajectory;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
@@ -140,7 +140,7 @@ public class PathfindingDemoCreator implements Creator {
                     }
                 }, start, target);
 
-        final tt.euclid2i.Trajectory trajectory = new LineSegmentConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
+        final tt.euclid2i.Trajectory trajectory = new LineSegmentsConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(
                 0, path, 1, (int) path.getWeight());
 
         return new MovingCircle(trajectory, radius, (int) radius / 4);

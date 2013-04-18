@@ -22,7 +22,7 @@ import tt.euclid2i.Point;
  *
  */
 
-public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line> implements EvaluatedTrajectory {
+public class LineSegmentsConstantSpeedTrajectory<V extends Point, E extends Line> implements EvaluatedTrajectory {
 
     private List<E> maneuvers = null;
 
@@ -37,7 +37,7 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
     private int speed;
 
 
-    public LineSegmentConstantSpeedTrajectory(int startTime, GraphPath<V,E> graphPath, int speed, int duration) {
+    public LineSegmentsConstantSpeedTrajectory(int startTime, GraphPath<V,E> graphPath, int speed, int duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
         this.maneuvers = graphPath.getEdgeList();
@@ -108,7 +108,7 @@ public class LineSegmentConstantSpeedTrajectory<V extends Point, E extends Line>
             return false;
         if (getClass() != obj.getClass())
             return false;
-        LineSegmentConstantSpeedTrajectory other = (LineSegmentConstantSpeedTrajectory) obj;
+        LineSegmentsConstantSpeedTrajectory other = (LineSegmentsConstantSpeedTrajectory) obj;
         if (maneuvers == null) {
             if (other.maneuvers != null)
                 return false;
