@@ -8,7 +8,6 @@ import javax.vecmath.Point2d;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.AStarShortestPathSimple;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
@@ -25,6 +24,8 @@ import cz.agents.alite.vis.VisManager;
 import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
+import org.jgrapht.alg.AStarShortestPath;
+import org.jgrapht.util.Heuristic;
 
 
 public class PathfindingDemoCreator implements Creator {
@@ -44,14 +45,9 @@ public class PathfindingDemoCreator implements Creator {
 						new Point(50, 50)), LazyGrid.PATTERN_4_WAY, 10);
 
         // plan the shortest path
-        //FIXME use the new A*
-        final AStarShortestPathSimple<Point, Line> astar = new AStarShortestPathSimple<Point, Line>(graph, new Point(0,0), new Point(30,40), new AStarShortestPathSimple.Heuristic<Point>() {
-            @Override
-            public double getHeuristicEstimate(Point current, Point goal) {
-                return current.distance(goal);
-            }
-        });
-
+        final Point start = new Point(0,0);
+        final Point goal = new Point(30,40);
+        
         initVisualization();
 
         // graph
@@ -70,7 +66,13 @@ public class PathfindingDemoCreator implements Creator {
 
             @Override
             public GraphPath<Point, Line> getPath() {
-                return astar.getPath();
+                return AStarShortestPath.findPathBetween(graph, new Heuristic<Point>() {
+
+                    @Override
+                    public double getCostToGoalEstimate(Point current) {
+                        return current.distance(goal);
+                    }
+                }, start, goal);
             }
 
         },  new ProjectionTo2d(),Color.RED, Color.RED, 2, 4));
