@@ -8,12 +8,19 @@ import org.jgrapht.DirectedGraph;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.probleminstance.ShortestPathProblem;
 import tt.euclid2i.region.Rectangle;
 import tt.planner.rrtstar.Extension;
 
 public class GraphDomain extends StraightLineDomain {
 
     DirectedGraph<Point, Line> graph;
+
+    public GraphDomain(DirectedGraph<Point, Line> graph,
+            ShortestPathProblem problem, int seed, double tryGoalRatio) {
+        super(problem, seed, tryGoalRatio);
+        this.graph = graph;
+    }
 
     public GraphDomain(Rectangle bounds, DirectedGraph<Point, Line> graph,
             Collection<Region> obstacles,

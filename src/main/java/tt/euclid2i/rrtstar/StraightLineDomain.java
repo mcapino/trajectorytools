@@ -6,6 +6,7 @@ import java.util.Random;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.probleminstance.ShortestPathProblem;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.planner.rrtstar.Domain;
@@ -22,9 +23,17 @@ public class StraightLineDomain implements Domain<Point, Line> {
     Random random;
     final double speed = 1.0;
 
+    public StraightLineDomain(ShortestPathProblem problem, int seed, double tryGoalRatio) {
+        super();
+        this.bounds = problem.getBounds();
+        this.obstacles = problem.getObstacles();
+        this.target = problem.getTargetRegion();
+        this.targetPoint = problem.getTargetPoint();
+        this.random = new Random(seed);
+        this.tryGoalRatio = tryGoalRatio;
+    }
 
-    public StraightLineDomain(Rectangle bounds,
-            Collection<Region> obstacles,
+    public StraightLineDomain(Rectangle bounds, Collection<Region> obstacles,
             Region target, Point targetPoint, int seed, double tryGoalRatio) {
         super();
         this.bounds = bounds;
@@ -44,8 +53,7 @@ public class StraightLineDomain implements Domain<Point, Line> {
     }
 
     @Override
-    public Extension<Point, Line>
-    extendTo(Point from, Point to) {
+    public Extension<Point, Line> extendTo(Point from, Point to) {
         Extension<Point, Line> result = null;
         if (Util.isVisible(from, to, obstacles)) {
             Line maneuver = new Line(from, to);
@@ -56,7 +64,7 @@ public class StraightLineDomain implements Domain<Point, Line> {
 
     @Override
     public ExtensionEstimate estimateExtension(Point p1, Point p2) {
-        return new ExtensionEstimate(p1.distance(p2)/speed, true);
+        return new ExtensionEstimate(p1.distance(p2) / speed, true);
     }
 
     @Override

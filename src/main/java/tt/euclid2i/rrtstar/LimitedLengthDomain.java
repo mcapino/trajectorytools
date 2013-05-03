@@ -7,6 +7,7 @@ import javax.vecmath.Vector2d;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.probleminstance.ShortestPathProblem;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.planner.rrtstar.Extension;
@@ -14,6 +15,12 @@ import tt.planner.rrtstar.Extension;
 public class LimitedLengthDomain extends StraightLineDomain {
 
     double maxLength;
+
+    public LimitedLengthDomain(ShortestPathProblem problem, double maxLength,
+            int seed, double tryGoalRatio) {
+        super(problem, seed, tryGoalRatio);
+        this.maxLength = maxLength;
+    }
 
     public LimitedLengthDomain(Rectangle bounds,
             Collection<Region> obstacles,
