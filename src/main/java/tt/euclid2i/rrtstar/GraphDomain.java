@@ -17,23 +17,23 @@ public class GraphDomain extends StraightLineDomain {
 
     public GraphDomain(Rectangle bounds, DirectedGraph<Point, Line> graph,
             Collection<Region> obstacles,
-            Region target, Point targetPoint,
+            Region target, Point targetPoint, int seed,
             double tryGoalRatio) {
-        super(bounds, obstacles, target, targetPoint, tryGoalRatio);
+        super(bounds, obstacles, target, targetPoint, seed, tryGoalRatio);
         this.graph = graph;
     }
 
     @Override
     public Extension<Point, Line> extendTo(
             Point from, Point to) {
-        assert(graph.containsVertex(from));
+        assert (graph.containsVertex(from));
 
         Set<Line> outEdges = graph.outgoingEdgesOf(from);
 
         Line bestEdge = null;
         double bestEdgeDistance = Double.POSITIVE_INFINITY;
 
-        for (Line edge :  outEdges) {
+        for (Line edge : outEdges) {
             if (edge.getEnd().distance(to) < bestEdgeDistance) {
                 bestEdgeDistance = edge.getEnd().distance(to);
                 bestEdge = edge;
@@ -42,7 +42,4 @@ public class GraphDomain extends StraightLineDomain {
 
         return new Extension<Point, Line>(from, bestEdge.getEnd(), bestEdge, graph.getEdgeWeight(bestEdge), bestEdge.getEnd().equals(to));
     }
-
-
-
 }

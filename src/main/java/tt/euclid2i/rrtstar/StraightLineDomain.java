@@ -25,13 +25,13 @@ public class StraightLineDomain implements Domain<Point, Line> {
 
     public StraightLineDomain(Rectangle bounds,
             Collection<Region> obstacles,
-            Region target, Point targetPoint, double tryGoalRatio) {
+            Region target, Point targetPoint, int seed, double tryGoalRatio) {
         super();
         this.bounds = bounds;
         this.obstacles = obstacles;
         this.target = target;
         this.targetPoint = targetPoint;
-        this.random = new Random(1);
+        this.random = new Random(seed);
         this.tryGoalRatio = tryGoalRatio;
     }
 

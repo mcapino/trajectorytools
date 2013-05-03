@@ -11,22 +11,20 @@ import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.planner.rrtstar.Extension;
 
-public class LimitedLengthDomain extends
-        StraightLineDomain {
+public class LimitedLengthDomain extends StraightLineDomain {
 
     double maxLength;
 
     public LimitedLengthDomain(Rectangle bounds,
             Collection<Region> obstacles,
             Region target, Point targetPoint, double maxLength,
-            double tryGoalRatio) {
-        super(bounds, obstacles, target, targetPoint, tryGoalRatio);
+            int seed, double tryGoalRatio) {
+        super(bounds, obstacles, target, targetPoint, seed, tryGoalRatio);
         this.maxLength = maxLength;
     }
 
     @Override
-    public Extension<Point, Line>
-    extendTo(Point from, Point to) {
+    public Extension<Point, Line> extendTo(Point from, Point to) {
         Extension<Point, Line> result = null;
 
         Vector2d direction = new Vector2d(to.x - from.x, to.y - from.y);
@@ -41,5 +39,4 @@ public class LimitedLengthDomain extends
         }
         return result;
     }
-
 }
