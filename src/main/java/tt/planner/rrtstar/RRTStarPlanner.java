@@ -149,7 +149,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
 
-    private Vertex<S,E> insertExtension(Vertex<S,E> parent, Extension<S, E> extension) {
+    protected Vertex<S,E> insertExtension(Vertex<S,E> parent, Extension<S, E> extension) {
 
         if (bestVertex != null) {
             if (bestVertex.getCostFromRoot() < parent.getCostFromRoot() + domain.estimateCostToGo(parent.getState())) {
@@ -165,7 +165,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return newVertex;
     }
 
-    private void insertExtension(Vertex<S,E> parent, Extension<S, E> extension, Vertex<S,E> target) {
+    protected void insertExtension(Vertex<S,E> parent, Extension<S, E> extension, Vertex<S,E> target) {
         if (target.parent != null) {
             target.parent.removeChild(target);
         }
@@ -199,7 +199,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-    private BestParentSearchResult findBestParent(S randomSample, Collection<Vertex<S,E>> nearVertices) {
+    protected BestParentSearchResult findBestParent(S randomSample, Collection<Vertex<S,E>> nearVertices) {
 
         class VertexCost implements Comparable<VertexCost> {
             final Vertex<S,E> vertex;
@@ -250,7 +250,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
 
 
 
-    private void rewire(Vertex<S,E> candidateParent, Collection<Vertex<S,E>> vertices) {
+    protected void rewire(Vertex<S,E> candidateParent, Collection<Vertex<S,E>> vertices) {
         for (Vertex<S,E> nearVertex : vertices) {
             if (nearVertex != candidateParent) {
                 ExtensionEstimate extensionEst = domain.estimateExtension(candidateParent.getState(), nearVertex.getState());
@@ -269,7 +269,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-    private void updateBranchCost(Vertex<S,E> vertex) {
+    protected void updateBranchCost(Vertex<S,E> vertex) {
         checkBestVertex(vertex);
         for (Vertex<S,E> child : vertex.getChildren()) {
             child.setCostFromRoot(vertex.getCostFromRoot() + child.getCostFromParent());
@@ -277,7 +277,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-    private void checkBestVertex(Vertex<S,E> vertex) {
+    protected void checkBestVertex(Vertex<S,E> vertex) {
         if (domain.isInTargetRegion(vertex.getState())) {
             if (bestVertex == null || vertex.costFromRoot < bestVertex.costFromRoot) {
                 bestVertex = vertex;
@@ -285,7 +285,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         }
     }
 
-    private Collection<Vertex<S,E>> getNearParentCandidates(final S x) {
+    protected Collection<Vertex<S,E>> getNearParentCandidates(final S x) {
         final double radius = getNearBallRadius();
         return dfsConditionSearch( new Condition<S,E>() {
             @Override
@@ -296,7 +296,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
     }
 
 
-    private Collection<Vertex<S,E>> getNearChildrenCandidates(final S x) {
+    protected Collection<Vertex<S,E>> getNearChildrenCandidates(final S x) {
         final double radius = getNearBallRadius();
         return dfsConditionSearch( new Condition<S,E>() {
             @Override
@@ -311,7 +311,7 @@ public class RRTStarPlanner<S,E> implements Graph<S,E> {
         return Math.min(gamma * Math.pow(Math.log(n+1)/(n+1), 1 / domain.nDimensions()), eta);
     }
 
-    private Vertex<S,E>  getNearestParentVertex(S x) {
+    protected Vertex<S,E>  getNearestParentVertex(S x) {
         return dfsNearestParentSearch(x);
     }
 
