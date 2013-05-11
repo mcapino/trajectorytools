@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Alite Trajectory Tools</name>
@@ -9,11 +9,11 @@
     <!-- version>1.0-SNAPSHOT</version -->
     <description>
         Alite trajectory toolkit is a bundle of classes facilitating tasks connected with
-(multi-agent) trajectory planning in synthetic environments. It contains an A*
-planner on general graphs and a set of special-purpose graph generators such
-grid-graphs, space-time grid-graphs, meneuver graphs etc.
-Further it contains facilities such as trajectory approximators, conflict detectors,
-visualization components etc.
+        (multi-agent) trajectory planning in synthetic environments. It contains an A*
+        planner on general graphs and a set of special-purpose graph generators such
+        grid-graphs, space-time grid-graphs, meneuver graphs etc.
+        Further it contains facilities such as trajectory approximators, conflict detectors,
+        visualization components etc.
 
 
         http://jones.felk.cvut.cz/redmine/projects/alite/wiki/Trajectory_Tools
@@ -55,6 +55,13 @@ visualization components etc.
             <artifactId>jgrapht-jdk1.6</artifactId>
             <version>0.8.2</version>
         </dependency>
+        <!--
+        <dependency>
+            <groupId>net.sf.jgrapht</groupId> 
+            <artifactId>jgrapht</artifactId>
+            <version>0.8.3</version>
+        </dependency>
+        -->
         <dependency>
             <groupId>math.javageom</groupId>
             <artifactId>javaGeom</artifactId>
@@ -62,10 +69,10 @@ visualization components etc.
         </dependency>
         <dependency>
             <groupId>org.teneighty</groupId>
-                <artifactId>heaps</artifactId>
+            <artifactId>heaps</artifactId>
             <version>2.0.0</version>
         </dependency>
-     </dependencies>
+    </dependencies>
 
     <version>2.0-SNAPSHOT</version>
 </project>
