@@ -1,34 +1,39 @@
 package org.jgrapht.alg;
 
+import org.jgrapht.event.ListenableWrapperChangeEvent;
+import org.jgrapht.event.VertexChangeEvent;
+import org.jgrapht.event.EdgeChangeEvent;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import org.jgrapht.Graphs;
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.event.GraphEdgeChangeEvent;
-import org.jgrapht.event.GraphListener;
-import org.jgrapht.event.GraphVertexChangeEvent;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.listenable.*;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.Heuristic;
 import org.jgrapht.util.PlanningHeapWrapper;
 import org.teneighty.heap.FibonacciHeap;
 
-public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> implements GraphListener<V, E> {
+public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> implements ListenableWrapperListenerWrapper<V, E> {
 
-    private Heuristic<V> heuristic;
     private Set<V> inconsistentGoals;
     private Map<V, Double> rightHandSideValue;
     private Map<V, E> rightHandSideLeastEdge;
+    //
+    private Heuristic<V> heuristic;
     private PlanningHeapWrapper<Key, V> heap;
-    private GraphPath<V, E> path;
+    //
+    private Queue<ListenableWrapperChangeEvent<V, E>> eventQueue;
     //
     private V leastDistantGole;
     private Key leastDistantGoleKey;
 
-    public DStarLiteShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public DStarLiteShortestPath(ListenableGraphWrapper<V, E> graph, Heuristic<V> heuristic, V startVertex,
             final V endVertex) {
 
         this(graph, heuristic, startVertex, new Goal<V>() {
@@ -39,9 +44,11 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         });
     }
 
-    public DStarLiteShortestPath(Graph<V, E> graph, Heuristic<V> heuristic,
+    @SuppressWarnings("LeakingThisInConstructor")
+    public DStarLiteShortestPath(ListenableGraphWrapper<V, E> graph, Heuristic<V> heuristic,
             V startVertex, Goal<V> goal) {
         super(graph, startVertex, goal);
+        graph.addListeners(this);
 
         this.heuristic = heuristic;
         initialize();
@@ -49,6 +56,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
 
     private void initialize() {
         heap = new PlanningHeapWrapper<Key, V>(new FibonacciHeap<Key, V>());
+        eventQueue = new ArrayDeque<ListenableWrapperChangeEvent<V, E>>();
         rightHandSideValue = new HashMap<V, Double>();
         rightHandSideLeastEdge = new HashMap<V, E>();
         inconsistentGoals = new HashSet<V>();
@@ -58,8 +66,8 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
     }
 
     public GraphPath<V, E> iterate() {
-        repareShortestPath();
-        return path;
+        handleAvailableEvents();
+        return repareShortestPath();
     }
 
     private Key calculateKey(V vertex) {
@@ -72,7 +80,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         return key;
     }
 
-    private void repareShortestPath() {
+    private GraphPath<V, E> repareShortestPath() {
         V foundGoal = null;
 
         while (!heap.isEmpty()) {
@@ -89,7 +97,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
 
             } else {
                 setShortestDistanceTo(vertex, Double.POSITIVE_INFINITY);
-                updateRightHandSideOfTheVertex(vertex);
+                updateRightHandSide(vertex);
             }
 
             if (seenGoalsHaveLowerKeyThatTopOfQueue() && allSeenGoalsProcessed()) {
@@ -99,9 +107,9 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         }
 
         if (foundGoal != null) {
-            path = reconstructPath(startVertex, foundGoal);
+            return reconstructPath(startVertex, foundGoal);
         } else {
-            path = null;
+            return null;
         }
     }
 
@@ -120,7 +128,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         for (Iterator<V> it = specifics.succesorVertexIterator(vertex); it.hasNext();) {
             V succesor = it.next();
             if (succesor != vertex) {
-                updateRightHandSideOfTheVertex(succesor);
+                updateRightHandSide(succesor);
             }
         }
     }
@@ -135,7 +143,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
         return inconsistentGoals.isEmpty();
     }
 
-    private void updateRightHandSideOfTheVertex(V vertex) {
+    private void updateRightHandSide(V vertex) {
         if (vertex != startVertex) {
             findShortestPathThruPredecessors(vertex);
         }
@@ -198,23 +206,56 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
 
     // ---- GraphListener methods --------------------------------
     @Override
-    public void edgeAdded(GraphEdgeChangeEvent<V, E> gece) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void handleEdgeEvent(EdgeChangeEvent<V, E> event) {
+        eventQueue.offer(event);
     }
 
     @Override
-    public void edgeRemoved(GraphEdgeChangeEvent<V, E> gece) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void handleVertexEvent(VertexChangeEvent<V, E> event) {
+        eventQueue.offer(event);
     }
 
-    @Override
-    public void vertexAdded(GraphVertexChangeEvent<V> gvce) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void handleAvailableEvents() {
+        while (!eventQueue.isEmpty()) {
+            handleEvent(eventQueue.poll());
+        }
     }
 
-    @Override
-    public void vertexRemoved(GraphVertexChangeEvent<V> gvce) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void handleEvent(ListenableWrapperChangeEvent event) {
+        if (event instanceof EdgeChangeEvent) {
+            handleEdgeChangeEvent((EdgeChangeEvent) event);
+        } else {
+            handleVertexChangeEvent((VertexChangeEvent) event);
+        }
+    }
+
+    private void handleVertexChangeEvent(VertexChangeEvent<V, E> vertexEvent) {
+        int type = vertexEvent.getType();
+        V vertex = vertexEvent.getVertex();
+
+        if (type == VertexChangeEvent.VERTEX_REMOVED) {
+            handleVertexRemoved(vertex);
+        }
+    }
+
+    private void handleEdgeChangeEvent(EdgeChangeEvent<V, E> edgeEvent) {
+        V source = edgeEvent.getSource();
+        V target = edgeEvent.getTarget();
+
+        if (graph.containsVertex(target)) {
+            updateRightHandSide(target);
+        }
+        if (graph instanceof UndirectedGraph && graph.containsVertex(source)) {
+            updateRightHandSide(source);
+        }
+    }
+
+    private void handleVertexRemoved(V vertex) {
+        removeShortestDistanceTo(vertex);
+        removeShortestPathTreeEdge(vertex);
+        heap.remove(vertex);
+        rightHandSideValue.remove(vertex);
+        rightHandSideLeastEdge.remove(vertex);
     }
 
     // ---- Local classes --------------------------------

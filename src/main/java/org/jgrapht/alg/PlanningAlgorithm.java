@@ -38,6 +38,10 @@ class PlanningAlgorithm<V, E> {
         shortestPathTreeEdges.put(v, e);
     }
 
+    protected void removeShortestPathTreeEdge(V v) {
+        shortestPathTreeEdges.remove(v);
+    }
+
     protected double getShortestDistanceTo(V v) {
         Double dist = shortestDistanceToVertex.get(v);
         return (dist == null) ? Double.POSITIVE_INFINITY : dist;
@@ -45,6 +49,10 @@ class PlanningAlgorithm<V, E> {
 
     protected void setShortestDistanceTo(V v, double distance) {
         shortestDistanceToVertex.put(v, distance);
+    }
+
+    protected void removeShortestDistanceTo(V v) {
+        shortestDistanceToVertex.remove(v);
     }
 
     protected GraphPath<V, E> reconstructPath(V startVertex, V endVertex) {
