@@ -10,17 +10,18 @@ import tt.euclid2i.util.Util;
 
 public class ShortestPathProblem {
 
-    final protected int targetRegionSide = 30;
+    final protected int targetRegionSide;
     protected int seed;
     protected Environment environment;
     protected Point start;
     protected Region targetRegion;
     protected Point targetPoint;
 
-
-    public ShortestPathProblem(int seed) {
+    public ShortestPathProblem(int dimX, int dimY, int obstacles, int obstacleMaxSize, int targetSize, int seed) {
+        this.targetRegionSide = targetSize;
         this.seed = seed;
-        this.environment = new Environment(40, 200,seed);
+        this.environment = new Environment(dimX, dimY, obstacles, obstacleMaxSize, seed);
+
         Random random = new Random(seed);
 
         start = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
@@ -29,7 +30,6 @@ public class ShortestPathProblem {
                 new Point(targetPoint.x - targetRegionSide / 2, targetPoint.y - targetRegionSide / 2),
                 new Point(targetPoint.x + targetRegionSide / 2, targetPoint.y + targetRegionSide / 2));
     }
-
 
     public Collection<Region> getObstacles() {
         return environment.getObstacles();
@@ -58,5 +58,4 @@ public class ShortestPathProblem {
     public int getTargetRegionRadius() {
         return targetRegionSide / 2;
     }
-
 }

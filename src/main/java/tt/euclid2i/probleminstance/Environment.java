@@ -14,19 +14,19 @@ public class Environment {
     protected Rectangle bounds;
     protected Collection<Region> obstacles = new LinkedList<Region>();
 
-    public Environment(int n, int maxSize, int seed) {
+    public Environment(int dimX, int dimY, int obstacneCount, int maxSize, int seed) {
         Random random = new Random(seed);
-        bounds = new Rectangle(new Point(0,0), new Point(1000,1000));
+        bounds = new Rectangle(new Point(0, 0), new Point(dimX, dimY));
         this.seed = seed;
-        createObstacles(n, maxSize, random);
+        createObstacles(obstacneCount, maxSize, random);
     }
 
     private void createObstacles(int n, int maxSize, Random random) {
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
             int size = random.nextInt(maxSize);
             int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
             int y = bounds.getCorner1().y + random.nextInt(bounds.getCorner2().y - bounds.getCorner1().y);
-            Rectangle obstacle = new Rectangle(new Point(x, y), new Point(x+size,y+size));
+            Rectangle obstacle = new Rectangle(new Point(x, y), new Point(x + size, y + size));
             obstacles.add(obstacle);
         }
     }
@@ -42,5 +42,4 @@ public class Environment {
     public int getSeed() {
         return seed;
     }
-
 }
