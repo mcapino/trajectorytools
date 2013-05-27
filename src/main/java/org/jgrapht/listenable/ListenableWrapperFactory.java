@@ -5,7 +5,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 
-public class ListenableGraphFactory {
+public class ListenableWrapperFactory {
 
     public static<V, E> ListenableWrapper createListenableWrapper(Graph<V, E> graph) {
         if (graph instanceof DirectedGraph) {
