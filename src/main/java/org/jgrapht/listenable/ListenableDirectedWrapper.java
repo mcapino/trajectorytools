@@ -1,19 +1,24 @@
 package org.jgrapht.listenable;
 
-import java.util.Set;
 import org.jgrapht.DirectedGraph;
 
+import java.util.Set;
+
 /**
- *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
-public class ListenableDirectedGraphWrapper<V, E> extends ListenableGraphWrapper<V, E> implements DirectedGraph<V, E> {
+public class ListenableDirectedWrapper<V, E> extends ListenableWrapper<V, E> implements DirectedGraph<V, E> {
 
     private DirectedGraph<V, E> graph;
 
-    public ListenableDirectedGraphWrapper(DirectedGraph<V, E> graph) {
+    ListenableDirectedWrapper(DirectedGraph<V, E> graph) {
         super(graph);
         this.graph = graph;
+    }
+
+    @Override
+    public void setEdgeWeight(E e, double v) {
+        throw new RuntimeException("Parent Graph is not weighted!");
     }
 
     @Override

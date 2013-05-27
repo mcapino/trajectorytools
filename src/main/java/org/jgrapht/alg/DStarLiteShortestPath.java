@@ -19,7 +19,7 @@ import org.jgrapht.util.Heuristic;
 import org.jgrapht.util.PlanningHeapWrapper;
 import org.teneighty.heap.FibonacciHeap;
 
-public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> implements ListenableWrapperListenerWrapper<V, E> {
+public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> implements ListenableWrapperListener<V, E> {
 
     private Set<V> inconsistentGoals;
     private Map<V, Double> rightHandSideValue;
@@ -33,7 +33,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
     private V leastDistantGole;
     private Key leastDistantGoleKey;
 
-    public DStarLiteShortestPath(ListenableGraphWrapper<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public DStarLiteShortestPath(ListenableWrapper<V, E> graph, Heuristic<V> heuristic, V startVertex,
             final V endVertex) {
 
         this(graph, heuristic, startVertex, new Goal<V>() {
@@ -45,7 +45,7 @@ public class DStarLiteShortestPath<V, E> extends PlanningAlgorithm<V, E> impleme
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    public DStarLiteShortestPath(ListenableGraphWrapper<V, E> graph, Heuristic<V> heuristic,
+    public DStarLiteShortestPath(ListenableWrapper<V, E> graph, Heuristic<V> heuristic,
             V startVertex, Goal<V> goal) {
         super(graph, startVertex, goal);
         graph.addListeners(this);

@@ -4,17 +4,13 @@ import org.jgrapht.event.EdgeChangeEvent;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.WeightedGraph;
 
-public class ListenableDirectedWeightedGraphWrapper<V, E> extends ListenableDirectedGraphWrapper<V, E> implements WeightedGraph<V, E> {
+public class ListenableDirectedWeightedWrapper<V, E> extends ListenableDirectedWrapper<V, E> implements WeightedGraph<V, E> {
 
     private WeightedGraph<V, E> graph;
 
-    public ListenableDirectedWeightedGraphWrapper(DirectedGraph<V, E> graph) {
+    ListenableDirectedWeightedWrapper(DirectedGraph<V, E> graph) {
         super(graph);
-        if (graph instanceof WeightedGraph) {
-            this.graph = (WeightedGraph<V, E>) graph;
-        } else {
-            throw new RuntimeException("ListenableDirectedWeightedGraphWrapper must be Directed and Weighted");
-        }
+        this.graph = (WeightedGraph<V, E>) graph;
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.jgrapht.listenable;
 
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
+import org.jgrapht.WeightedGraph;
 import org.jgrapht.event.EdgeChangeEvent;
 import org.jgrapht.event.VertexChangeEvent;
 
@@ -13,53 +14,18 @@ import java.util.Set;
 /**
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
-public abstract class ListenableGraphWrapper<V, E> implements Graph<V, E> {
+public abstract class ListenableWrapper<V, E> implements WeightedGraph<V, E> {
 
     private Graph<V, E> graph;
     private Set<ListenableWrapperListener<V, E>> listeners;
 
-    public ListenableGraphWrapper(Graph<V, E> graph) {
+    ListenableWrapper(Graph<V, E> graph) {
         this.listeners = new HashSet<ListenableWrapperListener<V, E>>();
         this.graph = graph;
     }
 
     public Graph<V, E> getGraph() {
         return graph;
-    }
-
-    // -------------- Listenable --------------
-    public void addListeners(ListenableWrapperListener<V, E> listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(ListenableWrapperListener<V, E> listener) {
-        listeners.remove(listener);
-    }
-
-    public boolean containsListener(ListenableWrapperListener<V, E> listener) {
-        return listeners.contains(listener);
-    }
-
-    protected void fireVertexEvent(VertexChangeEvent<V, E> event) {
-        for (ListenableWrapperListener<V, E> listener : listeners) {
-            listener.handleVertexEvent(event);
-        }
-    }
-
-    protected void fireEdgeEvent(EdgeChangeEvent<V, E> event) {
-        for (ListenableWrapperListener<V, E> listener : listeners) {
-            listener.handleEdgeEvent(event);
-        }
-    }
-
-    protected void fireEdgeEvent(E edge, V source, V target, int type) {
-        EdgeChangeEvent<V, E> event = new EdgeChangeEvent<V, E>(this, edge, source, target, type);
-        fireEdgeEvent(event);
-    }
-
-    protected void fireVertexEvent(V vertex, int type) {
-        VertexChangeEvent<V, E> event = new VertexChangeEvent<V, E>(this, vertex, type);
-        fireVertexEvent(event);
     }
 
     // -------------- Wrapper GETTERS --------------
@@ -232,11 +198,46 @@ public abstract class ListenableGraphWrapper<V, E> implements Graph<V, E> {
 
     @Override
     public boolean equals(Object that) {
-        if (that instanceof ListenableGraphWrapper) {
-            Graph<V, E> target = ((ListenableGraphWrapper) that).graph;
+        if (that instanceof ListenableWrapper) {
+            Graph<V, E> target = ((ListenableWrapper) that).graph;
             return this.graph.equals(target);
         } else {
             return false;
         }
+    }
+
+    // -------------- Listenable --------------
+    public void addListeners(ListenableWrapperListener<V, E> listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(ListenableWrapperListener<V, E> listener) {
+        listeners.remove(listener);
+    }
+
+    public boolean containsListener(ListenableWrapperListener<V, E> listener) {
+        return listeners.contains(listener);
+    }
+
+    protected void fireVertexEvent(VertexChangeEvent<V, E> event) {
+        for (ListenableWrapperListener<V, E> listener : listeners) {
+            listener.handleVertexEvent(event);
+        }
+    }
+
+    protected void fireEdgeEvent(EdgeChangeEvent<V, E> event) {
+        for (ListenableWrapperListener<V, E> listener : listeners) {
+            listener.handleEdgeEvent(event);
+        }
+    }
+
+    protected void fireVertexEvent(V vertex, int type) {
+        VertexChangeEvent<V, E> event = new VertexChangeEvent<V, E>(this, vertex, type);
+        fireVertexEvent(event);
+    }
+
+    protected void fireEdgeEvent(E edge, V source, V target, int type) {
+        EdgeChangeEvent<V, E> event = new EdgeChangeEvent<V, E>(this, edge, source, target, type);
+        fireEdgeEvent(event);
     }
 }

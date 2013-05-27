@@ -5,9 +5,10 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.listenable.ListenableDirectedGraphWrapper;
-import org.jgrapht.listenable.ListenableGraphWrapper;
-import org.jgrapht.listenable.ListenableUndirectedGraphWrapper;
+import org.jgrapht.listenable.ListenableDirectedWrapper;
+import org.jgrapht.listenable.ListenableGraphFactory;
+import org.jgrapht.listenable.ListenableWrapper;
+import org.jgrapht.listenable.ListenableUndirectedWrapper;
 import org.jgrapht.util.Heuristic;
 
 public class DStarLiteGeneralGraphTest extends AbstractGeneralGraphTest {
@@ -22,16 +23,10 @@ public class DStarLiteGeneralGraphTest extends AbstractGeneralGraphTest {
             GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
         Graph<Node, DefaultWeightedEdge> graph = problem.graph;
-        ListenableGraphWrapper<Node, DefaultWeightedEdge> listenableGraph;
-
-        if (graph instanceof DirectedGraph) {
-            listenableGraph = new ListenableDirectedGraphWrapper<Node, DefaultWeightedEdge>((DirectedGraph) graph);
-        } else {
-            listenableGraph = new ListenableUndirectedGraphWrapper<Node, DefaultWeightedEdge>((UndirectedGraph) graph);
-        }
+        ListenableWrapper<Node, DefaultWeightedEdge> listenableWrapper = ListenableGraphFactory.createListenableWrapper(graph);
 
         DStarLiteShortestPath<Node, DefaultWeightedEdge> dStarLite =
-                new DStarLiteShortestPath<Node, DefaultWeightedEdge>(listenableGraph, new Heuristic<Node>() {
+                new DStarLiteShortestPath<Node, DefaultWeightedEdge>(listenableWrapper, new Heuristic<Node>() {
             @Override
             public double getCostToGoalEstimate(Node current) {
                 return 0;
