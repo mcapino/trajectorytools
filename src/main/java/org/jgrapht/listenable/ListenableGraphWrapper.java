@@ -1,25 +1,25 @@
 package org.jgrapht.listenable;
 
-import org.jgrapht.event.VertexChangeEvent;
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.Graph;
 import org.jgrapht.event.EdgeChangeEvent;
+import org.jgrapht.event.VertexChangeEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.jgrapht.EdgeFactory;
-import org.jgrapht.Graph;
 
 /**
- *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
 public abstract class ListenableGraphWrapper<V, E> implements Graph<V, E> {
 
     private Graph<V, E> graph;
-    private Set<ListenableWrapperListenerWrapper<V, E>> listeners;
+    private Set<ListenableWrapperListener<V, E>> listeners;
 
     public ListenableGraphWrapper(Graph<V, E> graph) {
-        this.listeners = new HashSet<ListenableWrapperListenerWrapper<V, E>>();
+        this.listeners = new HashSet<ListenableWrapperListener<V, E>>();
         this.graph = graph;
     }
 
@@ -28,26 +28,26 @@ public abstract class ListenableGraphWrapper<V, E> implements Graph<V, E> {
     }
 
     // -------------- Listenable --------------
-    public void addListeners(ListenableWrapperListenerWrapper<V, E> listener) {
+    public void addListeners(ListenableWrapperListener<V, E> listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(ListenableWrapperListenerWrapper<V, E> listener) {
+    public void removeListener(ListenableWrapperListener<V, E> listener) {
         listeners.remove(listener);
     }
 
-    public boolean containsListener(ListenableWrapperListenerWrapper<V, E> listener) {
+    public boolean containsListener(ListenableWrapperListener<V, E> listener) {
         return listeners.contains(listener);
     }
 
     protected void fireVertexEvent(VertexChangeEvent<V, E> event) {
-        for (ListenableWrapperListenerWrapper<V, E> listener : listeners) {
+        for (ListenableWrapperListener<V, E> listener : listeners) {
             listener.handleVertexEvent(event);
         }
     }
 
     protected void fireEdgeEvent(EdgeChangeEvent<V, E> event) {
-        for (ListenableWrapperListenerWrapper<V, E> listener : listeners) {
+        for (ListenableWrapperListener<V, E> listener : listeners) {
             listener.handleEdgeEvent(event);
         }
     }
