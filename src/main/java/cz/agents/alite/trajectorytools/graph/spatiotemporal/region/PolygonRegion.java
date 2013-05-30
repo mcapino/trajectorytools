@@ -70,6 +70,8 @@ public class PolygonRegion implements SpaceTimeRegion, SpaceRegion {
 		// and select the coordinate with the largest absolute value. 
 		Projection projection;
 
+		normal.absolute();
+		
 		if (normal.x > normal.y && normal.x > normal.z) {
 			projection = new ProjectionYZ();
 		} else if (normal.y > normal.x && normal.y > normal.z) {
@@ -158,6 +160,11 @@ public class PolygonRegion implements SpaceTimeRegion, SpaceRegion {
 		public double getY(Point3d point) {
 			return point.y;
 		}
+		
+		@Override
+		public String toString() {
+			return "Projection XY";
+		}
 	}
 
 	class ProjectionXZ implements Projection{
@@ -169,6 +176,11 @@ public class PolygonRegion implements SpaceTimeRegion, SpaceRegion {
 		public double getY(Point3d point) {
 			return point.z;
 		}
+
+		@Override
+		public String toString() {
+			return "Projection XZ";
+		}
 	}
 
 	class ProjectionYZ implements Projection{
@@ -179,6 +191,10 @@ public class PolygonRegion implements SpaceTimeRegion, SpaceRegion {
 		@Override
 		public double getY(Point3d point) {
 			return point.y;
+		}
+		@Override
+		public String toString() {
+			return "Projection YZ";
 		}
 	}
 }
