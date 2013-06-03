@@ -2,13 +2,12 @@ package tt.euclid2i.discretization;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.util.GraphBuilder;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
@@ -19,21 +18,21 @@ import tt.util.NotImplementedException;
 
 public class LazyGrid implements DirectedGraph<Point, Line> {
 
-	public static int[][] PATTERN_4_WAY =  {           {0,-1},
-											 {-1, 0},         { 1, 0},
-													  {0, 1},          };
+    public static int[][] PATTERN_4_WAY =  {           {0,-1},
+                                             {-1, 0},         { 1, 0},
+                                                      {0, 1},          };
 
-	public static int[][] PATTERN_4_WAY_WAIT =  {      {0,-1},
-											 {-1, 0},  {0, 0}, { 1, 0},
-													   {0, 1},          };
+    public static int[][] PATTERN_4_WAY_WAIT =  {      {0,-1},
+                                             {-1, 0},  {0, 0}, { 1, 0},
+                                                       {0, 1},          };
 
-	public static int[][] PATTERN_8_WAY =  {  {-1,-1},   {0,-1},    {1,-1},
-		 									  {-1, 0},              {1, 0},
-		 									  {-1, 1},   {0, 1},    {1, 1}};
+    public static int[][] PATTERN_8_WAY =  {  {-1,-1},   {0,-1},    {1,-1},
+                                               {-1, 0},              {1, 0},
+                                               {-1, 1},   {0, 1},    {1, 1}};
 
-	public static int[][] PATTERN_8_WAY_WAIT =  {  {-1,-1},   {0,-1},    {1,-1},
-												  {-1, 0},    {0, 0},    {1, 0},
-												  {-1, 1},    {0, 1},    {1, 1}};
+    public static int[][] PATTERN_8_WAY_WAIT =  {  {-1,-1},   {0,-1},    {1,-1},
+                                                  {-1, 0},    {0, 0},    {1, 0},
+                                                  {-1, 1},    {0, 1},    {1, 1}};
 
     private Point initialPoint;
     private Rectangle bounds;
@@ -50,9 +49,9 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
         // scale the pattern by step parameter
         this.pattern = new int[pattern.length][2];
         for (int i = 0; i < pattern.length; i++) {
-        	this.pattern[i][0] = pattern[i][0] * step;
-        	this.pattern[i][1] = pattern[i][1] * step;
-		}
+            this.pattern[i][0] = pattern[i][0] * step;
+            this.pattern[i][1] = pattern[i][1] * step;
+        }
     }
 
     @Override
@@ -216,40 +215,6 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
     }
 
     public DirectedGraph<Point, Line> generateFullGraph() {
-        DefaultDirectedGraph<Point, Line> fullGraph
-            = new DefaultDirectedGraph<Point, Line>( new EdgeFactory<Point, Line>() {
-
-                @Override
-                public Line createEdge(Point sourceVertex,
-                        Point targetVertex) {
-                    return new Line(sourceVertex, targetVertex);
-                }
-            });
-
-
-        Queue<Point> open = new LinkedList<Point>();
-        open.offer(initialPoint);
-        Set<Point> closed = new HashSet<Point>();
-        int iterations = 0;
-
-        while (!open.isEmpty()) {
-            iterations++;
-            Point current = open.poll();
-            fullGraph.addVertex(current);
-
-            Set<Line> outEdges = outgoingEdgesOf(current);
-            for (Line edge : outEdges) {
-                Point target = getEdgeTarget(edge);
-                fullGraph.addVertex(target);
-                fullGraph.addEdge(current, target);
-
-                if (!closed.contains(target)) {
-                    closed.add(target);
-                    open.offer(target);
-                }
-            }
-        }
-
-        return fullGraph;
+        return GraphBuilder.build(this, new DefaultDirectedGraph<Point, Line>(Line.class), initialPoint);
     }
 }
