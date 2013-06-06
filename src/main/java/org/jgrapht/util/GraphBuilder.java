@@ -7,6 +7,9 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 
+/**
+ * This class provides methods that can build an explicit representation of a graph from its implicit representation.
+ */
 public class GraphBuilder {
 
     public static <V, E> DirectedGraph<V, E> build(DirectedGraph<V, E> implicitGraph, DirectedGraph<V, E> explicitGraph, V init) {
