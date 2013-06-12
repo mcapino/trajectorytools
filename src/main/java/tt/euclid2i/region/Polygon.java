@@ -44,10 +44,31 @@ public class Polygon implements Region{
         return points;
     }
 
-	@Override
-	public Rectangle getBoundingBox() {
-		throw new NotImplementedException();
-	}
+    @Override
+    public Rectangle getBoundingBox() {
+        throw new NotImplementedException();
+    }
+
+    public Polygon inflate(double inflateBy, int pointsAtCorner) {
+
+        // convert points to 2d
+        tt.euclid2d.Point[] points2d = new tt.euclid2d.Point[points.length];
+        for (int i = 0; i < points.length; i++) {
+            points2d[i] = new tt.euclid2d.Point(points[i].x, points[i].y);
+        }
+
+        // inflate polygon2d
+        tt.euclid2d.region.Polygon polygon2d = new tt.euclid2d.region.Polygon(points2d);
+        tt.euclid2d.region.Polygon inflatedPolygon2d = polygon2d.inflate(inflateBy, pointsAtCorner);
+
+        // convert back to 2i
+        Point[] inflatedPoints = new Point[inflatedPolygon2d.getPoints().length];
+        for (int i = 0; i < inflatedPolygon2d.getPoints().length; i++) {
+            inflatedPoints[i] = new Point((int) inflatedPolygon2d.getPoints()[i].x, (int) inflatedPolygon2d.getPoints()[i].y);
+        }
+
+        return new Polygon(inflatedPoints);
+    }
 
 
 }

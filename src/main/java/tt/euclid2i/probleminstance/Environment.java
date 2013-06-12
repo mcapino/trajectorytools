@@ -6,6 +6,7 @@ import java.util.Random;
 
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
 public class Environment {
@@ -27,7 +28,8 @@ public class Environment {
             int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
             int y = bounds.getCorner1().y + random.nextInt(bounds.getCorner2().y - bounds.getCorner1().y);
             Rectangle obstacle = new Rectangle(new Point(x, y), new Point(x + size, y + size));
-            obstacles.add(obstacle);
+            Polygon polygon = obstacle.toPolygon();
+            obstacles.add(polygon);
         }
     }
 

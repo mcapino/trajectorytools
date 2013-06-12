@@ -46,9 +46,11 @@ public class RegionsLayer extends AbstractLayer {
         Collection<Region> regions = regionsProvider.getRegions();
 
         for (Region region : regions) {
-            if (region instanceof MovingCircle) {
+            if (region != null && region instanceof MovingCircle) {
                 MovingCircle movingCirc = (MovingCircle) region;
                 Trajectory traj = movingCirc.getTrajectory();
+
+                assert(traj != null);
 
                 for (int time = traj.getMinTime(); time < traj.getMaxTime(); time += samplingInterval) {
                     tt.euclid2i.Point pos = traj.get(time);

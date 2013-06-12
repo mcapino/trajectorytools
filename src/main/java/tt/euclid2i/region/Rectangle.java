@@ -49,11 +49,25 @@ public class Rectangle implements Region {
         return new Rectangle(new Point(minx-inflateBy, miny-inflateBy), new Point(maxx+inflateBy, maxy+inflateBy));
     }
 
-	@Override
-	public Rectangle getBoundingBox() {
-		return this;
-	}
+    @Override
+    public Rectangle getBoundingBox() {
+        return this;
+    }
 
+    public Polygon toPolygon() {
+
+        int minx = Math.min(corner1.x, corner2.x);
+        int maxx = Math.max(corner1.x, corner2.x);
+        int miny = Math.min(corner1.y, corner2.y);
+        int maxy = Math.max(corner1.y, corner2.y);
+
+
+        return new Polygon(new Point[] {
+                new Point(minx, miny),
+                new Point(maxx, miny),
+                new Point(maxx, maxy),
+                new Point(minx, maxy)});
+    }
 
 
 }

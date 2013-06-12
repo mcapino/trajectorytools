@@ -15,6 +15,7 @@ public class MovingCircle implements Region {
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
+        assert(trajectory != null);
         this.trajectory = trajectory;
         this.radius = radius;
         this.samplingInterval = radius/SAMPLES_PER_RADIUS;
