@@ -11,16 +11,19 @@ import cz.agents.alite.vis.layer.VisLayer;
 
 public class ParameterControlLayer extends AbstractLayer {
 
-	public interface ParameterProvider {
-		String getName();
-		String getValue();
-		char getIncreaseKey();
-		char getDecreaseKey();
-		void increased();
-		void decreased();
-	}
+    public interface ParameterProvider {
+        String getName();
+        String getValue();
+        char getIncreaseKey();
+        char getDecreaseKey();
+        char getResetKey();
 
-	private ParameterProvider parameterProvider;
+        void increased();
+        void decreased();
+        void reset();
+    }
+
+    private ParameterProvider parameterProvider;
 
     ParameterControlLayer(ParameterProvider parameterProvider) {
         this.parameterProvider = parameterProvider;
@@ -43,9 +46,11 @@ public class ParameterControlLayer extends AbstractLayer {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyChar() == parameterProvider.getIncreaseKey()) {
-                	parameterProvider.increased();
+                    parameterProvider.increased();
                 } else if (e.getKeyChar() == parameterProvider.getDecreaseKey()) {
-                	parameterProvider.decreased();
+                    parameterProvider.decreased();
+                } else if (e.getKeyChar() == parameterProvider.getResetKey()) {
+                    parameterProvider.reset();
                 }
             }
         });
