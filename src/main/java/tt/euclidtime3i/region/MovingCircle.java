@@ -95,4 +95,9 @@ public class MovingCircle implements Region {
                                   new Point(Integer.MAX_VALUE, Integer.MAX_VALUE, getTrajectory().getMaxTime()));
     }
 
+    @Override
+    public String toString() {
+        return "MC(" + Integer.toHexString(trajectory.hashCode()) + ", " + radius + ")";
+    }
+
 }
