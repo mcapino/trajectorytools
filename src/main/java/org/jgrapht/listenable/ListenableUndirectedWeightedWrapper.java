@@ -1,8 +1,8 @@
 package org.jgrapht.listenable;
 
-import org.jgrapht.event.EdgeChangeEvent;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
+import org.jgrapht.listenable.event.EdgeChangeEvent;
 
 public class ListenableUndirectedWeightedWrapper<V, E> extends ListenableUndirectedWrapper<V, E> implements WeightedGraph<V, E> {
 

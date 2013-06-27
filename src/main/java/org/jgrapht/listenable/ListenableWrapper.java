@@ -3,8 +3,8 @@ package org.jgrapht.listenable;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.WeightedGraph;
-import org.jgrapht.event.EdgeChangeEvent;
-import org.jgrapht.event.VertexChangeEvent;
+import org.jgrapht.listenable.event.EdgeChangeEvent;
+import org.jgrapht.listenable.event.VertexChangeEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -207,7 +207,7 @@ public abstract class ListenableWrapper<V, E> implements WeightedGraph<V, E> {
     }
 
     // -------------- Listenable --------------
-    public void addListeners(ListenableWrapperListener<V, E> listener) {
+    public void addListener(ListenableWrapperListener<V, E> listener) {
         listeners.add(listener);
     }
 

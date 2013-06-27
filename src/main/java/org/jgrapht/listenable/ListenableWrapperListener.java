@@ -1,7 +1,7 @@
 package org.jgrapht.listenable;
 
-import org.jgrapht.event.VertexChangeEvent;
-import org.jgrapht.event.EdgeChangeEvent;
+import org.jgrapht.listenable.event.EdgeChangeEvent;
+import org.jgrapht.listenable.event.VertexChangeEvent;
 
 public interface ListenableWrapperListener<V, E> {
 

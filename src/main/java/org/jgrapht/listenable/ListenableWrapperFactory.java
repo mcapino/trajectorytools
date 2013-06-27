@@ -5,21 +5,21 @@ import org.jgrapht.Graph;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 
-public class ListenableWrapperFactory {
+public class ListenableWrapperFactory<V, E> {
 
-    public static<V, E> ListenableWrapper createListenableWrapper(Graph<V, E> graph) {
+    public static <V, E> ListenableWrapper<V, E> createListenableWrapper(Graph<V, E> graph) {
         if (graph instanceof DirectedGraph) {
             if (graph instanceof WeightedGraph) {
-                return new ListenableDirectedWeightedWrapper((DirectedGraph) graph);
+                return new ListenableDirectedWeightedWrapper<V, E>((DirectedGraph<V, E>) graph);
             } else {
-                return new ListenableDirectedWrapper((DirectedGraph) graph);
+                return new ListenableDirectedWrapper<V, E>((DirectedGraph<V, E>) graph);
             }
 
         } else {
             if (graph instanceof WeightedGraph) {
-                return new ListenableUndirectedWeightedWrapper((UndirectedGraph) graph);
+                return new ListenableUndirectedWeightedWrapper<V, E>((UndirectedGraph<V, E>) graph);
             } else {
-                return new ListenableUndirectedWrapper((UndirectedGraph) graph);
+                return new ListenableUndirectedWrapper<V, E>((UndirectedGraph<V, E>) graph);
             }
         }
     }
