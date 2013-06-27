@@ -3,9 +3,10 @@ package tt.euclid2i.vis;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
-import java.util.LinkedList;
 
+import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.AbstractLayer;
@@ -13,8 +14,8 @@ import cz.agents.alite.vis.layer.VisLayer;
 
 public class RegionsLayer extends AbstractLayer {
 
-    public static class RegionsProvider {
-        public Collection<Region> getRegions() { return new LinkedList<Region>(); };
+    public interface RegionsProvider {
+        public Collection<Region> getRegions();
     }
 
     private RegionsProvider regionsProvider;
@@ -50,6 +51,26 @@ public class RegionsLayer extends AbstractLayer {
                 canvas.drawRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
                         Vis.transX(rect.getCorner2().x) -  Vis.transX(rect.getCorner1().x),
                         Vis.transY(rect.getCorner2().y) -  Vis.transY(rect.getCorner1().y));
+            }
+
+            if (region instanceof Polygon) {
+                Polygon polygon = (Polygon) region;
+                Point[] points = polygon.getPoints();
+
+                int n = points.length;
+                int x[] = new int[n];
+                int y[] = new int[n];
+
+                for (int i = 0; i < n; i++) {
+                    x[i] = Vis.transX(points[i].x);
+                    y[i] = Vis.transY(points[i].y);
+                }
+
+                canvas.setColor(fillColor);
+                canvas.fillPolygon(x,y,n);
+
+                canvas.setColor(edgeColor);
+                canvas.drawPolygon(x,y,n);
             }
         }
 

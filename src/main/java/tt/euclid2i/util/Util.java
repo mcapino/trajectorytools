@@ -11,6 +11,7 @@ import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
 public class Util {
@@ -98,6 +99,18 @@ public class Util {
         }
 
         return graph;
+    }
+
+    public static Collection<Region> inflateRegions(Collection<Region> obstacles, int agentBodyRadius) {
+        Collection<Region> inflatedRegions = new LinkedList<Region>();
+        for (Region region : obstacles) {
+            if (region instanceof Polygon) {
+                inflatedRegions.add(((Polygon) region).inflate(agentBodyRadius, 3));
+            } else {
+                throw new RuntimeException("not supported region type for inflation");
+            }
+        }
+        return inflatedRegions;
     }
 
 }

@@ -6,15 +6,19 @@ import tt.euclidtime3i.Region;
 
 
 public class MovingCircle implements Region {
+
     double samplingInterval;
     tt.euclid2i.Trajectory trajectory;
     int radius;
 
+    private static final int SAMPLES_PER_RADIUS = 4;
+
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
+        assert(trajectory != null);
         this.trajectory = trajectory;
         this.radius = radius;
-        this.samplingInterval = radius/4;
+        this.samplingInterval = radius/SAMPLES_PER_RADIUS;
     }
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius, int samplingInterval) {
@@ -41,15 +45,24 @@ public class MovingCircle implements Region {
         int tmax = Math.min(trajectory.getMaxTime(), end.getTime());
 
         for (int t = tmin; t <= tmax; t += samplingInterval) {
-            double alpha = (t - start.getTime())
-                    / (end.getTime() - start.getTime());
+            // todo what if end - start == 0???
+            double alpha = 0;
+            if (end.getTime() - start.getTime() > 0) {
+                alpha = (t - start.getTime()) / (end.getTime() - start.getTime());
+            } else if (end.getTime() - start.getTime() == 0) {
+                alpha = 0;
+                assert(start.equals(end));
+            } else {
+                throw new RuntimeException();
+            }
+
             assert (alpha >= -0.00001 && alpha <= 1.00001);
 
             tt.euclid2d.Point pos2d = tt.euclid2d.Point.interpolate(
                     new tt.euclid2d.Point(start.x, start.y),
                     new tt.euclid2d.Point(end.x, end.y), alpha);
 
-            if (trajectory.get(t).distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) <= radius) {
+            if (trajectory.get(t).distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) < radius) {
                 return true;
             }
         }
@@ -76,10 +89,15 @@ public class MovingCircle implements Region {
         return radius;
     }
 
-	@Override
-	public HyperRectangle getBoundingBox() {
-		return new HyperRectangle(new Point(Integer.MIN_VALUE, Integer.MIN_VALUE, getTrajectory().getMinTime()),
-								  new Point(Integer.MAX_VALUE, Integer.MAX_VALUE, getTrajectory().getMaxTime()));
-	}
+    @Override
+    public HyperRectangle getBoundingBox() {
+        return new HyperRectangle(new Point(Integer.MIN_VALUE, Integer.MIN_VALUE, getTrajectory().getMinTime()),
+                                  new Point(Integer.MAX_VALUE, Integer.MAX_VALUE, getTrajectory().getMaxTime()));
+    }
+
+    @Override
+    public String toString() {
+        return "MC(" + Integer.toHexString(trajectory.hashCode()) + ", " + radius + ")";
+    }
 
 }

@@ -11,47 +11,20 @@ import org.jgrapht.util.GraphBuilder;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
-import tt.euclid2i.Region;
-import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
 
-public class LazyGrid implements DirectedGraph<Point, Line> {
+public class ToGoalEdgeExtension implements DirectedGraph<Point, Line> {
 
-    public static int[][] PATTERN_4_WAY =  {           {0,-1},
-                                             {-1, 0},         { 1, 0},
-                                                      {0, 1},          };
+    DirectedGraph<Point, Line> graph;
+    Point goalPoint;
+    int radius;
 
-    public static int[][] PATTERN_4_WAY_WAIT =  {      {0,-1},
-                                             {-1, 0},  {0, 0}, { 1, 0},
-                                                       {0, 1},          };
-
-    public static int[][] PATTERN_8_WAY =  {  {-1,-1},   {0,-1},    {1,-1},
-                                               {-1, 0},              {1, 0},
-                                               {-1, 1},   {0, 1},    {1, 1}};
-
-    public static int[][] PATTERN_8_WAY_WAIT =  {  {-1,-1},   {0,-1},    {1,-1},
-                                                  {-1, 0},    {0, 0},    {1, 0},
-                                                  {-1, 1},    {0, 1},    {1, 1}};
-
-    private Point initialPoint;
-    private Rectangle bounds;
-    private int step;
-    private int[][] pattern;
-    private Collection<Region> obstacles;
-
-    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int[][] pattern, int step) {
-        this.initialPoint = initialPoint;
-        this.bounds = bounds;
-        this.obstacles = obstacles;
-        this.step = step;
-
-        // scale the pattern by step parameter
-        this.pattern = new int[pattern.length][2];
-        for (int i = 0; i < pattern.length; i++) {
-            this.pattern[i][0] = pattern[i][0] * step;
-            this.pattern[i][1] = pattern[i][1] * step;
-        }
+    public ToGoalEdgeExtension(DirectedGraph<Point, Line> graph,
+            Point goalPoint, int radius) {
+        super();
+        this.graph = graph;
+        this.goalPoint = goalPoint;
+        this.radius = radius;
     }
 
     @Override
@@ -81,7 +54,7 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public boolean containsVertex(Point p) {
-        return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0 && bounds.isInside(p);
+        return graph.containsVertex(p) || goalPoint.equals(p);
     }
 
     @Override
@@ -163,21 +136,11 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public Set<Line> incomingEdgesOf(Point vertex) {
-        Set<Point> children = new HashSet<Point>();
-
-        for (int[] offset : pattern) {
-            Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
-            if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
-                children.add(child);
-            }
+        if (vertex.equals(goalPoint)) {
+            throw new NotImplementedException();
+        } else {
+            return graph.incomingEdgesOf(vertex);
         }
-
-        Set<Line> edges = new HashSet<Line>();
-        for (Point child : children) {
-            edges.add(new Line(child, vertex));
-        }
-
-        return edges;
     }
 
     @Override
@@ -187,21 +150,15 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public Set<Line> outgoingEdgesOf(Point vertex) {
-        Set<Point> children = new HashSet<Point>();
 
-        for (int[] offset : pattern) {
-            Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
-            if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
-                children.add(child);
-            }
+        if (vertex.distance(goalPoint) <= radius) {
+            Set<Line> edges = new HashSet<Line>();
+            edges.addAll(graph.outgoingEdgesOf(vertex));
+            edges.add(new Line(vertex, goalPoint));
+            return edges;
+        } else {
+            return graph.outgoingEdgesOf(vertex);
         }
-
-        Set<Line> edges = new HashSet<Line>();
-        for (Point child : children) {
-            edges.add(new Line(vertex, child));
-        }
-
-        return edges;
     }
 
     @Override
@@ -214,7 +171,10 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
         throw new NotImplementedException();
     }
 
-    public DirectedGraph<Point, Line> generateFullGraph() {
-        return GraphBuilder.build(this, new DefaultDirectedGraph<Point, Line>(Line.class), initialPoint);
+    public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
+        DirectedGraph<Point, Line> fullGraph
+            = new DefaultDirectedGraph<Point, Line>(Line.class);
+
+        return GraphBuilder.build(this, fullGraph, initialPoint);
     }
 }
