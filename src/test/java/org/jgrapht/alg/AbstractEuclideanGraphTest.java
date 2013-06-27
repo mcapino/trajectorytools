@@ -154,7 +154,7 @@ public abstract class AbstractEuclideanGraphTest {
 
         if (testedAlgPath != null && referencePath != null) {
             assertTrue(hasSameWeight(referencePath, testedAlgPath));
-            System.out.println(String.format("Paths consistent: %f %f", referencePath.getWeight(), testedAlgPath.getWeight()));
+            //System.out.println(String.format("Paths consistent: %f %f", referencePath.getWeight(), testedAlgPath.getWeight()));
         }
     }
 
