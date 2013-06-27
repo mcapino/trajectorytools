@@ -1,18 +1,20 @@
 package org.jgrapht.alg;
 
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.util.Heuristic;
 
 /**
- *
  * @author Vojtech Letal <letalvoj@fel.cvut.cz>
  */
 public class AStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     public void initialize() {
+    }
+
+    @Override
+    public void after() {
     }
 
     @Override

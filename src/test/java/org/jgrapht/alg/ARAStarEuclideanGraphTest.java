@@ -13,6 +13,10 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
     }
 
     @Override
+    public void after() {
+    }
+
+    @Override
     protected GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
             final ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath) {

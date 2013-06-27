@@ -40,13 +40,20 @@
  */
 package org.jgrapht.alg;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.WeightedGraph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.jgrapht.graph.WeightedPseudograph;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractEuclideanGraphTest {
 
@@ -60,6 +67,9 @@ public abstract class AbstractEuclideanGraphTest {
 
     @Before
     public abstract void initialize();
+
+    @After
+    public abstract void after();
 
     protected abstract GraphPath<Point, DefaultWeightedEdge> runTestedAlgorithm(
             ShortestPathProblem<Point, DefaultWeightedEdge> problem,
@@ -104,7 +114,7 @@ public abstract class AbstractEuclideanGraphTest {
         return graph;
     }
 
-    private void assertTestedAlgorithmAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
+    private void testConsistencyWithDijkstra(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
             if (debugOut) {
@@ -122,17 +132,29 @@ public abstract class AbstractEuclideanGraphTest {
             ShortestPathProblem<Point, DefaultWeightedEdge> problem =
                     new ShortestPathProblem<Point, DefaultWeightedEdge>(graph, startVertex, endVertex);
 
-            startTimer();
-            GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
-            referenceOverallTime += stopTimer();
+            testOnInstance(problem);
+        }
+    }
 
-            startTimer();
-            GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
-            testedOverallTime += stopTimer();
+    protected void testOnInstance(ShortestPathProblem<Point, DefaultWeightedEdge> problem) {
+        startTimer();
+        GraphPath<Point, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
+        referenceOverallTime += stopTimer();
 
-            assertFalse(testedAlgPath == null && referencePath != null);
-            assertFalse(testedAlgPath != null && referencePath == null);
-            assertTrue(testedAlgPath == referencePath || hasSameWeight(referencePath, testedAlgPath));
+        startTimer();
+        GraphPath<Point, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
+        testedOverallTime += stopTimer();
+
+        assertPathsConsistent(referencePath, testedAlgPath);
+    }
+
+    protected void assertPathsConsistent(GraphPath<Point, DefaultWeightedEdge> referencePath, GraphPath<Point, DefaultWeightedEdge> testedAlgPath) {
+        assertFalse(testedAlgPath == null && referencePath != null);
+        assertFalse(testedAlgPath != null && referencePath == null);
+
+        if (testedAlgPath != null && referencePath != null) {
+            assertTrue(hasSameWeight(referencePath, testedAlgPath));
+            System.out.println(String.format("Paths consistent: %f %f", referencePath.getWeight(), testedAlgPath.getWeight()));
         }
     }
 
@@ -141,17 +163,21 @@ public abstract class AbstractEuclideanGraphTest {
     }
 
     protected boolean hasSameWeight(GraphPath<Point, DefaultWeightedEdge> pathA,
-            GraphPath<Point, DefaultWeightedEdge> pathB) {
-        return Math.abs(pathA.getWeight() - pathB.getWeight()) < 0.01;
+                                    GraphPath<Point, DefaultWeightedEdge> pathB) {
+        double weightA = pathA.getWeight();
+        double weightB = pathB.getWeight();
+        double mean = (weightA + weightB) / 2;
+
+        return Math.abs(weightA - weightB) <= 0.0001*mean;
     }
 
     @Test
     public void test() {
         // Check directed
-        assertTestedAlgorithmAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
+        testConsistencyWithDijkstra(true, TRIALS, VERTICES, EDGES);
 
         // Check undirected
-        assertTestedAlgorithmAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
+        testConsistencyWithDijkstra(false, TRIALS, VERTICES, EDGES);
     }
 
     // Auxiliary class for creating random graphs that could be interpreted as "webs" in 2D plane

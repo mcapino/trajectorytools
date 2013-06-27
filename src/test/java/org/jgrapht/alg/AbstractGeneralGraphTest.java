@@ -40,11 +40,6 @@
  */
 package org.jgrapht.alg;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Random;
-
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.WeightedGraph;
@@ -54,15 +49,20 @@ import org.jgrapht.graph.WeightedPseudograph;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Random;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractGeneralGraphTest {
 
-    private long timerStarted;
     protected long referenceOverallTime = 0;
     protected long testedOverallTime = 0;
     protected int TRIALS = 500;
     protected int VERTICES = 100;
     protected int EDGES = 150;
     protected boolean debugOut;
+    private long timerStarted;
 
     abstract GraphPath<Node, DefaultWeightedEdge> runTestedAlgorithm(
             ShortestPathProblem<Node, DefaultWeightedEdge> problem,
@@ -108,7 +108,7 @@ public abstract class AbstractGeneralGraphTest {
         return graph;
     }
 
-    private void assertAStarAndDijkstraConsistentOnTestSet(boolean directed, int trials, int nvertices, int nedges) {
+    private void testConsistencyWithDijkstra(boolean directed, int trials, int nvertices, int nedges) {
         // Test directed graphs
         for (int seed = 0; seed < trials; seed++) {
             if (debugOut) {
@@ -127,18 +127,26 @@ public abstract class AbstractGeneralGraphTest {
             ShortestPathProblem<Node, DefaultWeightedEdge> problem =
                     new ShortestPathProblem<Node, DefaultWeightedEdge>(graph, startVertex, endVertex);
 
-            startTimer();
-            GraphPath<Node, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
-            referenceOverallTime += stopTimer();
-
-            startTimer();
-            GraphPath<Node, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
-            testedOverallTime += stopTimer();
-
-            assertFalse(testedAlgPath == null && referencePath != null);
-            assertFalse(testedAlgPath != null && referencePath == null);
-            assertTrue(testedAlgPath == referencePath || hasSameWeight(referencePath, testedAlgPath));
+            testOnInstance(problem);
         }
+    }
+
+    protected void testOnInstance(ShortestPathProblem<Node, DefaultWeightedEdge> problem) {
+        startTimer();
+        GraphPath<Node, DefaultWeightedEdge> referencePath = runReferenceAlgorithm(problem);
+        referenceOverallTime += stopTimer();
+
+        startTimer();
+        GraphPath<Node, DefaultWeightedEdge> testedAlgPath = runTestedAlgorithm(problem, referencePath);
+        testedOverallTime += stopTimer();
+
+        assertPathsConsistent(referencePath, testedAlgPath);
+    }
+
+    protected void assertPathsConsistent(GraphPath<Node, DefaultWeightedEdge> referencePath, GraphPath<Node, DefaultWeightedEdge> testedAlgPath) {
+        assertFalse(testedAlgPath == null && referencePath != null);
+        assertFalse(testedAlgPath != null && referencePath == null);
+        assertTrue(testedAlgPath == referencePath || hasSameWeight(referencePath, testedAlgPath));
     }
 
     protected void printMeasuredTimes() {
@@ -146,17 +154,17 @@ public abstract class AbstractGeneralGraphTest {
     }
 
     protected boolean hasSameWeight(GraphPath<Node, DefaultWeightedEdge> pathA,
-            GraphPath<Node, DefaultWeightedEdge> pathB) {
+                                    GraphPath<Node, DefaultWeightedEdge> pathB) {
         return Math.abs(pathA.getWeight() - pathB.getWeight()) < 0.01;
     }
 
     @Test
     public void test() {
         // Check directed
-        assertAStarAndDijkstraConsistentOnTestSet(true, TRIALS, VERTICES, EDGES);
+        testConsistencyWithDijkstra(true, TRIALS, VERTICES, EDGES);
 
         // Check undirected
-        assertAStarAndDijkstraConsistentOnTestSet(false, TRIALS, VERTICES, EDGES);
+        testConsistencyWithDijkstra(false, TRIALS, VERTICES, EDGES);
     }
 
     // Auxiliary class for creating random graphs
