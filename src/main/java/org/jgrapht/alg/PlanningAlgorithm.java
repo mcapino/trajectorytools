@@ -18,8 +18,8 @@ class PlanningAlgorithm<V, E> {
     protected V startVertex;
     protected Goal<V> goal;
     protected Specifics<V, E> specifics;
-    private Map<V, E> shortestPathTreeEdges;
-    private Map<V, Double> shortestDistanceToVertex;
+    protected Map<V, E> shortestPathTreeEdges;
+    protected Map<V, Double> shortestDistanceToVertex;
 
     public PlanningAlgorithm(Graph<V, E> graph, V startVertex, Goal<V> goal) {
         this.graph = graph;
