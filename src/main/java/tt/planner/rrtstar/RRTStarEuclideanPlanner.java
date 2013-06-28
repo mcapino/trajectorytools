@@ -4,41 +4,32 @@ import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
-
 public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
     private KDTree<Vertex<S, E>> kdTree;
     private EuclideanCoordinatesProvider<S> euclideanProvider;
 
     public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                   S initialState, double gamma, double eta) {
+            S initialState, double gamma, double eta) {
         super(domain, initialState, gamma, eta);
 
         int dimensions = euclideanProvider.getSpaceDimension();
+        this.euclideanProvider = euclideanProvider;
         this.kdTree = new KDTree<Vertex<S, E>>(dimensions);
+        insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(initialState), root);
     }
 
     public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                   S initialState, double gamma) {
+            S initialState, double gamma) {
         this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
     }
-
 
     @Override
     protected Vertex<S, E> insertExtension(Vertex<S, E> parent, Extension<S, E> extension) {
         Vertex<S, E> newVertex = super.insertExtension(parent, extension);
         if (newVertex != null) {
             S state = newVertex.state;
-
-            try {
-                kdTree.insert(euclideanProvider.getEuclideanCoordinates(state), newVertex);
-            } catch (KeySizeException e) {
-                throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
-
-            } catch (KeyDuplicateException e) {
-                //TODO handle - if getNearestParentVertex returns parent on the very same coordinates throw it away
-                throw new RuntimeException("KD-Tree does not support duplicate keys");
-            }
+            insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(state), newVertex);
         }
 
         return newVertex;
@@ -46,12 +37,26 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
     @Override
     protected Vertex<S, E> getNearestParentVertex(S state) {
+        return nearestVertex(euclideanProvider.getEuclideanCoordinates(state));
+    }
+
+    private void insertIntoKDTree(double[] key, Vertex<S, E> value) {
         try {
-            return kdTree.nearest(euclideanProvider.getEuclideanCoordinates(state));
+            kdTree.insert(key, value);
+        } catch (KeySizeException e) {
+            throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
+
+        } catch (KeyDuplicateException e) {
+            //TODO handle - if getNearestParentVertex returns parent on the very same coordinates throw it away
+            throw new RuntimeException("KD-Tree does not support duplicate keys");
+        }
+    }
+
+    private Vertex<S, E> nearestVertex(double[] key) {
+        try {
+            return kdTree.nearest(key);
         } catch (KeySizeException e) {
             throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
         }
-
     }
-
 }
