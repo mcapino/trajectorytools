@@ -5,20 +5,22 @@ import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
 
-
-public class RRTStartEuclideanPlanner<S extends EuclideanPoint, E> extends RRTStarPlanner<S, E> {
+public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
     private KDTree<Vertex<S, E>> kdTree;
+    private EuclideanCoordinatesProvider<S> euclideanProvider;
 
-    public RRTStartEuclideanPlanner(Domain<S, E> domain, S initialState, double gamma, double eta) {
+    public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+                                   S initialState, double gamma, double eta) {
         super(domain, initialState, gamma, eta);
 
-        int dimensions = initialState.getCoordinates().length;
+        int dimensions = euclideanProvider.getSpaceDimension();
         this.kdTree = new KDTree<Vertex<S, E>>(dimensions);
     }
 
-    public RRTStartEuclideanPlanner(Domain<S, E> domain, S initialState, double gamma) {
-        this(domain, initialState, gamma, Double.POSITIVE_INFINITY);
+    public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+                                   S initialState, double gamma) {
+        this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
     }
 
 
@@ -29,7 +31,7 @@ public class RRTStartEuclideanPlanner<S extends EuclideanPoint, E> extends RRTSt
             S state = newVertex.state;
 
             try {
-                kdTree.insert(state.getCoordinates(), newVertex);
+                kdTree.insert(euclideanProvider.getEuclideanCoordinates(state), newVertex);
             } catch (KeySizeException e) {
                 throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
 
@@ -43,9 +45,9 @@ public class RRTStartEuclideanPlanner<S extends EuclideanPoint, E> extends RRTSt
     }
 
     @Override
-    protected Vertex<S, E> getNearestParentVertex(S vertex) {
+    protected Vertex<S, E> getNearestParentVertex(S state) {
         try {
-            return kdTree.nearest(vertex.getCoordinates());
+            return kdTree.nearest(euclideanProvider.getEuclideanCoordinates(state));
         } catch (KeySizeException e) {
             throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
         }
