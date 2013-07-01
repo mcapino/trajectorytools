@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
+public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
     private Graph<S, E> graph;
     private Goal<S> goal;
