@@ -151,24 +151,7 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
 
     @Override
     public Set<Point> vertexSet() {
-        Queue<Point> opened = new ArrayDeque<Point>();
-        Set<Point> closed = new HashSet<Point>();
-
-        opened.add(initialPoint);
-
-        while (!opened.isEmpty()) {
-            Point node = opened.poll();
-            closed.add(node);
-
-            for (Line line : outgoingEdgesOf(node)) {
-                Point successor = Graphs.getOppositeVertex(this, line, node);
-                if (!closed.contains(successor)) {
-                    opened.offer(successor);
-                }
-            }
-        }
-
-        return closed;
+        throw new NotImplementedException();
     }
 
     @Override
