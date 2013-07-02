@@ -46,7 +46,23 @@ public class Polygon implements Region{
 
     @Override
     public Rectangle getBoundingBox() {
-        throw new NotImplementedException();
+        //TODO check implementation
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        for (Point point : points) {
+            int X = point.getX();
+            int Y = point.getY();
+
+            if (X < minX) minX = X;
+            if (Y < minY) minY = Y;
+            if (X > maxX) maxX = X;
+            if (Y > maxY) maxY = Y;
+        }
+
+        return new Rectangle(new Point(minX,minY),new Point(maxX,maxY));
     }
 
     public Polygon inflate(double inflateBy, int pointsAtCorner) {
