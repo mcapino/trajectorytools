@@ -4,6 +4,7 @@ import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
@@ -18,7 +19,9 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
         int dimensions = euclideanProvider.getSpaceDimension();
         this.euclideanProvider = euclideanProvider;
+
         this.kdTree = new KDTree<Vertex<S, E>>(dimensions);
+        this.expandedStates = new HashSet<S>();
         insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(initialState), root);
     }
 
