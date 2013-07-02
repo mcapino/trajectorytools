@@ -4,13 +4,16 @@ import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
+import java.util.Set;
+
 public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
+    private Set<S> expandedStates;
     private KDTree<Vertex<S, E>> kdTree;
     private EuclideanCoordinatesProvider<S> euclideanProvider;
 
     public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-            S initialState, double gamma, double eta) {
+                                   S initialState, double gamma, double eta) {
         super(domain, initialState, gamma, eta);
 
         int dimensions = euclideanProvider.getSpaceDimension();
@@ -20,8 +23,19 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
     }
 
     public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-            S initialState, double gamma) {
+                                   S initialState, double gamma) {
         this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    protected S sampleState() {
+        S state;
+
+        do {
+            state = super.sampleState();
+        } while (!expandedStates.contains(state));
+
+        return state;
     }
 
     @Override
@@ -29,6 +43,7 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
         Vertex<S, E> newVertex = super.insertExtension(parent, extension);
         if (newVertex != null) {
             S state = newVertex.state;
+            expandedStates.add(state);
             insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(state), newVertex);
         }
 
