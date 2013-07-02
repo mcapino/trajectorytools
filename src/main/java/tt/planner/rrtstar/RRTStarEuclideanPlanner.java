@@ -36,7 +36,7 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
         do {
             state = super.sampleState();
-        } while (!expandedStates.contains(state));
+        } while (expandedStates.contains(state));
 
         expandedStates.add(state);
 
