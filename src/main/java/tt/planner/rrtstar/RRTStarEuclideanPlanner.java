@@ -38,6 +38,8 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
             state = super.sampleState();
         } while (!expandedStates.contains(state));
 
+        expandedStates.add(state);
+
         return state;
     }
 
@@ -46,7 +48,6 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
         Vertex<S, E> newVertex = super.insertExtension(parent, extension);
         if (newVertex != null) {
             S state = newVertex.state;
-            expandedStates.add(state);
             insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(state), newVertex);
         }
 
