@@ -1,6 +1,6 @@
 package org.jgrapht.util;
 
-public interface Heuristic<V> {
+public interface HeuristicToGoal<V> {
     double getCostToGoalEstimate(V current);
     boolean isAdmissible();
 }

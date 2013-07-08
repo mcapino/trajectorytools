@@ -25,7 +25,7 @@ import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 import org.jgrapht.alg.AStarShortestPath;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 
 
 public class PathfindingDemoCreator implements Creator {
@@ -66,7 +66,7 @@ public class PathfindingDemoCreator implements Creator {
 
             @Override
             public GraphPath<Point, Line> getPath() {
-                return AStarShortestPath.findPathBetween(graph, new Heuristic<Point>() {
+                return AStarShortestPath.findPathBetween(graph, new HeuristicToGoal<Point>() {
 
                     @Override
                     public double getCostToGoalEstimate(Point current) {

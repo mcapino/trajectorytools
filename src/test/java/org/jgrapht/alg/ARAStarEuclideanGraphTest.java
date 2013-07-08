@@ -3,7 +3,7 @@ package org.jgrapht.alg;
 import static org.junit.Assert.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.BinaryHeap;
 
 public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
@@ -21,7 +21,7 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
             final ShortestPathProblem<Point, DefaultWeightedEdge> problem,
             GraphPath<Point, DefaultWeightedEdge> referencePath) {
 
-        ARAStarShortestPath<Point, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Point, DefaultWeightedEdge>(problem.graph, new Heuristic<Point>() {
+        ARAStarShortestPath<Point, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Point, DefaultWeightedEdge>(problem.graph, new HeuristicToGoal<Point>() {
             @Override
             public double getCostToGoalEstimate(Point current) {
                 return current.euclideanDistance(problem.endVertex);

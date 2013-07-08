@@ -8,12 +8,12 @@ import org.jgrapht.Graphs;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.util.Goal;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 import org.jgrapht.util.QueueEntry;
 
 public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
 
-    private Heuristic<V> heuristic;
+    private HeuristicToGoal<V> heuristicToGoal;
     private Result result;
     private double suboptimalityScale;
     private double suboptimalityDecreaseStep;
@@ -22,7 +22,7 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
     private Set<V> inconsistent;
     private Queue<QueueEntry<V, Double>> queue;
 
-    public ARAStarShortestPathNaive(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public ARAStarShortestPathNaive(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex,
             final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep) {
 
         this(graph, heuristic, startVertex, new Goal<V>() {
@@ -33,11 +33,11 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
         }, suboptimalityScale, suboptimalityDecreaseStep);
     }
 
-    public ARAStarShortestPathNaive(Graph<V, E> graph, Heuristic<V> heuristic,
+    public ARAStarShortestPathNaive(Graph<V, E> graph, HeuristicToGoal<V> heuristic,
             V startVertex, Goal<V> goal, double suboptimalityScale, double suboptimalityDecreaseStep) {
         super(graph, startVertex, goal);
 
-        this.heuristic = heuristic;
+        this.heuristicToGoal = heuristic;
         this.suboptimalityScale = suboptimalityScale;
         this.suboptimalityDecreaseStep = suboptimalityDecreaseStep;
         initialize();
@@ -93,7 +93,7 @@ public class ARAStarShortestPathNaive<V, E> extends PlanningAlgorithm<V, E> {
 
     private double calculateKey(V vertex) {
         return getShortestDistanceTo(vertex)
-                + suboptimalityScale * heuristic.getCostToGoalEstimate(vertex);
+                + suboptimalityScale * heuristicToGoal.getCostToGoalEstimate(vertex);
     }
 
     private void decreaseEpsilon() {

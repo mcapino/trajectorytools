@@ -4,7 +4,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.GreedyBestFirstSearch;
 import org.jgrapht.util.GeneralHeuristic;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 import tt.planner.rrtstar.Domain;
 import tt.planner.rrtstar.Extension;
 import tt.planner.rrtstar.ExtensionEstimate;
@@ -54,7 +54,7 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
         if ((heuristic.getCostEstimate(from, to) < radius) || !heuristic.isAdmissible()) {
 
-            GraphPath<S, E> path = GreedyBestFirstSearch.findPathBetween(graph, new Heuristic<S>() {
+            GraphPath<S, E> path = GreedyBestFirstSearch.findPathBetween(graph, new HeuristicToGoal<S>() {
                 @Override
                 public double getCostToGoalEstimate(S current) {
                     return heuristic.getCostEstimate(current, to);

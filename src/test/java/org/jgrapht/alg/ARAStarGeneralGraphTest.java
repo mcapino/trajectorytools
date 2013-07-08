@@ -8,7 +8,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.BinaryHeap;
 
 public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
@@ -22,7 +22,7 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
             ShortestPathProblem<Node, DefaultWeightedEdge> problem,
             GraphPath<Node, DefaultWeightedEdge> referencePath) {
 
-        ARAStarShortestPath<Node, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Node, DefaultWeightedEdge>(problem.graph, new Heuristic<Node>() {
+        ARAStarShortestPath<Node, DefaultWeightedEdge> araStar = new ARAStarShortestPath<Node, DefaultWeightedEdge>(problem.graph, new HeuristicToGoal<Node>() {
             @Override
             public double getCostToGoalEstimate(Node current) {
                 return 0;

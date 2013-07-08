@@ -11,7 +11,7 @@ import org.jgrapht.graph.GraphPathImpl;
 import org.jgrapht.traverse.ClosestFirstIterator;
 import org.jgrapht.traverse.HeuristicIterator;
 import org.jgrapht.util.Goal;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 
 /**
  * An implementation of <a
@@ -22,7 +22,7 @@ public class AStarShortestPath<V, E> {
 
 
     private Graph<V, E> graph;
-    private Heuristic<V> heuristic;
+    private HeuristicToGoal<V> heuristicToGoal;
     private V startVertex;
     private Goal<V> goal;
     private double radius;
@@ -35,19 +35,19 @@ public class AStarShortestPath<V, E> {
     private static final long INF = Long.MAX_VALUE;
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
-            Heuristic<V> heuristic, V startVertex, final V endVertex) {
+            HeuristicToGoal<V> heuristic, V startVertex, final V endVertex) {
 
         return findPathBetween(graph, heuristic, startVertex, endVertex, Double.POSITIVE_INFINITY, INF);
     }
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
-            Heuristic<V> heuristic, V startVertex, Goal<V> goal) {
+            HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal) {
 
         return findPathBetween(graph, heuristic, startVertex, goal, Double.POSITIVE_INFINITY, INF);
     }
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph,
-            Heuristic<V> heuristic, V startVertex, final V endVertex, double radius, long timeoutNs) {
+            HeuristicToGoal<V> heuristic, V startVertex, final V endVertex, double radius, long timeoutNs) {
 
         return findPathBetween(graph, heuristic, startVertex, new Goal<V>() {
             @Override
@@ -57,7 +57,7 @@ public class AStarShortestPath<V, E> {
         }, radius, timeoutNs);
     }
 
-    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, Heuristic<V> heuristic,
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic,
             V startVertex, Goal<V> goal, double radius, long timeoutNs) {
 
         AStarShortestPath<V, E> alg = new AStarShortestPath<V, E>(graph,
@@ -67,10 +67,10 @@ public class AStarShortestPath<V, E> {
         return alg.path;
     }
 
-    public AStarShortestPath(Graph<V, E> graph, Heuristic<V> heuristic, V startVertex,
+    public AStarShortestPath(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex,
             Goal<V> goalChecker, double radius) {
         this.graph = graph;
-        this.heuristic = heuristic;
+        this.heuristicToGoal = heuristic;
         this.startVertex = startVertex;
         this.goal = goalChecker;
         this.radius = radius;
@@ -78,7 +78,7 @@ public class AStarShortestPath<V, E> {
 
     public GraphPath<V, E> findPath(long timeoutNs) {
         HeuristicIterator<V, E> iter =
-                new HeuristicIterator<V, E>(graph, heuristic, startVertex, radius);
+                new HeuristicIterator<V, E>(graph, heuristicToGoal, startVertex, radius);
 
         long startTimeNs = System.nanoTime();
 

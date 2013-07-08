@@ -11,7 +11,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.util.Goal;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 
 import tt.discrete.vis.TrajectoryLayer;
 import tt.discrete.vis.TrajectoryLayer.TrajectoryProvider;
@@ -82,7 +82,7 @@ public class PathfindingDemoCreator implements Creator {
         ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
-                .findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {
+                .findPathBetween(spatioTemporalGraph, new HeuristicToGoal<Point>() {
                             @Override
                             public double getCostToGoalEstimate(Point current) {
                                 return (current.getPosition())
@@ -140,7 +140,7 @@ public class PathfindingDemoCreator implements Creator {
             int radius) {
 
         GraphPath<tt.euclid2i.Point, tt.euclid2i.Line> path = AStarShortestPath
-                .findPathBetween(graph, new Heuristic<tt.euclid2i.Point>() {
+                .findPathBetween(graph, new HeuristicToGoal<tt.euclid2i.Point>() {
 
                     @Override
                     public double getCostToGoalEstimate(tt.euclid2i.Point current) {

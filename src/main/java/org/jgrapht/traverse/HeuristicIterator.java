@@ -5,20 +5,20 @@ import java.util.HashMap;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.util.FibonacciHeapNode;
-import org.jgrapht.util.Heuristic;
+import org.jgrapht.util.HeuristicToGoal;
 
 public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
 
-    private final Heuristic<V> heuristic;
+    private final HeuristicToGoal<V> heuristicToGoal;
     private final HashMap<V, Double> shortestPathLengths;
 
-    public HeuristicIterator(Graph<V, E> g, Heuristic<V> heuristic, V startVertex) {
+    public HeuristicIterator(Graph<V, E> g, HeuristicToGoal<V> heuristic, V startVertex) {
         this(g, heuristic, startVertex, Double.MAX_VALUE);
     }
 
-    public HeuristicIterator(Graph<V, E> g, Heuristic<V> heuristic, V startVertex, double radius) {
+    public HeuristicIterator(Graph<V, E> g, HeuristicToGoal<V> heuristic, V startVertex, double radius) {
         super(g, startVertex, radius);
-        this.heuristic = heuristic;
+        this.heuristicToGoal = heuristic;
         this.shortestPathLengths = new HashMap<V, Double>();
     }
 
@@ -32,7 +32,7 @@ public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
         } else {
             shortestPathLength = calculatePathLength(vertex, edge);
         }
-        heuristicEstimate = heuristic.getCostToGoalEstimate(vertex);
+        heuristicEstimate = heuristicToGoal.getCostToGoalEstimate(vertex);
 
         double key = shortestPathLength + heuristicEstimate;
 
@@ -51,7 +51,7 @@ public class HeuristicIterator<V, E> extends ClosestFirstIterator<V, E> {
         }
 
         double candidatePathLength = calculatePathLength(vertex, edge);
-        double heuristicEstimate = heuristic.getCostToGoalEstimate(vertex);
+        double heuristicEstimate = heuristicToGoal.getCostToGoalEstimate(vertex);
         double candidateKey = candidatePathLength + heuristicEstimate;
 
         if (candidateKey < node.getKey()) {

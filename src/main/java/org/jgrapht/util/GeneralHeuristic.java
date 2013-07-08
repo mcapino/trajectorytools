@@ -1,4 +1,4 @@
 package org.jgrapht.util;
 
-public interface GeneralHeuristic<S> extends Heuristic<S>, PointToPointHeuristic<S> {
+public interface GeneralHeuristic<S> extends HeuristicToGoal<S>, HeuristicPointToPoint<S> {
 }

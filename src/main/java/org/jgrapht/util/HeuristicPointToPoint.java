@@ -1,6 +1,6 @@
 package org.jgrapht.util;
 
-public interface PointToPointHeuristic<S> {
+public interface HeuristicPointToPoint<S> {
     double getCostEstimate(S from, S to);
     boolean isAdmissible();
 }
