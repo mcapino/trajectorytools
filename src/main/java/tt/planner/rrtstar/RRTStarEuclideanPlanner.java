@@ -38,8 +38,6 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
             state = super.sampleState();
         } while (expandedStates.contains(state));
 
-        expandedStates.add(state);
-
         return state;
     }
 
@@ -49,6 +47,7 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
         if (newVertex != null) {
             S state = newVertex.state;
             insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(state), newVertex);
+            expandedStates.add(state);
         }
 
         return newVertex;
@@ -66,7 +65,6 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
             throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
 
         } catch (KeyDuplicateException e) {
-            //TODO handle - if getNearestParentVertex returns parent on the very same coordinates throw it away
             throw new RuntimeException("KD-Tree does not support duplicate keys");
         }
     }
