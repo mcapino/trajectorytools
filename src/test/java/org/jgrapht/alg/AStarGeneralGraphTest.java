@@ -24,6 +24,12 @@ public class AStarGeneralGraphTest extends AbstractGeneralGraphTest {
             public double getCostToGoalEstimate(Node current) {
                 return 0;
             }
+
+            @Override
+            public boolean isAdmissible() {
+                return true;
+            }
+
         }, problem.startVertex, problem.endVertex);
     }
 }

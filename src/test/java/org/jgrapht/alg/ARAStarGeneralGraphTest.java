@@ -27,6 +27,12 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
             public double getCostToGoalEstimate(Node current) {
                 return 0;
             }
+
+            @Override
+            public boolean isAdmissible() {
+                return true;
+            }
+
         }, problem.startVertex, problem.endVertex, 2, 0.02, new BinaryHeap<Double, Node>());
 
         ARAStarShortestPath.Result<Node, DefaultWeightedEdge> araResult;

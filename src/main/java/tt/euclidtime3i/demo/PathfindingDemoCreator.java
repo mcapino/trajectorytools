@@ -83,17 +83,25 @@ public class PathfindingDemoCreator implements Creator {
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(spatioTemporalGraph, new Heuristic<Point>() {
-                    @Override
-                    public double getCostToGoalEstimate(Point current) {
-                        return (current.getPosition())
-                                .distance(new tt.euclid2i.Point(0, 10));
-                    }
-                }, new Point(0, -10, 0), new Goal<Point>() {
-                    @Override
-                    public boolean isGoal(Point current) {
-                        return current.x == 0 && current.y == 10;
-                    }
-                });
+                            @Override
+                            public double getCostToGoalEstimate(Point current) {
+                                return (current.getPosition())
+                                        .distance(new tt.euclid2i.Point(0, 10));
+                            }
+
+                            @Override
+                            public boolean isAdmissible() {
+                                return true;
+                            }
+
+
+                        }, new Point(0, -10, 0), new Goal<Point>() {
+                            @Override
+                            public boolean isGoal(Point current) {
+                                return current.x == 0 && current.y == 10;
+                            }
+                        }
+                );
 
         final Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
 
@@ -138,6 +146,12 @@ public class PathfindingDemoCreator implements Creator {
                     public double getCostToGoalEstimate(tt.euclid2i.Point current) {
                         return current.distance(target);
                     }
+
+                    @Override
+                    public boolean isAdmissible() {
+                        return true;
+                    }
+
                 }, start, target);
 
         final tt.euclid2i.Trajectory trajectory = new LineSegmentsConstantSpeedTrajectory<tt.euclid2i.Point, tt.euclid2i.Line>(

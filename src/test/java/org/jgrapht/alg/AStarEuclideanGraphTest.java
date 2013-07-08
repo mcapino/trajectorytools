@@ -27,6 +27,12 @@ public class AStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
             public double getCostToGoalEstimate(Point current) {
                 return current.euclideanDistance(problem.endVertex);
             }
+
+            @Override
+            public boolean isAdmissible() {
+                return true;
+            }
+
         }, problem.startVertex, problem.endVertex);
     }
 }
