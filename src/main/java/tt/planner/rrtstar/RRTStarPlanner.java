@@ -314,14 +314,6 @@ public class RRTStarPlanner<S, E> implements Graph<S, E> {
 
     }
 
-    public Collection<Vertex<S, E>> getNearVertices(Condition<S, E> nearCondition) {
-        return dfsConditionSearch(nearCondition);
-    }
-
-    public Collection<Vertex<S, E>> conditionSearch(Condition<S, E> condition) {
-        return dfsConditionSearch(condition);
-    }
-
     Collection<Vertex<S, E>> dfsConditionSearch(Condition<S, E> condition) {
         Queue<Vertex<S, E>> queue = new LinkedList<Vertex<S, E>>();
         LinkedList<Vertex<S, E>> result = new LinkedList<Vertex<S, E>>();
