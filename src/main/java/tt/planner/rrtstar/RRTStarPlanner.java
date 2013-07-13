@@ -184,7 +184,7 @@ public class RRTStarPlanner<S, E> implements Graph<S, E> {
         }
     }
 
-    class BestParentSearchResult {
+    protected class BestParentSearchResult {
         final Vertex<S, E> parent;
         final Extension<S, E> extension;
 
