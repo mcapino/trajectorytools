@@ -1,4 +1,4 @@
-package tt.planner.rrtstar;
+package tt.planner.rrtstar.util;
 
 public class ExtensionEstimate {
     final public double cost;

@@ -1,5 +1,8 @@
 package tt.planner.rrtstar;
 
+import tt.planner.rrtstar.util.Vertex;
+import tt.planner.rrtstar.domain.Domain;
+import tt.planner.rrtstar.util.Extension;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;

@@ -1,4 +1,4 @@
-package tt.planner.rrtstar.graph;
+package tt.planner.rrtstar.domain;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -6,9 +6,8 @@ import org.jgrapht.alg.GreedyBestFirstSearch;
 import org.jgrapht.util.GeneralHeuristic;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
-import tt.planner.rrtstar.Domain;
-import tt.planner.rrtstar.Extension;
-import tt.planner.rrtstar.ExtensionEstimate;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
 
 import java.util.ArrayList;
 import java.util.List;

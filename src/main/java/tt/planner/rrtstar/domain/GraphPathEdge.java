@@ -1,4 +1,4 @@
-package tt.planner.rrtstar.graph;
+package tt.planner.rrtstar.domain;
 
 import org.jgrapht.GraphPath;
 

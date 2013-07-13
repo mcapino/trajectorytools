@@ -9,9 +9,9 @@ import tt.euclid2i.Region;
 import tt.euclid2i.probleminstance.ShortestPathProblem;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
-import tt.planner.rrtstar.Domain;
-import tt.planner.rrtstar.Extension;
-import tt.planner.rrtstar.ExtensionEstimate;
+import tt.planner.rrtstar.domain.Domain;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
 
 public class StraightLineDomain implements Domain<Point, Line> {
 

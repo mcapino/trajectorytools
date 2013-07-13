@@ -1,4 +1,4 @@
-package tt.planner.rrtstar;
+package tt.planner.rrtstar.util;
 
 public class Extension<S,E> {
     final public S source;

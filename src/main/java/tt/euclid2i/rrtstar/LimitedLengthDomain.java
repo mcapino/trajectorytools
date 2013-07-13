@@ -10,7 +10,7 @@ import tt.euclid2i.Region;
 import tt.euclid2i.probleminstance.ShortestPathProblem;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
-import tt.planner.rrtstar.Extension;
+import tt.planner.rrtstar.util.Extension;
 
 public class LimitedLengthDomain extends StraightLineDomain {
 

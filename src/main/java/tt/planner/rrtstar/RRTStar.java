@@ -1,5 +1,9 @@
 package tt.planner.rrtstar;
 
+import tt.planner.rrtstar.util.Vertex;
+import tt.planner.rrtstar.domain.Domain;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;

@@ -1,4 +1,4 @@
-package tt.planner.rrtstar.graph;
+package tt.planner.rrtstar.domain;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -6,7 +6,7 @@ import org.jgrapht.alg.GreedyBestFirstSearch;
 import org.jgrapht.util.GeneralHeuristic;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
-import tt.planner.rrtstar.Extension;
+import tt.planner.rrtstar.util.Extension;
 
 public class GraphDomainExtending<S, E> extends GraphDomain<S, E> {
 

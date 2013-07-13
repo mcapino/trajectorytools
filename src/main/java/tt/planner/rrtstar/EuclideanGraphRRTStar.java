@@ -1,7 +1,10 @@
 package tt.planner.rrtstar;
 
-import tt.planner.rrtstar.graph.GraphDomain;
-import tt.planner.rrtstar.graph.GraphPathEdge;
+import tt.planner.rrtstar.util.Vertex;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
+import tt.planner.rrtstar.domain.GraphDomain;
+import tt.planner.rrtstar.domain.GraphPathEdge;
 
 import java.util.Collection;
 

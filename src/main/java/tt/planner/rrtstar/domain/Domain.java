@@ -1,4 +1,7 @@
-package tt.planner.rrtstar;
+package tt.planner.rrtstar.domain;
+
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
 
 /**
  * The definition of a planning problem for RRT*

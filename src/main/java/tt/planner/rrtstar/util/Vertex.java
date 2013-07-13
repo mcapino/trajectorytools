@@ -1,17 +1,17 @@
-package tt.planner.rrtstar;
+package tt.planner.rrtstar.util;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 public class Vertex<S, E> {
-    S state;
-    Vertex<S, E> parent;
-    Collection<Vertex<S, E>> children;
+    public S state;
+    public Vertex<S, E> parent;
+    public Collection<Vertex<S, E>> children;
 
-    E edgeFromParent;
+    public E edgeFromParent;
 
-    double costFromRoot;
-    double costFromParent;
+    public double costFromRoot;
+    public double costFromParent;
 
     public Vertex(S state) {
         super();
