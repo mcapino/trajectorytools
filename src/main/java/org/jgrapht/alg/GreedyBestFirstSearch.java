@@ -16,7 +16,7 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
 
     protected GraphPath<V, E> path;
     protected Set<V> opened;
-    protected HeuristicToGoal<V> heuristicToGoal;
+    protected HeuristicToGoal<V> heuristic;
     protected double radius;
     protected int depthLimit;
 
@@ -53,47 +53,45 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
     public GreedyBestFirstSearch(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, double radius, int depthLimit) {
         super(graph, startVertex, goal);
         this.opened = new HashSet<V>();
-        this.heuristicToGoal = heuristic;
+        this.heuristic = heuristic;
         this.depthLimit = depthLimit;
         this.radius = radius;
     }
 
     public GraphPath<V, E> findPath() {
+
         double cost = 0;
-        double depth = 0;
         V current = startVertex;
 
-        while (cost < radius && depth < depthLimit && !goal.isGoal(current)) {
+        while (cost < radius && opened.size() < depthLimit && !goal.isGoal(current)) {
+            opened.add(current);
 
-            double min = Double.POSITIVE_INFINITY;
+            double minCost = Double.POSITIVE_INFINITY;
             V bestSuccessorVertex = null;
             E bestSuccessorEdge = null;
 
             Set<E> outgoingEdges = specifics.outgoingEdgesOf(current);
-
             for (E edge : outgoingEdges) {
                 V successor = Graphs.getOppositeVertex(graph, edge, current);
 
-                if (current.equals(successor) || opened.contains(successor)) continue;
+                if (opened.contains(successor))
+                    continue;
 
-                double costToGoEstimate = heuristicToGoal.getCostToGoalEstimate(successor);
-
-                if (costToGoEstimate < min) {
-                    min = costToGoEstimate;
+                double costToGoEstimate = heuristic.getCostToGoalEstimate(successor);
+                if (costToGoEstimate < minCost) {
+                    minCost = costToGoEstimate;
                     bestSuccessorVertex = successor;
                     bestSuccessorEdge = edge;
                 }
             }
 
-            if (bestSuccessorVertex == null) break;
-
-            current = bestSuccessorVertex;
+            if (bestSuccessorVertex == null)
+                break;
 
             edgeList.add(bestSuccessorEdge);
-            opened.add(bestSuccessorVertex);
 
+            current = bestSuccessorVertex;
             cost += graph.getEdgeWeight(bestSuccessorEdge);
-            depth++;
         }
 
         path = new GraphPathImpl<V, E>(graph, startVertex, current, edgeList, cost);
