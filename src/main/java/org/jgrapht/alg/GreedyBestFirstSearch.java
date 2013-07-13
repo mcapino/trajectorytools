@@ -14,11 +14,13 @@ import java.util.Set;
 
 public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
 
-    private Set<V> closed;
-    private HeuristicToGoal<V> heuristicToGoal;
-    private double radius;
+    protected GraphPath<V, E> path;
+    protected Set<V> closed;
+    protected HeuristicToGoal<V> heuristicToGoal;
+    protected double radius;
+    protected int depthLimit;
 
-    private List<E> edgeList = new ArrayList<E>();
+    protected List<E> edgeList = new ArrayList<E>();
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, final V endVertex, double radius) {
         return findPathBetween(graph, heuristic, startVertex, new Goal<V>() {
@@ -30,22 +32,38 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, double radius) {
-        GreedyBestFirstSearch<V, E> alg = new GreedyBestFirstSearch<V, E>(graph, heuristic, startVertex, goal, radius);
+        GreedyBestFirstSearch<V, E> alg = new GreedyBestFirstSearch<V, E>(graph, heuristic, startVertex, goal, radius, Integer.MAX_VALUE);
         return alg.findPath();
     }
 
-    private GreedyBestFirstSearch(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, double radius) {
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, final V endVertex, int depthLimit) {
+        return findPathBetween(graph, heuristic, startVertex, new Goal<V>() {
+            @Override
+            public boolean isGoal(V current) {
+                return current.equals(endVertex);
+            }
+        }, depthLimit);
+    }
+
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, int depthLimit) {
+        GreedyBestFirstSearch<V, E> alg = new GreedyBestFirstSearch<V, E>(graph, heuristic, startVertex, goal, Double.POSITIVE_INFINITY, depthLimit);
+        return alg.findPath();
+    }
+
+    public GreedyBestFirstSearch(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, double radius, int depthLimit) {
         super(graph, startVertex, goal);
         this.closed = new HashSet<V>();
         this.heuristicToGoal = heuristic;
+        this.depthLimit = depthLimit;
         this.radius = radius;
     }
 
-    private GraphPath<V, E> findPath() {
+    public GraphPath<V, E> findPath() {
         double cost = 0;
+        double depth = 0;
         V current = startVertex;
 
-        while (cost < radius && !goal.isGoal(current)) {
+        while (cost < radius && depth < depthLimit && !goal.isGoal(current)) {
 
             double min = Double.POSITIVE_INFINITY;
             V bestSuccessorVertex = null;
@@ -70,15 +88,27 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
             if (bestSuccessorVertex == null) break;
 
             current = bestSuccessorVertex;
-            cost += graph.getEdgeWeight(bestSuccessorEdge);
             edgeList.add(bestSuccessorEdge);
             closed.add(bestSuccessorVertex);
+
+            cost += graph.getEdgeWeight(bestSuccessorEdge);
+            depth++;
         }
+
+        path = new GraphPathImpl<V, E>(graph, startVertex, current, edgeList, cost);
 
         if (!goal.isGoal(current)) {
             return null;
         } else {
-            return new GraphPathImpl<V, E>(graph, startVertex, current, edgeList, cost);
+            return path;
         }
+    }
+
+    public GraphPath<V, E> getTraversedPath() {
+        return path;
+    }
+
+    public Set<V> getClosedSet() {
+        return closed;
     }
 }
