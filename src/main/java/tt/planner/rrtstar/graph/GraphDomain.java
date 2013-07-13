@@ -4,6 +4,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.GreedyBestFirstSearch;
 import org.jgrapht.util.GeneralHeuristic;
+import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import tt.planner.rrtstar.Domain;
 import tt.planner.rrtstar.Extension;
@@ -15,21 +16,21 @@ import java.util.Random;
 
 public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
-    private Graph<S, E> graph;
-    private S goal;
-    private GeneralHeuristic<S> heuristic;
-    private Random random;
-    private double radius;
-    private double tryGoalRatio;
+    protected Graph<S, E> graph;
+    protected S goal;
+    protected GeneralHeuristic<S> heuristic;
+    protected Random random;
+    protected int depthLimit;
+    protected double tryGoalRatio;
 
-    private List<S> vertexSet;
-    private int vertexCount;
+    protected List<S> vertexSet;
+    protected int vertexCount;
 
-    public GraphDomain(Graph<S, E> graph, GeneralHeuristic<S> heuristic, S goal, int seed, double radius, double tryGoalRatio) {
+    public GraphDomain(Graph<S, E> graph, GeneralHeuristic<S> heuristic, S goal, int seed, int depthLimit, double tryGoalRatio) {
         this.graph = graph;
         this.heuristic = heuristic;
         this.goal = goal;
-        this.radius = radius;
+        this.depthLimit = depthLimit;
         this.tryGoalRatio = tryGoalRatio;
 
         this.random = new Random(seed);
@@ -39,7 +40,7 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
     @Override
     public S sampleState() {
-        if (Math.random() > tryGoalRatio) {
+        if (random.nextDouble() > tryGoalRatio) {
             int rnd = random.nextInt(vertexCount);
             return vertexSet.get(rnd);
         } else {
@@ -52,25 +53,31 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
     public Extension<S, GraphPathEdge<S, E>> extendTo(S from, final S to) {
         Extension<S, GraphPathEdge<S, E>> result = null;
 
-        if ((heuristic.getCostEstimate(from, to) < radius) || !heuristic.isAdmissible()) {
-
-            GraphPath<S, E> path = GreedyBestFirstSearch.findPathBetween(graph, new HeuristicToGoal<S>() {
-                @Override
-                public double getCostToGoalEstimate(S current) {
-                    return heuristic.getCostEstimate(current, to);
-                }
-
-                @Override
-                public boolean isAdmissible() {
-                    return heuristic.isAdmissible();
-                }
-
-
-            }, from, to, radius);
-
-            if (path != null) {
-                result = new Extension<S, GraphPathEdge<S, E>>(from, to, new GraphPathEdge<S, E>(path), path.getWeight(), true);
+        GreedyBestFirstSearch<S, E> algorithm = new GreedyBestFirstSearch<S, E>(graph, new HeuristicToGoal<S>() {
+            @Override
+            public double getCostToGoalEstimate(S current) {
+                return heuristic.getCostEstimate(current, to);
             }
+
+            @Override
+            public boolean isAdmissible() {
+                return heuristic.isAdmissible();
+            }
+
+
+        }, from, new Goal<S>() {
+            @Override
+            public boolean isGoal(S current) {
+                return current.equals(to);
+            }
+        }, Double.MAX_VALUE, depthLimit
+        );
+
+        GraphPath<S, E> path = algorithm.findPath();
+
+        if (path != null) {
+            result = new Extension<S, GraphPathEdge<S, E>>(path.getStartVertex(), path.getEndVertex(),
+                    new GraphPathEdge<S, E>(path), path.getWeight(), true);
         }
 
         return result;
