@@ -4,12 +4,13 @@ import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
-    private Set<S> expandedStates;
+    private Set<S> kdKeys;
     private KDTree<Vertex<S, E>> kdTree;
     private EuclideanCoordinatesProvider<S> euclideanProvider;
 
@@ -21,8 +22,8 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
         this.euclideanProvider = euclideanProvider;
 
         this.kdTree = new KDTree<Vertex<S, E>>(dimensions);
-        this.expandedStates = new HashSet<S>();
-        insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(initialState), root);
+        this.kdKeys = new HashSet<S>();
+        insertIntoKDTree(root);
     }
 
     public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
@@ -36,42 +37,90 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
 
         do {
             state = super.sampleState();
-        } while (expandedStates.contains(state));
+        } while (kdKeys.contains(state));
 
         return state;
     }
 
     @Override
     protected Vertex<S, E> insertExtension(Vertex<S, E> parent, Extension<S, E> extension) {
-        Vertex<S, E> newVertex = super.insertExtension(parent, extension);
+        Vertex<S, E> newVertex;
+
+        if (kdKeys.contains(extension.target)) {
+            //TODO might be better to check whether the new path is shorter
+            newVertex = null;
+        } else {
+            newVertex = super.insertExtension(parent, extension);
+        }
+
         if (newVertex != null) {
-            S state = newVertex.state;
-            insertIntoKDTree(euclideanProvider.getEuclideanCoordinates(state), newVertex);
-            expandedStates.add(state);
+            //TODO possible double checking kdKeys.contains(...)
+            insertIntoKDTree(newVertex);
         }
 
         return newVertex;
     }
 
-    @Override
-    protected Vertex<S, E> getNearestParentVertex(S state) {
-        return nearestVertex(euclideanProvider.getEuclideanCoordinates(state));
+    private void insertIntoKDTree(Vertex<S, E> newVertex) {
+        S state = newVertex.state;
+        double[] key = euclideanProvider.getEuclideanCoordinates(state);
+
+        if (!kdKeys.contains(state))
+            try {
+                kdTree.insert(key, newVertex);
+                kdKeys.add(state);
+
+            } catch (KeySizeException e) {
+                throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
+
+            } catch (KeyDuplicateException e) {
+                throw new RuntimeException("KD-Tree does not support duplicate keys");
+            }
     }
 
-    private void insertIntoKDTree(double[] key, Vertex<S, E> value) {
+    @Override
+    protected Vertex<S, E> getNearestParentVertex(S state) {
+        double[] key = euclideanProvider.getEuclideanCoordinates(state);
+        return getNearestVertex(key);
+    }
+
+    protected Vertex<S, E> getNearestVertex(double[] key) {
         try {
-            kdTree.insert(key, value);
+            return kdTree.nearest(key);
         } catch (KeySizeException e) {
             throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
-
-        } catch (KeyDuplicateException e) {
-            throw new RuntimeException("KD-Tree does not support duplicate keys");
         }
     }
 
-    private Vertex<S, E> nearestVertex(double[] key) {
+    @Override
+    protected Collection<Vertex<S, E>> getNearParentCandidates(S state) {
+        double radius = getNearBallRadius();
+        Collection<Vertex<S, E>> parentCandidates = getVerticesInRadius(state, radius);
+        return parentCandidates;
+    }
+
+    @Override
+    protected Collection<Vertex<S, E>> getNearChildrenCandidates(S state) {
+        double[] key = euclideanProvider.getEuclideanCoordinates(state);
+        double radius = getNearBallRadius();
+
+        Collection<Vertex<S, E>> childrenCandidates = getVerticesInRadius(state, radius);
+
         try {
-            return kdTree.nearest(key);
+            Vertex<S, E> stateVertex = kdTree.search(key);
+            if (stateVertex != null) childrenCandidates.remove(stateVertex);
+
+        } catch (KeySizeException e) {
+            throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
+        }
+
+        return childrenCandidates;
+    }
+
+    private Collection<Vertex<S, E>> getVerticesInRadius(S state, double radius) {
+        double[] key = euclideanProvider.getEuclideanCoordinates(state);
+        try {
+            return kdTree.nearestEuclidean(key, radius);
         } catch (KeySizeException e) {
             throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
         }
