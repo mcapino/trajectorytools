@@ -53,10 +53,12 @@ public class RRTStarEuclideanGraphPlanner<S, E> extends RRTStarEuclideanPlanner<
             S candidateState = vertex.getState();
 
             ExtensionEstimate extensionEst = domain.estimateExtension(candidateState, randomSample);
-            if (isEstimateWorse(extensionEst, minCost)) continue;
+            if (estimateIsWorseThanMin(extensionEst, minCost))
+                continue;
 
             Extension<S, GraphPathEdge<S, E>> extension = domain.extendTo(candidateState, randomSample);
-            if (isExtensionWorse(randomSample, extension)) continue;
+            if (!extensionIsValid(randomSample, extension))
+                continue;
 
             ExtensionCost cost = new ExtensionCost(vertex.getCostFromRoot(), extension.cost);
             if (cost.compareTo(minCost) < 0) {
@@ -68,11 +70,11 @@ public class RRTStarEuclideanGraphPlanner<S, E> extends RRTStarEuclideanPlanner<
         return result;
     }
 
-    private boolean isExtensionWorse(S randomSample, Extension<S, GraphPathEdge<S, E>> extension) {
-        return extension == null || !extension.exact || !randomSample.equals(extension.target);
+    private boolean extensionIsValid(S randomSample, Extension<S, GraphPathEdge<S, E>> extension) {
+        return extension != null && extension.exact && randomSample.equals(extension.target);
     }
 
-    private boolean isEstimateWorse(ExtensionEstimate extensionEst, ExtensionCost minCost) {
+    private boolean estimateIsWorseThanMin(ExtensionEstimate extensionEst, ExtensionCost minCost) {
         return extensionEst != null && extensionEst.cost > minCost.overallCost;
     }
 
