@@ -15,7 +15,7 @@ import java.util.Set;
 public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
 
     protected GraphPath<V, E> path;
-    protected Set<V> closed;
+    protected Set<V> opened;
     protected HeuristicToGoal<V> heuristicToGoal;
     protected double radius;
     protected int depthLimit;
@@ -52,7 +52,7 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
 
     public GreedyBestFirstSearch(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, double radius, int depthLimit) {
         super(graph, startVertex, goal);
-        this.closed = new HashSet<V>();
+        this.opened = new HashSet<V>();
         this.heuristicToGoal = heuristic;
         this.depthLimit = depthLimit;
         this.radius = radius;
@@ -74,7 +74,7 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
             for (E edge : outgoingEdges) {
                 V successor = Graphs.getOppositeVertex(graph, edge, current);
 
-                if (current.equals(successor) || closed.contains(successor)) continue;
+                if (current.equals(successor) || opened.contains(successor)) continue;
 
                 double costToGoEstimate = heuristicToGoal.getCostToGoalEstimate(successor);
 
@@ -88,8 +88,9 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
             if (bestSuccessorVertex == null) break;
 
             current = bestSuccessorVertex;
+
             edgeList.add(bestSuccessorEdge);
-            closed.add(bestSuccessorVertex);
+            opened.add(bestSuccessorVertex);
 
             cost += graph.getEdgeWeight(bestSuccessorEdge);
             depth++;
@@ -108,7 +109,7 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
         return path;
     }
 
-    public Set<V> getClosedSet() {
-        return closed;
+    public Set<V> getVisitedVertices() {
+        return opened;
     }
 }
