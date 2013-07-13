@@ -8,13 +8,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
+public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
 
     private Set<S> kdKeys;
     private KDTree<Vertex<S, E>> kdTree;
     private EuclideanCoordinatesProvider<S> euclideanProvider;
 
-    public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+    public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                    S initialState, double gamma, double eta) {
         super(domain, initialState, gamma, eta);
 
@@ -26,7 +26,7 @@ public class RRTStarEuclideanPlanner<S, E> extends RRTStarPlanner<S, E> {
         insertIntoKDTree(root);
     }
 
-    public RRTStarEuclideanPlanner(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+    public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                    S initialState, double gamma) {
         this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
     }

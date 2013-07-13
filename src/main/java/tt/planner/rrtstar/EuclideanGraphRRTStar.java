@@ -5,15 +5,15 @@ import tt.planner.rrtstar.graph.GraphPathEdge;
 
 import java.util.Collection;
 
-public class RRTStarEuclideanGraphPlanner<S, E> extends RRTStarEuclideanPlanner<S, GraphPathEdge<S, E>> {
+public class EuclideanGraphRRTStar<S, E> extends EuclideanRRTStar<S, GraphPathEdge<S, E>> {
 
 
-    public RRTStarEuclideanGraphPlanner(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+    public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                         S initialState, double gamma, double eta) {
         super(domain, euclideanProvider, initialState, gamma, eta);
     }
 
-    public RRTStarEuclideanGraphPlanner(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
+    public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                         S initialState, double gamma) {
         super(domain, euclideanProvider, initialState, gamma);
     }

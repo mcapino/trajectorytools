@@ -8,7 +8,7 @@ import tt.util.NotImplementedException;
 
 import java.util.*;
 
-public class RRTStarPlanner<S, E> implements Graph<S, E> {
+public class RRTStar<S, E> implements Graph<S, E> {
 
     Domain<S, E> domain;
     List<RRTStarListener<S, E>> listeners;
@@ -28,11 +28,11 @@ public class RRTStarPlanner<S, E> implements Graph<S, E> {
     S lastSampleDrawn = null;
     S lastNewSample = null;
 
-    public RRTStarPlanner(Domain<S, E> domain, S initialState, double gamma) {
+    public RRTStar(Domain<S, E> domain, S initialState, double gamma) {
         this(domain, initialState, gamma, Double.POSITIVE_INFINITY);
     }
 
-    public RRTStarPlanner(Domain<S, E> domain, S initialState, double gamma, double eta) {
+    public RRTStar(Domain<S, E> domain, S initialState, double gamma, double eta) {
         super();
 
         this.domain = domain;
