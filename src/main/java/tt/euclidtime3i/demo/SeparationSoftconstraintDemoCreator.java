@@ -22,7 +22,7 @@ import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
-import tt.euclidtime3i.discretization.SeparationSoftConstraintWrapper;
+import tt.euclidtime3i.discretization.SeparationAsSoftConstraintWrapper;
 import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.trajectory.Trajectories;
@@ -84,8 +84,8 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
             = new ConstantSpeedTimeExtension(spatialGraph, 5000, new int[]{1});
 
         // Add soft-constraint
-        SeparationSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
-            = new SeparationSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 11);
+        SeparationAsSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
+            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 11);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {
