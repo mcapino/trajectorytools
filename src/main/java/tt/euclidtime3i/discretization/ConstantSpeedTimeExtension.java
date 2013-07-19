@@ -161,7 +161,6 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
             }
         }
 
-
         Set<Straight> edges = new HashSet<Straight>();
         for (Point child : children) {
             edges.add(new Straight(vertex, child));
@@ -188,46 +187,4 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
     public boolean removeAllVertices(Collection<? extends Point> arg0) {
         throw new NotImplementedException();
     }
-
-    /*
-    public DirectedGraph<Point, Straight> generateFullGraph() {
-        DefaultDirectedGraph<Point, Straight> fullGraph
-            = new DefaultDirectedGraph<Point, Straight>( new EdgeFactory<Point, Straight>() {
-
-                @Override
-                public Straight createEdge(Point sourceVertex,
-                        Point targetVertex) {
-                    return new Straight(sourceVertex, targetVertex);
-                }
-            });
-
-        Queue<Point> open = new LinkedList<Point>();
-
-        open.offer(spatialGraph.getInitialPoint());
-        Set<Point> closed = new HashSet<Point>();
-        int iterations = 0;
-
-        while (!open.isEmpty()) {
-            iterations++;
-            Point current = open.poll();
-            fullGraph.addVertex(current);
-
-            Set<Straight> outEdges = outgoingEdgesOf(current);
-            for (Straight edge : outEdges) {
-                Point target = getEdgeTarget(edge);
-                fullGraph.addVertex(target);
-                fullGraph.addEdge(current, target);
-
-                if (!closed.contains(target)) { // it must mean that this closed.contains(target) is always true
-                    closed.add(target);
-                    open.offer(target);
-                }
-            }
-        }
-
-        System.out.println("iterations:" + iterations);
-        System.out.println("closed:" + closed.size());
-        return fullGraph;
-    }
-    */
 }

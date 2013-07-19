@@ -21,8 +21,8 @@ import tt.euclid2i.trajectory.StraightSegmentTrajectory;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.euclidtime3i.Trajectory;
-import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
+import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.trajectory.Trajectories;
 import tt.euclidtime3i.vis.RegionsLayer;
@@ -60,14 +60,14 @@ public class PathfindingDemoCreator implements Creator {
         final DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph
             = new LazyGrid(new tt.euclid2i.Point(0,0),
                     new LinkedList<tt.euclid2i.Region>(),
-                    new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-50,-50),
-                    new tt.euclid2i.Point(50,50)),
+                    new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-100,-100),
+                    new tt.euclid2i.Point(100,100)),
                     LazyGrid.PATTERN_8_WAY,
                     10);
 
         // create dynamic obstacles
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
-        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-10,0), new tt.euclid2i.Point(10,0), 5));
+        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-10,0), new tt.euclid2i.Point(10,0), 9));
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
@@ -78,7 +78,7 @@ public class PathfindingDemoCreator implements Creator {
         }, new TimeParameterProjectionTo2d(time), Color.RED, Color.GRAY));
 
 
-        // create spatio-temporal graph
+        // create spatio-temporal graph, cut out dynamic obstacles
         ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
@@ -88,7 +88,7 @@ public class PathfindingDemoCreator implements Creator {
                                 return (current.getPosition())
                                         .distance(new tt.euclid2i.Point(0, 10));
                             }
-                        }, new Point(0, -10, 0), new Goal<Point>() {
+                        }, new Point(0, -20, 0), new Goal<Point>() {
                             @Override
                             public boolean isGoal(Point current) {
                                 return current.x == 0 && current.y == 10;
@@ -124,7 +124,7 @@ public class PathfindingDemoCreator implements Creator {
                 return path;
             }
 
-        },  new TimeParameterProjectionTo2d(time),Color.RED, Color.RED, 2, 8));
+        },  new TimeParameterProjectionTo2d(time),Color.RED, Color.RED, 4, 8));
     }
 
     private Region createMovingObstacle(
