@@ -2,6 +2,7 @@ package tt.euclidtime3i.discretization;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -27,6 +28,12 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
         this.maxTime = maxTime;
         this.speeds = speeds;
         this.dynamicObstacles = dynamicObstacles;
+    }
+
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds) {
+       this(spatialGraph, maxTime, speeds, new LinkedList<Region>());
     }
 
     @Override
@@ -68,7 +75,7 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
     @Override
     public Set<Straight> edgesOf(Point vertex) {
         Set<Straight> edges = new HashSet<Straight>();
-        edges.addAll(incomingEdgesOf(vertex));
+        //edges.addAll(incomingEdgesOf(vertex));
         edges.addAll(outgoingEdgesOf(vertex));
         return edges;
     }
