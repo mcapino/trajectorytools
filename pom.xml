@@ -65,13 +65,11 @@
             <artifactId>jgrapht-jdk1.6</artifactId>
             <version>0.8.2</version>
         </dependency>
-        <!--
-<dependency>
-    <groupId>net.sf.jgrapht</groupId>
-    <artifactId>jgrapht</artifactId>
-    <version>0.8.3</version>
-</dependency>
-           -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience</artifactId>
+            <version>4.3.1</version>
+        </dependency>
         <dependency>
             <groupId>math.javageom</groupId>
             <artifactId>javaGeom</artifactId>
