@@ -24,12 +24,6 @@ public class GraphDomainExtending<S, E> extends GraphDomain<S, E> {
                 return heuristic.getCostEstimate(current, to);
             }
 
-            @Override
-            public boolean isAdmissible() {
-                return heuristic.isAdmissible();
-            }
-
-
         }, from, new Goal<S>() {
             @Override
             public boolean isGoal(S current) {

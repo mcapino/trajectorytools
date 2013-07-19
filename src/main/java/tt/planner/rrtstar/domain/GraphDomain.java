@@ -57,13 +57,6 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
             public double getCostToGoalEstimate(S current) {
                 return heuristic.getCostEstimate(current, to);
             }
-
-            @Override
-            public boolean isAdmissible() {
-                return heuristic.isAdmissible();
-            }
-
-
         }, from, new Goal<S>() {
             @Override
             public boolean isGoal(S current) {
