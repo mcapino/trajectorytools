@@ -88,13 +88,6 @@ public class PathfindingDemoCreator implements Creator {
                                 return (current.getPosition())
                                         .distance(new tt.euclid2i.Point(0, 10));
                             }
-
-                            @Override
-                            public boolean isAdmissible() {
-                                return true;
-                            }
-
-
                         }, new Point(0, -10, 0), new Goal<Point>() {
                             @Override
                             public boolean isGoal(Point current) {
@@ -145,11 +138,6 @@ public class PathfindingDemoCreator implements Creator {
                     @Override
                     public double getCostToGoalEstimate(tt.euclid2i.Point current) {
                         return current.distance(target);
-                    }
-
-                    @Override
-                    public boolean isAdmissible() {
-                        return true;
                     }
 
                 }, start, target);

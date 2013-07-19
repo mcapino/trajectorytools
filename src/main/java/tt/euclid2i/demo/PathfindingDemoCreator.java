@@ -72,11 +72,6 @@ public class PathfindingDemoCreator implements Creator {
                     public double getCostToGoalEstimate(Point current) {
                         return current.distance(goal);
                     }
-
-                    @Override
-                    public boolean isAdmissible() {
-                        return true;
-                    }
                 }, start, goal);
             }
 

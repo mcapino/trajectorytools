@@ -25,11 +25,6 @@ public class AStarGeneralGraphTest extends AbstractGeneralGraphTest {
                 return 0;
             }
 
-            @Override
-            public boolean isAdmissible() {
-                return true;
-            }
-
         }, problem.startVertex, problem.endVertex);
     }
 }

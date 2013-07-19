@@ -28,11 +28,6 @@ public class AStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
                 return current.euclideanDistance(problem.endVertex);
             }
 
-            @Override
-            public boolean isAdmissible() {
-                return true;
-            }
-
         }, problem.startVertex, problem.endVertex);
     }
 }

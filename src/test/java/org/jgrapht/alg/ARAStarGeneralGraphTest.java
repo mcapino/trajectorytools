@@ -28,11 +28,6 @@ public class ARAStarGeneralGraphTest extends AbstractGeneralGraphTest {
                 return 0;
             }
 
-            @Override
-            public boolean isAdmissible() {
-                return true;
-            }
-
         }, problem.startVertex, problem.endVertex, 2, 0.02, new BinaryHeap<Double, Node>());
 
         ARAStarShortestPath.Result<Node, DefaultWeightedEdge> araResult;

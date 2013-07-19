@@ -26,12 +26,6 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
             public double getCostToGoalEstimate(Point current) {
                 return current.euclideanDistance(problem.endVertex);
             }
-
-            @Override
-            public boolean isAdmissible() {
-                return true;
-            }
-
         }, problem.startVertex, problem.endVertex, 2, 0.02, new BinaryHeap<Double, Point>());
 
         ARAStarShortestPath.Result<Point, DefaultWeightedEdge> araResult;
