@@ -44,6 +44,9 @@ import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 public class SeparationSoftconstraintDemoCreator implements Creator {
 
+    private static final int RADIUS = 75;
+    private static final int GRID_STEP_SIZE = 25;
+
     @Override
     public void init(String[] args) {}
 
@@ -64,11 +67,11 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
                     new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-200,-200),
                     new tt.euclid2i.Point(200,200)),
                     LazyGrid.PATTERN_8_WAY,
-                    25);
+                    GRID_STEP_SIZE);
 
         // create dynamic obstacles
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
-        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-100,0), new tt.euclid2i.Point(100,0), 75));
+        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-100,0), new tt.euclid2i.Point(100,0), RADIUS));
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
@@ -85,7 +88,7 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
 
         // Add soft-constraint
         SeparationAsSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
-            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 11);
+            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 5*GRID_STEP_SIZE);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {

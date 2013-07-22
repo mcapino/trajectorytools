@@ -28,10 +28,11 @@ public class SeparationAsSoftConstraintWrapper<V extends Point, E extends Straig
             if (region.intersectsLine(e.getStart(), e.getEnd())) {
                 MovingCircle mc = (MovingCircle) region;
 
+                double endDist = mc.getTrajectory().get(e.getEnd().getTime()).distance(e.getEnd().getPosition());
+
                 // tanh should work here: 1+tanh(1/sepdist) should be good
 
-
-                cost += maxViolationCost;
+                cost += Math.max(0, maxViolationCost*(mc.getRadius()-endDist));
             }
         }
 
