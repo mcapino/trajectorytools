@@ -3,7 +3,6 @@ package tt.planner.homotopy;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graphs;
-import org.jgrapht.alg.specifics.Specifics;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jscience.mathematics.number.Complex;
 
@@ -14,11 +13,19 @@ import java.util.Set;
 public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
     private DirectedGraph<V, E> graph;
-    private Specifics<V, E> specifics;
     private LValueIntegrator integrator;
     private ProjectionToComplexPlane<V> projection;
 
     private HashMap<E, Complex> lValues;
+    private Set<Complex> forbiddenValues;
+
+    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Set<Complex> forbiddenValues, ProjectionToComplexPlane<V> projection, LValueIntegrator integrator) {
+        this.graph = graph;
+        this.projection = projection;
+        this.integrator = integrator;
+        this.forbiddenValues = forbiddenValues;
+        this.lValues = new HashMap<E, Complex>();
+    }
 
     @Override
     public EdgeFactory<HNode<V>, HEdge<V, E>> getEdgeFactory() {
@@ -62,6 +69,8 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, opposite, vertex);
             Complex oppositeLValue = lValue.plus(increment);
 
+            if (!isAllowed(oppositeLValue)) continue;
+
             HNode<V> source = new HNode<V>(opposite, oppositeLValue, target.getPrecision());
 
             incomingEdges.add(new HEdge<V, E>(edge, increment, source, target));
@@ -84,12 +93,23 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, vertex, opposite);
             Complex oppositeLValue = lValue.plus(increment);
 
+            if (!isAllowed(oppositeLValue)) continue;
+
             HNode<V> target = new HNode<V>(opposite, oppositeLValue, source.getPrecision());
 
             outgoingEdges.add(new HEdge<V, E>(edge, increment, source, target));
         }
 
         return outgoingEdges;
+    }
+
+    private boolean isAllowed(Complex oppositeLValue) {
+        for (Complex value : forbiddenValues) {
+            if (oppositeLValue.equals(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Complex lValueIncrement(E edge, V source, V target) {
