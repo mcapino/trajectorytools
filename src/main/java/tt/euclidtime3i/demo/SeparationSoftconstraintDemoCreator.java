@@ -88,7 +88,7 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
 
         // Add soft-constraint
         SeparationAsSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
-            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 5*GRID_STEP_SIZE);
+            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, GRID_STEP_SIZE);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {
