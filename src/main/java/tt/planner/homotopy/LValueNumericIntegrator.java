@@ -30,16 +30,15 @@ public class LValueNumericIntegrator implements LValueIntegrator {
     }
 
     private Complex fractionValue(Complex point) {
-        Complex qEvaluated = evaluatePolynomial(qRoots, point);
-        Complex pEvaluated = evaluatePolynomial(pRoots, point);
-        return qEvaluated.divide(pEvaluated);
+        Complex qEvaluated = logEvaluatePolynomial(qRoots, point);
+        Complex pEvaluated = logEvaluatePolynomial(pRoots, point);
+        return qEvaluated.minus(pEvaluated).exp();
     }
 
-    private Complex evaluatePolynomial(List<Complex> roots, Complex point) {
-        Complex evaluated = Complex.ONE;
+    private Complex logEvaluatePolynomial(List<Complex> roots, Complex point) {
+        Complex evaluated = Complex.ZERO;
         for (int i = 0; i < roots.size(); i++) {
-            evaluated = evaluated.times(point.minus(roots.get(i)));
-
+            evaluated = evaluated.plus(point.minus(roots.get(i)).log());
         }
         return evaluated;
     }

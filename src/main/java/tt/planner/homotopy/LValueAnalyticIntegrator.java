@@ -48,28 +48,28 @@ public class LValueAnalyticIntegrator implements LValueIntegrator {
         List<Complex> residues = new ArrayList<Complex>();
 
         for (int l = 0; l < pRoots.size(); l++) {
-            Complex pEvaluated = evaluateDenominator(l);
-            Complex qEvaluated = evaluateNominator(l);
-            residues.add(qEvaluated.divide(pEvaluated));
+            Complex pEvaluated = logEvaluateDenominator(l);
+            Complex qEvaluated = logEvaluateNominator(l);
+            residues.add(qEvaluated.minus(pEvaluated).exp());
         }
 
         return residues;
     }
 
-    private Complex evaluateNominator(int l) {
-        Complex qEvaluated = Complex.ONE;
+    private Complex logEvaluateNominator(int l) {
+        Complex qEvaluated = Complex.ZERO;
         for (int j = 0; j < qRoots.size(); j++) {
-            qEvaluated = qEvaluated.times(qRoots.get(j).minus(pRoots.get(l)));
+            qEvaluated = qEvaluated.plus(qRoots.get(j).minus(pRoots.get(l)).log());
 
         }
         return qEvaluated;
     }
 
-    private Complex evaluateDenominator(int l) {
-        Complex pEvaluated = Complex.ONE;
+    private Complex logEvaluateDenominator(int l) {
+        Complex pEvaluated = Complex.ZERO;
         for (int j = 0; j < pRoots.size(); j++) {
             if (l == j) continue;
-            pEvaluated = pEvaluated.times(pRoots.get(l).minus(pRoots.get(j)));
+            pEvaluated = pEvaluated.plus(pRoots.get(l).minus(pRoots.get(j)).log());
 
         }
         return pEvaluated;
