@@ -1,126 +1,118 @@
 package tt.planner.homotopy;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
-import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
 import org.jgrapht.alg.specifics.Specifics;
-import tt.util.NotImplementedException;
+import org.jgrapht.graph.AbstractDirectedGraphWrapper;
+import org.jscience.mathematics.number.Complex;
 
-import javax.vecmath.Point2d;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
-public class HomotopyGraphWrapper<V, E> implements Graph<HNode<V>, HEdge<E>> {
+public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
-    private Graph<V, E> graph;
+    private DirectedGraph<V, E> graph;
     private Specifics<V, E> specifics;
-    private List<Point2d> obstacles;
+    private LValueIntegrator integrator;
+    private ProjectionToComplexPlane<V> projection;
 
-    private Set<HNode<V>> nodes;
-    private Set<HEdge<V>> vertices;
+    private HashMap<E, Complex> lValues;
 
     @Override
-    public EdgeFactory<HNode<V>, HEdge<E>> getEdgeFactory() {
+    public EdgeFactory<HNode<V>, HEdge<V, E>> getEdgeFactory() {
         return null;
     }
 
     @Override
-    public HEdge<E> getEdge(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
+    public double getEdgeWeight(HEdge<V, E> hEdge) {
+        return graph.getEdgeWeight(hEdge.getEdge());
     }
 
     @Override
-    public boolean containsVertex(HNode<V> vhNode) {
-        throw new NotImplementedException();
+    public int inDegreeOf(HNode<V> vertex) {
+        return graph.inDegreeOf(vertex.getNode());
     }
 
     @Override
-    public Set<HEdge<E>> edgeSet() {
-        throw new NotImplementedException();
+    public int outDegreeOf(HNode<V> vertex) {
+        return graph.outDegreeOf(vertex.getNode());
     }
 
     @Override
-    public Set<HEdge<E>> edgesOf(HNode<V> vertex) {
-        throw new NotImplementedException();
+    public Set<HEdge<V, E>> edgesOf(HNode<V> vertex) {
+        Set<HEdge<V, E>> edges = new HashSet<HEdge<V, E>>();
+        edges.addAll(incomingEdgesOf(vertex));
+        edges.addAll(outgoingEdgesOf(vertex));
+        return edges;
     }
 
     @Override
-    public boolean removeAllEdges(Collection<? extends HEdge<E>> edges) {
-        throw new NotImplementedException();
+    public Set<HEdge<V, E>> incomingEdgesOf(HNode<V> target) {
+        Set<HEdge<V, E>> incomingEdges = new HashSet<HEdge<V, E>>();
+        Set<E> originalEdges = graph.incomingEdgesOf(target.getNode());
+
+        V vertex = target.getNode();
+        Complex lValue = target.getlValue();
+
+        for (E edge : originalEdges) {
+            V opposite = Graphs.getOppositeVertex(graph, edge, vertex);
+
+            Complex increment = lValueIncrement(edge, opposite, vertex);
+            Complex oppositeLValue = lValue.plus(increment);
+
+            HNode<V> source = new HNode<V>(opposite, oppositeLValue, target.getPrecision());
+
+            incomingEdges.add(new HEdge<V, E>(edge, increment, source, target));
+        }
+
+        return incomingEdges;
     }
 
     @Override
-    public Set<HEdge<E>> removeAllEdges(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
+    public Set<HEdge<V, E>> outgoingEdgesOf(HNode<V> source) {
+        Set<HEdge<V, E>> outgoingEdges = new HashSet<HEdge<V, E>>();
+        Set<E> originalEdges = graph.outgoingEdgesOf(source.getNode());
+
+        V vertex = source.getNode();
+        Complex lValue = source.getlValue();
+
+        for (E edge : originalEdges) {
+            V opposite = Graphs.getOppositeVertex(graph, edge, vertex);
+
+            Complex increment = lValueIncrement(edge, vertex, opposite);
+            Complex oppositeLValue = lValue.plus(increment);
+
+            HNode<V> target = new HNode<V>(opposite, oppositeLValue, source.getPrecision());
+
+            outgoingEdges.add(new HEdge<V, E>(edge, increment, source, target));
+        }
+
+        return outgoingEdges;
+    }
+
+    private Complex lValueIncrement(E edge, V source, V target) {
+        Complex lvalue = lValues.get(edge);
+
+        if (lvalue == null) {
+            Complex from = projection.complexValue(source);
+            Complex to = projection.complexValue(target);
+
+            lvalue = integrator.lineSegmentIncrement(from, to);
+            lValues.put(edge, lvalue);
+        }
+
+        return lvalue;
     }
 
     @Override
-    public boolean removeAllVertices(Collection<? extends HNode<V>> vertices) {
-        throw new NotImplementedException();
+    public HNode<V> getEdgeSource(HEdge<V, E> hEdge) {
+        return hEdge.getSource();
     }
 
     @Override
-    public HEdge<E> removeEdge(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeEdge(HEdge<E> ehEdge) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeVertex(HNode<V> vhNode) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<HNode<V>> vertexSet() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public HNode<V> getEdgeSource(HEdge<E> ehEdge) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public HNode<V> getEdgeTarget(HEdge<E> ehEdge) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public double getEdgeWeight(HEdge<E> ehEdge) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<HEdge<E>> getAllEdges(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public HEdge<E> addEdge(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addEdge(HNode<V> sourceVertex, HNode<V> targetVertex, HEdge<E> ehEdge) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addVertex(HNode<V> vhNode) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(HNode<V> sourceVertex, HNode<V> targetVertex) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(HEdge<E> ehEdge) {
-        throw new NotImplementedException();
+    public HNode<V> getEdgeTarget(HEdge<V, E> hEdge) {
+        return hEdge.getTarget();
     }
 }

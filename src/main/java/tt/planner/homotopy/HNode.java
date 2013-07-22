@@ -8,6 +8,8 @@ public class HNode<V> {
     private final Complex lValue;
     private final double precision;
 
+    //TODO fix passing preccision in the constructor all the time...
+
     public HNode(V node, Complex lValue, double comparisonPrecision) {
         this.node = node;
         this.lValue = lValue;
@@ -22,6 +24,9 @@ public class HNode<V> {
         return lValue;
     }
 
+    public double getPrecision() {
+        return precision;
+    }
 
     @Override
     public boolean equals(Object o) {
