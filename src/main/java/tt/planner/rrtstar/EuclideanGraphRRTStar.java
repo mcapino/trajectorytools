@@ -5,6 +5,7 @@ import tt.planner.rrtstar.util.Extension;
 import tt.planner.rrtstar.util.ExtensionEstimate;
 import tt.planner.rrtstar.domain.GraphDomain;
 import tt.planner.rrtstar.domain.GraphPathEdge;
+import tt.util.EuclideanCoordinatesProvider;
 
 import java.util.Collection;
 
