@@ -1,18 +1,18 @@
 package tt.euclidtime3i.discretization;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
-
+import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import tt.euclid2i.Line;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.util.NotImplementedException;
 
-public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight> {
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Point, Straight> {
 
     private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
     private int maxTime;
@@ -30,39 +30,9 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
     }
 
     @Override
-    public Straight addEdge(Point arg0, Point arg1) {
-       throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addEdge(Point arg0, Point arg1, Straight arg2) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Straight arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public boolean containsVertex(Point p) {
         return spatialGraph.containsVertex(p.getPosition()) &&
                 p.getTime() <= maxTime;
-    }
-
-    @Override
-    public Set<Straight> edgeSet() {
-        throw new NotImplementedException();
     }
 
     @Override
@@ -76,8 +46,8 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
     @Override
     public Set<Straight> getAllEdges(Point start, Point end) {
         Set<Straight> edges = new HashSet<Straight>();
-        edges.add(new Straight(start, end) );
-        edges.add(new Straight(end, start) );
+        edges.add(new Straight(start, end));
+        edges.add(new Straight(end, start));
         return edges;
     }
 
@@ -108,41 +78,6 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
 
 
     @Override
-    public Set<Straight> removeAllEdges(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeEdge(Straight arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Straight removeEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Point> vertexSet() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public int inDegreeOf(Point vertex) {
-         throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Straight> incomingEdgesOf(Point vertex) {
-         throw new NotImplementedException();
-    }
-
-    @Override
     public int outDegreeOf(Point vertex) {
         return outgoingEdgesOf(vertex).size();
     }
@@ -154,7 +89,7 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
         Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
         for (Line spatialEdge : spatialEdges) {
             for (int speed : speeds) {
-                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance()/speed));
+                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
                 if (child.getTime() < maxTime && isVisible(vertex, child, dynamicObstacles)) {
                     children.add(child);
                 }
@@ -177,16 +112,6 @@ public class ConstantSpeedTimeExtension implements DirectedGraph<Point, Straight
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean removeAllEdges(Collection<? extends Straight> arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeAllVertices(Collection<? extends Point> arg0) {
-        throw new NotImplementedException();
     }
 
     /*
