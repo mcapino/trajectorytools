@@ -22,6 +22,7 @@ import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
+import tt.euclidtime3i.discretization.SeparationAsSoftConstraintWrapper;
 import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.trajectory.Trajectories;
@@ -41,7 +42,7 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
-public class PathfindingDemoCreator implements Creator {
+public class SeparationSoftconstraintDemoCreator implements Creator {
 
     @Override
     public void init(String[] args) {}
@@ -60,14 +61,14 @@ public class PathfindingDemoCreator implements Creator {
         final DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph
             = new LazyGrid(new tt.euclid2i.Point(0,0),
                     new LinkedList<tt.euclid2i.Region>(),
-                    new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-100,-100),
-                    new tt.euclid2i.Point(100,100)),
+                    new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-200,-200),
+                    new tt.euclid2i.Point(200,200)),
                     LazyGrid.PATTERN_8_WAY,
-                    10);
+                    25);
 
         // create dynamic obstacles
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
-        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-10,0), new tt.euclid2i.Point(10,0), 9));
+        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-100,0), new tt.euclid2i.Point(100,0), 75));
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
@@ -78,20 +79,25 @@ public class PathfindingDemoCreator implements Creator {
         }, new TimeParameterProjectionTo2d(time), Color.RED, Color.GRAY));
 
 
-        // create spatio-temporal graph, cut out dynamic obstacles
-        ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
+        // create spatio-temporal graph
+        ConstantSpeedTimeExtension spatioTemporalGraph
+            = new ConstantSpeedTimeExtension(spatialGraph, 5000, new int[]{1});
+
+        // Add soft-constraint
+        SeparationAsSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
+            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, 11);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
-                .findPathBetween(spatioTemporalGraph, new HeuristicToGoal<Point>() {
+                .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {
                             @Override
                             public double getCostToGoalEstimate(Point current) {
                                 return (current.getPosition())
-                                        .distance(new tt.euclid2i.Point(0, 10));
+                                        .distance(new tt.euclid2i.Point(0, 150));
                             }
-                        }, new Point(0, -20, 0), new Goal<Point>() {
+                        }, new Point(0, -100, 0), new Goal<Point>() {
                             @Override
                             public boolean isGoal(Point current) {
-                                return current.x == 0 && current.y == 10;
+                                return current.x == 0 && current.y == 150;
                             }
                         }
                 );
@@ -105,9 +111,9 @@ public class PathfindingDemoCreator implements Creator {
             public Graph<tt.euclid2i.Point, tt.euclid2i.Line> getGraph() {
                 return ((LazyGrid) spatialGraph).generateFullGraph();
             }
-        }, new tt.euclid2i.vis.ProjectionTo2d(), Color.GRAY, Color.GRAY, 1, 4));
+        }, new tt.euclid2i.vis.ProjectionTo2d(), new Color(250,250,250), Color.LIGHT_GRAY, 1, 4));
 
-
+        // draw trajectory
         VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider<Point>() {
 
             @Override
@@ -124,7 +130,7 @@ public class PathfindingDemoCreator implements Creator {
                 return path;
             }
 
-        },  new TimeParameterProjectionTo2d(time),Color.RED, Color.RED, 4, 8));
+        },  new TimeParameterProjectionTo2d(time),Color.BLUE, Color.BLUE, 2, 8));
     }
 
     private Region createMovingObstacle(
@@ -149,7 +155,7 @@ public class PathfindingDemoCreator implements Creator {
     }
 
     private void initVisualization() {
-        VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 200, 200);
+        VisManager.setInitParam("Trajectory Tools Vis", 1024, 768);
         VisManager.setSceneParam(new SceneParams(){
 
             @Override
@@ -159,7 +165,7 @@ public class PathfindingDemoCreator implements Creator {
 
             @Override
             public double getDefaultZoomFactor() {
-                return 5;
+                return 1;
             } } );
 
         VisManager.init();
@@ -172,8 +178,10 @@ public class PathfindingDemoCreator implements Creator {
     }
 
 
+
+
     public static void main(String[] args) {
-        new PathfindingDemoCreator().create();
+        new SeparationSoftconstraintDemoCreator().create();
     }
 
 }

@@ -6,10 +6,10 @@ import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import tt.euclid2i.Line;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
-import tt.util.NotImplementedException;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Point, Straight> {
@@ -29,6 +29,12 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         this.dynamicObstacles = dynamicObstacles;
     }
 
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds) {
+       this(spatialGraph, maxTime, speeds, new LinkedList<Region>());
+    }
+
     @Override
     public boolean containsVertex(Point p) {
         return spatialGraph.containsVertex(p.getPosition()) &&
@@ -38,7 +44,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
     @Override
     public Set<Straight> edgesOf(Point vertex) {
         Set<Straight> edges = new HashSet<Straight>();
-        edges.addAll(incomingEdgesOf(vertex));
+        //edges.addAll(incomingEdgesOf(vertex));
         edges.addAll(outgoingEdgesOf(vertex));
         return edges;
     }
@@ -96,7 +102,6 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
             }
         }
 
-
         Set<Straight> edges = new HashSet<Straight>();
         for (Point child : children) {
             edges.add(new Straight(vertex, child));
@@ -113,46 +118,4 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         }
         return true;
     }
-
-    /*
-    public DirectedGraph<Point, Straight> generateFullGraph() {
-        DefaultDirectedGraph<Point, Straight> fullGraph
-            = new DefaultDirectedGraph<Point, Straight>( new EdgeFactory<Point, Straight>() {
-
-                @Override
-                public Straight createEdge(Point sourceVertex,
-                        Point targetVertex) {
-                    return new Straight(sourceVertex, targetVertex);
-                }
-            });
-
-        Queue<Point> open = new LinkedList<Point>();
-
-        open.offer(spatialGraph.getInitialPoint());
-        Set<Point> closed = new HashSet<Point>();
-        int iterations = 0;
-
-        while (!open.isEmpty()) {
-            iterations++;
-            Point current = open.poll();
-            fullGraph.addVertex(current);
-
-            Set<Straight> outEdges = outgoingEdgesOf(current);
-            for (Straight edge : outEdges) {
-                Point target = getEdgeTarget(edge);
-                fullGraph.addVertex(target);
-                fullGraph.addEdge(current, target);
-
-                if (!closed.contains(target)) { // it must mean that this closed.contains(target) is always true
-                    closed.add(target);
-                    open.offer(target);
-                }
-            }
-        }
-
-        System.out.println("iterations:" + iterations);
-        System.out.println("closed:" + closed.size());
-        return fullGraph;
-    }
-    */
 }

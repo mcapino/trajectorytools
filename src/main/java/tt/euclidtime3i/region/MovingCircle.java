@@ -11,7 +11,7 @@ public class MovingCircle implements Region {
     tt.euclid2i.Trajectory trajectory;
     int radius;
 
-    private static final int SAMPLES_PER_RADIUS = 4;
+    private static final int SAMPLES_PER_RADIUS = 2;
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
@@ -48,7 +48,7 @@ public class MovingCircle implements Region {
             // todo what if end - start == 0???
             double alpha = 0;
             if (end.getTime() - start.getTime() > 0) {
-                alpha = (t - start.getTime()) / (end.getTime() - start.getTime());
+                alpha = (double)(t - start.getTime()) / (double)(end.getTime() - start.getTime());
             } else if (end.getTime() - start.getTime() == 0) {
                 alpha = 0;
                 assert(start.equals(end));
@@ -62,7 +62,9 @@ public class MovingCircle implements Region {
                     new tt.euclid2d.Point(start.x, start.y),
                     new tt.euclid2d.Point(end.x, end.y), alpha);
 
-            if (trajectory.get(t).distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) < radius) {
+            tt.euclid2i.Point trajPoint = trajectory.get(t);
+
+            if (trajPoint.distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) < radius) {
                 return true;
             }
         }
