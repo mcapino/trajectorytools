@@ -167,7 +167,7 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public double getFValue(V vertex) {
-        return getShortestDistanceTo(vertex);
+        return calculateKey(vertex);
     }
 
     public static class Result<V, E> {
