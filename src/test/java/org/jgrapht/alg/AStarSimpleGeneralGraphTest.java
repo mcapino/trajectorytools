@@ -11,9 +11,6 @@ public class AStarSimpleGeneralGraphTest extends AbstractGeneralGraphTest {
 
     @Override
     public void initialize() {
-        TRIALS = 30000;
-        VERTICES = 100;
-        EDGES = 500;
     }
 
     @Override

@@ -11,9 +11,6 @@ public class AStarSimpleEuclideanGraphTest extends AbstractEuclideanGraphTest {
 
     @Override
     public void initialize() {
-        TRIALS = 25000;
-        VERTICES = 100;
-        EDGES = 500;
     }
 
     @Override
