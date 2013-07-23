@@ -1,30 +1,31 @@
 package org.jgrapht.alg;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import org.jgrapht.Graphs;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.Heap;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
 
-    private HeuristicToGoal<V> heuristicToGoal;
-    private Result result;
-    private double suboptimalityScale;
-    private double suboptimalityDecreaseStep;
+    protected HeuristicToGoal<V> heuristicToGoal;
+    protected Result<V, E> result;
+    protected double suboptimalityScale;
+    protected double suboptimalityDecreaseStep;
     //
-    private Set<V> closed;
-    private Set<V> inconsistent;
-    private Heap<Double, V> heap;
+    protected Set<V> closed;
+    protected Set<V> inconsistent;
+    protected Heap<Double, V> heap;
 
     public ARAStarShortestPath(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex,
-            final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep,
-            Heap<Double, V> heap) {
+                               final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep,
+                               Heap<Double, V> heap) {
 
         this(graph, heuristic, startVertex, new Goal<V>() {
             @Override
@@ -35,8 +36,8 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public ARAStarShortestPath(Graph<V, E> graph, HeuristicToGoal<V> heuristic,
-            V startVertex, Goal<V> goal, double suboptimalityScale,
-            double suboptimalityDecreaseStep, Heap<Double, V> heap) {
+                               V startVertex, Goal<V> goal, double suboptimalityScale,
+                               double suboptimalityDecreaseStep, Heap<Double, V> heap) {
         super(graph, startVertex, goal);
 
         this.heuristicToGoal = heuristic;
@@ -60,18 +61,18 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
 
     public Result<V, E> iterate() {
         prepareOpenQueue();
-        clearCloseAndInconsistenSet();
+        clearCloseAndInconsistentSet();
         improvePath();
         decreaseEpsilon();
         return result;
     }
 
-    private void prepareOpenQueue() {
+    protected void prepareOpenQueue() {
         updateKeysOfEncounteredVertices();
-        moveInconsistendVerticesIntoQueue();
+        moveInconsistentVerticesIntoQueue();
     }
 
-    private void updateKeysOfEncounteredVertices() {
+    protected void updateKeysOfEncounteredVertices() {
         Collection<Heap.Entry<Double, V>> keys = new ArrayList<Heap.Entry<Double, V>>(heap.getEntries());
         for (Heap.Entry<Double, V> entry : keys) {
             V vertex = entry.getValue();
@@ -79,31 +80,31 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         }
     }
 
-    private void moveInconsistendVerticesIntoQueue() {
+    protected void moveInconsistentVerticesIntoQueue() {
         for (V vertex : inconsistent) {
             double key = calculateKey(vertex);
             heap.insert(key, vertex);
         }
     }
 
-    private void clearCloseAndInconsistenSet() {
+    protected void clearCloseAndInconsistentSet() {
         closed.clear();
         inconsistent.clear();
     }
 
-    private double calculateKey(V vertex) {
+    protected double calculateKey(V vertex) {
         return getShortestDistanceTo(vertex)
                 + suboptimalityScale * heuristicToGoal.getCostToGoalEstimate(vertex);
     }
 
-    private void decreaseEpsilon() {
+    protected void decreaseEpsilon() {
         suboptimalityScale -= suboptimalityDecreaseStep;
         if (suboptimalityScale < 1) {
             suboptimalityScale = 1;
         }
     }
 
-    private void improvePath() {
+    protected void improvePath() {
         V foundGoal = null;
 
         while (!heap.isEmpty()) {
@@ -139,10 +140,10 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
             path = null;
         }
 
-        result = new Result(path, suboptimalityScale);
+        result = new Result<V, E>(path, suboptimalityScale);
     }
 
-    private void encounterVertex(V vertex, E edge, double distanceToVertex) {
+    protected void encounterVertex(V vertex, E edge, double distanceToVertex) {
         setShortestDistanceTo(vertex, distanceToVertex);
         setShortestPathTreeEdge(vertex, edge);
 
@@ -151,6 +152,22 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         } else {
             heap.insert(calculateKey(vertex), vertex);
         }
+    }
+
+    public Collection<V> getOpenedNodes() {
+        return heap.getValues();
+    }
+
+    public Collection<V> getClosedNodes() {
+        return closed;
+    }
+
+    public V getParent(V vertex) {
+        return Graphs.getOppositeVertex(graph, getShortestPathTreeEdge(vertex), vertex);
+    }
+
+    public double getFValue(V vertex) {
+        return getShortestDistanceTo(vertex);
     }
 
     public static class Result<V, E> {
