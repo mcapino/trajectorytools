@@ -1,4 +1,4 @@
-package tt.planner.homotopy.hvalue;
+package tt.planner.homotopy.hclass;
 
 import org.jscience.mathematics.number.Complex;
 

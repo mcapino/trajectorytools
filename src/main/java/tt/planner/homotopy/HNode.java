@@ -1,8 +1,8 @@
 package tt.planner.homotopy;
 
-import tt.planner.homotopy.hvalue.HClass;
-import tt.planner.homotopy.hvalue.HClassDiscretized;
 import org.jscience.mathematics.number.Complex;
+import tt.planner.homotopy.hclass.HClass;
+import tt.planner.homotopy.hclass.HClassDiscretized;
 
 public class HNode<V> {
 
