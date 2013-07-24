@@ -3,6 +3,11 @@ package tt.planner.homotopy;
 import org.jscience.mathematics.number.Complex;
 import tt.planner.homotopy.hclass.HClass;
 
+/**
+ * This class represents simple node wrapper which is used in HomotopyGraphWrapper. Using the HClass object it can be
+ * distinguished whether two HNodes containing similar hValue belongs into the same homotopy class or not.
+ */
+
 public class HNode<V> {
 
     private final V node;

@@ -4,12 +4,21 @@ import org.jscience.mathematics.number.Complex;
 
 import java.util.List;
 
+
+/**
+ * This class implements simple numeric integrator.
+ */
+
 public class HValueNumericIntegrator implements HValueIntegrator {
 
     private int samples;
     private List<Complex> qRoots;
     private List<Complex> pRoots;
 
+    /**
+     * @param qRoots N-1 roots of the nominator (samples of free space)
+     * @param pRoots N roots of the denominator (samples representing obstacles)
+     */
     public HValueNumericIntegrator(List<Complex> qRoots, List<Complex> pRoots, int samples) {
         this.qRoots = qRoots;
         this.pRoots = pRoots;

@@ -5,6 +5,10 @@ import org.jscience.mathematics.number.Complex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This integrator implements the analytic approach as it is described in the paper.
+ */
+
 public class HValueAnalyticIntegrator implements HValueIntegrator {
 
     private List<Complex> qRoots;
@@ -12,6 +16,11 @@ public class HValueAnalyticIntegrator implements HValueIntegrator {
     //
     private List<Complex> residues;
 
+
+    /**
+     * @param qRoots N-1 roots of the nominator (samples of free space)
+     * @param pRoots N roots of the denominator (samples representing obstacles)
+     */
     public HValueAnalyticIntegrator(List<Complex> qRoots, List<Complex> pRoots) {
         this.qRoots = qRoots;
         this.pRoots = pRoots;

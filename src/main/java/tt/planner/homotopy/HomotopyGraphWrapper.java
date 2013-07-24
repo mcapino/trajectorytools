@@ -15,20 +15,27 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class implements an graph wrapper for usage as it is explained in paper "Topological constrains in search-based
+ * robot path planning" (S. Bhattacharya). The wrapped graph can be easily searched for shortest trajectories in different
+ * homotopy classes simply using any graph path planing algorithm.
+ */
+
 public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
     private final DirectedGraph<V, E> graph;
-    private final HValueIntegrator integrator;
-    private final ProjectionToComplexPlane<V> projection;
     private final Goal<V> goal;
-    private final HClassProvider provider;
+    private final ProjectionToComplexPlane<V> projection;
+
+    private final HValueIntegrator integrator;
+    private final HClassProvider<V> provider;
     private final HValuePolicy policy;
     private final double precision;
 
     private final HashMap<E, Complex> lValues;
 
     public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
-                                HValueIntegrator integrator, HClassProvider provider, HValuePolicy policy, double precision) {
+                                HValueIntegrator integrator, HClassProvider<V> provider, HValuePolicy policy, double precision) {
         this.graph = graph;
         this.goal = goal;
         this.projection = projection;
@@ -40,7 +47,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     }
 
     public HNode<V> wrapNode(V node, Complex hValue) {
-        HClass hClass = provider.assignHClass(hValue, precision);
+        HClass hClass = provider.assignHClass(node, hValue, precision);
         return new HNode<V>(node, hValue, hClass);
     }
 
