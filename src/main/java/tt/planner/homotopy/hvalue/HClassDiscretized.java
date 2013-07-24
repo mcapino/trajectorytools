@@ -1,15 +1,15 @@
-package tt.planner.homotopy;
+package tt.planner.homotopy.hvalue;
 
 import org.jscience.mathematics.number.Complex;
 
-public class SimpleLClass implements LClass {
+public class HClassDiscretized implements HClass {
     private static final double MIN_VALUE = 1E-200;
 
     private long re;
     private long im;
     private int quadrant;
 
-    public SimpleLClass(Complex c, double precision) {
+    public HClassDiscretized(Complex c, double precision) {
         double dRe = c.getReal();
         double dIm = c.getImaginary();
 
@@ -27,7 +27,7 @@ public class SimpleLClass implements LClass {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SimpleLClass that = (SimpleLClass) o;
+        HClassDiscretized that = (HClassDiscretized) o;
 
         if (im != that.im) return false;
         if (quadrant != that.quadrant) return false;

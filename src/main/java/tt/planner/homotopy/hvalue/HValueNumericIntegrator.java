@@ -1,16 +1,16 @@
-package tt.planner.homotopy;
+package tt.planner.homotopy.hvalue;
 
 import org.jscience.mathematics.number.Complex;
 
 import java.util.List;
 
-public class LValueNumericIntegrator implements LValueIntegrator {
+public class HValueNumericIntegrator implements HValueIntegrator {
 
     private int samples;
     private List<Complex> qRoots;
     private List<Complex> pRoots;
 
-    public LValueNumericIntegrator(List<Complex> qRoots, List<Complex> pRoots, int samples) {
+    public HValueNumericIntegrator(List<Complex> qRoots, List<Complex> pRoots, int samples) {
         this.qRoots = qRoots;
         this.pRoots = pRoots;
         this.samples = samples;

@@ -1,18 +1,18 @@
-package tt.planner.homotopy;
+package tt.planner.homotopy.hvalue;
 
 import org.jscience.mathematics.number.Complex;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LValueAnalyticIntegrator implements LValueIntegrator {
+public class HValueAnalyticIntegrator implements HValueIntegrator {
 
     private List<Complex> qRoots;
     private List<Complex> pRoots;
     //
     private List<Complex> residues;
 
-    public LValueAnalyticIntegrator(List<Complex> qRoots, List<Complex> pRoots) {
+    public HValueAnalyticIntegrator(List<Complex> qRoots, List<Complex> pRoots) {
         this.qRoots = qRoots;
         this.pRoots = pRoots;
         this.residues = calculateFractionCoefficient();

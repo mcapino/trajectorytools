@@ -1,5 +1,6 @@
 package tt.planner.homotopy;
 
+import tt.planner.homotopy.hvalue.HValueIntegrator;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graphs;
@@ -15,14 +16,14 @@ import java.util.Set;
 public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
     private DirectedGraph<V, E> graph;
-    private LValueIntegrator integrator;
+    private HValueIntegrator integrator;
     private ProjectionToComplexPlane<V> projection;
     private Goal<V> goal;
 
     private HashMap<E, Complex> lValues;
     private Set<Complex> forbiddenValues;
 
-    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection, LValueIntegrator integrator) {
+    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection, HValueIntegrator integrator) {
         this.graph = graph;
         this.goal = goal;
         this.projection = projection;
