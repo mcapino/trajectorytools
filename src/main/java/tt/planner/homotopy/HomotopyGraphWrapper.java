@@ -9,8 +9,8 @@ import org.jscience.mathematics.number.Complex;
 import tt.planner.homotopy.hclass.HClass;
 import tt.planner.homotopy.hclass.HClassProvider;
 import tt.planner.homotopy.hvalue.HValueIntegrator;
+import tt.planner.homotopy.hvalue.HValuePolicy;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,29 +22,21 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     private final ProjectionToComplexPlane<V> projection;
     private final Goal<V> goal;
     private final HClassProvider provider;
+    private final HValuePolicy policy;
     private final double precision;
 
     private final HashMap<E, Complex> lValues;
-    private final Set<Complex> forbiddenValues;
 
     public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
-                                HValueIntegrator integrator, HClassProvider provider, double precision) {
+                                HValueIntegrator integrator, HClassProvider provider, HValuePolicy policy, double precision) {
         this.graph = graph;
         this.goal = goal;
         this.projection = projection;
         this.integrator = integrator;
-        this.forbiddenValues = new HashSet<Complex>();
         this.lValues = new HashMap<E, Complex>();
         this.provider = provider;
         this.precision = precision;
-    }
-
-    public void forbidLValue(Complex lValue) {
-        forbiddenValues.add(lValue);
-    }
-
-    public void forbidAllLValues(Collection<Complex> lValues) {
-        forbiddenValues.addAll(lValues);
+        this.policy = policy;
     }
 
     public HNode<V> wrapNode(V node, Complex hValue) {
@@ -74,7 +66,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, opposite, vertex);
             Complex oppositeLValue = hValue.plus(increment);
 
-            if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
+            if (goal.isGoal(opposite) && !policy.isAllowed(oppositeLValue, precision)) continue;
             HNode<V> source = wrapNode(opposite, oppositeLValue);
 
             incomingEdges.add(new HEdge<V, E>(edge, source, target));
@@ -97,24 +89,13 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, vertex, opposite);
             Complex oppositeLValue = lValue.plus(increment);
 
-            if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
+            if (goal.isGoal(opposite) && !policy.isAllowed(oppositeLValue, precision)) continue;
             HNode<V> target = wrapNode(opposite, oppositeLValue);
 
             outgoingEdges.add(new HEdge<V, E>(edge, source, target));
         }
 
         return outgoingEdges;
-    }
-
-    private boolean isAllowed(Complex oppositeLValue) {
-        for (Complex value : forbiddenValues) {
-            double diff = value.minus(oppositeLValue).magnitude();
-            double abs = value.plus(oppositeLValue).divide(2).magnitude();
-
-            if (diff / abs < precision) return false;
-        }
-
-        return true;
     }
 
     private Complex lValueIncrement(E edge, V source, V target) {
