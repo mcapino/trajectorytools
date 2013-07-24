@@ -23,4 +23,8 @@ public class HValueAllowPolicy implements HValuePolicy {
         }
         return false;
     }
+
+    public void allow(Complex hValue) {
+        allowed.add(hValue);
+    }
 }

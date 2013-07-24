@@ -24,4 +24,7 @@ public class HValueForbidPolicy implements HValuePolicy {
         return true;
     }
 
+    public void forbid(Complex hValue) {
+        forbidden.add(hValue);
+    }
 }
