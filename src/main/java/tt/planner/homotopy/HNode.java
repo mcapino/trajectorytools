@@ -2,22 +2,19 @@ package tt.planner.homotopy;
 
 import org.jscience.mathematics.number.Complex;
 import tt.planner.homotopy.hclass.HClass;
-import tt.planner.homotopy.hclass.HClassDiscretized;
 
 public class HNode<V> {
 
     private final V node;
     private final Complex lValue;
     private final HClass lClass;
-    private final double precision;
 
     //TODO fix passing precision in the constructor all the time...
 
-    public HNode(V node, Complex lValue, double comparisonPrecision) {
+    HNode(V node, Complex lValue, HClass lClass) {
         this.node = node;
         this.lValue = lValue;
-        this.precision = comparisonPrecision;
-        this.lClass = new HClassDiscretized(lValue, precision);
+        this.lClass = lClass;
     }
 
     public Complex getlValue() {
@@ -26,10 +23,6 @@ public class HNode<V> {
 
     public V getNode() {
         return node;
-    }
-
-    public double getPrecision() {
-        return precision;
     }
 
     @Override

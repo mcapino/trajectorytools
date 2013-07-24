@@ -39,4 +39,12 @@ public class HClassDiscretized implements HClass {
         result = 31 * result + quadrant;
         return result;
     }
+    
+    public static class Provider implements HClassProvider{
+
+        @Override
+        public HClass assignHClass(Complex c, double precision) {
+            return new HClassDiscretized(c, precision);
+        }
+    }
 }

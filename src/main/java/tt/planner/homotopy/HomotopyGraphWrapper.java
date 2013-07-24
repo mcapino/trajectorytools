@@ -12,24 +12,31 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import tt.planner.homotopy.hclass.HClass;
+import tt.planner.homotopy.hclass.HClassProvider;
 
 public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
-    private DirectedGraph<V, E> graph;
-    private HValueIntegrator integrator;
-    private ProjectionToComplexPlane<V> projection;
-    private Goal<V> goal;
+    private final DirectedGraph<V, E> graph;
+    private final HValueIntegrator integrator;
+    private final ProjectionToComplexPlane<V> projection;
+    private final Goal<V> goal;
+    private final HClassProvider provider;
+    private final double precision;
 
-    private HashMap<E, Complex> lValues;
-    private Set<Complex> forbiddenValues;
+    private final HashMap<E, Complex> lValues;
+    private final Set<Complex> forbiddenValues;
 
-    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection, HValueIntegrator integrator) {
+    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
+            HValueIntegrator integrator, HClassProvider provider, double precision) {
         this.graph = graph;
         this.goal = goal;
         this.projection = projection;
         this.integrator = integrator;
         this.forbiddenValues = new HashSet<Complex>();
         this.lValues = new HashMap<E, Complex>();
+        this.provider = provider;
+        this.precision = precision;
     }
 
     public void forbidLValue(Complex lValue) {
@@ -39,7 +46,12 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     public void forbidAllLValues(Collection<Complex> lValues) {
         forbiddenValues.addAll(lValues);
     }
-
+    
+    public HNode<V> wrapStartNode(V node) {
+        HClass hClass = provider.assignHClass(Complex.ZERO, precision);
+        return new HNode<V>(node, Complex.ZERO, hClass);
+    }
+    
     @Override
     public Set<HEdge<V, E>> edgesOf(HNode<V> vertex) {
         Set<HEdge<V, E>> edges = new HashSet<HEdge<V, E>>();
@@ -64,7 +76,8 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
             if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
 
-            HNode<V> source = new HNode<V>(opposite, oppositeLValue, target.getPrecision());
+            HClass hClass = provider.assignHClass(lValue, precision);
+            HNode<V> source = new HNode<V>(opposite, oppositeLValue, hClass);
 
             incomingEdges.add(new HEdge<V, E>(edge, increment, source, target));
         }
@@ -88,7 +101,8 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
             if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
 
-            HNode<V> target = new HNode<V>(opposite, oppositeLValue, source.getPrecision());
+            HClass hClass = provider.assignHClass(lValue, precision);
+            HNode<V> target = new HNode<V>(opposite, oppositeLValue, hClass);
 
             outgoingEdges.add(new HEdge<V, E>(edge, increment, source, target));
         }
@@ -100,9 +114,10 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
         for (Complex value : forbiddenValues) {
             double diff = value.minus(oppositeLValue).magnitude();
             double abs = value.plus(oppositeLValue).divide(2).magnitude();
-            //TODO shitty method better, to create a constant or parameter
-            if (diff / abs < 0.01) return false;
+
+            if (diff / abs < precision) return false;
         }
+        
         return true;
     }
 

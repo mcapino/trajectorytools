@@ -9,7 +9,7 @@ public class HEdge<V, E> {
     private HNode<V> source;
     private HNode<V> target;
 
-    public HEdge(E edge, Complex lIncrement, HNode<V> source, HNode<V> target) {
+    HEdge(E edge, Complex lIncrement, HNode<V> source, HNode<V> target) {
         this.edge = edge;
         this.lIncrement = lIncrement;
         this.source = source;
