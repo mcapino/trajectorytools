@@ -4,8 +4,10 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
+import org.jgrapht.util.Goal;
 import org.jscience.mathematics.number.Complex;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,36 +17,26 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     private DirectedGraph<V, E> graph;
     private LValueIntegrator integrator;
     private ProjectionToComplexPlane<V> projection;
+    private Goal<V> goal;
 
     private HashMap<E, Complex> lValues;
     private Set<Complex> forbiddenValues;
 
-    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Set<Complex> forbiddenValues, ProjectionToComplexPlane<V> projection, LValueIntegrator integrator) {
+    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection, LValueIntegrator integrator) {
         this.graph = graph;
+        this.goal = goal;
         this.projection = projection;
         this.integrator = integrator;
-        this.forbiddenValues = forbiddenValues;
+        this.forbiddenValues = new HashSet<Complex>();
         this.lValues = new HashMap<E, Complex>();
     }
 
-    @Override
-    public EdgeFactory<HNode<V>, HEdge<V, E>> getEdgeFactory() {
-        return null;
+    public void forbidLValue(Complex lValue) {
+        forbiddenValues.add(lValue);
     }
 
-    @Override
-    public double getEdgeWeight(HEdge<V, E> hEdge) {
-        return graph.getEdgeWeight(hEdge.getEdge());
-    }
-
-    @Override
-    public int inDegreeOf(HNode<V> vertex) {
-        return graph.inDegreeOf(vertex.getNode());
-    }
-
-    @Override
-    public int outDegreeOf(HNode<V> vertex) {
-        return graph.outDegreeOf(vertex.getNode());
+    public void forbidAllLValues(Collection<Complex> lValues) {
+        forbiddenValues.addAll(lValues);
     }
 
     @Override
@@ -69,7 +61,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, opposite, vertex);
             Complex oppositeLValue = lValue.plus(increment);
 
-            if (!isAllowed(oppositeLValue)) continue;
+            if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
 
             HNode<V> source = new HNode<V>(opposite, oppositeLValue, target.getPrecision());
 
@@ -93,7 +85,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, vertex, opposite);
             Complex oppositeLValue = lValue.plus(increment);
 
-            if (!isAllowed(oppositeLValue)) continue;
+            if (goal.isGoal(opposite) && !isAllowed(oppositeLValue)) continue;
 
             HNode<V> target = new HNode<V>(opposite, oppositeLValue, source.getPrecision());
 
@@ -105,9 +97,10 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
     private boolean isAllowed(Complex oppositeLValue) {
         for (Complex value : forbiddenValues) {
-            if (oppositeLValue.equals(value)) {
-                return false;
-            }
+            double diff = value.minus(oppositeLValue).magnitude();
+            double abs = value.plus(oppositeLValue).divide(2).magnitude();
+            //TODO shitty method better, to create a constant or parameter
+            if (diff / abs < 0.01) return false;
         }
         return true;
     }
@@ -134,5 +127,25 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     @Override
     public HNode<V> getEdgeTarget(HEdge<V, E> hEdge) {
         return hEdge.getTarget();
+    }
+
+    @Override
+    public EdgeFactory<HNode<V>, HEdge<V, E>> getEdgeFactory() {
+        return null;
+    }
+
+    @Override
+    public double getEdgeWeight(HEdge<V, E> hEdge) {
+        return graph.getEdgeWeight(hEdge.getEdge());
+    }
+
+    @Override
+    public int inDegreeOf(HNode<V> vertex) {
+        return graph.inDegreeOf(vertex.getNode());
+    }
+
+    @Override
+    public int outDegreeOf(HNode<V> vertex) {
+        return graph.outDegreeOf(vertex.getNode());
     }
 }
