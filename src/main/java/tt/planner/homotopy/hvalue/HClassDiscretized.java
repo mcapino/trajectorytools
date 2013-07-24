@@ -29,11 +29,7 @@ public class HClassDiscretized implements HClass {
 
         HClassDiscretized that = (HClassDiscretized) o;
 
-        if (im != that.im) return false;
-        if (quadrant != that.quadrant) return false;
-        if (re != that.re) return false;
-
-        return true;
+        return im == that.im && quadrant == that.quadrant && re == that.re;
     }
 
     @Override
