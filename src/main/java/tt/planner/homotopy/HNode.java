@@ -6,19 +6,19 @@ import tt.planner.homotopy.hclass.HClass;
 public class HNode<V> {
 
     private final V node;
-    private final Complex lValue;
-    private final HClass lClass;
+    private final Complex hValue;
+    private final HClass hClass;
 
     //TODO fix passing precision in the constructor all the time...
 
-    HNode(V node, Complex lValue, HClass lClass) {
+    HNode(V node, Complex hValue, HClass hClass) {
         this.node = node;
-        this.lValue = lValue;
-        this.lClass = lClass;
+        this.hValue = hValue;
+        this.hClass = hClass;
     }
 
-    public Complex getlValue() {
-        return lValue;
+    public Complex getHValue() {
+        return hValue;
     }
 
     public V getNode() {
@@ -32,7 +32,7 @@ public class HNode<V> {
 
         HNode hNode = (HNode) o;
 
-        if (!lClass.equals(hNode.lClass)) return false;
+        if (!hClass.equals(hNode.hClass)) return false;
         if (!node.equals(hNode.node)) return false;
 
         return true;
@@ -41,7 +41,7 @@ public class HNode<V> {
     @Override
     public int hashCode() {
         int result = node.hashCode();
-        result = 31 * result + lClass.hashCode();
+        result = 31 * result + hClass.hashCode();
         return result;
     }
 }
