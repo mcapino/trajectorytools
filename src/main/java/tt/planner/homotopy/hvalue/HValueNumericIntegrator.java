@@ -46,8 +46,8 @@ public class HValueNumericIntegrator implements HValueIntegrator {
 
     private Complex logEvaluatePolynomial(List<Complex> roots, Complex point) {
         Complex evaluated = Complex.ZERO;
-        for (int i = 0; i < roots.size(); i++) {
-            evaluated = evaluated.plus(point.minus(roots.get(i)).log());
+        for (Complex root : roots) {
+            evaluated = evaluated.plus(point.minus(root).log());
         }
         return evaluated;
     }
