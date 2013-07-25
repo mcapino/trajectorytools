@@ -3,27 +3,29 @@ package tt.euclidtime3i.discretization.softconstraints;
 import tt.euclid2i.Point;
 import tt.euclid2i.Trajectory;
 
-public class SeparationConstraint implements PairwiseConstraint {
+public class GrowingSeparationConstraint implements PairwiseConstraint {
 
     SeparationPenaltyFunction penaltyFunction;
     int samplingInterval;
+    int separation;
 
-    public SeparationConstraint(SeparationPenaltyFunction penaltyFunction,
+    public GrowingSeparationConstraint(int separation,
             int samplingInterval) {
         super();
-        this.penaltyFunction = penaltyFunction;
         this.samplingInterval = samplingInterval;
+        this.separation = separation;
     }
 
     @Override
     public double getPenalty(Trajectory t1, Trajectory t2, double weight) {
-        return weight * integratePenalty(t1, new Trajectory[] {t2}, penaltyFunction, samplingInterval);
+        return integratePenalty(t1, new Trajectory[] {t2}, (int) (this.separation * weight), 1000, samplingInterval);
     }
 
     public static double integratePenalty(
             Trajectory thisTrajectory,
             Trajectory[] otherTrajectories,
-            SeparationPenaltyFunction penaltyFunction, int samplingInterval) {
+            int separation, int penalty,
+            int samplingInterval) {
 
         double penaltySum = 0;
 
@@ -37,8 +39,12 @@ public class SeparationConstraint implements PairwiseConstraint {
                         // handle the case when the sample lies near the end of either this trajectory or other trajectory
                         int segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
 
+
+
                         Point otherPos = otherTrajectories[j].get(t);
-                        penaltySum += penaltyFunction.getPenalty(thisPos, otherPos) * segmentLength;
+                        if (thisPos.distance(otherPos) < separation) {
+                            penaltySum += penalty * segmentLength;
+                        }
                     }
                 }
             }

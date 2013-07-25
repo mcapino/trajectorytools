@@ -93,8 +93,8 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
         PairwiseSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
             = new PairwiseSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph,
                     new Trajectory[] {((MovingCircle) dynamicObstacles.get(0)).getTrajectory()},
-                    new SeparationConstraint(new LinearSeparationPenaltyFunction(RADIUS, 1.18), 1)
-                    );
+                    new SeparationConstraint(new LinearSeparationPenaltyFunction(RADIUS, 1.18), 1),
+                    1.0);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {

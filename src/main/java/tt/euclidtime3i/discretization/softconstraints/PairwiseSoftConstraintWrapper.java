@@ -12,11 +12,13 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
 
     private Trajectory[] otherTrajs;
     private PairwiseConstraint constraint;
+    private double weight;
 
-    public PairwiseSoftConstraintWrapper(DirectedGraph<V, E> g, Trajectory[] otherTrajs, PairwiseConstraint constraint) {
+    public PairwiseSoftConstraintWrapper(DirectedGraph<V, E> g, Trajectory[] otherTrajs, PairwiseConstraint constraint, double weight) {
         super(g);
         this.otherTrajs = otherTrajs;
         this.constraint = constraint;
+        this.weight = weight;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
 
         double cost = super.getEdgeWeight(e);
         for (int i = 0; i < otherTrajs.length; i++) {
-            cost += constraint.getPenalty(traj, otherTrajs[i]);
+            cost += constraint.getPenalty(traj, otherTrajs[i], weight);
         }
 
         return cost;
