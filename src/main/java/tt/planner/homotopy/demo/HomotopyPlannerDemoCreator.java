@@ -40,7 +40,7 @@ public class HomotopyPlannerDemoCreator {
 
     //TODO - refactor / write from scratch - it's just copy pasted code from rrt_vs_lags TestCreatorHomotopyAVG...
 
-    private static final int ITERATION_DELAY = 25;
+    private static final int ITERATION_DELAY = 20;
     private final ShortestPathProblem problem;
 
 
@@ -76,7 +76,7 @@ public class HomotopyPlannerDemoCreator {
         }
 
         // >>>>>>> 4. initialize integrator
-        final HValueIntegrator numericIntegrator = new HValueNumericIntegrator(qRoots, pRoots, 0.05, 10);
+        final HValueIntegrator numericIntegrator = new HValueNumericIntegrator(qRoots, pRoots, 0.1, 100);
 
         // >>>>>>> 5. choose policy of allowing / forbidding hValues
         final HValueForbidPolicy policy = new HValueForbidPolicy();
@@ -91,7 +91,7 @@ public class HomotopyPlannerDemoCreator {
             public boolean isGoal(Point current) {
                 return problem.getTargetRegion().isInside(current);
             }
-        }, projection, numericIntegrator, provider, policy, 0.01);
+        }, projection, numericIntegrator, provider, policy, 0.05);
 
         // >>>>>>> 8. Use any kind of graph path planning algorithm you want. It it advised to use informed one.
         final AStarShortestPathSimple<HNode<Point>, HEdge<Point, Line>> aStar =
@@ -122,7 +122,7 @@ public class HomotopyPlannerDemoCreator {
             }
         });
 
-        createVisualization();
+        initializeVisualization();
         showVisualization(visibilityGraph, aStar);
 
         GraphPath<HNode<Point>, HEdge<Point, Line>> path;
@@ -148,7 +148,7 @@ public class HomotopyPlannerDemoCreator {
         return polygons;
     }
 
-    private void createVisualization() {
+    private void initializeVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768);
         VisManager.setSceneParam(new VisManager.SceneParams() {
             @Override
