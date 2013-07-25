@@ -6,28 +6,36 @@ import java.util.List;
 
 
 /**
- * This class implements simple numeric integrator.
+ * This class implements simple numeric integrator. This approach is suitable for every graph, but is computationally
+ * hard. For some special cases it might be better to use analytic integrator.
  */
 
 public class HValueNumericIntegrator implements HValueIntegrator {
 
-    private int samples;
-    private List<Complex> qRoots;
-    private List<Complex> pRoots;
+    private final int minSamples;
+    private final double step;
+    private final List<Complex> qRoots;
+    private final List<Complex> pRoots;
 
     /**
-     * @param qRoots N-1 roots of the nominator (samples of free space)
-     * @param pRoots N roots of the denominator (samples representing obstacles)
+     * @param qRoots     N-1 roots of the nominator (samples of free space)
+     * @param pRoots     N roots of the denominator (samples representing obstacles)
+     * @param step       discretization step
+     * @param minSamples minimum number of samples per edge
      */
-    public HValueNumericIntegrator(List<Complex> qRoots, List<Complex> pRoots, int samples) {
+    public HValueNumericIntegrator(List<Complex> qRoots, List<Complex> pRoots, double step, int minSamples) {
         this.qRoots = qRoots;
         this.pRoots = pRoots;
-        this.samples = samples;
+        this.step = step;
+        this.minSamples = minSamples;
     }
 
     @Override
     public Complex lineSegmentIncrement(Complex start, Complex end) {
         Complex integralSum = Complex.ZERO;
+
+        int samples = (int) (end.minus(start).magnitude() / step);
+        samples = (samples < minSamples) ? minSamples : samples;
 
         for (double i = 0; i < samples; i++) {
             double lambda = i / samples;
