@@ -7,12 +7,13 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 
+import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import tt.euclid2i.Line;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
 import tt.util.NotImplementedException;
 
-public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Straight> {
+public class SynchronizedMovesTimeExtension extends AbstractDirectedGraphWrapper<Point, Straight> {
 
     private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
     private int maxTime;
@@ -27,31 +28,6 @@ public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Stra
         this.maxTime = maxTime;
         this.timeStepDuration = timeStepDuration;
         this.dynamicObstacles = dynamicObstacles;
-    }
-
-    @Override
-    public Straight addEdge(Point arg0, Point arg1) {
-       throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addEdge(Point arg0, Point arg1, Straight arg2) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Straight arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
     }
 
     @Override
@@ -108,41 +84,6 @@ public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Stra
 
 
     @Override
-    public Set<Straight> removeAllEdges(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeEdge(Straight arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Straight removeEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Point> vertexSet() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public int inDegreeOf(Point vertex) {
-         throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Straight> incomingEdgesOf(Point vertex) {
-         throw new NotImplementedException();
-    }
-
-    @Override
     public int outDegreeOf(Point vertex) {
         return outgoingEdgesOf(vertex).size();
     }
@@ -174,16 +115,6 @@ public class SynchronizedMovesTimeExtension implements DirectedGraph<Point, Stra
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean removeAllEdges(Collection<? extends Straight> arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeAllVertices(Collection<? extends Point> arg0) {
-        throw new NotImplementedException();
     }
 
     /*

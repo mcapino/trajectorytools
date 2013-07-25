@@ -1,4 +1,4 @@
-package tt.planner.rrtstar;
+package tt.util;
 
 public interface EuclideanCoordinatesProvider<V> {
 

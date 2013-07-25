@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
+import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 import tt.euclid2d.Line;
@@ -16,7 +17,7 @@ import tt.euclid2d.region.Rectangle;
 import tt.euclid2d.region.Region;
 import tt.util.NotImplementedException;
 
-public class LazyGrid implements DirectedGraph<Point, Line> {
+public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
     private static final double SPEED = 1.0;
     private Point initialPoint;
@@ -35,41 +36,6 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
         this.pattern = new double[][] {           {0,-step},
                                         {-step, 0},         { step, 0},
                                                   {0, step},          };
-    }
-
-    @Override
-    public Line addEdge(Point arg0, Point arg1) {
-       throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addEdge(Point arg0, Point arg1, Line arg2) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean addVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Line arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean containsVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Line> edgeSet() {
-        throw new NotImplementedException();
     }
 
     @Override
@@ -113,31 +79,6 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
         return edge.getDistance();
     }
 
-
-    @Override
-    public Set<Line> removeAllEdges(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeEdge(Line arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Line removeEdge(Point arg0, Point arg1) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeVertex(Point arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<Point> vertexSet() {
-        throw new NotImplementedException();
-    }
 
     @Override
     public int inDegreeOf(Point vertex) {
@@ -205,16 +146,6 @@ public class LazyGrid implements DirectedGraph<Point, Line> {
         }
 
         return true;
-    }
-
-    @Override
-    public boolean removeAllEdges(Collection<? extends Line> arg0) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean removeAllVertices(Collection<? extends Point> arg0) {
-        throw new NotImplementedException();
     }
 
     public DirectedGraph<Point, Line> generateFullGraph() {

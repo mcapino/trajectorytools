@@ -1,36 +1,39 @@
 package tt.planner.rrtstar;
 
-import tt.planner.rrtstar.util.Vertex;
+import ags.utils.dataStructures.KdTree;
+import ags.utils.dataStructures.SquareEuclideanDistanceFunction;
+import ags.utils.dataStructures.utils.MaxHeap;
 import tt.planner.rrtstar.domain.Domain;
 import tt.planner.rrtstar.util.Extension;
-import edu.wlu.cs.levy.CG.KDTree;
-import edu.wlu.cs.levy.CG.KeyDuplicateException;
-import edu.wlu.cs.levy.CG.KeySizeException;
+import tt.planner.rrtstar.util.Vertex;
+import tt.util.EuclideanCoordinatesProvider;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
 
-    private Set<S> kdKeys;
-    private KDTree<Vertex<S, E>> kdTree;
-    private EuclideanCoordinatesProvider<S> euclideanProvider;
+    protected Set<S> kdKeys;
+    protected KdTree<Vertex<S, E>> knnKdTree;
+    protected EuclideanCoordinatesProvider<S> euclideanProvider;
+    protected SquareEuclideanDistanceFunction distanceFunction;
 
     public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                   S initialState, double gamma, double eta) {
+                            S initialState, double gamma, double eta) {
         super(domain, initialState, gamma, eta);
 
         int dimensions = euclideanProvider.getSpaceDimension();
         this.euclideanProvider = euclideanProvider;
 
-        this.kdTree = new KDTree<Vertex<S, E>>(dimensions);
+        this.distanceFunction = new SquareEuclideanDistanceFunction();
+
+        this.knnKdTree = new KdTree<Vertex<S, E>>(dimensions);
         this.kdKeys = new HashSet<S>();
+
         insertIntoKDTree(root);
     }
 
     public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                   S initialState, double gamma) {
+                            S initialState, double gamma) {
         this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
     }
 
@@ -57,7 +60,7 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
         }
 
         if (newVertex != null) {
-            //TODO possible double checking kdKeys.contains(...)
+            //TODO fix possible double checking kdKeys.contains(...)
             insertIntoKDTree(newVertex);
         }
 
@@ -68,64 +71,75 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
         S state = newVertex.state;
         double[] key = euclideanProvider.getEuclideanCoordinates(state);
 
-        if (!kdKeys.contains(state))
-            try {
-                kdTree.insert(key, newVertex);
-                kdKeys.add(state);
-
-            } catch (KeySizeException e) {
-                throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
-
-            } catch (KeyDuplicateException e) {
-                throw new RuntimeException("KD-Tree does not support duplicate keys");
-            }
+        if (!kdKeys.contains(state)) {
+            knnKdTree.addPoint(key, newVertex);
+            kdKeys.add(state);
+        }
     }
 
     @Override
     protected Vertex<S, E> getNearestParentVertex(S state) {
         double[] key = euclideanProvider.getEuclideanCoordinates(state);
-        return getNearestVertex(key);
-    }
 
-    protected Vertex<S, E> getNearestVertex(double[] key) {
-        try {
-            return kdTree.nearest(key);
-        } catch (KeySizeException e) {
-            throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
-        }
+        MaxHeap<Vertex<S, E>> nearestNeighbour = knnKdTree.findNearestNeighbors(key, 1, distanceFunction);
+
+        return nearestNeighbour.getMax();
     }
 
     @Override
     protected Collection<Vertex<S, E>> getNearParentCandidates(S state) {
         double radius = getNearBallRadius();
-        Collection<Vertex<S, E>> parentCandidates = getVerticesInRadius(state, radius);
+        List<Vertex<S, E>> parentCandidates = getVerticesWithinRadius(state, radius);
         return parentCandidates;
     }
 
     @Override
     protected Collection<Vertex<S, E>> getNearChildrenCandidates(S state) {
-        double[] key = euclideanProvider.getEuclideanCoordinates(state);
         double radius = getNearBallRadius();
-
-        Collection<Vertex<S, E>> childrenCandidates = getVerticesInRadius(state, radius);
-
-        try {
-            Vertex<S, E> stateVertex = kdTree.search(key);
-            if (stateVertex != null) childrenCandidates.remove(stateVertex);
-
-        } catch (KeySizeException e) {
-            throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
-        }
+        List<Vertex<S, E>> childrenCandidates = getVerticesWithinRadius(state, radius);
+        removeStateFromHeadOfList(state, childrenCandidates);
 
         return childrenCandidates;
     }
 
-    private Collection<Vertex<S, E>> getVerticesInRadius(S state, double radius) {
-        double[] key = euclideanProvider.getEuclideanCoordinates(state);
-        try {
-            return kdTree.nearestEuclidean(key, radius);
-        } catch (KeySizeException e) {
-            throw new RuntimeException("A dimension of a state coordinates does not match the dimension of initial state");
+    private void removeStateFromHeadOfList(S state, List<Vertex<S, E>> childrenCandidates) {
+        if (childrenCandidates.size() == 0)
+            return;
+
+        Vertex<S, E> nearest = childrenCandidates.get(0);
+        if (state.equals(nearest.state)) {
+            childrenCandidates.remove(0);
         }
+
+    }
+
+    protected List<Vertex<S, E>> getVerticesWithinRadius(S state, double radius) {
+        double radius_sq = radius * radius;
+        double[] key = euclideanProvider.getEuclideanCoordinates(state);
+
+        Iterator<Vertex<S, E>> iterator =
+                knnKdTree.getNearestNeighborIterator(key, kdKeys.size(), distanceFunction);
+        List<Vertex<S, E>> list = new LinkedList<Vertex<S, E>>();
+
+        while (iterator.hasNext()) {
+            Vertex<S, E> vertex = iterator.next();
+            double[] key2 = euclideanProvider.getEuclideanCoordinates(vertex.state);
+            if (distanceSquared(key, key2) < radius_sq) {
+                list.add(vertex);
+            } else {
+                break;
+            }
+        }
+
+        return list;
+    }
+
+    protected static double distanceSquared(double[] key1, double[] key2) {
+        double dist_sq = 0;
+        for (int i = 0; i < key1.length; i++) {
+            double diff = key1[i] - key2[i];
+            dist_sq += diff * diff;
+        }
+        return dist_sq;
     }
 }
