@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This integrator implements the analytic approach as it is described in the paper.
+ * This integrator implements the analytic approach as it is described in the paper. This approach is suitable only for
+ * graphs which edges are only SMALL LINE SEGMENTS (grid). It should not happen that any of graph's edges go around
+ * multiple poles at once.
  */
 
 public class HValueAnalyticIntegrator implements HValueIntegrator {
@@ -78,7 +80,7 @@ public class HValueAnalyticIntegrator implements HValueIntegrator {
         Complex pEvaluated = Complex.ZERO;
         for (int j = 0; j < pRoots.size(); j++) {
             if (l == j) continue;
-            pEvaluated = pEvaluated.plus(pRoots.get(l).minus(pRoots.get(j)).log());
+            pEvaluated = pEvaluated.plus(pRoots.get(j).minus(pRoots.get(l)).log());
 
         }
         return pEvaluated;
