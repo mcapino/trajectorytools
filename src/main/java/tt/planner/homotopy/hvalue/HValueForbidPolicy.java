@@ -17,7 +17,7 @@ public class HValueForbidPolicy implements HValuePolicy {
     public boolean isAllowed(Complex hValue, double precision) {
         for (Complex value : forbidden) {
             double diff = value.minus(hValue).magnitude();
-            double abs = value.plus(hValue).divide(2).magnitude();
+            double abs = (value.magnitude() + hValue.magnitude()) / 2;
 
             if (diff / abs < precision) return false;
         }
