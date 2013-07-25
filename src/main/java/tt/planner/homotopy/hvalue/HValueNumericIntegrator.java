@@ -6,8 +6,8 @@ import java.util.List;
 
 
 /**
- * This class implements simple numeric integrator. This approach is suitable for every graph, but is computationally
- * hard. For some special cases it might be better to use analytic integrator.
+ * This class implements simple numeric integrator. This approach is <b>suitable for every graph</b>, but is computationally
+ * <b>slow</b>. For some special cases it might be better to use analytic integrator.
  */
 
 public class HValueNumericIntegrator implements HValueIntegrator {

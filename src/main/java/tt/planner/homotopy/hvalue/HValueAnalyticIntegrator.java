@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * This integrator implements the analytic approach as it is described in the paper. This approach is suitable only for
- * graphs which edges are only SMALL LINE SEGMENTS (grid). It should not happen that any of graph's edges go around
- * multiple poles at once.
+ * graphs which edges are only <b>SMALL LINE SEGMENTS (grid)</b>. It is caused by possible multiple discontinuity in
+ * imaginary part of poleContribution.
  */
 
 public class HValueAnalyticIntegrator implements HValueIntegrator {
