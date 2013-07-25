@@ -18,7 +18,7 @@ public class HValueNumericIntegrator implements HValueIntegrator {
     private final List<Complex> pRoots;
 
     /**
-     * @param qRoots     N-1 roots of the nominator (samples of free space)
+     * @param qRoots     (not necessarily N-1) roots of the nominator (samples of free space)
      * @param pRoots     N roots of the denominator (samples representing obstacles)
      * @param step       discretization step
      * @param minSamples minimum number of samples per edge
