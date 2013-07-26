@@ -30,7 +30,13 @@ public class TrajectoryLayer extends CommonLayer {
         Trajectory<PP> getTrajectory();
     }
 
-    public static <X> VisLayer create(final TrajectoryProvider<X> trajectoryProvider, final ProjectionTo2d<X> projection, final Color color, final int samplingInterval, final int maxTimeArg, final char toggleKey) {
+    public static <X> VisLayer create(final TrajectoryProvider<X> trajectoryProvider, final ProjectionTo2d<X> projection,
+            final Color color, final int samplingInterval, final int maxTimeArg, final char toggleKey) {
+        return create(trajectoryProvider, projection, color, samplingInterval, maxTimeArg, 4, toggleKey);
+    }
+
+    public static <X> VisLayer create(final TrajectoryProvider<X> trajectoryProvider, final ProjectionTo2d<X> projection,
+            final Color color, final int samplingInterval, final int maxTimeArg, final int pointSize, final char toggleKey) {
         GroupLayer group = GroupLayer.create();
 
         group.addSubLayer(StyledPointLayer.create(new StyledPointElements() {
@@ -47,11 +53,11 @@ public class TrajectoryLayer extends CommonLayer {
                     Point2d target = projection.project(traj.get(maxTime));
 
                     if (start != null ) {
-                        points.add(new StyledPointImpl( new Point3d(start.x, start.y, 0), color, 6));
+                        points.add(new StyledPointImpl( new Point3d(start.x, start.y, 0), color, pointSize));
                     }
 
                     if (target != null) {
-                        points.add(new StyledPointImpl( new Point3d(target.x, target.y, 0), color, 6));
+                        points.add(new StyledPointImpl( new Point3d(target.x, target.y, 0), color, 8));
                     }
 
                     for (int time = traj.getMinTime(); time < maxTime; time += samplingInterval) {
@@ -59,7 +65,7 @@ public class TrajectoryLayer extends CommonLayer {
                         if (pos != null) {
                             Point2d point = projection.project(pos);
                             if (point != null) {
-                                points.add(new StyledPointImpl(new Point3d(point.x, point.y, 0), color, 4));
+                                points.add(new StyledPointImpl(new Point3d(point.x, point.y, 0), color, pointSize));
                             }
                         } else {
                             throw new RuntimeException("Position for time " + time + "s is null in trajectory " + traj);
