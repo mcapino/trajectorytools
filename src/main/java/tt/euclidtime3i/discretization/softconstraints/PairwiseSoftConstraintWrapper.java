@@ -26,7 +26,7 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
 
         int duration = e.getEnd().getTime() - e.getStart().getTime();
         double distance = e.getStart().getPosition().distance(e.getEnd().getPosition());
-        Trajectory traj = new LinearTrajectory(e.getStart().getTime(), e.getStart().getPosition(), e.getEnd().getPosition(), (int) distance / duration, duration, super.getEdgeWeight(e));
+        Trajectory traj = new LinearTrajectory(e.getStart().getTime(), e.getStart().getPosition(), e.getEnd().getPosition(), (int) Math.round(distance / duration), duration, super.getEdgeWeight(e));
 
         double cost = super.getEdgeWeight(e);
         for (int i = 0; i < otherTrajs.length; i++) {
