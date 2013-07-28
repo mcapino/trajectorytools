@@ -12,10 +12,15 @@ import java.util.*;
 
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
+    public static interface ExpansionListener<V, E> {
+
+        public void exapanded(V expandedState);
+    }
     protected Heap<Double, V> heap;
     protected HeuristicToGoal<V> heuristicToGoal;
     protected Map<V, Heap.Entry<Double, V>> opened;
     protected Set<V> closed;
+    protected List<ExpansionListener<V, E>> listeners;
     protected int iterationCounter;
     //
     protected GraphPath<V, E> path;
@@ -59,6 +64,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         this.heap = new FibonacciHeap<Double, V>();
         this.opened = new HashMap<V, Heap.Entry<Double, V>>();
         this.closed = new HashSet<V>();
+        this.listeners = new ArrayList<ExpansionListener<V, E>>();
         initialize();
     }
 
@@ -66,6 +72,20 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         setShortestDistanceTo(startVertex, 0.);
         Heap.Entry<Double, V> entry = heap.insert(calculateKey(startVertex), startVertex);
         opened.put(startVertex, entry);
+    }
+
+    public void addExpansionListener(ExpansionListener<V, E> listener) {
+        listeners.add(listener);
+    }
+
+    public void removeExpansionListener(ExpansionListener<V, E> listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyExpansionListeners(V state) {
+        for (ExpansionListener<V, E> listener : listeners) {
+            listener.exapanded(state);
+        }
     }
 
     public GraphPath<V, E> findShortestPath(int iterationLimit) {
