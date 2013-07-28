@@ -1,18 +1,20 @@
 package tt.planner.rrtstar;
 
-import tt.planner.rrtstar.util.Vertex;
-import tt.planner.rrtstar.domain.Domain;
-import tt.planner.rrtstar.util.Extension;
-import tt.planner.rrtstar.util.ExtensionEstimate;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphPathImpl;
+import tt.planner.rrtstar.domain.Domain;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
+import tt.planner.rrtstar.util.Vertex;
 import tt.util.NotImplementedException;
 
 import java.util.*;
 
 public class RRTStar<S, E> implements Graph<S, E> {
+
+    public static int ext_counter = 0;
 
     Domain<S, E> domain;
     List<RRTStarListener<S, E>> listeners;
@@ -70,7 +72,7 @@ public class RRTStar<S, E> implements Graph<S, E> {
             return;
 
         Vertex<S, E> nearestVertex = getNearestParentVertex(randomSample);
-        Extension<S, E> nearestToNew = domain.extendTo(nearestVertex.getState(), randomSample);
+        Extension<S, E> nearestToNew = extendTo(nearestVertex, randomSample);
 
         if (nearestToNew != null) {
             S newSample = nearestToNew.target;
@@ -95,6 +97,17 @@ public class RRTStar<S, E> implements Graph<S, E> {
             }
 
         }
+    }
+
+    private Extension<S, E> extendTo(Vertex<S, E> vertex, S sample) {
+        ext_counter++;
+//        if (ext_counter++ % 200 == 0)
+//            if (bestVertex == null) {
+//                System.out.println(String.format("best,%d,Inf", ext_counter));
+//            } else {
+//                System.out.println(String.format("best,%d,%f", ext_counter, bestVertex.costFromRoot));
+//            }
+        return domain.extendTo(vertex.getState(), sample);
     }
 
     /**
@@ -126,7 +139,7 @@ public class RRTStar<S, E> implements Graph<S, E> {
         } else {
             // b) extend from nearest
             Vertex<S, E> nearestVertex = getNearestParentVertex(randomSample);
-            Extension<S, E> nearestToNew = domain.extendTo(nearestVertex.getState(), randomSample);
+            Extension<S, E> nearestToNew = extendTo(nearestVertex, randomSample);
             if (nearestToNew != null) {
                 result = new BestParentSearchResult(nearestVertex, nearestToNew);
             }
@@ -149,11 +162,12 @@ public class RRTStar<S, E> implements Graph<S, E> {
 
     protected Vertex<S, E> insertExtension(Vertex<S, E> parent, Extension<S, E> extension) {
 
-        if (bestVertex != null) {
-            if (bestVertex.getCostFromRoot() < parent.getCostFromRoot() + domain.estimateCostToGo(parent.getState())) {
-                return null;
-            }
-        }
+        //TODO není to ořezávání trochu pozdě, když už je všechna práce hotova?
+        //if (bestVertex != null) {
+        //    if (bestVertex.getCostFromRoot() < parent.getCostFromRoot() + domain.estimateCostToGo(parent.getState())) {
+        //        return null;
+        //    }
+        //}
 
         Vertex<S, E> newVertex = new Vertex<S, E>(extension.target);
         nSamples++;
@@ -168,7 +182,7 @@ public class RRTStar<S, E> implements Graph<S, E> {
             target.parent.removeChild(target);
         }
 
-        assert (extension.exact ? extension.target.equals(target.getState()) : true);
+        assert (!extension.exact || extension.target.equals(target.getState()));
 
         parent.addChild(target);
         target.setParent(parent);
@@ -238,7 +252,7 @@ public class RRTStar<S, E> implements Graph<S, E> {
         // Try to establish an edge to vertices in increasing order of costs
         for (VertexCost vertexCost : vertexCosts) {
             Vertex<S, E> vertex = vertexCost.vertex;
-            Extension<S, E> extension = domain.extendTo(vertex.getState(), randomSample);
+            Extension<S, E> extension = extendTo(vertex, randomSample);
             if (extension != null && extension.exact) {
                 return new BestParentSearchResult(vertex, extension);
             }
@@ -255,7 +269,7 @@ public class RRTStar<S, E> implements Graph<S, E> {
                 if (extensionEst != null) {
                     double costToRootOverNew = candidateParent.getCostFromRoot() + extensionEst.cost;
                     if (extensionEst.exact && costToRootOverNew < nearVertex.getCostFromRoot()) {
-                        Extension<S, E> extension = domain.extendTo(candidateParent.getState(), nearVertex.getState());
+                        Extension<S, E> extension = extendTo(candidateParent, nearVertex.getState());
                         if (extension != null && extension.exact) {
                             insertExtension(candidateParent, extension, nearVertex);
                             updateBranchCost(nearVertex);

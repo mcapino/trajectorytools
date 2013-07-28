@@ -89,8 +89,7 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
     @Override
     protected Collection<Vertex<S, E>> getNearParentCandidates(S state) {
         double radius = getNearBallRadius();
-        List<Vertex<S, E>> parentCandidates = getVerticesWithinRadius(state, radius);
-        return parentCandidates;
+        return getVerticesWithinRadius(state, radius);
     }
 
     @Override
@@ -121,15 +120,19 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
                 knnKdTree.getNearestNeighborIterator(key, kdKeys.size(), distanceFunction);
         List<Vertex<S, E>> list = new LinkedList<Vertex<S, E>>();
 
+//        int vertices = 0;
         while (iterator.hasNext()) {
             Vertex<S, E> vertex = iterator.next();
             double[] key2 = euclideanProvider.getEuclideanCoordinates(vertex.state);
             if (distanceSquared(key, key2) < radius_sq) {
                 list.add(vertex);
+//                vertices++;
             } else {
                 break;
             }
         }
+
+//        System.out.println(String.format("ball,%f,%d", radius, vertices));
 
         return list;
     }

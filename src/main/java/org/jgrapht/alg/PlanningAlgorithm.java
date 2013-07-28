@@ -1,16 +1,15 @@
 package org.jgrapht.alg;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.specifics.Specifics;
 import org.jgrapht.alg.specifics.SpecificsFactory;
 import org.jgrapht.graph.GraphPathImpl;
+import org.jgrapht.util.ExpansionListener;
 import org.jgrapht.util.Goal;
+
+import java.util.*;
 
 class PlanningAlgorithm<V, E> {
 
@@ -20,6 +19,7 @@ class PlanningAlgorithm<V, E> {
     protected Specifics<V, E> specifics;
     protected Map<V, E> shortestPathTreeEdges;
     protected Map<V, Double> shortestDistanceToVertex;
+    protected List<ExpansionListener<V>> listeners;
 
     public PlanningAlgorithm(Graph<V, E> graph, V startVertex, Goal<V> goal) {
         this.graph = graph;
@@ -28,6 +28,21 @@ class PlanningAlgorithm<V, E> {
         this.goal = goal;
         this.shortestPathTreeEdges = new HashMap<V, E>();
         this.shortestDistanceToVertex = new HashMap<V, Double>();
+        this.listeners = new ArrayList<ExpansionListener<V>>();
+    }
+
+    public void addExpansionListener(ExpansionListener<V> listener) {
+        listeners.add(listener);
+    }
+
+    public void removeExpansionListener(ExpansionListener<V> listener) {
+        listeners.remove(listener);
+    }
+
+    protected void notifyExpansionListeners(V state) {
+        for (ExpansionListener<V> listener : listeners) {
+            listener.exapanded(state);
+        }
     }
 
     protected E getShortestPathTreeEdge(V v) {
