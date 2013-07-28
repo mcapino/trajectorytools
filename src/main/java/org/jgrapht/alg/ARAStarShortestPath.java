@@ -22,6 +22,7 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     protected Set<V> closed;
     protected Set<V> inconsistent;
     protected Heap<Double, V> heap;
+    protected V current;
 
     public ARAStarShortestPath(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex,
                                final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep,
@@ -110,6 +111,9 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         while (!heap.isEmpty()) {
 
             V vertex = heap.extractMinimum().getValue();
+
+            notifyExpansionListeners(vertex);
+
             if (goal.isGoal(vertex)) {
                 inconsistent.add(vertex); //goal state should remain in the queue
                 foundGoal = vertex;
@@ -163,11 +167,25 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public V getParent(V vertex) {
-        return Graphs.getOppositeVertex(graph, getShortestPathTreeEdge(vertex), vertex);
+        E edge = getShortestPathTreeEdge(vertex);
+
+        if (edge != null) {
+            return Graphs.getOppositeVertex(graph, edge, vertex);
+        } else {
+            return null;
+        }
     }
 
     public double getFValue(V vertex) {
         return calculateKey(vertex);
+    }
+
+    public Result<V, E> getResult() {
+        return result;
+    }
+
+    public V getCurrentNode() {
+        return current;
     }
 
     public static class Result<V, E> {
@@ -178,6 +196,12 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         public Result(GraphPath<V, E> path, double suboptimalityScale) {
             this.path = path;
             this.suboptimalityScale = suboptimalityScale;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Result{weight=%f, edges=%d, heuristicScale=%f}", path.getWeight(),
+                    path.getEdgeList().size(), suboptimalityScale);
         }
     }
 }
