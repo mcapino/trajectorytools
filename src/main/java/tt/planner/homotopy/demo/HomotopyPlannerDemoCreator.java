@@ -7,6 +7,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
+import org.jgrapht.util.ExpansionListener;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import org.jscience.mathematics.number.Complex;
@@ -111,7 +112,7 @@ public class HomotopyPlannerDemoCreator {
                         }
                 );
 
-        aStar.addExpansionListener(new AStarShortestPathSimple.ExpansionListener<HNode<Point>, HEdge<Point, Line>>() {
+        aStar.addExpansionListener(new ExpansionListener<HNode<Point>>() {
             @Override
             public void exapanded(HNode<Point> expandedState) {
                 try {
