@@ -1,12 +1,12 @@
 package tt.euclid2i.probleminstance;
 
-import java.util.Collection;
-import java.util.Random;
-
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
+
+import java.util.Collection;
+import java.util.Random;
 
 public class ShortestPathProblem {
 
@@ -24,11 +24,18 @@ public class ShortestPathProblem {
 
         Random random = new Random(seed);
 
-        start = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
-        targetPoint = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
+        do {
+            start = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
+        } while (start.getX() > dimX / 2 || start.getY() > dimY / 2);
+
+        do {
+            targetPoint = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
+        } while (targetPoint.getX() < dimX / 2 || targetPoint.getY() < dimY / 2);
+
         targetRegion = new Rectangle(
                 new Point(targetPoint.x - targetRegionSide / 2, targetPoint.y - targetRegionSide / 2),
                 new Point(targetPoint.x + targetRegionSide / 2, targetPoint.y + targetRegionSide / 2));
+
     }
 
     public Collection<Region> getObstacles() {
