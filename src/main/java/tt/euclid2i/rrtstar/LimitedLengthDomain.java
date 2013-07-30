@@ -1,9 +1,5 @@
 package tt.euclid2i.rrtstar;
 
-import java.util.Collection;
-
-import javax.vecmath.Vector2d;
-
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -12,20 +8,23 @@ import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.planner.rrtstar.util.Extension;
 
+import javax.vecmath.Vector2d;
+import java.util.Collection;
+
 public class LimitedLengthDomain extends StraightLineDomain {
 
     double maxLength;
 
     public LimitedLengthDomain(ShortestPathProblem problem, double maxLength,
-            int seed, double tryGoalRatio) {
+                               int seed, double tryGoalRatio) {
         super(problem, seed, tryGoalRatio);
         this.maxLength = maxLength;
     }
 
     public LimitedLengthDomain(Rectangle bounds,
-            Collection<Region> obstacles,
-            Region target, Point targetPoint, double maxLength,
-            int seed, double tryGoalRatio) {
+                               Collection<Region> obstacles,
+                               Region target, Point targetPoint, double maxLength,
+                               int seed, double tryGoalRatio) {
         super(bounds, obstacles, target, targetPoint, seed, tryGoalRatio);
         this.maxLength = maxLength;
     }
@@ -35,8 +34,11 @@ public class LimitedLengthDomain extends StraightLineDomain {
         Extension<Point, Line> result = null;
 
         Vector2d direction = new Vector2d(to.x - from.x, to.y - from.y);
-        direction.normalize();
-        direction.scale(maxLength);
+
+        if (direction.length() > maxLength) {
+            direction.normalize();
+            direction.scale(maxLength);
+        }
 
         Point actualEnd = new Point((int) Math.round(from.x + direction.x), (int) Math.round(from.y + direction.y));
 
