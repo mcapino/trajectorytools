@@ -1,13 +1,8 @@
 package tt.euclid2i.trajectory;
 
 import java.text.DecimalFormat;
-import java.util.List;
-
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
 
 import tt.euclid2i.EvaluatedTrajectory;
-import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 
 public class LinearTrajectory implements EvaluatedTrajectory {
@@ -24,7 +19,7 @@ public class LinearTrajectory implements EvaluatedTrajectory {
         this.endWaypoint = endWaypoint;
 
         if (startWaypoint.equals(endWaypoint)) {
-        	throw new IllegalArgumentException("start and end waypoint must be different");
+            throw new IllegalArgumentException("start and end waypoint must be different");
         }
 
         this.startTime = startTime;
@@ -48,21 +43,19 @@ public class LinearTrajectory implements EvaluatedTrajectory {
             assert(alpha >= -0.00001 && alpha <= 1.00001);
 
             tt.euclid2d.Point pos
-            	= tt.euclid2d.Point.interpolate(
-            			new tt.euclid2d.Point(startWaypoint.x, startWaypoint.y),
-            			new tt.euclid2d.Point(endWaypoint.x, endWaypoint.y), alpha);
+                = tt.euclid2d.Point.interpolate(
+                        new tt.euclid2d.Point(startWaypoint.x, startWaypoint.y),
+                        new tt.euclid2d.Point(endWaypoint.x, endWaypoint.y), alpha);
 
             return new Point((int) Math.round(pos.x), (int) Math.round(pos.y));
         }
 
         if (t >= endWaypointTime) {
-        	return endWaypoint;
+            return endWaypoint;
         }
 
         return null;
     }
-
-
 
     @Override
     public String toString() {

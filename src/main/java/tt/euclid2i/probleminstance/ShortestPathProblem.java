@@ -20,7 +20,7 @@ public class ShortestPathProblem {
     public ShortestPathProblem(int dimX, int dimY, int obstacles, int obstacleMaxSize, int targetSize, int seed) {
         this.targetRegionSide = targetSize;
         this.seed = seed;
-        this.environment = new Environment(dimX, dimY, obstacles, obstacleMaxSize, seed);
+        this.environment = new RandomEnvironment(dimX, dimY, obstacles, obstacleMaxSize, seed);
 
         Random random = new Random(seed);
 

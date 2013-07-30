@@ -15,15 +15,17 @@ import org.jgrapht.util.HeuristicToGoal;
 
 import tt.discrete.vis.TrajectoryLayer;
 import tt.discrete.vis.TrajectoryLayer.TrajectoryProvider;
+import tt.euclid2i.Trajectory;
 import tt.euclid2i.discretization.LazyGrid;
 import tt.euclid2i.trajectory.LineSegmentsConstantSpeedTrajectory;
 import tt.euclid2i.trajectory.StraightSegmentTrajectory;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
-import tt.euclidtime3i.Trajectory;
 import tt.euclidtime3i.discretization.ConstantSpeedTimeExtension;
-import tt.euclidtime3i.discretization.SeparationAsSoftConstraintWrapper;
 import tt.euclidtime3i.discretization.Straight;
+import tt.euclidtime3i.discretization.softconstraints.LinearSeparationPenaltyFunction;
+import tt.euclidtime3i.discretization.softconstraints.PairwiseSoftConstraintWrapper;
+import tt.euclidtime3i.discretization.softconstraints.SeparationConstraint;
 import tt.euclidtime3i.region.MovingCircle;
 import tt.euclidtime3i.trajectory.Trajectories;
 import tt.euclidtime3i.vis.RegionsLayer;
@@ -69,7 +71,7 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
                     LazyGrid.PATTERN_8_WAY,
                     GRID_STEP_SIZE);
 
-        // create dynamic obstacles
+        // create obstacle
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
         dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-100,0), new tt.euclid2i.Point(100,0), RADIUS));
 
@@ -83,12 +85,16 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
 
 
         // create spatio-temporal graph
-        ConstantSpeedTimeExtension spatioTemporalGraph
-            = new ConstantSpeedTimeExtension(spatialGraph, 5000, new int[]{1});
+        DirectedGraph<Point, Straight> spatioTemporalGraph
+            = new ConstantSpeedTimeExtension(spatialGraph, 20000, new int[]{1});
 
         // Add soft-constraint
-        SeparationAsSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
-            = new SeparationAsSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph, dynamicObstacles, GRID_STEP_SIZE);
+
+        PairwiseSoftConstraintWrapper<Point, Straight> graphWithSoftConstraints
+            = new PairwiseSoftConstraintWrapper<Point, Straight>(spatioTemporalGraph,
+                    new Trajectory[] {((MovingCircle) dynamicObstacles.get(0)).getTrajectory()},
+                    new SeparationConstraint(new LinearSeparationPenaltyFunction(RADIUS, 1.18), 1),
+                    1.0);
 
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(graphWithSoftConstraints, new HeuristicToGoal<Point>() {
@@ -105,9 +111,9 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
                         }
                 );
 
-        final Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
+        final tt.euclidtime3i.Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
 
-        // graph
+        // Draw Graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {
 
             @Override
@@ -123,7 +129,7 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
             public tt.discrete.Trajectory<Point> getTrajectory() {
                 return trajectory;
             }
-        }, new TimeParameterProjectionTo2d(time), Color.BLUE, 1, 100, 's'));
+        }, new TimeParameterProjectionTo2d(time), Color.BLUE, 1, 10000, 's'));
 
         // draw the shortest path
         VisManager.registerLayer(GraphPathLayer.create(new PathProvider<Point, Straight>() {
@@ -179,8 +185,6 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
     }
-
-
 
 
     public static void main(String[] args) {

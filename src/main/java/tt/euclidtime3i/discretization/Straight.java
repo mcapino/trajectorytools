@@ -62,5 +62,4 @@ public class Straight {
         return String.format("(%s : %s)", start, end);
     }
 
-
 }
