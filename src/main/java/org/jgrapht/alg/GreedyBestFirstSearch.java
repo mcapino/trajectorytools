@@ -60,10 +60,10 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
 
     public GraphPath<V, E> findPath() {
 
-        double cost = 0;
+        double currentPathCost = 0;
         V current = startVertex;
 
-        while (cost < radius && opened.size() < depthLimit && !goal.isGoal(current)) {
+        while (currentPathCost < radius && opened.size() < depthLimit && !goal.isGoal(current)) {
             opened.add(current);
 
             double minCost = Double.POSITIVE_INFINITY;
@@ -77,7 +77,10 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
                 if (opened.contains(successor))
                     continue;
 
-                double costToGoEstimate = heuristic.getCostToGoalEstimate(successor);
+                double edgeCost = graph.getEdgeWeight(edge);
+                double costToGoalEstimate = heuristic.getCostToGoalEstimate(successor);
+
+                double costToGoEstimate = edgeCost + costToGoalEstimate;
                 if (costToGoEstimate < minCost) {
                     minCost = costToGoEstimate;
                     bestSuccessorVertex = successor;
@@ -91,10 +94,10 @@ public class GreedyBestFirstSearch<V, E> extends PlanningAlgorithm<V, E> {
             edgeList.add(bestSuccessorEdge);
 
             current = bestSuccessorVertex;
-            cost += graph.getEdgeWeight(bestSuccessorEdge);
+            currentPathCost += graph.getEdgeWeight(bestSuccessorEdge);
         }
 
-        path = new GraphPathImpl<V, E>(graph, startVertex, current, edgeList, cost);
+        path = new GraphPathImpl<V, E>(graph, startVertex, current, edgeList, currentPathCost);
 
         if (!goal.isGoal(current)) {
             return null;
