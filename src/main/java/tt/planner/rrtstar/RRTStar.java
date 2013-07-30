@@ -14,15 +14,16 @@ import java.util.*;
 
 public class RRTStar<S, E> implements Graph<S, E> {
 
-    public static int ext_counter = 0;
-
     Domain<S, E> domain;
-    List<RRTStarListener<S, E>> listeners;
 
+    List<RRTStarListener<S, E>> listeners;
     int nSamples;
+
+    public int ext_counter;
     Vertex<S, E> root;
-    double gamma;
-    double eta;
+    double initialRadius;
+    double minRadius;
+    double maxRadius;
 
     Vertex<S, E> bestVertex;
 
@@ -34,18 +35,20 @@ public class RRTStar<S, E> implements Graph<S, E> {
     S lastSampleDrawn = null;
     S lastNewSample = null;
 
-    public RRTStar(Domain<S, E> domain, S initialState, double gamma) {
-        this(domain, initialState, gamma, Double.POSITIVE_INFINITY);
+    public RRTStar(Domain<S, E> domain, S initialState, double initialRadius) {
+        this(domain, initialState, initialRadius, 0, Double.POSITIVE_INFINITY);
     }
 
-    public RRTStar(Domain<S, E> domain, S initialState, double gamma, double eta) {
+    public RRTStar(Domain<S, E> domain, S initialState, double initialRadius, double minRadius, double maxRadius) {
         super();
 
         this.domain = domain;
-        this.gamma = gamma;
-        this.eta = eta;
+        this.initialRadius = initialRadius;
+        this.minRadius = minRadius;
+        this.maxRadius = maxRadius;
         this.root = new Vertex<S, E>(initialState);
         this.nSamples = 1;
+        this.ext_counter = 0;
 
         this.bestVertex = null;
         this.listeners = new LinkedList<RRTStarListener<S, E>>();
@@ -320,7 +323,13 @@ public class RRTStar<S, E> implements Graph<S, E> {
 
     public double getNearBallRadius() {
         int n = nSamples;
-        return Math.min(gamma * Math.pow(Math.log(n + 1) / (n + 1), 1 / domain.nDimensions()), eta);
+
+        double radius = initialRadius * Math.pow(Math.log(n + 1) / (n + 1), 1 / domain.nDimensions());
+
+        radius = Math.min(radius, maxRadius);
+        radius = Math.max(radius, minRadius);
+
+        return radius;
     }
 
     protected Vertex<S, E> getNearestParentVertex(S x) {
@@ -373,7 +382,6 @@ public class RRTStar<S, E> implements Graph<S, E> {
 
         return minDistVertex;
     }
-
 
     public Vertex<S, E> getRoot() {
         return root;
