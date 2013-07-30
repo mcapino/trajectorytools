@@ -1,25 +1,26 @@
 package tt.planner.rrtstar;
 
-import tt.planner.rrtstar.util.Vertex;
-import tt.planner.rrtstar.util.Extension;
-import tt.planner.rrtstar.util.ExtensionEstimate;
 import tt.planner.rrtstar.domain.GraphDomain;
 import tt.planner.rrtstar.domain.GraphPathEdge;
+import tt.planner.rrtstar.util.Extension;
+import tt.planner.rrtstar.util.ExtensionEstimate;
+import tt.planner.rrtstar.util.Vertex;
 import tt.util.EuclideanCoordinatesProvider;
 
+import javax.vecmath.Point2i;
 import java.util.Collection;
 
-public class EuclideanGraphRRTStar<S, E> extends EuclideanRRTStar<S, GraphPathEdge<S, E>> {
+public class EuclideanGraphRRTStar<S extends Point2i, E> extends EuclideanRRTStar<S, GraphPathEdge<S, E>> {
 
 
     public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                        S initialState, double gamma, double eta) {
-        super(domain, euclideanProvider, initialState, gamma, eta);
+                                 S initialState, double initialRadius, double minRadius, double maxRadius) {
+        super(domain, euclideanProvider, initialState, initialRadius, minRadius, maxRadius);
     }
 
     public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                                        S initialState, double gamma) {
-        super(domain, euclideanProvider, initialState, gamma);
+                                 S initialState, double initialRadius) {
+        this(domain, euclideanProvider, initialState, initialRadius, 0, Double.POSITIVE_INFINITY);
     }
 
     @Override

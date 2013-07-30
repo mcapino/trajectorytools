@@ -18,12 +18,12 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
     protected SquareEuclideanDistanceFunction distanceFunction;
 
     public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                            S initialState, double gamma, double eta) {
-        super(domain, initialState, gamma, eta);
+                            S initialState, double initialRadius, double minRadius, double maxRadius) {
+        super(domain, initialState, initialRadius, minRadius, maxRadius);
 
         int dimensions = euclideanProvider.getSpaceDimension();
-        this.euclideanProvider = euclideanProvider;
 
+        this.euclideanProvider = euclideanProvider;
         this.distanceFunction = new SquareEuclideanDistanceFunction();
 
         this.knnKdTree = new KdTree<Vertex<S, E>>(dimensions);
@@ -33,8 +33,8 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
     }
 
     public EuclideanRRTStar(Domain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
-                            S initialState, double gamma) {
-        this(domain, euclideanProvider, initialState, gamma, Double.POSITIVE_INFINITY);
+                            S initialState, double initialRadius) {
+        this(domain, euclideanProvider, initialState, initialRadius, 0, Double.POSITIVE_INFINITY);
     }
 
     @Override
@@ -95,30 +95,32 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
     @Override
     protected Collection<Vertex<S, E>> getNearChildrenCandidates(S state) {
         double radius = getNearBallRadius();
-        List<Vertex<S, E>> childrenCandidates = getVerticesWithinRadius(state, radius);
-        removeStateFromHeadOfList(state, childrenCandidates);
+        LinkedList<Vertex<S, E>> childrenCandidates = getVerticesWithinRadius(state, radius);
+        removeStateIfFirst(state, childrenCandidates);
 
         return childrenCandidates;
     }
 
-    private void removeStateFromHeadOfList(S state, List<Vertex<S, E>> childrenCandidates) {
+    protected void removeStateIfFirst(S state, LinkedList<Vertex<S, E>> childrenCandidates) {
         if (childrenCandidates.size() == 0)
             return;
 
         Vertex<S, E> nearest = childrenCandidates.get(0);
         if (state.equals(nearest.state)) {
-            childrenCandidates.remove(0);
+            childrenCandidates.removeFirst();
+        } else {
+            childrenCandidates.removeLast();
         }
 
     }
 
-    protected List<Vertex<S, E>> getVerticesWithinRadius(S state, double radius) {
+    protected LinkedList<Vertex<S, E>> getVerticesWithinRadius(S state, double radius) {
         double radius_sq = radius * radius;
         double[] key = euclideanProvider.getEuclideanCoordinates(state);
 
         Iterator<Vertex<S, E>> iterator =
                 knnKdTree.getNearestNeighborIterator(key, kdKeys.size(), distanceFunction);
-        List<Vertex<S, E>> list = new LinkedList<Vertex<S, E>>();
+        LinkedList<Vertex<S, E>> list = new LinkedList<Vertex<S, E>>();
 
 //        int vertices = 0;
         while (iterator.hasNext()) {
