@@ -31,7 +31,6 @@ public class ParallelLauncher {
                     provider.execute(next);
                 }
             });
-            System.out.println("added");
         }
 
         executor.shutdown();
