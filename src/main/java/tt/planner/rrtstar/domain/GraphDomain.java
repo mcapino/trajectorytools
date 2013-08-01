@@ -39,6 +39,7 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
     @Override
     public S sampleState() {
+        //TODO might be damn slow in combination with EuclideanRRTStar which contains list of already sampled states
         if (random.nextDouble() > tryGoalRatio) {
             int rnd = random.nextInt(vertexCount);
             return vertexSet.get(rnd);
@@ -50,13 +51,13 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
     @Override
     public Extension<S, GraphPathEdge<S, E>> extendTo(S from, final S to) {
-        Extension<S, GraphPathEdge<S, E>> result = null;
 
         GreedyBestFirstSearch<S, E> algorithm = new GreedyBestFirstSearch<S, E>(graph, new HeuristicToGoal<S>() {
             @Override
             public double getCostToGoalEstimate(S current) {
                 return heuristic.getCostEstimate(current, to);
             }
+
         }, from, new Goal<S>() {
             @Override
             public boolean isGoal(S current) {
@@ -67,12 +68,11 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
         GraphPath<S, E> path = algorithm.findPath();
 
-        if (path != null) {
-            result = new Extension<S, GraphPathEdge<S, E>>(path.getStartVertex(), path.getEndVertex(),
-                    new GraphPathEdge<S, E>(path), path.getWeight(), true);
+        if (path == null) {
+            path = algorithm.getTraversedPath();
         }
 
-        return result;
+        return new Extension<S, GraphPathEdge<S, E>>(path.getStartVertex(), path.getEndVertex(), new GraphPathEdge<S, E>(path), path.getWeight(), true);
     }
 
     @Override
