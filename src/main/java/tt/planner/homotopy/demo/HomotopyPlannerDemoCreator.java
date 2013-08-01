@@ -44,7 +44,6 @@ public class HomotopyPlannerDemoCreator {
     private static final int ITERATION_DELAY = 20;
     private final ShortestPathProblem problem;
 
-
     List<Complex> qRoots;
     List<Complex> pRoots;
 
@@ -61,7 +60,7 @@ public class HomotopyPlannerDemoCreator {
             }
         };
 
-        Collection<Rectangle> polygons = getObstaclesAsPolygons();
+        Collection<Rectangle> polygons = getObstaclesBoundingBoxes();
 
         // >>>>>>> 2. select a point inside every significant obstacle
         pRoots = new ArrayList<Complex>();
@@ -139,10 +138,9 @@ public class HomotopyPlannerDemoCreator {
 
     }
 
-    private Collection<Rectangle> getObstaclesAsPolygons() {
+    private Collection<Rectangle> getObstaclesBoundingBoxes() {
         Collection<Rectangle> polygons = new LinkedList<Rectangle>();
         for (Region obstacle : problem.getObstacles()) {
-            assert obstacle instanceof Rectangle;
             Rectangle boundingBox = obstacle.getBoundingBox();
             polygons.add(boundingBox);
         }
