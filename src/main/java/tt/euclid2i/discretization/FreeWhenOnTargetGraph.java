@@ -1,4 +1,6 @@
-package tt.euclidtime3i.discretization;
+package tt.euclid2i.discretization;
+
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
@@ -22,6 +24,11 @@ public class FreeWhenOnTargetGraph<V extends tt.euclid2i.Point, E extends Line>
     }
 
     @Override
+	public Set<E> outgoingEdgesOf(V arg0) {
+		return super.outgoingEdgesOf(arg0);
+	}
+
+	@Override
     public double getEdgeWeight(E e) {
         V edgeSource = getEdgeSource(e);
         V edgeTarget = getEdgeTarget(e);
