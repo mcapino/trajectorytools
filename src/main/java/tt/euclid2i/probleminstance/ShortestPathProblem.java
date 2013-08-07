@@ -26,11 +26,11 @@ public class ShortestPathProblem {
 
         do {
             start = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
-        } while (start.getX() > dimX / 2 || start.getY() > dimY / 2);
+        } while (start.getX() > dimX / 4 || start.getY() > dimY / 4);
 
         do {
             targetPoint = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
-        } while (targetPoint.getX() < dimX / 2 || targetPoint.getY() < dimY / 2);
+        } while (targetPoint.getX() < dimX * 3 / 4 || targetPoint.getY() < dimY * 3 / 4);
 
         targetRegion = new Rectangle(
                 new Point(targetPoint.x - targetRegionSide / 2, targetPoint.y - targetRegionSide / 2),
