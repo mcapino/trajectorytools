@@ -19,20 +19,24 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
     private int[] speeds;
     private Collection<Region> dynamicObstacles;
 
+    public final static int DISABLE_WAIT_MOVE = 0;
+    private int waitMoveDuration;
+
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, Collection<Region> dynamicObstacles) {
+            int[] speeds, Collection<Region> dynamicObstacles, int waitMoveDuration) {
         super();
         this.spatialGraph = spatialGraph;
         this.maxTime = maxTime;
         this.speeds = speeds;
         this.dynamicObstacles = dynamicObstacles;
+        this.waitMoveDuration = waitMoveDuration;
     }
 
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
             int[] speeds) {
-       this(spatialGraph, maxTime, speeds, new LinkedList<Region>());
+       this(spatialGraph, maxTime, speeds, new LinkedList<Region>(), DISABLE_WAIT_MOVE);
     }
 
     @Override
@@ -103,6 +107,14 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         }
 
         Set<Straight> edges = new HashSet<Straight>();
+
+        if (waitMoveDuration != DISABLE_WAIT_MOVE) {
+        	Point endPoint = new tt.euclidtime3i.Point(vertex.x, vertex.y, vertex.getTime() + waitMoveDuration);
+        	if (isVisible(vertex, endPoint, dynamicObstacles)) {
+        		edges.add(new Straight(vertex, endPoint));
+        	}
+        }
+
         for (Point child : children) {
             edges.add(new Straight(vertex, child));
         }

@@ -11,14 +11,14 @@ public class MovingCircle implements Region {
     tt.euclid2i.Trajectory trajectory;
     int radius;
 
-    private static final int SAMPLES_PER_RADIUS = 2;
+    private static final int SAMPLES_PER_RADIUS = 4;
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
         assert(trajectory != null);
         this.trajectory = trajectory;
         this.radius = radius;
-        this.samplingInterval = radius/SAMPLES_PER_RADIUS;
+        this.samplingInterval = Math.floor((double)radius/(double)SAMPLES_PER_RADIUS);
     }
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius, int samplingInterval) {

@@ -63,11 +63,11 @@ public class PathfindingDemoCreator implements Creator {
                     new tt.euclid2i.region.Rectangle(new tt.euclid2i.Point(-100,-100),
                     new tt.euclid2i.Point(100,100)),
                     LazyGrid.PATTERN_8_WAY,
-                    10);
+                    5);
 
         // create dynamic obstacles
         final LinkedList<Region> dynamicObstacles = new LinkedList<Region>();
-        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-10,0), new tt.euclid2i.Point(10,0), 9));
+        dynamicObstacles.add(createMovingObstacle(spatialGraph, new tt.euclid2i.Point(-15,0), new tt.euclid2i.Point(20,0), 8));
 
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
@@ -79,19 +79,23 @@ public class PathfindingDemoCreator implements Creator {
 
 
         // create spatio-temporal graph, cut out dynamic obstacles
-        ConstantSpeedTimeExtension spatioTemporalGraph = new ConstantSpeedTimeExtension(spatialGraph, 50, new int[]{1,2}, dynamicObstacles);
+        ConstantSpeedTimeExtension spatioTemporalGraph
+        	= new ConstantSpeedTimeExtension(spatialGraph,
+        			50, new int[]{1,2}, dynamicObstacles,
+        			5);
 
+        final tt.euclid2i.Point goal = new tt.euclid2i.Point(0, 0);
         final GraphPath<Point, Straight> path = AStarShortestPath
                 .findPathBetween(spatioTemporalGraph, new HeuristicToGoal<Point>() {
                             @Override
                             public double getCostToGoalEstimate(Point current) {
                                 return (current.getPosition())
-                                        .distance(new tt.euclid2i.Point(0, 10));
+                                        .distance(goal);
                             }
                         }, new Point(0, -20, 0), new Goal<Point>() {
                             @Override
                             public boolean isGoal(Point current) {
-                                return current.x == 0 && current.y == 10;
+                                return current.getPosition().equals(goal);
                             }
                         }
                 );
