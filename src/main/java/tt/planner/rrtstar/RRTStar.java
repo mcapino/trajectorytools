@@ -165,12 +165,11 @@ public class RRTStar<S, E> implements Graph<S, E> {
 
     protected Vertex<S, E> insertExtension(Vertex<S, E> parent, Extension<S, E> extension) {
 
-        //TODO není to ořezávání trochu pozdě, když už je všechna práce hotova?
-        //if (bestVertex != null) {
-        //    if (bestVertex.getCostFromRoot() < parent.getCostFromRoot() + domain.estimateCostToGo(parent.getState())) {
-        //        return null;
-        //    }
-        //}
+        if (bestVertex != null) {
+            if (bestVertex.getCostFromRoot() < parent.getCostFromRoot() + domain.estimateCostToGo(parent.getState())) {
+                return null;
+            }
+        }
 
         Vertex<S, E> newVertex = new Vertex<S, E>(extension.target);
         nSamples++;
