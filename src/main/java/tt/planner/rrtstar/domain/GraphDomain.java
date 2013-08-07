@@ -19,17 +19,17 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
     protected S goal;
     protected GeneralHeuristic<S> heuristic;
     protected Random random;
-    protected int depthLimit;
+    protected double costLimit;
     protected double tryGoalRatio;
 
     protected List<S> vertexSet;
     protected int vertexCount;
 
-    public GraphDomain(Graph<S, E> graph, GeneralHeuristic<S> heuristic, S goal, int seed, int depthLimit, double tryGoalRatio) {
+    public GraphDomain(Graph<S, E> graph, GeneralHeuristic<S> heuristic, S goal, int seed, double costLimit, double tryGoalRatio) {
         this.graph = graph;
         this.heuristic = heuristic;
         this.goal = goal;
-        this.depthLimit = depthLimit;
+        this.costLimit = costLimit;
         this.tryGoalRatio = tryGoalRatio;
 
         this.random = new Random(seed);
@@ -39,7 +39,6 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
 
     @Override
     public S sampleState() {
-        //TODO might be damn slow in combination with EuclideanRRTStar which contains list of already sampled states
         if (random.nextDouble() > tryGoalRatio) {
             int rnd = random.nextInt(vertexCount);
             return vertexSet.get(rnd);
@@ -47,6 +46,10 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
             return goal;
         }
 
+    }
+
+    public void setCostLimit(double costLimit) {
+        this.costLimit = costLimit;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
             public boolean isGoal(S current) {
                 return current.equals(to);
             }
-        }, Double.MAX_VALUE, depthLimit
+        }, costLimit, Integer.MAX_VALUE
         );
 
         GraphPath<S, E> path = algorithm.findPath();
