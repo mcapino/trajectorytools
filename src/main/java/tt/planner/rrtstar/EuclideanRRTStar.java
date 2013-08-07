@@ -38,29 +38,10 @@ public class EuclideanRRTStar<S, E> extends RRTStar<S, E> {
     }
 
     @Override
-    protected S sampleState() {
-        S state;
-
-        do {
-            state = super.sampleState();
-        } while (kdKeys.contains(state));
-
-        return state;
-    }
-
-    @Override
     protected Vertex<S, E> insertExtension(Vertex<S, E> parent, Extension<S, E> extension) {
-        Vertex<S, E> newVertex;
-
-        if (kdKeys.contains(extension.target)) {
-            //TODO might be better to check whether the new path is shorter
-            newVertex = null;
-        } else {
-            newVertex = super.insertExtension(parent, extension);
-        }
+        Vertex<S, E> newVertex = super.insertExtension(parent, extension);
 
         if (newVertex != null) {
-            //TODO fix possible double checking kdKeys.contains(...)
             insertIntoKDTree(newVertex);
         }
 
