@@ -12,15 +12,24 @@ import java.util.Collection;
 
 public class EuclideanGraphRRTStar<S extends Point2i, E> extends EuclideanRRTStar<S, GraphPathEdge<S, E>> {
 
+    GraphDomain<S, E> domain;
 
     public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                  S initialState, double initialRadius, double minRadius, double maxRadius) {
         super(domain, euclideanProvider, initialState, initialRadius, minRadius, maxRadius);
+        this.domain = domain;
     }
 
     public EuclideanGraphRRTStar(GraphDomain<S, E> domain, EuclideanCoordinatesProvider<S> euclideanProvider,
                                  S initialState, double initialRadius) {
         this(domain, euclideanProvider, initialState, initialRadius, 0, Double.POSITIVE_INFINITY);
+    }
+
+
+    @Override
+    public void iterate() {
+        domain.setCostLimit(2 * getNearBallRadius());
+        super.iterate();
     }
 
     @Override
