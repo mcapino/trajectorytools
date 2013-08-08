@@ -11,7 +11,7 @@ import org.jgrapht.util.Goal;
 
 import java.util.*;
 
-class PlanningAlgorithm<V, E> {
+abstract class PlanningAlgorithm<V, E> implements VizualizableAlgorithm<V, E> {
 
     protected Graph<V, E> graph;
     protected V startVertex;
@@ -30,6 +30,8 @@ class PlanningAlgorithm<V, E> {
         this.shortestDistanceToVertex = new HashMap<V, Double>();
         this.listeners = new ArrayList<ExpansionListener<V>>();
     }
+
+    public abstract GraphPath<V, E> findPath(int iterationLimit);
 
     public void addExpansionListener(ExpansionListener<V> listener) {
         listeners.add(listener);
@@ -89,4 +91,21 @@ class PlanningAlgorithm<V, E> {
 
         return edgeList;
     }
+
+    @Override
+    public V getParent(V vertex) {
+        E edge = getShortestPathTreeEdge(vertex);
+
+        if (edge != null) {
+            return Graphs.getOppositeVertex(graph, edge, vertex);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public double getFValue(V vertex) {
+        return getShortestDistanceTo(vertex);
+    }
+
 }

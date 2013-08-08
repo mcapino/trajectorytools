@@ -40,7 +40,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, int iterationLimit) {
         AStarShortestPathSimple<V, E> alg = new AStarShortestPathSimple<V, E>(graph, heuristic, startVertex, goal);
-        return alg.findShortestPath(iterationLimit);
+        return alg.findPath(iterationLimit);
     }
 
     public AStarShortestPathSimple(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, final V endVertex) {
@@ -68,7 +68,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         opened.put(startVertex, entry);
     }
 
-    public GraphPath<V, E> findShortestPath(int iterationLimit) {
+    public GraphPath<V, E> findPath(int iterationLimit) {
         V foundGoal = null;
 
         while (!heap.isEmpty() && iterationCounter++ < iterationLimit) {
@@ -129,7 +129,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         return getShortestDistanceTo(vertex) + heuristicToGoal.getCostToGoalEstimate(vertex);
     }
 
-    public GraphPath<V, E> getPath() {
+    public GraphPath<V, E> getTraversedPath() {
         return path;
     }
 
@@ -141,25 +141,11 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         return closed;
     }
 
-    public V getParent(V vertex) {
-        E edge = getShortestPathTreeEdge(vertex);
-
-        if (edge != null) {
-            return Graphs.getOppositeVertex(graph, edge, vertex);
-        } else {
-            return null;
-        }
-    }
-
-    public double getFValue(V vertex) {
-        return calculateKey(vertex);
-    }
-
     public V getCurrentVertex() {
         return current;
     }
 
-    public int getIterationCounter() {
+    public int getIterationCount() {
         return iterationCounter;
     }
 }

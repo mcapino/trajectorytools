@@ -23,6 +23,7 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
     protected Set<V> inconsistent;
     protected Heap<Double, V> heap;
     protected V current;
+    private int iterationCounter;
 
     public ARAStarShortestPath(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex,
                                final V endVertex, double suboptimalityScale, double suboptimalityDecreaseStep,
@@ -60,10 +61,15 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         this.suboptimalityDecreaseStep = step;
     }
 
-    public Result<V, E> iterate() {
+    @Override
+    public GraphPath<V, E> findPath(int iterationLimit) {
+        return iterate(iterationLimit).path;
+    }
+
+    public Result<V, E> iterate(int iterationLimit) {
         prepareOpenQueue();
         clearCloseAndInconsistentSet();
-        improvePath();
+        improvePath(iterationLimit);
         decreaseEpsilon();
         return result;
     }
@@ -105,10 +111,10 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         }
     }
 
-    protected void improvePath() {
+    protected void improvePath(int iterationLimit) {
         V foundGoal = null;
 
-        while (!heap.isEmpty()) {
+        while (!heap.isEmpty() && iterationCounter++ < iterationLimit) {
 
             V vertex = heap.extractMinimum().getValue();
 
@@ -158,6 +164,11 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         }
     }
 
+    @Override
+    public GraphPath<V, E> getTraversedPath() {
+        return (result == null) ? null : result.path;
+    }
+
     public Collection<V> getOpenedNodes() {
         return heap.getValues();
     }
@@ -166,26 +177,18 @@ public class ARAStarShortestPath<V, E> extends PlanningAlgorithm<V, E> {
         return closed;
     }
 
-    public V getParent(V vertex) {
-        E edge = getShortestPathTreeEdge(vertex);
-
-        if (edge != null) {
-            return Graphs.getOppositeVertex(graph, edge, vertex);
-        } else {
-            return null;
-        }
+    @Override
+    public V getCurrentVertex() {
+        return current;
     }
 
-    public double getFValue(V vertex) {
-        return calculateKey(vertex);
+    @Override
+    public int getIterationCount() {
+        return iterationCounter;
     }
 
     public Result<V, E> getResult() {
         return result;
-    }
-
-    public V getCurrentNode() {
-        return current;
     }
 
     public static class Result<V, E> {

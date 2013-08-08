@@ -66,10 +66,10 @@ public class GraphDomain<S, E> implements Domain<S, GraphPathEdge<S, E>> {
             public boolean isGoal(S current) {
                 return current.equals(to);
             }
-        }, costLimit, Integer.MAX_VALUE
+        }, costLimit
         );
 
-        GraphPath<S, E> path = algorithm.findPath();
+        GraphPath<S, E> path = algorithm.findPath(Integer.MAX_VALUE);
 
         if (path == null) {
             path = algorithm.getTraversedPath();

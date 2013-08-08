@@ -128,8 +128,8 @@ public class HomotopyPlannerDemoCreator {
         GraphPath<HNode<Point>, HEdge<Point, Line>> path;
 
         for (int i = 0; i < 100; i++) {
-            aStar.findShortestPath(Integer.MAX_VALUE);
-            path = aStar.getPath();
+            aStar.findPath(Integer.MAX_VALUE);
+            path = aStar.getTraversedPath();
             if (path != null) {
                 policy.forbid(path.getEndVertex().getHValue());
                 System.out.println(String.format("Iteration: %d Solution length: %f", i, path.getWeight()));
@@ -216,7 +216,7 @@ public class HomotopyPlannerDemoCreator {
         VisManager.registerLayer(GraphPathLayer.create(new GraphPathLayer.PathProvider<HNode<Point>, HEdge<Point, Line>>() {
                                                            @Override
                                                            public GraphPath<HNode<Point>, HEdge<Point, Line>> getPath() {
-                                                               return aStar.getPath();
+                                                               return aStar.getTraversedPath();
                                                            }
                                                        }, new tt.vis.ProjectionTo2d<HNode<Point>>() {
                                                            @Override

@@ -31,7 +31,7 @@ public class ARAStarEuclideanGraphTest extends AbstractEuclideanGraphTest {
         ARAStarShortestPath.Result<Point, DefaultWeightedEdge> araResult;
         
         do {
-            araResult = araStar.iterate();
+            araResult = araStar.iterate(Integer.MAX_VALUE);
 
             assertFalse(araResult.path == null && referencePath != null);
             assertFalse(araResult.path != null && referencePath == null);
