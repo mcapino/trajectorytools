@@ -5,8 +5,8 @@
     <name>Alite Trajectory Tools</name>
     <groupId>cz.agents.alite</groupId>
     <artifactId>trajectorytools</artifactId>
-    <!-- TODO: after change of this version or version of the parent, remove the comment -->
-    <!-- version>1.0-SNAPSHOT</version -->
+    <version>2.0-SNAPSHOT</version>
+
     <description>
         Alite trajectory toolkit is a bundle of classes facilitating tasks connected with
         (multi-agent) trajectory planning in synthetic environments. It contains an A*
@@ -36,11 +36,6 @@
             <groupId>ags.utils.dataStructures</groupId>
             <artifactId>kdtreerednaxela</artifactId>
             <version>3.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.wlu.cs.levy.CG</groupId>
-            <artifactId>kdtree</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cz.agents.alite</groupId>
@@ -81,5 +76,5 @@
             <version>2.0.0</version>
         </dependency>
     </dependencies>
-    <version>2.0-SNAPSHOT</version>
+
 </project>
