@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class IntervalAVLTreeTest {
 
-    private static final int TEST_LENGTH = 1500;
+    private static final int TEST_LENGTH = 1000;
     private static final int MAX = TEST_LENGTH * 50;
     private static final int MAX_INT = MAX / 10;
 
@@ -42,7 +42,7 @@ public class IntervalAVLTreeTest {
 
     @Test
     public void testIntersectsPoint() throws Exception {
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 100; i++) {
             int val = random.nextInt(MAX);
             int intersects = 0;
 
@@ -58,7 +58,7 @@ public class IntervalAVLTreeTest {
 
     @Test
     public void testIntersectsInterval() throws Exception {
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 100; i++) {
             Interval val = new Interval(random.nextInt(MAX), random.nextInt(MAX));
             int intersects = 0;
 
