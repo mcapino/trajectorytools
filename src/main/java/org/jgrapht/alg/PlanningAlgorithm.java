@@ -11,7 +11,7 @@ import org.jgrapht.util.Goal;
 
 import java.util.*;
 
-abstract class PlanningAlgorithm<V, E> implements VizualizableAlgorithm<V, E> {
+public abstract class PlanningAlgorithm<V, E> implements VizualizableAlgorithm<V, E> {
 
     protected Graph<V, E> graph;
     protected V startVertex;
