@@ -21,7 +21,7 @@ public class Straight {
     }
 
 
-    public Point projectToTime(int t) {
+    public Point interpolate(int t) {
         int tStart = start.getTime();
         int tEnd = end.getTime();
 
