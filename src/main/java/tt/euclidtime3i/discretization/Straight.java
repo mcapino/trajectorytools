@@ -22,10 +22,13 @@ public class Straight {
 
 
     public Point projectToTime(int t) {
-        double tStart = start.getTime();
-        double tEnd = end.getTime();
+        int tStart = start.getTime();
+        int tEnd = end.getTime();
 
-        double scale = (t - tStart) / (tEnd - tStart);
+        if (t < tStart || tEnd < t)
+            throw new RuntimeException("This straight is not defined int time " + t);
+
+        double scale = ((double) (t - tStart)) / (tEnd - tStart);
 
         int xStart = start.getX();
         int xEnd = end.getX();
@@ -36,7 +39,7 @@ public class Straight {
         int x = (int) Math.round(xStart + (xEnd - xStart) * scale);
         int y = (int) Math.round(yStart + (yEnd - yStart) * scale);
 
-        return new Point(t, x, y);
+        return new Point(x, y, t);
     }
 
     public Point getStart() {
