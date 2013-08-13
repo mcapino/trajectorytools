@@ -1,13 +1,13 @@
 package tt.euclid2i.trajectory;
 
-import tt.discrete.EvaluatedTrajectory;
-import tt.discrete.SegmentedTrajectory;
+import tt.euclid2i.EvaluatedTrajectory;
 import tt.euclid2i.Point;
+import tt.euclid2i.SegmentedTrajectory;
 import tt.euclidtime3i.discretization.Straight;
 
 import java.util.List;
 
-public class BasicSegmentedTrajectory implements SegmentedTrajectory<Point>, EvaluatedTrajectory<Point> {
+public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedTrajectory {
 
     private int startTime;
     private int maxTime;
