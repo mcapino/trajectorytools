@@ -21,6 +21,24 @@ public class Straight {
     }
 
 
+    public Point projectToTime(int t) {
+        double tStart = start.getTime();
+        double tEnd = end.getTime();
+
+        double scale = (t - tStart) / (tEnd - tStart);
+
+        int xStart = start.getX();
+        int xEnd = end.getX();
+
+        int yStart = start.getY();
+        int yEnd = end.getY();
+
+        int x = (int) Math.round(xStart + (xEnd - xStart) * scale);
+        int y = (int) Math.round(yStart + (yEnd - yStart) * scale);
+
+        return new Point(t, x, y);
+    }
+
     public Point getStart() {
         return start;
     }
