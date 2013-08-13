@@ -20,15 +20,21 @@ public class Straight {
         }
     }
 
+    public Straight intersect(int time1, int time2) {
+        Point p1 = interpolate(time1);
+        Point p2 = interpolate(time2);
 
-    public Point interpolate(int t) {
+        return new Straight(p1, p2);
+    }
+
+    public Point interpolate(int time) {
         int tStart = start.getTime();
         int tEnd = end.getTime();
 
-        if (t < tStart || tEnd < t)
-            throw new RuntimeException("This straight is not defined int time " + t);
+        if (time < tStart || tEnd < time)
+            throw new RuntimeException("This straight is not defined in time " + time);
 
-        double scale = ((double) (t - tStart)) / (tEnd - tStart);
+        double scale = ((double) (time - tStart)) / (tEnd - tStart);
 
         int xStart = start.getX();
         int xEnd = end.getX();
@@ -39,7 +45,7 @@ public class Straight {
         int x = (int) Math.round(xStart + (xEnd - xStart) * scale);
         int y = (int) Math.round(yStart + (yEnd - yStart) * scale);
 
-        return new Point(x, y, t);
+        return new Point(x, y, time);
     }
 
     public Point getStart() {

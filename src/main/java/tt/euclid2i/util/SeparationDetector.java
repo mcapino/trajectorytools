@@ -83,14 +83,12 @@ public class SeparationDetector {
         }
     }
 
-
     /**
      * Computes pairwise conflicts between thisTrajectory and otherTrajectories.
      */
-    public static List<tt.euclidtime3i.Point> computePairwiseConflicts(
-            Trajectory thisTrajectory,
-            Collection<Trajectory> otherTrajectoriesCollection,
-            int separation, int samplingInterval) {
+    public static List<tt.euclidtime3i.Point> computePairwiseConflicts(Trajectory thisTrajectory,
+                                                                       Collection<Trajectory> otherTrajectoriesCollection,
+                                                                       int separation, int samplingInterval) {
 
 
         List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
@@ -113,11 +111,9 @@ public class SeparationDetector {
         return conflicts;
     }
 
-    public static boolean hasAnyPairwiseConflict(
-            Trajectory thisTrajectory,
-            Collection<Trajectory> otherTrajectoriesCollection,
-            int separation, int samplingInterval) {
-
+    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory,
+                                                 Collection<Trajectory> otherTrajectoriesCollection,
+                                                 int separation, int samplingInterval) {
 
         List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
 
