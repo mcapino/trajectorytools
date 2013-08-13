@@ -9,7 +9,7 @@ import tt.euclidtime3i.discretization.Straight;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Trajectories {
+public class SegmentedTrajectoryFactory {
 
     @SuppressWarnings("unchecked")
     public static <V, E extends Straight> BasicSegmentedTrajectory createTrajectory(GraphPath<V, E> graphPath, int duration, double cost) {
