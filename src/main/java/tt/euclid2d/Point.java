@@ -1,6 +1,7 @@
 package tt.euclid2d;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2i;
 import javax.vecmath.Tuple2d;
 
 public class Point extends Point2d {
@@ -13,8 +14,8 @@ public class Point extends Point2d {
         super(x, y);
     }
 
-    public Point(Point2d p1) {
-        super(p1);
+    public Point(Point2i p) {
+        super(p.x, p.y);
     }
 
     public Point(Tuple2d t1) {
@@ -26,7 +27,7 @@ public class Point extends Point2d {
 
     public static Point interpolate(Point p1, Point p2, double alpha) {
         Point result = new Point();
-        ((Tuple2d)result).interpolate(p1, p2, alpha);
+        ((Tuple2d) result).interpolate(p1, p2, alpha);
         return result;
     }
 
@@ -62,7 +63,6 @@ public class Point extends Point2d {
 //        int value = (int) Math.round(d * Math.pow(10,n));
 //        return value;
 //    }
-
 
 
 }
