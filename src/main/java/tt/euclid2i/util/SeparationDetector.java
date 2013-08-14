@@ -4,7 +4,6 @@ import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
-import tt.util.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +35,7 @@ public class SeparationDetector {
                 int t1 = Math.max(startTimeA, startTimeB);
                 int t2 = Math.min(endTimeA, endTimeB);
 
-                if (hasConflict(straightA.intersect(t1, t2), straightB.intersect(t1, t2))) {
+                if (hasConflict(straightA.intersect(t1, t2), straightB.intersect(t1, t2), separation)) {
                     return true;
                 }
 
@@ -50,36 +49,44 @@ public class SeparationDetector {
         return false;
     }
 
-    private static boolean hasConflict(Straight sA, Straight sB) {
-
+    private static boolean hasConflict(Straight sA, Straight sB, int separation) {
         Point a = sA.getStart().getPosition();
         Point b = sA.getEnd().getPosition();
 
         Point c = sB.getStart().getPosition();
         Point d = sB.getEnd().getPosition();
 
-        int ux = a.getX() - c.getX();
-        int uy = a.getY() - c.getY();
+        int ux = a.x - c.y;
+        int uy = a.y - c.y;
 
-        int vx = b.getX() + c.getX() - d.getX() - a.getX();
-        int vy = b.getY() + c.getY() - d.getY() - a.getY();
+        int vx = b.x + c.x - d.x - a.x;
+        int vy = b.y + c.y - d.y - a.y;
 
         int nom = -(ux * vx + uy * vy);
         int denom = vx * vx + vy * vy;
 
         if (denom == 0)
-            return false;
+            return a.distance(c) < separation;
 
         double frac = ((double) nom) / denom;
 
         if (frac < 0) {
-            //TODO check whether is the condition broken at point 0
-            throw new NotImplementedException();
+            return a.distance(c) < separation;
+
         } else if (frac > 1) {
-            //TODO check whether is the condition broken at point 1
-            throw new NotImplementedException();
+            return b.distance(d) < separation;
+
         } else {
-            return true;
+            int abx = (int) (a.x + (b.x - a.x) * frac);
+            int aby = (int) (a.y + (b.y - a.y) * frac);
+
+            int cdx = (int) (c.x + (d.x - c.x) * frac);
+            int cdy = (int) (c.y + (d.y - c.y) * frac);
+
+            int dx = abx - cdx;
+            int dy = aby - cdy;
+
+            return Math.sqrt(dx * dx + dy * dy) < separation;
         }
     }
 
