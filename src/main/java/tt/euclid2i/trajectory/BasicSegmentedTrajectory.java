@@ -10,10 +10,11 @@ import java.util.List;
 public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedTrajectory {
 
     private int startTime;
+    private int endTime;
     private int maxTime;
     private double cost;
+    private Point endWayPoint;
     private List<Straight> segments;
-
 
     public BasicSegmentedTrajectory(List<Straight> segments, int duration, double cost) {
         if (segments.isEmpty())
@@ -23,12 +24,18 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
         this.maxTime = startTime + duration;
         this.segments = segments;
         this.cost = cost;
+
+        tt.euclidtime3i.Point endTimePoint = segments.get(segments.size() - 1).getEnd();
+        this.endTime = endTimePoint.getTime();
+        this.endWayPoint = endTimePoint.getPosition();
     }
 
     @Override
     public Point get(int t) {
         if (t < startTime || t > maxTime) {
             return null;
+        } else if (t > endTime) {
+            return endWayPoint;
         }
 
         Straight segment = findSegment(t);
