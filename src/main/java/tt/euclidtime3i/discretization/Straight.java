@@ -20,7 +20,7 @@ public class Straight {
         }
     }
 
-    public Straight intersect(int time1, int time2) {
+    public Straight cut(int time1, int time2) {
         Point p1 = interpolate(time1);
         Point p2 = interpolate(time2);
 

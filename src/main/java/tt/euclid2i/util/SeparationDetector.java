@@ -38,7 +38,7 @@ public class SeparationDetector {
                 int t1 = Math.max(startTimeA, startTimeB);
                 int t2 = Math.min(endTimeA, endTimeB);
 
-                if (hasConflict(straightA.intersect(t1, t2), straightB.intersect(t1, t2), separation)) {
+                if (hasConflict(straightA.cut(t1, t2), straightB.cut(t1, t2), separation)) {
                     return true;
                 }
 
