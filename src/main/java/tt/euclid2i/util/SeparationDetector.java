@@ -12,25 +12,28 @@ import java.util.List;
 
 public class SeparationDetector {
 
-    public static boolean hasAnyPairwiseConflict(SegmentedTrajectory thisTrajectory, Collection<SegmentedTrajectory> otherTrajectoriesCollection,
-                                                 int separation) {
+    public static boolean hasAnyPairwiseConflict(SegmentedTrajectory thisTrajectory, Collection<SegmentedTrajectory> otherTrajectoriesCollection, int separation) {
 
         for (SegmentedTrajectory otherTrajectory : otherTrajectoriesCollection) {
-            List<Straight> segmentsA = thisTrajectory.getSegments();
-            List<Straight> segmentsB = otherTrajectory.getSegments();
+
+            //TODO it would be faster not to copy those sets all the time by using some condition for extendShorterList() in while cycle
+            List<Straight> segmentsA = new ArrayList<Straight>(thisTrajectory.getSegments());
+            List<Straight> segmentsB = new ArrayList<Straight>(otherTrajectory.getSegments());
+
+            extendShorterList(segmentsA, segmentsB);
 
             int i = 0;
             int j = 0;
 
-            while (i < segmentsA.size() && j < segmentsB.size()) {
+            while (i < segmentsA.size() || j < segmentsB.size()) {
                 Straight straightA = segmentsA.get(i);
-                Straight straightB = segmentsA.get(j);
+                Straight straightB = segmentsB.get(j);
 
                 int startTimeA = straightA.getStart().getTime();
                 int startTimeB = straightB.getStart().getTime();
 
-                int endTimeA = straightA.getStart().getTime();
-                int endTimeB = straightB.getStart().getTime();
+                int endTimeA = straightA.getEnd().getTime();
+                int endTimeB = straightB.getEnd().getTime();
 
                 int t1 = Math.max(startTimeA, startTimeB);
                 int t2 = Math.min(endTimeA, endTimeB);
@@ -47,6 +50,21 @@ public class SeparationDetector {
         }
 
         return false;
+    }
+
+    private static void extendShorterList(List<Straight> segmentsA, List<Straight> segmentsB) {
+        tt.euclidtime3i.Point lastA = segmentsA.get(segmentsA.size() - 1).getEnd();
+        int finishA = lastA.getTime();
+        tt.euclidtime3i.Point lastB = segmentsB.get(segmentsB.size() - 1).getEnd();
+        int finishB = lastB.getTime();
+
+        if (finishA < finishB) {
+            Point extend = lastA.getPosition();
+            segmentsA.add(new Straight(new tt.euclidtime3i.Point(extend, finishA), new tt.euclidtime3i.Point(extend, finishB)));
+        } else if (finishB < finishA) {
+            Point extend = lastB.getPosition();
+            segmentsB.add(new Straight(new tt.euclidtime3i.Point(extend, finishB), new tt.euclidtime3i.Point(extend, finishA)));
+        }
     }
 
     private static boolean hasConflict(Straight sA, Straight sB, int separation) {
