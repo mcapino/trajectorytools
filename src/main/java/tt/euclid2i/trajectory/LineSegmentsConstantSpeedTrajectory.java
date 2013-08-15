@@ -54,7 +54,7 @@ public class LineSegmentsConstantSpeedTrajectory<V extends Point, E extends Line
         Point currentWaypoint = startWaypoint;
         int currentWaypointTime = startTime;
 
-        if (t < startTime && t > startTime + duration) {
+        if (t < startTime || t > startTime + duration) {
             return null;
         }
 

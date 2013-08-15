@@ -39,7 +39,7 @@ public class StraightSegmentTrajectory<V extends tt.euclidtime3i.Point, E extend
     public Point get(int t) {
         tt.euclidtime3i.Point currentWaypoint = startWaypoint;
 
-        if (t < startWaypoint.getTime() && t > startWaypoint.getTime() + duration) {
+        if (t < startWaypoint.getTime() || t > startWaypoint.getTime() + duration) {
             return null;
         }
 
