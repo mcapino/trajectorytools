@@ -30,7 +30,7 @@ public class LinearTrajectory implements EvaluatedTrajectory {
 
     @Override
     public Point get(int t) {
-        if (t < startTime && t > startTime + duration) {
+        if (t < startTime || t > startTime + duration) {
             return null;
         }
 
