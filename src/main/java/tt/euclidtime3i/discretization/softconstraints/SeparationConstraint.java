@@ -16,8 +16,8 @@ public class SeparationConstraint implements PairwiseConstraint {
     }
 
     @Override
-    public double getPenalty(Trajectory t1, Trajectory t2, double weight) {
-        return weight * integratePenalty(t1, new Trajectory[] {t2}, penaltyFunction, samplingInterval);
+    public double getPenalty(Trajectory t1, Trajectory t2) {
+        return integratePenalty(t1, new Trajectory[] {t2}, penaltyFunction, samplingInterval);
     }
 
     public static double integratePenalty(
