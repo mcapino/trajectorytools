@@ -30,4 +30,12 @@ public class Point extends Point2i {
         return new Point2d(x, y).distanceL1(new Point2d(other.x, other.y));
     }
 
+    public Point divide(double scalar) {
+
+        int xsc = (int) Math.round(x / scalar);
+        int ysc = (int) Math.round(y / scalar);
+
+        return new Point(xsc, ysc);
+    }
+
 }
