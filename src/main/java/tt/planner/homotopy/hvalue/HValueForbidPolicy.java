@@ -14,6 +14,16 @@ public class HValueForbidPolicy implements HValuePolicy {
         forbidden = new HashSet<Complex>();
     }
 
+    public HValueForbidPolicy(Complex forbid) {
+        this();
+        forbidden.add(forbid);
+    }
+
+    public HValueForbidPolicy(Collection<Complex> forbid) {
+        this();
+        forbidden.addAll(forbid);
+    }
+
     @Override
     public boolean isAllowed(Complex hValue, double precision) {
         for (Complex value : forbidden) {

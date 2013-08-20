@@ -14,6 +14,16 @@ public class HValueAllowPolicy implements HValuePolicy {
         allowed = new HashSet<Complex>();
     }
 
+    public HValueAllowPolicy(Complex allow) {
+        this();
+        allowed.add(allow);
+    }
+
+    public HValueAllowPolicy(Collection<Complex> allow) {
+        this();
+        allowed.addAll(allow);
+    }
+
     @Override
     public boolean isAllowed(Complex hValue, double precision) {
         for (Complex value : allowed) {
