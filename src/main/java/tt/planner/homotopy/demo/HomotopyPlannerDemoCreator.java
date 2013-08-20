@@ -39,10 +39,8 @@ import java.util.List;
 
 public class HomotopyPlannerDemoCreator {
 
-    //TODO - refactor / write from scratch - it's just copy pasted code from rrt_vs_lags TestCreatorHomotopyAVG...
-
     private static final int ITERATION_DELAY = 20;
-    private final ShortestPathProblem problem;
+    private ShortestPathProblem problem;
 
     List<Complex> qRoots;
     List<Complex> pRoots;
@@ -76,25 +74,26 @@ public class HomotopyPlannerDemoCreator {
         }
 
         // >>>>>>> 4. initialize integrator
-        final HValueIntegrator numericIntegrator = new HValueNumericIntegrator(qRoots, pRoots, 0.1, 100);
+        HValueIntegrator numericIntegrator = new HValueNumericIntegrator(qRoots, pRoots, 0.1, 100);
 
-        // >>>>>>> 5. choose policy of allowing / forbidding hValues
-        final HValueForbidPolicy policy = new HValueForbidPolicy();
+        // >>>>>>> 5. select hClass provider - this class gets hValue of a assigns it into some hClass cluster!
+        HClassProvider<Point> provider = new HClassDiscretized.Provider<Point>();
 
-        // >>>>>>> 6. select hClass provider - this class gets hValue of a assigns it into some hClass cluster!
-        final HClassProvider<Point> provider = new HClassDiscretized.Provider<Point>();
-
-        // >>>>>>> 7. Wrap any graph you want into the
-        final DirectedGraph<Point, Line> visibilityGraph = Util.getVisibilityGraph(problem.getStart(), problem.getTargetPoint(), polygons);
+        // >>>>>>> 6. Wrap any graph you want into the
+        DirectedGraph<Point, Line> visibilityGraph = Util.getVisibilityGraph(problem.getStart(), problem.getTargetPoint(), polygons);
         final HomotopyGraphWrapper<Point, Line> homotopyWrapper = new HomotopyGraphWrapper<Point, Line>(visibilityGraph, new Goal<Point>() {
             @Override
             public boolean isGoal(Point current) {
                 return problem.getTargetRegion().isInside(current);
             }
-        }, projection, numericIntegrator, provider, policy, 0.05);
+        }, projection, numericIntegrator, provider, 0.05);
+
+        // >>>>>>> 7. choose policy of allowing / forbidding hValues
+        HValueForbidPolicy policy = new HValueForbidPolicy();
+        homotopyWrapper.setPolicy(policy);
 
         // >>>>>>> 8. Use any kind of graph path planning algorithm you want. It it advised to use informed one.
-        final AStarShortestPathSimple<HNode<Point>, HEdge<Point, Line>> aStar =
+        AStarShortestPathSimple<HNode<Point>, HEdge<Point, Line>> aStar =
                 new AStarShortestPathSimple<HNode<Point>, HEdge<Point, Line>>(homotopyWrapper,
                         new HeuristicToGoal<HNode<Point>>() {
                             @Override
