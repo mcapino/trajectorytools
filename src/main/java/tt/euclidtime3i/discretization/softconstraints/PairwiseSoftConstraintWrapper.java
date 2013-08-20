@@ -30,7 +30,7 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
 
         double cost = super.getEdgeWeight(e);
         for (int i = 0; i < otherTrajs.length; i++) {
-            cost += constraint.getPenalty(traj, otherTrajs[i], weight);
+            cost += weight * constraint.getPenalty(traj, otherTrajs[i]);
         }
 
         return cost;
