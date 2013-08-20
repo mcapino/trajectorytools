@@ -23,19 +23,19 @@ import java.util.Set;
 
 public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
 
-    private final DirectedGraph<V, E> graph;
-    private final Goal<V> goal;
-    private final ProjectionToComplexPlane<V> projection;
+    private DirectedGraph<V, E> graph;
+    private Goal<V> goal;
+    private ProjectionToComplexPlane<V> projection;
 
-    private final HValueIntegrator integrator;
-    private final HClassProvider<V> provider;
-    private final HValuePolicy policy;
-    private final double precision;
+    private HValueIntegrator integrator;
+    private HClassProvider<V> provider;
+    private HValuePolicy policy;
+    private double precision;
 
-    private final HashMap<E, Complex> lValues;
+    private HashMap<E, Complex> lValues;
 
     public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
-                                HValueIntegrator integrator, HClassProvider<V> provider, HValuePolicy policy, double precision) {
+                                HValueIntegrator integrator, HClassProvider<V> provider, double precision) {
         this.graph = graph;
         this.goal = goal;
         this.projection = projection;
@@ -43,6 +43,19 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
         this.lValues = new HashMap<E, Complex>();
         this.provider = provider;
         this.precision = precision;
+        this.policy = new HValuePolicy() {
+            @Override
+            public boolean isAllowed(Complex hValue, double precision) {
+                return true;
+            }
+        };
+    }
+
+    public HValuePolicy getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(HValuePolicy policy) {
         this.policy = policy;
     }
 
