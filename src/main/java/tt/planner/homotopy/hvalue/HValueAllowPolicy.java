@@ -2,6 +2,7 @@ package tt.planner.homotopy.hvalue;
 
 import org.jscience.mathematics.number.Complex;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,5 +27,9 @@ public class HValueAllowPolicy implements HValuePolicy {
 
     public void allow(Complex hValue) {
         allowed.add(hValue);
+    }
+
+    public void allowAll(Collection<Complex> hValues) {
+        allowed.addAll(hValues);
     }
 }
