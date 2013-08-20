@@ -80,13 +80,16 @@ public class HomotopyPlannerDemoCreator {
         HClassProvider<Point> provider = new HClassDiscretized.Provider<Point>();
 
         // >>>>>>> 6. Wrap any graph you want into the
-        DirectedGraph<Point, Line> visibilityGraph = Util.getVisibilityGraph(problem.getStart(), problem.getTargetPoint(), polygons);
-        final HomotopyGraphWrapper<Point, Line> homotopyWrapper = new HomotopyGraphWrapper<Point, Line>(visibilityGraph, new Goal<Point>() {
+
+        Goal<HNode<Point>> goal = new Goal<HNode<Point>>() {
             @Override
-            public boolean isGoal(Point current) {
-                return problem.getTargetRegion().isInside(current);
+            public boolean isGoal(HNode<Point> current) {
+                return problem.getTargetRegion().isInside(current.getNode());
             }
-        }, projection, numericIntegrator, provider, 0.05);
+        };
+
+        DirectedGraph<Point, Line> visibilityGraph = Util.getVisibilityGraph(problem.getStart(), problem.getTargetPoint(), polygons);
+        final HomotopyGraphWrapper<Point, Line> homotopyWrapper = new HomotopyGraphWrapper<Point, Line>(visibilityGraph, goal, projection, numericIntegrator, provider, 0.05);
 
         // >>>>>>> 7. choose policy of allowing / forbidding hValues
         HValueForbidPolicy policy = new HValueForbidPolicy();
@@ -101,14 +104,7 @@ public class HomotopyPlannerDemoCreator {
                                 return problem.getTargetPoint().distance(current.getNode());
                             }
                         },
-                        homotopyWrapper.wrapNode(problem.getStart(), Complex.ZERO),
-                        new Goal<HNode<Point>>() {
-                            @Override
-                            public boolean isGoal(HNode<Point> current) {
-                                return problem.getTargetRegion().isInside(current.getNode());
-                            }
-                        }
-                );
+                        homotopyWrapper.wrapNode(problem.getStart(), Complex.ZERO), goal);
 
         aStar.addExpansionListener(new ExpansionListener<HNode<Point>>() {
             @Override
