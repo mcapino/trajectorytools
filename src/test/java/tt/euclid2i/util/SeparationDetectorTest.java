@@ -3,7 +3,6 @@ package tt.euclid2i.util;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
-import org.jgrapht.alg.PlanningAlgorithm;
 import org.jgrapht.util.HeuristicToGoal;
 import org.junit.Test;
 import tt.euclid2i.*;
@@ -28,19 +27,6 @@ public class SeparationDetectorTest {
     private static final int NN_RADIUS = 25;
     private static final int SEP_RADIUS = 125;
 
-    private ProbabilisticRoadmap getProbabilisticRoadmap(int seed) {
-        return new ProbabilisticRoadmap(VERTICES, NN_RADIUS, new Point[]{}, new Rectangle(new Point(0, 0), new Point(SIZE, SIZE)), new ArrayList<Region>(), new Random(seed));
-    }
-
-    protected PlanningAlgorithm<Point, Line> initializeAlgorithm(Graph<Point, Line> graph, Point start, final Point end) {
-        return new AStarShortestPathSimple<Point, Line>(graph, new HeuristicToGoal<Point>() {
-            @Override
-            public double getCostToGoalEstimate(Point current) {
-                return end.distance(current);
-            }
-        }, start, end);
-    }
-
     @Test
     public void testHasAnyPairwiseConflict() throws Exception {
         Random testSeed = new Random(SEED);
@@ -51,14 +37,14 @@ public class SeparationDetectorTest {
         int different = 0;
 
         for (int i = 0; i < 100; i++) {
-            Point startA = vertices.get(testSeed.nextInt(1000));
-            Point endA = vertices.get(testSeed.nextInt(1000));
+            final Point startA = vertices.get(testSeed.nextInt(1000));
+            final Point endA = vertices.get(testSeed.nextInt(1000));
 
-            Point startB = vertices.get(testSeed.nextInt(1000));
-            Point endB = vertices.get(testSeed.nextInt(1000));
+            final Point startB = vertices.get(testSeed.nextInt(1000));
+            final Point endB = vertices.get(testSeed.nextInt(1000));
 
-            GraphPath<Point, Line> pathA = initializeAlgorithm(graph, startA, endA).findPath(Integer.MAX_VALUE);
-            GraphPath<Point, Line> pathB = initializeAlgorithm(graph, startB, endB).findPath(Integer.MAX_VALUE);
+            GraphPath<Point, Line> pathA = findPath(graph, startA, endA);
+            GraphPath<Point, Line> pathB = findPath(graph, startB, endB);
 
             if (pathA == null || pathB == null || pathA.getWeight() == 0 || pathB.getWeight() == 0)
                 continue;
@@ -81,5 +67,18 @@ public class SeparationDetectorTest {
 
         // 2% error is allowed due to numeric nonstability
         assertTrue(different < TEST_SIZE / 50);
+    }
+
+    private ProbabilisticRoadmap getProbabilisticRoadmap(int seed) {
+        return new ProbabilisticRoadmap(VERTICES, NN_RADIUS, new Point[]{}, new Rectangle(new Point(0, 0), new Point(SIZE, SIZE)), new ArrayList<Region>(), new Random(seed));
+    }
+
+    private GraphPath<Point, Line> findPath(Graph<Point, Line> graph, Point startA, final Point endA) {
+        return AStarShortestPathSimple.findPathBetween(graph, new HeuristicToGoal<Point>() {
+            @Override
+            public double getCostToGoalEstimate(Point current) {
+                return endA.distance(current);
+            }
+        }, startA, endA);
     }
 }
