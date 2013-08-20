@@ -27,7 +27,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
     private Graph<V, E> graph;
     private Specifics<V, E> specifics;
-    private Goal<V> goal;
+    private Goal<HNode<V>> goal;
     private ProjectionToComplexPlane<V> projection;
 
     private HValueIntegrator integrator;
@@ -37,7 +37,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
     private HashMap<E, Complex> lValues;
 
-    public HomotopyGraphWrapper(Graph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
+    public HomotopyGraphWrapper(Graph<V, E> graph, Goal<HNode<V>> goal, ProjectionToComplexPlane<V> projection,
                                 HValueIntegrator integrator, HClassProvider<V> provider, double precision) {
         this.graph = graph;
         this.specifics = SpecificsFactory.create(graph);
@@ -91,8 +91,10 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, opposite, vertex);
             Complex oppositeLValue = hValue.plus(increment);
 
-            if (goal.isGoal(opposite) && !policy.isAllowed(oppositeLValue, precision)) continue;
             HNode<V> source = wrapNode(opposite, oppositeLValue);
+
+            if (goal.isGoal(source) && !policy.isAllowed(oppositeLValue, precision))
+                continue;
 
             incomingEdges.add(new HEdge<V, E>(edge, source, target));
         }
@@ -114,8 +116,9 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
             Complex increment = lValueIncrement(edge, vertex, opposite);
             Complex oppositeLValue = lValue.plus(increment);
 
-            if (goal.isGoal(opposite) && !policy.isAllowed(oppositeLValue, precision)) continue;
             HNode<V> target = wrapNode(opposite, oppositeLValue);
+            if (goal.isGoal(target) && !policy.isAllowed(oppositeLValue, precision))
+                continue;
 
             outgoingEdges.add(new HEdge<V, E>(edge, source, target));
         }
