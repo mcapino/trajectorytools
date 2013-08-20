@@ -1,9 +1,9 @@
 package tt.planner.homotopy;
 
-import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
+import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-import org.jgrapht.graph.AbstractDirectedGraphWrapper;
+import org.jgrapht.graph.AbstractGraphWrapper;
 import org.jgrapht.util.Goal;
 import org.jscience.mathematics.number.Complex;
 import tt.planner.homotopy.hclass.HClass;
@@ -21,9 +21,9 @@ import java.util.Set;
  * homotopy classes simply using any graph path planing algorithm.
  */
 
-public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNode<V>, HEdge<V, E>> {
+public class HomotopyGraphWrapper<V, E> extends AbstractGraphWrapper<HNode<V>, HEdge<V, E>> {
 
-    private DirectedGraph<V, E> graph;
+    private Graph<V, E> graph;
     private Goal<V> goal;
     private ProjectionToComplexPlane<V> projection;
 
@@ -34,7 +34,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
 
     private HashMap<E, Complex> lValues;
 
-    public HomotopyGraphWrapper(DirectedGraph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
+    public HomotopyGraphWrapper(Graph<V, E> graph, Goal<V> goal, ProjectionToComplexPlane<V> projection,
                                 HValueIntegrator integrator, HClassProvider<V> provider, double precision) {
         this.graph = graph;
         this.goal = goal;
@@ -65,40 +65,9 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     }
 
     @Override
-    public Set<HEdge<V, E>> edgesOf(HNode<V> vertex) {
-        Set<HEdge<V, E>> edges = new HashSet<HEdge<V, E>>();
-        edges.addAll(incomingEdgesOf(vertex));
-        edges.addAll(outgoingEdgesOf(vertex));
-        return edges;
-    }
-
-    @Override
-    public Set<HEdge<V, E>> incomingEdgesOf(HNode<V> target) {
-        Set<HEdge<V, E>> incomingEdges = new HashSet<HEdge<V, E>>();
-        Set<E> originalEdges = graph.incomingEdgesOf(target.getNode());
-
-        V vertex = target.getNode();
-        Complex hValue = target.getHValue();
-
-        for (E edge : originalEdges) {
-            V opposite = Graphs.getOppositeVertex(graph, edge, vertex);
-
-            Complex increment = lValueIncrement(edge, opposite, vertex);
-            Complex oppositeLValue = hValue.plus(increment);
-
-            if (goal.isGoal(opposite) && !policy.isAllowed(oppositeLValue, precision)) continue;
-            HNode<V> source = wrapNode(opposite, oppositeLValue);
-
-            incomingEdges.add(new HEdge<V, E>(edge, source, target));
-        }
-
-        return incomingEdges;
-    }
-
-    @Override
-    public Set<HEdge<V, E>> outgoingEdgesOf(HNode<V> source) {
+    public Set<HEdge<V, E>> edgesOf(HNode<V> source) {
         Set<HEdge<V, E>> outgoingEdges = new HashSet<HEdge<V, E>>();
-        Set<E> originalEdges = graph.outgoingEdgesOf(source.getNode());
+        Set<E> originalEdges = graph.edgesOf(source.getNode());
 
         V vertex = source.getNode();
         Complex lValue = source.getHValue();
@@ -150,15 +119,5 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
     @Override
     public double getEdgeWeight(HEdge<V, E> hEdge) {
         return graph.getEdgeWeight(hEdge.getEdge());
-    }
-
-    @Override
-    public int inDegreeOf(HNode<V> vertex) {
-        return graph.inDegreeOf(vertex.getNode());
-    }
-
-    @Override
-    public int outDegreeOf(HNode<V> vertex) {
-        return graph.outDegreeOf(vertex.getNode());
     }
 }
