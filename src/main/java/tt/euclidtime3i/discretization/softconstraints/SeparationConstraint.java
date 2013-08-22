@@ -20,6 +20,8 @@ public class SeparationConstraint implements PairwiseConstraint {
         return integratePenalty(t1, new Trajectory[] {t2}, penaltyFunction, samplingInterval);
     }
 
+
+    //TODO implement for segmentedTrajectory
     public static double integratePenalty(
             Trajectory thisTrajectory,
             Trajectory[] otherTrajectories,

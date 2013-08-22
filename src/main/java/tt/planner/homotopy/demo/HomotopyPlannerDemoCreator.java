@@ -39,6 +39,8 @@ import java.util.List;
 
 public class HomotopyPlannerDemoCreator {
 
+    private static final boolean VISUALIZE = true;
+
     private static final int ITERATION_DELAY = 20;
     private ShortestPathProblem problem;
 
@@ -110,16 +112,18 @@ public class HomotopyPlannerDemoCreator {
             @Override
             public void exapanded(HNode<Point> expandedState) {
                 try {
-                    Thread.sleep(ITERATION_DELAY);
+                    if (VISUALIZE)
+                        Thread.sleep(ITERATION_DELAY);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        initializeVisualization();
-        showVisualization(visibilityGraph, aStar);
-
+        if (VISUALIZE) {
+            initializeVisualization();
+            showVisualization(visibilityGraph, aStar);
+        }
         GraphPath<HNode<Point>, HEdge<Point, Line>> path;
 
         for (int i = 0; i < 100; i++) {
