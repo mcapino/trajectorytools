@@ -1,21 +1,20 @@
 package tt.euclid2i.discretization;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
-
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
@@ -36,11 +35,11 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
             {-1, 1}, {0, 1}, {1, 1}};
 
     public static int[][] PATTERN_16_WAY = {
-                       {-1,-2},           {1,-2},
-            {-2, -1},  {-1, -1}, {0, -1}, {1, -1}, {2,-1},
-                       {-1, 0},           {1, 0},
-            {-2,  1},  {-1, 1},  {0, 1},  {1, 1},  {2, 1},
-                       {-1, 2},           {1, 2}};
+            {-1, -2}, {1, -2},
+            {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1},
+            {-1, 0}, {1, 0},
+            {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1},
+            {-1, 2}, {1, 2}};
 
     private Point initialPoint;
     private Rectangle bounds;
@@ -67,6 +66,11 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
         return (p.x - initialPoint.x) % step == 0 && (p.y - initialPoint.y) % step == 0 && bounds.isInside(p);
     }
 
+    private void checkEdgeIsInGraph(Point start, Point end) {
+        if (!containsVertex(start) || !containsVertex(end))
+            throw new RuntimeException("At least one of the nodes is not present in the graph");
+    }
+
     @Override
     public Set<Line> edgeSet() {
         throw new NotImplementedException();
@@ -82,6 +86,8 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
     @Override
     public Set<Line> getAllEdges(Point start, Point end) {
+        checkEdgeIsInGraph(start, end);
+
         Set<Line> edges = new HashSet<Line>();
         edges.add(new Line(start, end));
         edges.add(new Line(end, start));
@@ -90,6 +96,7 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
     @Override
     public Line getEdge(Point start, Point end) {
+        checkEdgeIsInGraph(start, end);
         return new Line(start, end);
     }
 
@@ -121,18 +128,15 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
     @Override
     public Set<Line> incomingEdgesOf(Point vertex) {
-        Set<Point> children = new HashSet<Point>();
-
-        for (int[] offset : pattern) {
-            Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
-            if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
-                children.add(child);
-            }
-        }
-
         Set<Line> edges = new HashSet<Line>();
-        for (Point child : children) {
-            edges.add(new Line(child, vertex));
+
+        if (containsVertex(vertex)) {
+            for (int[] offset : pattern) {
+                Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
+                if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
+                    edges.add(new Line(child, vertex));
+                }
+            }
         }
 
         return edges;
@@ -145,18 +149,15 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
     @Override
     public Set<Line> outgoingEdgesOf(Point vertex) {
-        Set<Point> children = new HashSet<Point>();
-
-        for (int[] offset : pattern) {
-            Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
-            if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
-                children.add(child);
-            }
-        }
-
         Set<Line> edges = new HashSet<Line>();
-        for (Point child : children) {
-            edges.add(new Line(vertex, child));
+
+        if (containsVertex(vertex)) {
+            for (int[] offset : pattern) {
+                Point child = new Point(vertex.x + offset[0], vertex.y + offset[1]);
+                if (bounds.isInside(child) && Util.isVisible(vertex, child, obstacles)) {
+                    edges.add(new Line(vertex, child));
+                }
+            }
         }
 
         return edges;
