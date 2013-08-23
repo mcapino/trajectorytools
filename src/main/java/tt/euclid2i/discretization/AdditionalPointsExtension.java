@@ -8,7 +8,6 @@ import org.jgrapht.util.GraphBuilder;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,10 +20,6 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
 
     HashMap<Point, Set<Line>> newIncomingEdges;
     HashMap<Point, Set<Line>> newOutgoingEdges;
-
-    public AdditionalPointsExtension(DirectedGraph<Point, Line> graph, Point goal, int radius) {
-        this(graph, Collections.singleton(goal), radius);
-    }
 
     public AdditionalPointsExtension(DirectedGraph<Point, Line> graph, Set<Point> points, int radius) {
         super();
