@@ -51,7 +51,7 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
             }
 
             newIncomingEdges.put(newPoint, incoming);
-            newIncomingEdges.put(newPoint, outgoing);
+            newOutgoingEdges.put(newPoint, outgoing);
         }
     }
 
