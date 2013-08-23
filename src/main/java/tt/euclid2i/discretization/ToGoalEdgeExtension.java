@@ -118,7 +118,7 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
                 edges.add(new Line(vertex, point));
         }
 
-        return graph.outgoingEdgesOf(vertex);
+        return edges;
     }
 
     public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
