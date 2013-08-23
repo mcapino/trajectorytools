@@ -1,11 +1,8 @@
 package org.jgrapht.util;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-
 import org.jgrapht.DirectedGraph;
+
+import java.util.*;
 
 /**
  * This class provides methods that can build an explicit representation of a graph from its implicit representation.
@@ -13,20 +10,32 @@ import org.jgrapht.DirectedGraph;
 public class GraphBuilder {
 
     public static <V, E> DirectedGraph<V, E> build(DirectedGraph<V, E> implicitGraph, DirectedGraph<V, E> explicitGraph, V init) {
+        return build(implicitGraph, explicitGraph, Collections.singletonList(init), Integer.MAX_VALUE);
+    }
+
+    public static <V, E> DirectedGraph<V, E> build(DirectedGraph<V, E> implicitGraph,
+                                                   DirectedGraph<V, E> emptyExplicitGraph,
+                                                   Collection<V> init,
+                                                   int maxVertices) {
 
         Queue<V> open = new LinkedList<V>();
-        open.offer(init);
         Set<V> closed = new HashSet<V>();
 
-        while (!open.isEmpty()) {
+        for (V v : init) {
+            open.offer(v);
+        }
+
+        int counter = 0;
+
+        while (!open.isEmpty() && counter++ < maxVertices) {
             V current = open.poll();
-            explicitGraph.addVertex(current);
+            emptyExplicitGraph.addVertex(current);
 
             Set<E> outEdges = implicitGraph.outgoingEdgesOf(current);
             for (E edge : outEdges) {
                 V target = implicitGraph.getEdgeTarget(edge);
-                explicitGraph.addVertex(target);
-                explicitGraph.addEdge(current, target, edge);
+                emptyExplicitGraph.addVertex(target);
+                emptyExplicitGraph.addEdge(current, target, edge);
 
                 if (!closed.contains(target)) {
                     closed.add(target);
@@ -35,6 +44,6 @@ public class GraphBuilder {
             }
         }
 
-        return explicitGraph;
+        return emptyExplicitGraph;
     }
 }
