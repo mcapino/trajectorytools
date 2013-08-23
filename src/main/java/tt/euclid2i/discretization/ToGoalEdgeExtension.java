@@ -37,7 +37,7 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
     }
 
     private void prepareNewEdges() {
-        Set<Point> vertexSet = vertexSet();
+        Set<Point> vertexSet = graph.vertexSet();
         for (Point newPoint : points) {
             Set<Line> incoming = new HashSet<Line>();
             Set<Line> outgoing = new HashSet<Line>();
