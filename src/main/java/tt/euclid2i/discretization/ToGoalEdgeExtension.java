@@ -119,7 +119,15 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
     @Override
     public Set<Line> incomingEdgesOf(Point vertex) {
         if (graph.containsVertex(vertex)) {
-            return graph.incomingEdgesOf(vertex);
+            Set<Line> edges = new HashSet<Line>();
+            edges.addAll(graph.incomingEdgesOf(vertex));
+
+            for (Point point : points) {
+                if (vertex.distance(point) <= radius)
+                    edges.add(new Line(point, vertex));
+            }
+
+            return edges;
 
         } else if (points.contains(vertex)) {
             return newIncomingEdges.get(vertex);
@@ -137,8 +145,15 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
     @Override
     public Set<Line> outgoingEdgesOf(Point vertex) {
         if (graph.containsVertex(vertex)) {
-            return graph.outgoingEdgesOf(vertex);
+            Set<Line> edges = new HashSet<Line>();
+            edges.addAll(graph.outgoingEdgesOf(vertex));
 
+            for (Point point : points) {
+                if (vertex.distance(point) <= radius)
+                    edges.add(new Line(vertex, point));
+            }
+
+            return edges;
         } else if (points.contains(vertex)) {
             return newOutgoingEdges.get(vertex);
 
