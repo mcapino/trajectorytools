@@ -68,6 +68,8 @@ public class TrajectoryLayer extends CommonLayer {
                             if (previous != null && point.distance(previous) == 0)
                                 continue;
 
+                            previous = point;
+
                             if (point != null) {
                                 points.add(new StyledPointImpl(new Point3d(point.x, point.y, 0), color, pointSize));
                             }
