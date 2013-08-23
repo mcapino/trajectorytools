@@ -32,6 +32,26 @@ public class Line {
         return String.format("(%s : %s)", start, end);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Line line = (Line) o;
+
+        if (end != null ? !end.equals(line.end) : line.end != null) return false;
+        if (start != null ? !start.equals(line.start) : line.start != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = start != null ? start.hashCode() : 0;
+        result = 31 * result + (end != null ? end.hashCode() : 0);
+        return result;
+    }
+
     /*
     @Override
     public Trajectory getTrajectory(final double startTime) {
