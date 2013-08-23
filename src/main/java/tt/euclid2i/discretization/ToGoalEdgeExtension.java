@@ -7,57 +7,33 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
+import tt.util.NotImplementedException;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Line> {
 
     DirectedGraph<Point, Line> graph;
-    Set<Point> points;
+    Point goalPoint;
     int radius;
 
-    HashMap<Point, Set<Line>> newIncomingEdges;
-    HashMap<Point, Set<Line>> newOutgoingEdges;
-
-    public ToGoalEdgeExtension(DirectedGraph<Point, Line> graph, Point goal, int radius) {
-        this(graph, Collections.singleton(goal), radius);
-    }
-
-    public ToGoalEdgeExtension(DirectedGraph<Point, Line> graph, Set<Point> points, int radius) {
+    public ToGoalEdgeExtension(DirectedGraph<Point, Line> graph,
+                               Point goalPoint, int radius) {
         super();
         this.graph = graph;
-        this.points = points;
+        this.goalPoint = goalPoint;
         this.radius = radius;
-        this.newIncomingEdges = new HashMap<Point, Set<Line>>();
-        this.newOutgoingEdges = new HashMap<Point, Set<Line>>();
-        prepareNewEdges();
-    }
-
-    private void prepareNewEdges() {
-        Set<Point> vertexSet = graph.vertexSet();
-        for (Point newPoint : points) {
-            Set<Line> incoming = new HashSet<Line>();
-            Set<Line> outgoing = new HashSet<Line>();
-
-            for (Point graphPoint : vertexSet) {
-                if (newPoint.distance(graphPoint) > radius)
-                    continue;
-
-                incoming.add(new Line(graphPoint, newPoint));
-                outgoing.add(new Line(newPoint, graphPoint));
-            }
-
-            newIncomingEdges.put(newPoint, incoming);
-            newOutgoingEdges.put(newPoint, outgoing);
-        }
     }
 
     @Override
     public boolean containsVertex(Point p) {
-        return graph.containsVertex(p) || points.contains(p);
+        return graph.containsVertex(p) || goalPoint.equals(p);
+    }
+
+    @Override
+    public Set<Line> edgeSet() {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -70,24 +46,15 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
 
     @Override
     public Set<Line> getAllEdges(Point start, Point end) {
-        checkEdgeIsInGraph(start, end);
-
         Set<Line> edges = new HashSet<Line>();
         edges.add(new Line(start, end));
         edges.add(new Line(end, start));
-
         return edges;
     }
 
     @Override
     public Line getEdge(Point start, Point end) {
-        checkEdgeIsInGraph(start, end);
         return new Line(start, end);
-    }
-
-    private void checkEdgeIsInGraph(Point start, Point end) {
-        if (!containsVertex(start) || !containsVertex(end))
-            throw new RuntimeException("At least one of the nodes is not present in the graph");
     }
 
     @Override
@@ -118,22 +85,10 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
 
     @Override
     public Set<Line> incomingEdgesOf(Point vertex) {
-        if (graph.containsVertex(vertex)) {
-            Set<Line> edges = new HashSet<Line>();
-            edges.addAll(graph.incomingEdgesOf(vertex));
-
-            for (Point point : points) {
-                if (vertex.distance(point) <= radius)
-                    edges.add(new Line(point, vertex));
-            }
-
-            return edges;
-
-        } else if (points.contains(vertex)) {
-            return newIncomingEdges.get(vertex);
-
+        if (vertex.equals(goalPoint)) {
+            throw new NotImplementedException();
         } else {
-            throw new RuntimeException("Decorated graph and decorator itself do not contain vertex" + vertex);
+            return graph.incomingEdgesOf(vertex);
         }
     }
 
@@ -144,21 +99,14 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
 
     @Override
     public Set<Line> outgoingEdgesOf(Point vertex) {
-        if (graph.containsVertex(vertex)) {
+
+        if (vertex.distance(goalPoint) <= radius) {
             Set<Line> edges = new HashSet<Line>();
             edges.addAll(graph.outgoingEdgesOf(vertex));
-
-            for (Point point : points) {
-                if (vertex.distance(point) <= radius)
-                    edges.add(new Line(vertex, point));
-            }
-
+            edges.add(new Line(vertex, goalPoint));
             return edges;
-        } else if (points.contains(vertex)) {
-            return newOutgoingEdges.get(vertex);
-
         } else {
-            throw new RuntimeException("Decorated graph and decorator itself do not contain vertex" + vertex);
+            return graph.outgoingEdgesOf(vertex);
         }
     }
 
