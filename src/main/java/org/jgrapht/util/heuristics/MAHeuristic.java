@@ -29,7 +29,7 @@ public class MAHeuristic<S, M, E> implements HeuristicToGoal<M> {
         Map<S, Double>[] shortestDistances = new Map[size];
 
         for (int i = 0; i < size; i++) {
-            shortestDistances[i] = CustomAStar.calculateDistancesToGoal(graph, goals[i]);
+            shortestDistances[i] = DijkstraShortestPath.calculateDistancesToGoal(graph, goals[i]);
         }
 
         return shortestDistances;
@@ -51,22 +51,22 @@ public class MAHeuristic<S, M, E> implements HeuristicToGoal<M> {
         return estimate;
     }
 
-    private static class CustomAStar<S, E> extends AStarShortestPathSimple<S, E> {
+    private static class DijkstraShortestPath<S, E> extends AStarShortestPathSimple<S, E> {
 
-        public static <S, E> Map<S, Double> calculateDistancesToGoal(Graph<S, E> graph, S goal) {
-            CustomAStar<S, E> astar = new CustomAStar<S, E>(graph, new ZeroHeuristic<S>(), goal, new Goal<S>() {
+        private static <S, E> Map<S, Double> calculateDistancesToGoal(Graph<S, E> graph, S goal) {
+            DijkstraShortestPath<S, E> alg = new DijkstraShortestPath<S, E>(graph, goal, new Goal<S>() {
                 @Override
                 public boolean isGoal(S current) {
                     return false;
                 }
             });
 
-            astar.findPath(Integer.MAX_VALUE);
-            return astar.getShortestDistances();
+            alg.findPath(Integer.MAX_VALUE);
+            return alg.getShortestDistances();
         }
 
-        private CustomAStar(Graph<S, E> graph, HeuristicToGoal<S> heuristic, S startVertex, Goal<S> goal) {
-            super(graph, heuristic, startVertex, goal);
+        private DijkstraShortestPath(Graph<S, E> graph, S startVertex, Goal<S> goal) {
+            super(graph, new ZeroHeuristic<S>(), startVertex, goal);
         }
 
         public Map<S, Double> getShortestDistances() {
