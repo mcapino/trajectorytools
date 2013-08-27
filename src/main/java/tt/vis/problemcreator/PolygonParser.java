@@ -37,7 +37,7 @@ public class PolygonParser {
         }
     }
 
-    private static List<Region> load(String file) {
+    public static List<Region> load(String file) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(file)));
             List<Region> polygons = new ArrayList<Region>();
