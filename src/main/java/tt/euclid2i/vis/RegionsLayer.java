@@ -15,7 +15,7 @@ import cz.agents.alite.vis.layer.VisLayer;
 public class RegionsLayer extends AbstractLayer {
 
     public interface RegionsProvider {
-        public Collection<Region> getRegions();
+        public Collection<? extends Region> getRegions();
     }
 
     private RegionsProvider regionsProvider;
@@ -36,7 +36,7 @@ public class RegionsLayer extends AbstractLayer {
 
         super.paint(canvas);
 
-        Collection<Region> regions = regionsProvider.getRegions();
+        Collection<? extends Region> regions = regionsProvider.getRegions();
 
         for (Region region : regions) {
             if (region instanceof Rectangle) {
