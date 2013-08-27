@@ -1,22 +1,21 @@
 package tt.euclid2i.util;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Random;
-
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
+
 public class Util {
 
-    public static boolean isVisible(Point start, Point end, Collection<Region> obstacles) {
+    public static boolean isVisible(Point start, Point end, Collection<? extends Region> obstacles) {
         // check obstacles
         for (Region obstacle : obstacles) {
             if (obstacle.isInside(start) || obstacle.isInside(end) || obstacle.intersectsLine(start, end)) {
@@ -26,7 +25,7 @@ public class Util {
         return true;
     }
 
-    public static boolean isInFreeSpace(Point point, Collection<Region> obstacles) {
+    public static boolean isInFreeSpace(Point point, Collection<? extends Region> obstacles) {
         for (Region obstacle : obstacles) {
             if (obstacle.isInside(point)) {
                 return false;
@@ -36,7 +35,7 @@ public class Util {
         return true;
     }
 
-    public static Point sampleFreeSpace(Rectangle bounds, Collection<Region> obstacles, Random random) {
+    public static Point sampleFreeSpace(Rectangle bounds, Collection<? extends Region> obstacles, Random random) {
 
         Point point;
         do {
@@ -52,13 +51,13 @@ public class Util {
         return new Point(x, y);
     }
 
-    public static DirectedGraph<Point, Line> getVisibilityGraph(Point start, Point goal, Collection<Rectangle> polygons) {
+    public static DirectedGraph<Point, Line> getVisibilityGraph(Point start, Point goal, Collection<? extends Rectangle> polygons) {
         @SuppressWarnings("serial")
         DirectedGraph<Point, Line> graph = new DefaultDirectedWeightedGraph<Point, Line>(new EdgeFactory<Point, Line>() {
 
             @Override
             public Line createEdge(Point start,
-                    Point end) {
+                                   Point end) {
                 return new Line(start, end);
             }
         }) {
@@ -89,8 +88,8 @@ public class Util {
 
         Point[] points = graph.vertexSet().toArray(new Point[0]);
 
-        for (int i=0; i<points.length; i++) {
-            for (int j=i+1; j<points.length; j++) {
+        for (int i = 0; i < points.length; i++) {
+            for (int j = i + 1; j < points.length; j++) {
                 if (Util.isVisible(points[i], points[j], obstacles)) {
                     Line edge1 = graph.addEdge(points[i], points[j]);
                     Line edge2 = graph.addEdge(points[j], points[i]);
@@ -101,7 +100,7 @@ public class Util {
         return graph;
     }
 
-    public static Collection<Region> inflateRegions(Collection<Region> obstacles, int agentBodyRadius) {
+    public static Collection<Region> inflateRegions(Collection<? extends Region> obstacles, int agentBodyRadius) {
         Collection<Region> inflatedRegions = new LinkedList<Region>();
         for (Region region : obstacles) {
             if (region instanceof Polygon) {
