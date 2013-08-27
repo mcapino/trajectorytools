@@ -17,6 +17,7 @@ import java.util.Collection;
 public class ProblemCreatorLayer extends GroupLayer {
 
     private static final char SAVE_POLYGON = 32;
+    private static final char SAVE_LIST = 's';
     private static final char REMOVE_POLYGON = 8;
 
     private PolygonCreator polygonCreator;
@@ -42,6 +43,11 @@ public class ProblemCreatorLayer extends GroupLayer {
             case REMOVE_POLYGON:
                 polygonCreator.clearLast();
                 break;
+
+            case SAVE_LIST:
+                polygonCreator.savePolygon();
+                polygonCreator.saveList();
+                break;
         }
     }
 
@@ -64,13 +70,13 @@ public class ProblemCreatorLayer extends GroupLayer {
             public Collection<? extends Region> getRegions() {
                 return polygonCreator.getPolygons();
             }
-        }, Color.black, transparent(Color.gray, 128)));
+        }, Color.black, Color.gray));
         addSubLayer(RegionsLayer.create(new RegionsLayer.RegionsProvider() {
             @Override
             public Collection<? extends Region> getRegions() {
                 return polygonCreator.getCurrent();
             }
-        }, Color.black, transparent(Color.red, 128)));
+        }, Color.black, Color.red));
 
         initializeListeners();
     }

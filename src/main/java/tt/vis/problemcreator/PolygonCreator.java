@@ -1,19 +1,25 @@
 package tt.vis.problemcreator;
 
+import cz.agents.alite.vis.Vis;
 import tt.euclid2i.Point;
 import tt.euclid2i.region.Polygon;
 
+import javax.swing.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PolygonCreator {
 
-    private LinkedList<Polygon> polygons;
+    private List<Polygon> polygons;
     private Polygon current;
 
     public PolygonCreator() {
-        polygons = new LinkedList<Polygon>();
+        polygons = new ArrayList<Polygon>();
     }
 
     public List<Polygon> getPolygons() {
@@ -49,7 +55,24 @@ public class PolygonCreator {
             current = null;
         } else {
             if (!polygons.isEmpty())
-                polygons.removeLast();
+                polygons.remove(polygons.size() - 1);
+
+        }
+    }
+
+    public void saveList() {
+        String name = JOptionPane.showInputDialog(Vis.getInstance(), "Save as");
+
+        try {
+            ObjectOutputStream strem = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File("name"))));
+
+            strem.writeObject(polygons);
+            strem.flush();
+            strem.close();
+
+            JOptionPane.showMessageDialog(Vis.getInstance(), "LinkedList<Polygon> serialized successfully", "Successful", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Vis.getInstance(), "LinkedList<Polygon> serialized unsuccessful", "Unsuccessful", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

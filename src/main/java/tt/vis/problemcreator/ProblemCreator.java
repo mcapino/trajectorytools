@@ -1,7 +1,6 @@
 package tt.vis.problemcreator;
 
 import cz.agents.alite.vis.VisManager;
-import cz.agents.alite.vis.layer.common.BackgroundLayer;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 import tt.vis.PictureLayer;
