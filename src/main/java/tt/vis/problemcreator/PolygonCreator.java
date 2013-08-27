@@ -5,7 +5,9 @@ import tt.euclid2i.Point;
 import tt.euclid2i.region.Polygon;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,11 +66,7 @@ public class PolygonCreator {
             if (name == null || name.isEmpty())
                 throw new RuntimeException("Empty name");
 
-            ObjectOutputStream objectStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(name + ".linkedlist"))));
             BufferedWriter textWriter = new BufferedWriter(new FileWriter(new File(name + ".txt")));
-
-            objectStream.writeObject(polygons);
-            objectStream.flush();
 
             for (Polygon polygon : polygons) {
                 for (Point point : polygon.getPoints()) {
@@ -77,8 +75,6 @@ public class PolygonCreator {
                 textWriter.newLine();
             }
             textWriter.flush();
-
-            objectStream.close();
             textWriter.close();
 
             JOptionPane.showMessageDialog(Vis.getInstance(), "List of polygons saved successfully", "Successful", JOptionPane.INFORMATION_MESSAGE);
