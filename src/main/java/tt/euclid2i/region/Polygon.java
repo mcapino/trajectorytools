@@ -4,9 +4,10 @@ import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Polygon implements Region{
+public class Polygon implements Region, Serializable{
 
     private Point[] points;
 
