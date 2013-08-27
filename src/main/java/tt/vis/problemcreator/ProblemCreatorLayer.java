@@ -16,9 +16,9 @@ import java.util.Collection;
 
 public class ProblemCreatorLayer extends GroupLayer {
 
-    private static final char SAVE_POLYGON = 32;
+    private static final char SAVE_POLYGON = ' ';   //space
     private static final char SAVE_LIST = 's';
-    private static final char REMOVE_POLYGON = 8;
+    private static final char REMOVE_POLYGON = 8;   //backspace
 
     private PolygonCreator polygonCreator;
 
@@ -76,7 +76,7 @@ public class ProblemCreatorLayer extends GroupLayer {
             public Collection<? extends Region> getRegions() {
                 return polygonCreator.getCurrent();
             }
-        }, Color.black, Color.red));
+        }, Color.black, transparent(Color.red, 128)));
 
         initializeListeners();
     }

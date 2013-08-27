@@ -64,7 +64,9 @@ public class PolygonCreator {
         String name = JOptionPane.showInputDialog(Vis.getInstance(), "Save as");
 
         try {
-            ObjectOutputStream strem = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File("name"))));
+            File f = new File(name);
+            ObjectOutputStream strem = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+            System.out.println(f.getAbsolutePath());
 
             strem.writeObject(polygons);
             strem.flush();
