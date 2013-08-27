@@ -3,17 +3,17 @@ package tt.vis.problemcreator;
 import tt.euclid2i.Point;
 import tt.euclid2i.region.Polygon;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PolygonCreator {
 
-    private List<Polygon> polygons;
+    private LinkedList<Polygon> polygons;
     private Polygon current;
 
     public PolygonCreator() {
-        polygons = new ArrayList<Polygon>();
+        polygons = new LinkedList<Polygon>();
     }
 
     public List<Polygon> getPolygons() {
@@ -41,6 +41,15 @@ public class PolygonCreator {
         if (current != null) {
             polygons.add(current);
             current = null;
+        }
+    }
+
+    public void clearLast() {
+        if (current != null) {
+            current = null;
+        } else {
+            if (!polygons.isEmpty())
+                polygons.removeLast();
         }
     }
 }

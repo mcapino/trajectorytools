@@ -18,11 +18,28 @@ import java.util.Collection;
 
 public class ProblemCreator {
 
+    private static final char SAVE_POLYGON = 32;
+    private static final char REMOVE_POLYGON = 8;
+
     private PolygonCreator polygonCreator;
 
     public ProblemCreator() {
         this.polygonCreator = new PolygonCreator();
         initialize();
+    }
+
+    private void handleKey(KeyEvent e) {
+        System.out.println((int) e.getKeyChar());
+
+        switch (e.getKeyChar()) {
+            case SAVE_POLYGON:
+                polygonCreator.savePolygon();
+                break;
+
+            case REMOVE_POLYGON:
+                polygonCreator.clearLast();
+                break;
+        }
     }
 
     private void handleMouse(MouseEvent e) {
@@ -33,19 +50,9 @@ public class ProblemCreator {
 
     private void addPointToPolygon() {
         Point2d cursor = Vis.getCursorPosition();
-
         int x = (int) Vis.transInvX((int) cursor.x);
         int y = (int) Vis.transInvY((int) cursor.y);
-
         polygonCreator.addPoint(new Point(x, y));
-    }
-
-    private void handleKey(KeyEvent e) {
-        if (e.getKeyChar() == ' ') {
-            polygonCreator.savePolygon();
-        } else {
-            System.out.println(e.getKeyChar());
-        }
     }
 
     private void initialize() {
@@ -68,13 +75,13 @@ public class ProblemCreator {
             public Collection<? extends Region> getRegions() {
                 return polygonCreator.getPolygons();
             }
-        }, Color.black, Color.gray));
+        }, Color.black, transparent(Color.gray, 128)));
         VisManager.registerLayer(RegionsLayer.create(new RegionsLayer.RegionsProvider() {
             @Override
             public Collection<? extends Region> getRegions() {
                 return polygonCreator.getCurrent();
             }
-        }, Color.black, Color.red));
+        }, Color.black, transparent(Color.red, 128)));
 
         initializeListeners();
 
@@ -97,6 +104,10 @@ public class ProblemCreator {
                 handleKey(e);
             }
         });
+    }
+
+    private static Color transparent(Color c, int a) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
     }
 
     public static void main(String[] args) {
