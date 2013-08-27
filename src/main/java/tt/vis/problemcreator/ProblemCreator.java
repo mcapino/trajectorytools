@@ -1,11 +1,14 @@
 package tt.vis.problemcreator;
 
 import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.layer.common.BackgroundLayer;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
+import tt.vis.PictureLayer;
 
 import javax.vecmath.Point2d;
 import java.awt.*;
+import java.io.File;
 
 public class ProblemCreator {
 
@@ -28,8 +31,8 @@ public class ProblemCreator {
             }
         });
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
+        VisManager.registerLayer(PictureLayer.create(new File("/home/tisek/Pictures/dejvice.png")));
         VisManager.registerLayer(ProblemCreatorLayer.create());
-
         VisManager.registerLayer(VisInfoLayer.create());
         VisManager.init();
     }
