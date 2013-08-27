@@ -58,9 +58,12 @@ public class PolygonCreator {
     }
 
     public void saveList() {
-        String name = JOptionPane.showInputDialog(Vis.getInstance(), "Save as");
+        String name = JOptionPane.showInputDialog(Vis.getInstance(), "Save as (absolute path or relative to the project's root)");
 
         try {
+            if (name == null || name.isEmpty())
+                throw new RuntimeException("Empty name");
+
             ObjectOutputStream objectStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(name + ".linkedlist"))));
             BufferedWriter textWriter = new BufferedWriter(new FileWriter(new File(name + ".txt")));
 
@@ -80,7 +83,7 @@ public class PolygonCreator {
 
             JOptionPane.showMessageDialog(Vis.getInstance(), "List of polygons saved successfully", "Successful", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(Vis.getInstance(), "Error while saving list of polygons", "Unsuccessful", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Vis.getInstance(), "Could not save", "Unsuccessful", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
