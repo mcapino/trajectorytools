@@ -3,7 +3,8 @@ package tt.euclid2i.region;
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
-import tt.util.NotImplementedException;
+
+import java.util.Arrays;
 
 public class Polygon implements Region{
 
@@ -12,6 +13,12 @@ public class Polygon implements Region{
     public Polygon(Point[] points) {
         super();
         this.points = points;
+    }
+
+    public void addPoint(Point point) {
+        int len = points.length;
+        points = Arrays.copyOf(points, len + 1);
+        points[len] = point;
     }
 
     @Override
