@@ -18,16 +18,37 @@ import java.util.Collection;
 
 public class ProblemCreator {
 
-    private PolygonCreator creator;
+    private PolygonCreator polygonCreator;
 
     public ProblemCreator() {
-        preinit();
-        this.creator = new PolygonCreator();
-        listenersInit();
-        afterInit();
+        this.polygonCreator = new PolygonCreator();
+        initialize();
     }
 
-    private void preinit() {
+    private void handleMouse(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            addPointToPolygon();
+        }
+    }
+
+    private void addPointToPolygon() {
+        Point2d cursor = Vis.getCursorPosition();
+
+        int x = (int) Vis.transInvX((int) cursor.x);
+        int y = (int) Vis.transInvY((int) cursor.y);
+
+        polygonCreator.addPoint(new Point(x, y));
+    }
+
+    private void handleKey(KeyEvent e) {
+        if (e.getKeyChar() == ' ') {
+            polygonCreator.savePolygon();
+        } else {
+            System.out.println(e.getKeyChar());
+        }
+    }
+
+    private void initialize() {
         VisManager.setInitParam("Problem creator", 1024, 768, 200, 200);
         VisManager.setSceneParam(new VisManager.SceneParams() {
 
@@ -45,48 +66,37 @@ public class ProblemCreator {
         VisManager.registerLayer(RegionsLayer.create(new RegionsLayer.RegionsProvider() {
             @Override
             public Collection<? extends Region> getRegions() {
-                return creator.getPolygons();
+                return polygonCreator.getPolygons();
             }
         }, Color.black, Color.gray));
         VisManager.registerLayer(RegionsLayer.create(new RegionsLayer.RegionsProvider() {
             @Override
             public Collection<? extends Region> getRegions() {
-                return creator.getCurrent();
+                return polygonCreator.getCurrent();
             }
         }, Color.black, Color.red));
+
+        initializeListeners();
+
+        VisManager.registerLayer(VisInfoLayer.create());
+        VisManager.init();
     }
 
-    private void listenersInit() {
+    private void initializeListeners() {
         Vis vis = Vis.getInstance();
 
         vis.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    Point2d cursor = Vis.getCursorPosition();
-
-                    int x = (int) Vis.transInvX((int) cursor.x);
-                    int y = (int) Vis.transInvY((int) cursor.y);
-
-                    creator.addPoint(new Point(x, y));
-                }
+                handleMouse(e);
             }
         });
         vis.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == ' ') {
-                    creator.savePolygon();
-                } else {
-                    System.out.println(e.getKeyChar());
-                }
+                handleKey(e);
             }
         });
-    }
-
-    private void afterInit() {
-        VisManager.registerLayer(VisInfoLayer.create());
-        VisManager.init();
     }
 
     public static void main(String[] args) {
