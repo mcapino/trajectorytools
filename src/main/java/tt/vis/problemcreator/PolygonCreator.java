@@ -5,10 +5,7 @@ import tt.euclid2i.Point;
 import tt.euclid2i.region.Polygon;
 
 import javax.swing.*;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,17 +61,29 @@ public class PolygonCreator {
         String name = JOptionPane.showInputDialog(Vis.getInstance(), "Save as");
 
         try {
-            File f = new File(name);
-            ObjectOutputStream strem = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
-            System.out.println(f.getAbsolutePath());
+            ObjectOutputStream objectStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(name + ".linkedlist"))));
+            BufferedWriter textWriter = new BufferedWriter(new FileWriter(new File(name + ".txt")));
 
-            strem.writeObject(polygons);
-            strem.flush();
-            strem.close();
+            objectStream.writeObject(polygons);
+            objectStream.flush();
 
-            JOptionPane.showMessageDialog(Vis.getInstance(), "LinkedList<Polygon> serialized successfully", "Successful", JOptionPane.INFORMATION_MESSAGE);
+            for (Polygon polygon : polygons) {
+                for (Point point : polygon.getPoints()) {
+                    textWriter.write(String.format("%d %d%n", point.x, point.y));
+                }
+                textWriter.newLine();
+            }
+            textWriter.flush();
+
+            objectStream.close();
+            textWriter.close();
+
+            JOptionPane.showMessageDialog(Vis.getInstance(), "List of polygons saved successfully", "Successful", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(Vis.getInstance(), "LinkedList<Polygon> serialized unsuccessful", "Unsuccessful", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Vis.getInstance(), "Error while saving list of polygons", "Unsuccessful", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
+
+
+
