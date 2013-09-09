@@ -58,7 +58,7 @@ public class SeparationDetectorTest {
             trajectories.add(trajectoryB);
 
             boolean colideNumeric = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, trajectories, SEP_RADIUS, 1);
-            boolean colideAnalytic = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, segmentedTrajectories, SEP_RADIUS);
+            boolean colideAnalytic = SeparationDetector.hasAnyPairwiseConflictAnalytic(trajectoryA, segmentedTrajectories, SEP_RADIUS);
 
             if (colideNumeric != colideAnalytic) {
                 different++;
