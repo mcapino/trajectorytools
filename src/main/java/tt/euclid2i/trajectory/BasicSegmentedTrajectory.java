@@ -1,11 +1,11 @@
 package tt.euclid2i.trajectory;
 
+import java.util.List;
+
 import tt.euclid2i.EvaluatedTrajectory;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclidtime3i.discretization.Straight;
-
-import java.util.List;
 
 public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedTrajectory {
 
@@ -86,4 +86,48 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     public double getCost() {
         return cost;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((segments == null) ? 0 : segments.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BasicSegmentedTrajectory other = (BasicSegmentedTrajectory) obj;
+        if (segments == null) {
+            if (other.segments != null)
+                return false;
+        } else if (!segments.equals(other.segments))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+
+        if (!segments.isEmpty()) {
+            sb.append(" " + segments.get(0).getStart());
+        }
+
+        for (Straight maneuver: segments) {
+            sb.append(" " + maneuver.getEnd());
+        }
+        sb.append("");
+        return sb.toString();
+    }
+
+
 }

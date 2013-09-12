@@ -111,7 +111,7 @@ public class SeparationSoftconstraintDemoCreator implements Creator {
                         }
                 );
 
-        final tt.euclidtime3i.Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory<Point, Straight>(path, path.getEndVertex().getTime()));
+        final tt.euclidtime3i.Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory(path, path.getEndVertex().getTime()));
 
         // Draw Graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {

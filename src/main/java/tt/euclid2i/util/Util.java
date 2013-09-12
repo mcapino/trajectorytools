@@ -1,17 +1,20 @@
 package tt.euclid2i.util;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.EdgeFactory;
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import tt.euclid2i.Line;
-import tt.euclid2i.Point;
-import tt.euclid2i.Region;
-import tt.euclid2i.region.Polygon;
-import tt.euclid2i.region.Rectangle;
-
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+
+import tt.euclid2i.Line;
+import tt.euclid2i.Point;
+import tt.euclid2i.Region;
+import tt.euclid2i.Trajectory;
+import tt.euclid2i.region.Polygon;
+import tt.euclid2i.region.Rectangle;
 
 public class Util {
 
@@ -110,6 +113,14 @@ public class Util {
             }
         }
         return inflatedRegions;
+    }
+
+    public static void exportTrajectory(Trajectory trajectory, PrintWriter writer,int samplingInterval, int maxTime) {
+        for (int t=trajectory.getMinTime(); t < trajectory.getMaxTime() && t < maxTime ;t += samplingInterval) {
+            Point pos = trajectory.get(t);
+            writer.print(t + " " + pos.x + " " + pos.y + ", " );
+        }
+        writer.flush();
     }
 
 }

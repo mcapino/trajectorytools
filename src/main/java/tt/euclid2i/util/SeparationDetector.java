@@ -12,7 +12,7 @@ import java.util.List;
 
 public class SeparationDetector {
 
-    public static boolean hasAnyPairwiseConflict(SegmentedTrajectory thisTrajectory, Collection<SegmentedTrajectory> otherTrajectoriesCollection, int separation) {
+    public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, Collection<SegmentedTrajectory> otherTrajectoriesCollection, int separation) {
 
         for (SegmentedTrajectory otherTrajectory : otherTrajectoriesCollection) {
 

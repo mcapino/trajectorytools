@@ -15,7 +15,7 @@ import cz.agents.alite.vis.layer.VisLayer;
 public class RegionsLayer extends AbstractLayer {
 
     public interface RegionsProvider {
-        public Collection<? extends Region> getRegions();
+        Collection<? extends Region> getRegions();
     }
 
     private RegionsProvider regionsProvider;
