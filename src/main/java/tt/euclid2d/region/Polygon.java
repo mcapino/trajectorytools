@@ -1,7 +1,10 @@
 package tt.euclid2d.region;
 
-import javax.vecmath.Vector2d;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import tt.euclid2d.Point;
 import tt.euclid2d.util.Intersection;
 
@@ -15,8 +18,8 @@ public class Polygon {
     }
 
     public boolean intersectsLine(Point p1, Point p2) {
-        for (int i = 0; i < points.length-1; i++) {
-            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, points[i].x, points[i].y, points[i+1].x, points[i+1].y, true)) {
+        for (int i = 0; i < points.length - 1; i++) {
+            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, true)) {
                 return true;
             }
         }
@@ -25,16 +28,16 @@ public class Polygon {
     }
 
     public boolean isInside(Point p) {
-          int i;
-          int j;
-          boolean result = false;
-          for (i = 0, j = points.length - 1; i < points.length; j = i++) {
+        int i;
+        int j;
+        boolean result = false;
+        for (i = 0, j = points.length - 1; i < points.length; j = i++) {
             if ((points[i].y > p.y) != (points[j].y > p.y) &&
-                (p.x < (points[j].x - points[i].x) * (p.y - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
-              result = !result;
-             }
-          }
-          return result;
+                    (p.x < (points[j].x - points[i].x) * (p.y - points[i].y) / (points[j].y - points[i].y) + points[i].x)) {
+                result = !result;
+            }
+        }
+        return result;
 
     }
 
@@ -43,53 +46,29 @@ public class Polygon {
     }
 
     public Polygon inflate(double inflateBy, int pointsAtCorner) {
-        Point[] inflatedPolygon = new Point[points.length*3];
+        int size = points.length;
 
-        // find the geometric center
-        float xSum = 0;
-        float ySum = 0;
+        Coordinate[] coordinates = new Coordinate[size + 1];
+        for (int i = 0; i < size; i++) {
+            coordinates[i] = new Coordinate(points[i].getX(), points[i].getY());
+        }
+        coordinates[size] = coordinates[0];
 
-        for (int j = 0; j < points.length; j++) {
-            xSum += points[j].x;
-            ySum += points[j].y;
+        GeometryFactory geometryFactory = new GeometryFactory();
+        LinearRing ring = new LinearRing(new CoordinateArraySequence(coordinates), geometryFactory);
+
+        Geometry jtsPolygon = new com.vividsolutions.jts.geom.Polygon(ring, new LinearRing[]{}, geometryFactory);
+        Geometry buffered = jtsPolygon.buffer(inflateBy, pointsAtCorner);
+
+
+        Coordinate[] bufferedCoordinates = buffered.getCoordinates();
+        int bufferedSize = bufferedCoordinates.length - 1;
+        Point[] bufferedPoints = new Point[bufferedSize];
+
+        for (int i = 0; i < bufferedSize; i++) {
+            bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
         }
 
-        Point geomCenter = new Point(xSum/points.length, ySum/points.length);
-
-        for (int j = 0; j < points.length; j++) {
-            Vector2d v = new Vector2d(points[j].x, points[j].y);
-            v.sub(geomCenter);
-            v.normalize();
-            v.scale(inflateBy);
-
-            if (pointsAtCorner == 2) {
-                //+ rotation with rotation matrix
-                double alpha = Math.PI/4;
-                v = new Vector2d(v.x*Math.cos(alpha) - v.y*Math.sin(alpha), v.x*Math.sin(alpha) + v.y*Math.cos(alpha));
-                inflatedPolygon[2*j + 1] = new Point(points[j].x + v.x, points[j].y + v.y);
-
-                //- rotation with rotation matrix
-                double beta = -2*alpha;
-                v = new Vector2d(v.x*Math.cos(beta) - v.y*Math.sin(beta), v.x*Math.sin(beta) + v.y*Math.cos(beta));
-                inflatedPolygon[2*j] = new Point(points[j].x + v.x, points[j].y + v.y);
-
-            } else if (pointsAtCorner == 3){
-                inflatedPolygon[3*j + 1] = new Point(points[j].x + v.x, points[j].y + v.y);
-
-                //+ rotation with rotation matrix
-                double alpha = Math.PI/4;
-                v = new Vector2d(v.x*Math.cos(alpha) - v.y*Math.sin(alpha), v.x*Math.sin(alpha) + v.y*Math.cos(alpha));
-                inflatedPolygon[3*j + 2] = new Point(points[j].x + v.x, points[j].y + v.y);
-
-                //- rotation with rotation matrix
-                double beta = -2*alpha;
-                v = new Vector2d(v.x*Math.cos(beta) - v.y*Math.sin(beta), v.x*Math.sin(beta) + v.y*Math.cos(beta));
-                inflatedPolygon[3*j] = new Point(points[j].x + v.x, points[j].y + v.y);
-            } else {
-                throw new RuntimeException("This method only supports inflation using 2 or 3 points at the corner");
-            }
-        }
-
-        return new Polygon(inflatedPolygon);
+        return new Polygon(bufferedPoints);
     }
 }
