@@ -1,20 +1,17 @@
 package tt.euclid2i.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
 
+import java.util.*;
+
 public class SeparationDetector {
 
     public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int[] separations) {
 
-        for (int otherTrajId=0; otherTrajId < otherTrajectories.length; otherTrajId++) {
+        for (int otherTrajId = 0; otherTrajId < otherTrajectories.length; otherTrajId++) {
 
             SegmentedTrajectory otherTrajectory = otherTrajectories[otherTrajId];
 
@@ -22,12 +19,14 @@ public class SeparationDetector {
             List<Straight> segmentsA = new ArrayList<Straight>(thisTrajectory.getSegments());
             List<Straight> segmentsB = new ArrayList<Straight>(otherTrajectory.getSegments());
 
+            //TODO - use linkedList, iterators and merge methods extend/prepend by some "timeAlign" funciton
             extendShorterList(segmentsA, segmentsB);
+            prependShorterList(segmentsA, segmentsB);
 
             int i = 0;
             int j = 0;
 
-            while (i < segmentsA.size() || j < segmentsB.size()) {
+            while (i < segmentsA.size() && j < segmentsB.size()) {
                 Straight straightA = segmentsA.get(i);
                 Straight straightB = segmentsB.get(j);
 
@@ -55,8 +54,8 @@ public class SeparationDetector {
     }
 
     public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory,
-            Trajectory[] otherTrajectories, int[] separations,
-            int samplingInterval) {
+                                                 Trajectory[] otherTrajectories, int[] separations,
+                                                 int samplingInterval) {
 
         for (int t = thisTrajectory.getMinTime(); t < thisTrajectory
                 .getMaxTime(); t += samplingInterval) {
@@ -116,6 +115,23 @@ public class SeparationDetector {
             }
         }
         return false;
+    }
+
+    private static void prependShorterList(List<Straight> segmentsA, List<Straight> segmentsB) {
+        tt.euclidtime3i.Point firstA = segmentsA.get(0).getStart();
+        int startA = firstA.getTime();
+        tt.euclidtime3i.Point firstB = segmentsB.get(0).getStart();
+        int startB = firstB.getTime();
+
+        if (startA > startB) {
+            Point extend = firstA.getPosition();
+            segmentsA.add(new Straight(new tt.euclidtime3i.Point(extend, startB), new tt.euclidtime3i.Point(extend, startA)));
+            Collections.swap(segmentsA, 0, segmentsA.size() - 1);
+        } else if (startB < startA) {
+            Point extend = firstB.getPosition();
+            segmentsB.add(new Straight(new tt.euclidtime3i.Point(extend, startA), new tt.euclidtime3i.Point(extend, startB)));
+            Collections.swap(segmentsB, 0, segmentsB.size() - 1);
+        }
     }
 
     private static void extendShorterList(List<Straight> segmentsA, List<Straight> segmentsB) {
