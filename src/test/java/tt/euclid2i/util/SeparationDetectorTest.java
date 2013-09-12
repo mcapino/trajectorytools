@@ -1,21 +1,26 @@
 package tt.euclid2i.util;
 
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.AStarShortestPathSimple;
-import org.jgrapht.util.HeuristicToGoal;
-import org.junit.Test;
-import tt.euclid2i.*;
-import tt.euclid2i.discretization.ProbabilisticRoadmap;
-import tt.euclid2i.region.Rectangle;
-import tt.euclid2i.trajectory.BasicSegmentedTrajectory;
-import tt.euclid2i.trajectory.SegmentedTrajectoryFactory;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.AStarShortestPathSimple;
+import org.jgrapht.util.HeuristicToGoal;
+import org.junit.Test;
+
+import tt.euclid2i.Line;
+import tt.euclid2i.Point;
+import tt.euclid2i.Region;
+import tt.euclid2i.SegmentedTrajectory;
+import tt.euclid2i.Trajectory;
+import tt.euclid2i.discretization.ProbabilisticRoadmap;
+import tt.euclid2i.region.Rectangle;
+import tt.euclid2i.trajectory.BasicSegmentedTrajectory;
+import tt.euclid2i.trajectory.SegmentedTrajectoryFactory;
 
 public class SeparationDetectorTest {
 
@@ -52,13 +57,11 @@ public class SeparationDetectorTest {
             BasicSegmentedTrajectory trajectoryA = SegmentedTrajectoryFactory.createConstantSpeedTrajectory(pathA, 0, SPEED, 2 * SIZE, pathA.getWeight() / SPEED);
             BasicSegmentedTrajectory trajectoryB = SegmentedTrajectoryFactory.createConstantSpeedTrajectory(pathB, 0, SPEED, 2 * SIZE, pathA.getWeight() / SPEED);
 
-            List<SegmentedTrajectory> segmentedTrajectories = new ArrayList<SegmentedTrajectory>();
-            segmentedTrajectories.add(trajectoryB);
-            List<Trajectory> trajectories = new ArrayList<Trajectory>();
-            trajectories.add(trajectoryB);
+            SegmentedTrajectory[] segmentedTrajectories = new SegmentedTrajectory[] {trajectoryB};
+            Trajectory[] trajectories = new Trajectory[] {trajectoryB};
 
-            boolean colideNumeric = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, trajectories, SEP_RADIUS, 1);
-            boolean colideAnalytic = SeparationDetector.hasAnyPairwiseConflictAnalytic(trajectoryA, segmentedTrajectories, SEP_RADIUS);
+            boolean colideNumeric = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, trajectories, new int[] {SEP_RADIUS}, 1);
+            boolean colideAnalytic = SeparationDetector.hasAnyPairwiseConflictAnalytic(trajectoryA, segmentedTrajectories, new int[] {SEP_RADIUS});
 
             if (colideNumeric != colideAnalytic) {
                 different++;
