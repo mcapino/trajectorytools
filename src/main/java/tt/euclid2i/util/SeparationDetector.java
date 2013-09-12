@@ -1,20 +1,22 @@
 package tt.euclid2i.util;
 
-import tt.euclid2i.Point;
-import tt.euclid2i.SegmentedTrajectory;
-import tt.euclid2i.Trajectory;
-import tt.euclidtime3i.discretization.Straight;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import tt.euclid2i.Point;
+import tt.euclid2i.SegmentedTrajectory;
+import tt.euclid2i.Trajectory;
+import tt.euclidtime3i.discretization.Straight;
+
 public class SeparationDetector {
 
-    public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, Collection<SegmentedTrajectory> otherTrajectoriesCollection, int separation) {
+    public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int[] separations) {
 
-        for (SegmentedTrajectory otherTrajectory : otherTrajectoriesCollection) {
+        for (int otherTrajId=0; otherTrajId < otherTrajectories.length; otherTrajId++) {
+
+            SegmentedTrajectory otherTrajectory = otherTrajectories[otherTrajId];
 
             //TODO it would be faster not to copy those sets all the time by using some condition for extendShorterList() in while cycle
             List<Straight> segmentsA = new ArrayList<Straight>(thisTrajectory.getSegments());
@@ -38,7 +40,7 @@ public class SeparationDetector {
                 int t1 = Math.max(startTimeA, startTimeB);
                 int t2 = Math.min(endTimeA, endTimeB);
 
-                if (hasConflict(straightA.cut(t1, t2), straightB.cut(t1, t2), separation)) {
+                if (hasConflict(straightA.cut(t1, t2), straightB.cut(t1, t2), separations[otherTrajId])) {
                     return true;
                 }
 
@@ -49,6 +51,70 @@ public class SeparationDetector {
             }
         }
 
+        return false;
+    }
+
+    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory,
+            Trajectory[] otherTrajectories, int[] separations,
+            int samplingInterval) {
+
+        for (int t = thisTrajectory.getMinTime(); t < thisTrajectory
+                .getMaxTime(); t += samplingInterval) {
+            Point thisTrajectoryPos = thisTrajectory.get(t);
+            for (int j = 0; j < otherTrajectories.length; j++) {
+
+                if (otherTrajectories[j] != null) {
+                    if (t >= otherTrajectories[j].getMinTime()
+                            && t <= otherTrajectories[j].getMaxTime()) {
+                        Point otherTrajectoryPos = otherTrajectories[j]
+                                .get(t);
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separations[j]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasAnyPairwiseConflict(Collection<Trajectory> trajectoriesCollection, int separation, int samplingInterval) {
+
+        List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
+
+        int minTime = Integer.MAX_VALUE;
+        for (Trajectory trajectory : trajectories) {
+            if (trajectory.getMinTime() < minTime) {
+                minTime = trajectory.getMinTime();
+            }
+        }
+
+        int maxTime = Integer.MIN_VALUE;
+        for (Trajectory trajectory : trajectories) {
+            if (trajectory.getMaxTime() > maxTime) {
+                maxTime = trajectory.getMaxTime();
+            }
+        }
+
+        // iterate over all time points
+        for (int t = minTime; t <= maxTime; t += samplingInterval) {
+            // check all pairs of agents for conflicts at timepoint t
+            for (int j = 0; j < trajectories.size(); j++) {
+                for (int k = j + 1; k < trajectories.size(); k++) {
+                    // check the distance between j and k
+                    Trajectory a = trajectories.get(j);
+                    Trajectory b = trajectories.get(k);
+
+                    if (t >= a.getMinTime() && t <= a.getMaxTime() &&
+                            t >= b.getMinTime() && t <= b.getMaxTime()) {
+                        if (a.get(t).distance(b.get(t)) <= separation) {
+                            return true;
+                        }
+                    }
+
+                }
+            }
+        }
         return false;
     }
 
@@ -136,28 +202,6 @@ public class SeparationDetector {
         return conflicts;
     }
 
-    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory,
-                                                 Collection<Trajectory> otherTrajectoriesCollection,
-                                                 int separation, int samplingInterval) {
-
-        List<Trajectory> otherTrajectories = new ArrayList<Trajectory>(otherTrajectoriesCollection);
-
-        for (int t = thisTrajectory.getMinTime(); t < thisTrajectory.getMaxTime(); t += samplingInterval) {
-            Point thisTrajectoryPos = thisTrajectory.get(t);
-            for (int j = 0; j < otherTrajectories.size(); j++) {
-
-                if (otherTrajectories.get(j) != null) {
-                    if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
-                        Point otherTrajectoryPos = otherTrajectories.get(j).get(t);
-                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Computes all pairwise conflicts between all pairs of trajectories from trajectoriesCollection.
@@ -204,46 +248,6 @@ public class SeparationDetector {
         return conflicts;
     }
 
-
-    public static boolean hasAnyPairwiseConflict(Collection<Trajectory> trajectoriesCollection, int separation, int samplingInterval) {
-
-        List<Trajectory> trajectories = new ArrayList<Trajectory>(trajectoriesCollection);
-
-        int minTime = Integer.MAX_VALUE;
-        for (Trajectory trajectory : trajectories) {
-            if (trajectory.getMinTime() < minTime) {
-                minTime = trajectory.getMinTime();
-            }
-        }
-
-        int maxTime = Integer.MIN_VALUE;
-        for (Trajectory trajectory : trajectories) {
-            if (trajectory.getMaxTime() > maxTime) {
-                maxTime = trajectory.getMaxTime();
-            }
-        }
-
-        // iterate over all time points
-        for (int t = minTime; t <= maxTime; t += samplingInterval) {
-            // check all pairs of agents for conflicts at timepoint t
-            for (int j = 0; j < trajectories.size(); j++) {
-                for (int k = j + 1; k < trajectories.size(); k++) {
-                    // check the distance between j and k
-                    Trajectory a = trajectories.get(j);
-                    Trajectory b = trajectories.get(k);
-
-                    if (t >= a.getMinTime() && t <= a.getMaxTime() &&
-                            t >= b.getMinTime() && t <= b.getMaxTime()) {
-                        if (a.get(t).distance(b.get(t)) <= separation) {
-                            return true;
-                        }
-                    }
-
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * finds the first conflicts and returns ids of the two agents involved in the conflict

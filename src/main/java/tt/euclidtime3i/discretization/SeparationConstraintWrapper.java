@@ -1,9 +1,7 @@
 package tt.euclidtime3i.discretization;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -15,15 +13,16 @@ import tt.euclid2i.trajectory.BasicSegmentedTrajectory;
 import tt.euclid2i.util.SeparationDetector;
 import tt.euclidtime3i.Point;
 
+@SuppressWarnings("serial")
 public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight> implements DirectedGraph<Point, Straight>  {
 
     private Trajectory[] otherTrajs;
-    private int separation;
+    private int[] separations;
 
-    public SeparationConstraintWrapper(DirectedGraph<Point, Straight> g, Trajectory[] otherTrajs, int separation) {
+    public SeparationConstraintWrapper(DirectedGraph<Point, Straight> g, Trajectory[] otherTrajs, int[] separations) {
         super(g);
         this.otherTrajs = otherTrajs;
-        this.separation = separation;
+        this.separations = separations;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
         Set<Straight> consistentEdges = new HashSet<Straight>();
 
         for (Straight edge : allEdges) {
-            if (consistent(edge, Arrays.asList(otherTrajs), separation)) {
+            if (consistent(edge, otherTrajs, separations)) {
                 consistentEdges.add(edge);
             }
         }
@@ -41,26 +40,19 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
     }
 
 
-    private boolean consistent(Straight e, Collection<Trajectory> otherTrajs, int sep) {
+    private boolean consistent(Straight e, Trajectory otherTrajs[], int[] separations) {
 
         int duration = e.getEnd().getTime() - e.getStart().getTime();
-        double distance = e.getStart().getPosition().distance(e.getEnd().getPosition());
 
         Trajectory thisTraj = new BasicSegmentedTrajectory(Arrays.asList(e), duration, super.getEdgeWeight(e));
 
-        Collection<SegmentedTrajectory> segmentedTrajectories = new LinkedList<SegmentedTrajectory>();
-        Collection<Trajectory> nonsegmentedTrajectories = new LinkedList<Trajectory>();
-        for (Trajectory otherTraj : otherTrajs) {
-            if (!(otherTraj instanceof SegmentedTrajectory)) {
-               segmentedTrajectories.add((SegmentedTrajectory) otherTraj);
-            } else {
-                nonsegmentedTrajectories.add(otherTraj);
-            }
+        SegmentedTrajectory[] segmentedTrajs = new SegmentedTrajectory[otherTrajs.length];
+        for (int i=0; i<otherTrajs.length; i++) {
+            assert(otherTrajs[i] instanceof SegmentedTrajectory);
+            segmentedTrajs[i] = (SegmentedTrajectory) otherTrajs[i];
         }
 
-
-        return !SeparationDetector.hasAnyPairwiseConflictAnalytic((tt.euclid2i.SegmentedTrajectory) thisTraj, segmentedTrajectories, sep)
-                && !SeparationDetector.hasAnyPairwiseConflict(thisTraj, nonsegmentedTrajectories, sep, sep/4) ;
+        return !SeparationDetector.hasAnyPairwiseConflictAnalytic((tt.euclid2i.SegmentedTrajectory) thisTraj, segmentedTrajs, separations);
     }
 
 }
