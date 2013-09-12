@@ -16,19 +16,22 @@ public class SeparationDetector {
             SegmentedTrajectory otherTrajectory = otherTrajectories[otherTrajId];
 
             //TODO it would be faster not to copy those sets all the time by using some condition for extendShorterList() in while cycle
-            List<Straight> segmentsA = new ArrayList<Straight>(thisTrajectory.getSegments());
-            List<Straight> segmentsB = new ArrayList<Straight>(otherTrajectory.getSegments());
+            LinkedList<Straight> segmentsA = new LinkedList<Straight>(thisTrajectory.getSegments());
+            LinkedList<Straight> segmentsB = new LinkedList<Straight>(otherTrajectory.getSegments());
 
-            //TODO - use linkedList, iterators and merge methods extend/prepend by some "timeAlign" funciton
             extendShorterList(segmentsA, segmentsB);
             prependShorterList(segmentsA, segmentsB);
+
+            ListIterator<Straight> iteratorA = segmentsA.listIterator();
+            ListIterator<Straight> iteratorB = segmentsB.listIterator();
 
             int i = 0;
             int j = 0;
 
+            Straight straightA = iteratorA.next();
+            Straight straightB = iteratorB.next();
+
             while (i < segmentsA.size() && j < segmentsB.size()) {
-                Straight straightA = segmentsA.get(i);
-                Straight straightB = segmentsB.get(j);
 
                 int startTimeA = straightA.getStart().getTime();
                 int startTimeB = straightB.getStart().getTime();
@@ -43,19 +46,23 @@ public class SeparationDetector {
                     return true;
                 }
 
-                if (endTimeA == t2)
+                if (endTimeA == t2) {
+                    if (iteratorA.hasNext())
+                        straightA = iteratorA.next();
                     i++;
-                if (endTimeB == t2)
+                }
+                if (endTimeB == t2) {
+                    if (iteratorB.hasNext())
+                        straightB = iteratorB.next();
                     j++;
+                }
             }
         }
 
         return false;
     }
 
-    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory,
-                                                 Trajectory[] otherTrajectories, int[] separations,
-                                                 int samplingInterval) {
+    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory, Trajectory[] otherTrajectories, int[] separations, int samplingInterval) {
 
         for (int t = thisTrajectory.getMinTime(); t < thisTrajectory
                 .getMaxTime(); t += samplingInterval) {
@@ -117,7 +124,7 @@ public class SeparationDetector {
         return false;
     }
 
-    private static void prependShorterList(List<Straight> segmentsA, List<Straight> segmentsB) {
+    private static void prependShorterList(LinkedList<Straight> segmentsA, LinkedList<Straight> segmentsB) {
         tt.euclidtime3i.Point firstA = segmentsA.get(0).getStart();
         int startA = firstA.getTime();
         tt.euclidtime3i.Point firstB = segmentsB.get(0).getStart();
@@ -125,16 +132,14 @@ public class SeparationDetector {
 
         if (startA > startB) {
             Point extend = firstA.getPosition();
-            segmentsA.add(new Straight(new tt.euclidtime3i.Point(extend, startB), new tt.euclidtime3i.Point(extend, startA)));
-            Collections.swap(segmentsA, 0, segmentsA.size() - 1);
+            segmentsA.addFirst(new Straight(new tt.euclidtime3i.Point(extend, startB), new tt.euclidtime3i.Point(extend, startA)));
         } else if (startB < startA) {
             Point extend = firstB.getPosition();
-            segmentsB.add(new Straight(new tt.euclidtime3i.Point(extend, startA), new tt.euclidtime3i.Point(extend, startB)));
-            Collections.swap(segmentsB, 0, segmentsB.size() - 1);
+            segmentsB.addFirst(new Straight(new tt.euclidtime3i.Point(extend, startA), new tt.euclidtime3i.Point(extend, startB)));
         }
     }
 
-    private static void extendShorterList(List<Straight> segmentsA, List<Straight> segmentsB) {
+    private static void extendShorterList(LinkedList<Straight> segmentsA, LinkedList<Straight> segmentsB) {
         tt.euclidtime3i.Point lastA = segmentsA.get(segmentsA.size() - 1).getEnd();
         int finishA = lastA.getTime();
         tt.euclidtime3i.Point lastB = segmentsB.get(segmentsB.size() - 1).getEnd();
