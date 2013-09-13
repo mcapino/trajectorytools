@@ -79,7 +79,7 @@ public class SeparationDetector {
             segments.addFirst(new Straight(new tt.euclidtime3i.Point(startPosition, minTime), new tt.euclidtime3i.Point(startPosition, start)));
 
         if (maxTine > end)
-            segments.addFirst(new Straight(new tt.euclidtime3i.Point(endPosition, end), new tt.euclidtime3i.Point(endPosition, maxTine)));
+            segments.addLast(new Straight(new tt.euclidtime3i.Point(endPosition, end), new tt.euclidtime3i.Point(endPosition, maxTine)));
 
         return segments;
     }
