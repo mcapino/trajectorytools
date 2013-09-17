@@ -1,5 +1,11 @@
 package org.jgrapht.alg;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -7,8 +13,6 @@ import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.FibonacciHeap;
 import org.teneighty.heap.Heap;
-
-import java.util.*;
 
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
@@ -69,9 +73,16 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPath(int iterationLimit) {
+        return findPath(iterationLimit, Long.MAX_VALUE);
+    }
+
+    public GraphPath<V, E> findPath(int iterationLimit, long runtimeLimitNs) {
+
+        long stopAtNs = System.nanoTime() + runtimeLimitNs;
+
         V foundGoal = null;
 
-        while (!heap.isEmpty() && iterationCounter++ < iterationLimit) {
+        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && System.nanoTime() < stopAtNs) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
