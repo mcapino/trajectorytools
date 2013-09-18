@@ -1,4 +1,4 @@
-package tt.vis.problemcreator;
+package tt.vis.environentcreator;
 
 import cz.agents.alite.vis.Vis;
 import tt.euclid2i.Point;

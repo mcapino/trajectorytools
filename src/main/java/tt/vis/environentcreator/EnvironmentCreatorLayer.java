@@ -1,4 +1,4 @@
-package tt.vis.problemcreator;
+package tt.vis.environentcreator;
 
 import cz.agents.alite.vis.Vis;
 import cz.agents.alite.vis.layer.GroupLayer;
@@ -14,7 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
-public class ProblemCreatorLayer extends GroupLayer {
+public class EnvironmentCreatorLayer extends GroupLayer {
 
     private static final char SAVE_POLYGON = ' ';   //space
     private static final char SAVE_LIST = 's';
@@ -22,11 +22,11 @@ public class ProblemCreatorLayer extends GroupLayer {
 
     private PolygonCreator polygonCreator;
 
-    public static ProblemCreatorLayer create() {
-        return new ProblemCreatorLayer();
+    public static EnvironmentCreatorLayer create() {
+        return new EnvironmentCreatorLayer();
     }
 
-    public ProblemCreatorLayer() {
+    public EnvironmentCreatorLayer() {
         this.polygonCreator = new PolygonCreator();
         initialize();
     }
