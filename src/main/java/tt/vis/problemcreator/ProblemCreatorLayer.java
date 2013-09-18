@@ -33,7 +33,7 @@ public class ProblemCreatorLayer extends GroupLayer {
 
 
     private void handleKey(KeyEvent e) {
-        System.out.println((int) e.getKeyChar());
+        //System.out.println((int) e.getKeyChar());
 
         switch (e.getKeyChar()) {
             case SAVE_POLYGON:
