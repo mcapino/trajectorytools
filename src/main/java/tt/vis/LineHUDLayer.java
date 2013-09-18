@@ -26,12 +26,6 @@ public class LineHUDLayer extends AbstractLayer {
         canvas.drawString(provider.getText(), 15, 40);
     }
 
-//    public static VisLayer create(TextProvider provider, Color color) {
-//        KeyToggleLayer toggle = KeyToggleLayer.create("t");
-//        toggle.addSubLayer(new CornerTextLayer(provider, color));
-//        return toggle;
-//    }
-
     public static VisLayer create(TextProvider provider, Color color) {
         return new LineHUDLayer(provider, color);
     }
