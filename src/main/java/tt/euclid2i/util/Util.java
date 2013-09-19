@@ -47,6 +47,19 @@ public class Util {
 
         return point;
     }
+    
+    public static Point sampleFreeSpace(Rectangle bounds,
+			Collection<Region> obstacles, Random random, int maxTrials) {
+    	
+    	 Point point;
+    	 int trials = 0;
+         do {
+             point = sampleSpace(bounds, random);
+             trials ++;
+         } while (!isInFreeSpace(point, obstacles) && trials < maxTrials);
+
+         return point;
+	}
 
     public static Point sampleSpace(Rectangle bounds, Random random) {
         int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
@@ -122,5 +135,7 @@ public class Util {
         }
         writer.flush();
     }
+
+	
 
 }
