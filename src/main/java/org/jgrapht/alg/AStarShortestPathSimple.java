@@ -1,11 +1,5 @@
 package org.jgrapht.alg;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -13,6 +7,8 @@ import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.FibonacciHeap;
 import org.teneighty.heap.Heap;
+
+import java.util.*;
 
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
@@ -77,12 +73,10 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPath(int iterationLimit, long runtimeLimitNs) {
-
-        long stopAtNs = System.nanoTime() + runtimeLimitNs;
+        long startTime = System.nanoTime();
 
         V foundGoal = null;
-
-        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && System.nanoTime() < stopAtNs) {
+        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkRuntime(startTime, runtimeLimitNs)) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
@@ -134,6 +128,10 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         }
 
         return path;
+    }
+
+    private boolean checkRuntime(long startTime, long runtimeLimitNs) {
+        return System.nanoTime() - startTime < runtimeLimitNs;
     }
 
     private double calculateKey(V vertex) {
