@@ -20,8 +20,17 @@ public class Intersection {
         if (boxesOverlap(x1,y1,x2,y2, x3,y3,x4,y4, closed)) {
             double det = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
             if (det == 0) {
-                // lines overlap
-                return true;
+                // lines are parallel
+
+                // convert to parametric form y = a*x + b
+                double a1 = (y2-y1)/(x2-x1); // slope of line 1
+                double b1 = y1 - a1*x1; // intercept of line 2
+                double a2 = (y4-y3)/(x4-x3);
+                double b2 = y3 - a2*x3;
+
+                assert a1 == a2;
+
+                return (b1 == b2);
             } else {
                 // find intersection point
                 double x = ((x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4)) / det;
