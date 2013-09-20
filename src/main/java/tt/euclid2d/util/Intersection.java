@@ -28,7 +28,7 @@ public class Intersection {
                 double a2 = (y4-y3)/(x4-x3);
                 double b2 = y3 - a2*x3;
 
-                assert a1 == a2;
+                //assert a1 == a2;
 
                 return (b1 == b2);
             } else {
