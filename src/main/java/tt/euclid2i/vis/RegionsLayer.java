@@ -1,7 +1,6 @@
 package tt.euclid2i.vis;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.Collection;
 
 import tt.euclid2i.Point;
@@ -66,11 +65,17 @@ public class RegionsLayer extends AbstractLayer {
                     y[i] = Vis.transY(points[i].y);
                 }
 
-                canvas.setColor(fillColor);
-                canvas.fillPolygon(x,y,n);
+                if (n == 1) {
+                    canvas.setColor(edgeColor);
+                    canvas.fillOval(x[0], y[0], 2, 2);
 
-                canvas.setColor(edgeColor);
-                canvas.drawPolygon(x,y,n);
+                } else {
+                    canvas.setColor(fillColor);
+                    canvas.fillPolygon(x, y, n);
+
+                    canvas.setColor(edgeColor);
+                    canvas.drawPolygon(x, y, n);
+                }
             }
         }
 
