@@ -24,6 +24,14 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
         this.weight = weight;
     }
 
+    public void setOtherTrajs(Trajectory[] otherTrajs) {
+        this.otherTrajs = otherTrajs;
+    }
+
+    public void setConstraint(PairwiseConstraint constraint) {
+        this.constraint = constraint;
+    }
+
     @Override
     public double getEdgeWeight(E e) {
         double cost = super.getEdgeWeight(e);
