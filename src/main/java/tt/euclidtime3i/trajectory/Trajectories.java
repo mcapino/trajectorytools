@@ -17,7 +17,7 @@ public class Trajectories {
         return new SinglePointTrajectory(point, time, cost);
     }
 
-    public static tt.euclid2i.EvaluatedTrajectory converetToEuclid2iTrajectory(final EvaluatedTrajectory traj) {
+    public static tt.euclid2i.EvaluatedTrajectory convertToEuclid2iTrajectory(final EvaluatedTrajectory traj) {
         return new tt.euclid2i.EvaluatedTrajectory() {
 
             @Override
@@ -38,7 +38,11 @@ public class Trajectories {
             @Override
             public tt.euclid2i.Point get(int t) {
                 Point timePoint = traj.get(t);
-                return new tt.euclid2i.Point(timePoint.x, timePoint.y);
+                if (timePoint != null) {
+                    return new tt.euclid2i.Point(timePoint.x, timePoint.y);
+                } else {
+                    return null;
+                }
             }
 
             @Override
