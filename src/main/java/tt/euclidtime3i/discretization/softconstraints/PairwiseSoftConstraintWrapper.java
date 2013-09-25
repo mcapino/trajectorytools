@@ -35,8 +35,11 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
     @Override
     public double getEdgeWeight(E e) {
         double cost = super.getEdgeWeight(e);
-        double penalty = calculateEdgePenalty(e);
-        return cost + penalty;
+
+        if (weight == 0)
+            return cost;
+        else
+            return cost + calculateEdgePenalty(e);
     }
 
     public double calculateEdgePenalty(E e) {
