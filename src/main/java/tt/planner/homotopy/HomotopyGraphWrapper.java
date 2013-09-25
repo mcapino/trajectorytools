@@ -10,6 +10,7 @@ import org.jgrapht.util.Goal;
 import org.jscience.mathematics.number.Complex;
 import tt.planner.homotopy.hclass.HClass;
 import tt.planner.homotopy.hclass.HClassProvider;
+import tt.planner.homotopy.hvalue.HValueAllowAllPolicy;
 import tt.planner.homotopy.hvalue.HValueIntegrator;
 import tt.planner.homotopy.hvalue.HValuePolicy;
 
@@ -48,12 +49,7 @@ public class HomotopyGraphWrapper<V, E> extends AbstractDirectedGraphWrapper<HNo
         this.provider = provider;
         this.precision = precision;
 
-        this.policy = new HValuePolicy() {
-            @Override
-            public boolean isAllowed(Complex hValue, double precision) {
-                return true;
-            }
-        };
+        this.policy = new HValueAllowAllPolicy();
     }
 
     public HValuePolicy getPolicy() {
