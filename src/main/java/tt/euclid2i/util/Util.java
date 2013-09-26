@@ -47,11 +47,10 @@ public class Util {
 
         return point;
     }
-    
-    public static Point sampleFreeSpace(Rectangle bounds,
-			Collection<Region> obstacles, Random random, int maxTrials) {
-    	
-    	 Point point;
+
+    public static Point sampleFreeSpace(Rectangle bounds, Collection<Region> obstacles, Random random, int maxTrials) {
+
+    	 Point point = null;
     	 int trials = 0;
          do {
              point = sampleSpace(bounds, random);
@@ -65,6 +64,17 @@ public class Util {
         int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
         int y = bounds.getCorner1().y + random.nextInt(bounds.getCorner2().y - bounds.getCorner1().y);
         return new Point(x, y);
+    }
+
+    public static Point sampleObstacle(Region region, Random random, int maxTrials) {
+        Rectangle bounds = region.getBoundingBox();
+
+        Point point;
+        do {
+            point = sampleSpace(bounds, random);
+        } while (region.isInside(point) && maxTrials-- > 0);
+
+        return point;
     }
 
     public static DirectedGraph<Point, Line> getVisibilityGraph(Point start, Point goal, Collection<? extends Rectangle> polygons) {
@@ -136,6 +146,6 @@ public class Util {
         writer.flush();
     }
 
-	
+
 
 }
