@@ -32,7 +32,7 @@ public class HomotopyUtils {
     public static List<Complex> sampleFreeSpace(Collection<? extends Region> obstacles, Rectangle problemBounds, Random random) {
         List<Complex> complexes = new ArrayList<Complex>();
 
-        int freeSpaceSamples = obstacles.size() + 1;
+        int freeSpaceSamples = obstacles.size() - 1;
         for (int i = 0; i < freeSpaceSamples; i++) {
             Point point = Util.sampleFreeSpace(problemBounds, obstacles, random);
             complexes.add(Complex.valueOf(point.x, point.y));
