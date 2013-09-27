@@ -18,7 +18,7 @@ public class HomotopyUtils {
     private HomotopyUtils() {
     }
 
-    public List<Complex> sampleObstacles(Collection<? extends Region> obstacles, Random random) {
+    public static List<Complex> sampleObstacles(Collection<? extends Region> obstacles, Random random) {
         List<Complex> complexes = new ArrayList<Complex>();
 
         for (Region obstacle : obstacles) {
@@ -29,7 +29,7 @@ public class HomotopyUtils {
         return complexes;
     }
 
-    public List<Complex> sampleFreeSpace(Collection<? extends Region> obstacles, Rectangle problemBounds, Random random) {
+    public static List<Complex> sampleFreeSpace(Collection<? extends Region> obstacles, Rectangle problemBounds, Random random) {
         List<Complex> complexes = new ArrayList<Complex>();
 
         int freeSpaceSamples = obstacles.size() + 1;
