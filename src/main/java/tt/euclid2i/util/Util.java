@@ -1,20 +1,19 @@
 package tt.euclid2i.util;
 
-import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Random;
-
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.Trajectory;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
+
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class Util {
 
@@ -50,15 +49,15 @@ public class Util {
 
     public static Point sampleFreeSpace(Rectangle bounds, Collection<Region> obstacles, Random random, int maxTrials) {
 
-    	 Point point = null;
-    	 int trials = 0;
-         do {
-             point = sampleSpace(bounds, random);
-             trials ++;
-         } while (!isInFreeSpace(point, obstacles) && trials < maxTrials);
+        Point point = null;
+        int trials = 0;
+        do {
+            point = sampleSpace(bounds, random);
+            trials++;
+        } while (!isInFreeSpace(point, obstacles) && trials < maxTrials);
 
-         return point;
-	}
+        return point;
+    }
 
     public static Point sampleSpace(Rectangle bounds, Random random) {
         int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
@@ -69,10 +68,13 @@ public class Util {
     public static Point sampleObstacle(Region region, Random random, int maxTrials) {
         Rectangle bounds = region.getBoundingBox();
 
-        Point point;
+        Point point = null;
         do {
             point = sampleSpace(bounds, random);
-        } while (region.isInside(point) && maxTrials-- > 0);
+        } while (!region.isInside(point) && maxTrials-- > 0);
+
+        if (point == null)
+            throw new RuntimeException(String.format("Could not sample obstacle in %d trials", maxTrials));
 
         return point;
     }
@@ -138,14 +140,13 @@ public class Util {
         return inflatedRegions;
     }
 
-    public static void exportTrajectory(Trajectory trajectory, PrintWriter writer,int samplingInterval, int maxTime) {
-        for (int t=trajectory.getMinTime(); t < trajectory.getMaxTime() && t < maxTime ;t += samplingInterval) {
+    public static void exportTrajectory(Trajectory trajectory, PrintWriter writer, int samplingInterval, int maxTime) {
+        for (int t = trajectory.getMinTime(); t < trajectory.getMaxTime() && t < maxTime; t += samplingInterval) {
             Point pos = trajectory.get(t);
-            writer.print(t + " " + pos.x + " " + pos.y + ", " );
+            writer.print(t + " " + pos.x + " " + pos.y + ", ");
         }
         writer.flush();
     }
-
 
 
 }
