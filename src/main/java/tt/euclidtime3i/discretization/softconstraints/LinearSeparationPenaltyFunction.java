@@ -4,25 +4,15 @@ import tt.euclid2i.Point;
 
 public class LinearSeparationPenaltyFunction implements SeparationPenaltyFunction {
 
-    private int separation;
     private double maxPenalty;
 
-    public LinearSeparationPenaltyFunction(int separation, double maxPenalty) {
+    public LinearSeparationPenaltyFunction(double maxPenalty) {
         super();
-        this.separation = separation;
-        this.maxPenalty = maxPenalty;
-    }
-
-    public void setSeparation(int separation) {
-        this.separation = separation;
-    }
-
-    public void setMaxPenalty(double maxPenalty) {
         this.maxPenalty = maxPenalty;
     }
 
     @Override
-    public double getPenalty(Point p1, Point p2) {
-        return Math.max(0, maxPenalty - (maxPenalty * p1.distance(p2)) / separation);
+    public double getPenalty(Point p1, Point p2, int minSeparation) {
+        return Math.max(0, maxPenalty - (maxPenalty * p1.distance(p2)) / minSeparation);
     }
 }

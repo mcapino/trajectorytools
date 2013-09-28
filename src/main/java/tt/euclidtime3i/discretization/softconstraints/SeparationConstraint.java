@@ -16,19 +16,17 @@ public class SeparationConstraint implements PairwiseConstraint {
     }
 
     @Override
-    public double getPenalty(Trajectory t1, Trajectory t2) {
-        return integratePenalty(t1, new Trajectory[]{t2}, penaltyFunction, samplingInterval);
-    }
-
-    public void setSeparation(int separation) {
-        penaltyFunction.setSeparation(separation);
+    public double getPenalty(Trajectory t1, Trajectory t2, int minSeparation) {
+        return integratePenalty(t1, new Trajectory[]{t2}, penaltyFunction, minSeparation, samplingInterval);
     }
 
     //TODO implement for segmentedTrajectory
     public static double integratePenalty(
             Trajectory thisTrajectory,
             Trajectory[] otherTrajectories,
-            SeparationPenaltyFunction penaltyFunction, int samplingInterval) {
+            SeparationPenaltyFunction penaltyFunction,
+            int minSeparation,
+            int samplingInterval) {
 
         double penaltySum = 0;
 
@@ -43,7 +41,7 @@ public class SeparationConstraint implements PairwiseConstraint {
                         int segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
 
                         Point otherPos = otherTrajectories[j].get(t);
-                        penaltySum += penaltyFunction.getPenalty(thisPos, otherPos) * segmentLength;
+                        penaltySum += penaltyFunction.getPenalty(thisPos, otherPos, minSeparation) * segmentLength;
                     }
                 }
             }

@@ -10,12 +10,14 @@ import tt.euclidtime3i.discretization.Straight;
 public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> extends GraphDelegator<V, E> {
 
     private Trajectory[] otherTrajs;
+    private int[] separations;
     private PairwiseConstraint constraint;
     private double weight;
 
-    public PairwiseSoftConstraintWrapper(DirectedGraph<V, E> g, Trajectory[] otherTrajs, PairwiseConstraint constraint, double weight) {
+    public PairwiseSoftConstraintWrapper(DirectedGraph<V, E> g, Trajectory[] otherTrajs, int[] separations, PairwiseConstraint constraint, double weight) {
         super(g);
         this.otherTrajs = otherTrajs;
+        this.separations = separations;
         this.constraint = constraint;
         this.weight = weight;
     }
@@ -50,7 +52,7 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
         Trajectory edgeTrajectory = new LinearTrajectory(e.getStart().getTime(), e.getStart().getPosition(), e.getEnd().getPosition(), (int) Math.round(distance / duration), duration, super.getEdgeWeight(e));
 
         for (int i = 0; i < otherTrajs.length; i++) {
-            double constraintPenalty = constraint.getPenalty(edgeTrajectory, otherTrajs[i]);
+            double constraintPenalty = constraint.getPenalty(edgeTrajectory, otherTrajs[i], separations[i]);
             if (constraintPenalty > 0) //Infinity times 0 is NaN
                 penalty += weight * constraintPenalty;
         }
