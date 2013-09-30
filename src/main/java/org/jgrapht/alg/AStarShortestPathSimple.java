@@ -65,14 +65,19 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPath(int iterationLimit) {
-        return findPathRuntimeLimit(iterationLimit, Long.MAX_VALUE);
+        return findPathRuntimeLimit(iterationLimit, Integer.MAX_VALUE);
     }
 
-    public GraphPath<V, E> findPathRuntimeLimit(int iterationLimit, long runtimeLimitMs) {
+    public GraphPath<V, E> findPathRuntimeLimit(int iterationLimit, int runtimeLimitMs) {
+        long deadline = System.currentTimeMillis() + runtimeLimitMs;
+        return findPathWithDeadline(iterationLimit, deadline);
+    }
+
+    public GraphPath<V, E> findPathWithDeadline(int iterationLimit, long deadline) {
         long startTime = System.currentTimeMillis();
 
         V foundGoal = null;
-        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkRuntime(startTime, runtimeLimitMs)) {
+        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkDeadline(deadline)) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
@@ -126,8 +131,8 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         return path;
     }
 
-    private boolean checkRuntime(long startTime, long runtimeLimitMs) {
-        return System.currentTimeMillis() - startTime < runtimeLimitMs;
+    private boolean checkDeadline(long deadline) {
+        return System.currentTimeMillis() < deadline;
     }
 
     private double calculateKey(V vertex) {
