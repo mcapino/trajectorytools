@@ -29,13 +29,9 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         return findPathBetween(graph, heuristic, startVertex, goal, Integer.MAX_VALUE);
     }
 
-    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, final V endVertex, int iterationLimit) {
-        return findPathBetween(graph, heuristic, startVertex, new Goal<V>() {
-            @Override
-            public boolean isGoal(V current) {
-                return current.equals(endVertex);
-            }
-        }, iterationLimit);
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, V endVertex, int iterationLimit) {
+        AStarShortestPathSimple<V, E> alg = new AStarShortestPathSimple<V, E>(graph, heuristic, startVertex, endVertex);
+        return alg.findPath(iterationLimit);
     }
 
     public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, int iterationLimit) {
@@ -69,14 +65,14 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPath(int iterationLimit) {
-        return findPath(iterationLimit, Long.MAX_VALUE);
+        return findPathRuntimeLimit(iterationLimit, Long.MAX_VALUE);
     }
 
-    public GraphPath<V, E> findPath(int iterationLimit, long runtimeLimitNs) {
-        long startTime = System.nanoTime();
+    public GraphPath<V, E> findPathRuntimeLimit(int iterationLimit, long runtimeLimitMs) {
+        long startTime = System.currentTimeMillis();
 
         V foundGoal = null;
-        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkRuntime(startTime, runtimeLimitNs)) {
+        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkRuntime(startTime, runtimeLimitMs)) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
@@ -130,8 +126,8 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         return path;
     }
 
-    private boolean checkRuntime(long startTime, long runtimeLimitNs) {
-        return System.nanoTime() - startTime < runtimeLimitNs;
+    private boolean checkRuntime(long startTime, long runtimeLimitMs) {
+        return System.currentTimeMillis() - startTime < runtimeLimitMs;
     }
 
     private double calculateKey(V vertex) {
