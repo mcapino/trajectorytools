@@ -27,6 +27,9 @@ public class HValueAllowPolicy implements HValuePolicy {
     @Override
     public boolean isAllowed(Complex hValue, double precision) {
         for (Complex value : allowed) {
+            if (hValue.equals(value))
+                return true;
+
             double diff = value.minus(hValue).magnitude();
             double abs = (value.magnitude() + hValue.magnitude()) / 2;
 
