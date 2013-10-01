@@ -1,16 +1,17 @@
 package tt.euclid2i.discretization;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.util.NotImplementedException;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Line> {
 
@@ -99,14 +100,21 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
 
     @Override
     public Set<Line> outgoingEdgesOf(Point vertex) {
-
-        if (vertex.distance(goalPoint) <= radius) {
-            Set<Line> edges = new HashSet<Line>();
-            edges.addAll(graph.outgoingEdgesOf(vertex));
-            edges.add(new Line(vertex, goalPoint));
-            return edges;
+        if (!vertex.equals(goalPoint)) {
+            if (vertex.distance(goalPoint) <= radius) {
+                Set<Line> edges = new HashSet<Line>();
+                edges.addAll(graph.outgoingEdgesOf(vertex));
+                edges.add(new Line(vertex, goalPoint));
+                return edges;
+            } else {
+                return graph.outgoingEdgesOf(vertex);
+            }
         } else {
-            return graph.outgoingEdgesOf(vertex);
+            if (graph.containsVertex(vertex)) {
+                 return graph.outgoingEdgesOf(vertex);
+            } else {
+                return new HashSet<Line>();
+            }
         }
     }
 
