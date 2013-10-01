@@ -1,20 +1,21 @@
 package tt.euclid2i.discretization;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
 
@@ -40,6 +41,13 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
             {-1, 0}, {1, 0},
             {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1},
             {-1, 2}, {1, 2}};
+
+    public static int[][] PATTERN_16_WAY_WAIT = {
+        {-1, -2}, {1, -2},
+        {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1},
+        {-1, 0}, {0, 0}, {1, 0},
+        {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1},
+        {-1, 2}, {1, 2}};
 
     private Point initialPoint;
     private Rectangle bounds;
