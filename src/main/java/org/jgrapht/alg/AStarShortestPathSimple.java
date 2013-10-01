@@ -12,6 +12,10 @@ import java.util.*;
 
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
+    public interface TerminatingCondition {
+        boolean proceed();
+    }
+
     protected Heap<Double, V> heap;
     protected HeuristicToGoal<V> heuristicToGoal;
     protected Map<V, Heap.Entry<Double, V>> opened;
@@ -64,20 +68,38 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         opened.put(startVertex, entry);
     }
 
-    public GraphPath<V, E> findPath(int iterationLimit) {
-        return findPathRuntimeLimit(iterationLimit, Integer.MAX_VALUE);
+    public GraphPath<V, E> findPath(final int iterationLimit) {
+        return findPath(new TerminatingCondition() {
+            private int iteration = 0;
+
+            @Override
+            public boolean proceed() {
+                return iteration++ < iterationLimit;
+            }
+        });
     }
 
-    public GraphPath<V, E> findPathRuntimeLimit(int iterationLimit, int runtimeLimitMs) {
-        long deadline = System.currentTimeMillis() + runtimeLimitMs;
-        return findPathDeadlineLimit(iterationLimit, deadline);
+    public GraphPath<V, E> findPathRuntimeLimit(final int iterationLimit, final long runtimeLimitMs) {
+        return findPath(new TerminatingCondition() {
+
+            private long startTime = 0;
+            private int iteration = 0;
+
+            @Override
+            public boolean proceed() {
+                if (startTime == 0) {
+                    startTime = System.currentTimeMillis();
+                }
+                return System.currentTimeMillis() - startTime < runtimeLimitMs
+                        && iteration++ < iterationLimit;
+            }
+        });
     }
 
-    public GraphPath<V, E> findPathDeadlineLimit(int iterationLimit, long deadline) {
-        long startTime = System.currentTimeMillis();
+    public GraphPath<V, E> findPath(TerminatingCondition condition) {
 
         V foundGoal = null;
-        while (!heap.isEmpty() && iterationCounter++ < iterationLimit && checkDeadline(deadline)) {
+        while (!heap.isEmpty() && condition.proceed()) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
@@ -129,10 +151,6 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         }
 
         return path;
-    }
-
-    private boolean checkDeadline(long deadline) {
-        return System.currentTimeMillis() < deadline;
     }
 
     private double calculateKey(V vertex) {
