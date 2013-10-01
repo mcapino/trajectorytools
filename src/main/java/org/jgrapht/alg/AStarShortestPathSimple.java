@@ -79,7 +79,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         });
     }
 
-    public GraphPath<V, E> findPathRuntimeLimit(final int iterationLimit, final long runtimeLimitMs) {
+    public GraphPath<V, E> findPathRuntimeLimit(final int iterationLimit, final int runtimeLimitMs) {
         return findPath(new TerminatingCondition() {
 
             private long startTime = 0;
@@ -91,6 +91,23 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
                     startTime = System.currentTimeMillis();
                 }
                 return System.currentTimeMillis() - startTime < runtimeLimitMs
+                        && iteration++ < iterationLimit;
+            }
+        });
+    }
+
+    public GraphPath<V, E> findPathDeadlineLimit(final int iterationLimit, final long deadlineLimit) {
+        return findPath(new TerminatingCondition() {
+
+            private long startTime = 0;
+            private int iteration = 0;
+
+            @Override
+            public boolean proceed() {
+                if (startTime == 0) {
+                    startTime = System.currentTimeMillis();
+                }
+                return System.currentTimeMillis() < deadlineLimit
                         && iteration++ < iterationLimit;
             }
         });
