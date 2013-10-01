@@ -80,20 +80,8 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPathRuntimeLimit(final int iterationLimit, final int runtimeLimitMs) {
-        return findPath(new TerminatingCondition() {
-
-            private long startTime = 0;
-            private int iteration = 0;
-
-            @Override
-            public boolean proceed() {
-                if (startTime == 0) {
-                    startTime = System.currentTimeMillis();
-                }
-                return System.currentTimeMillis() - startTime < runtimeLimitMs
-                        && iteration++ < iterationLimit;
-            }
-        });
+        long deadline = System.currentTimeMillis() + runtimeLimitMs;
+        return findPathDeadlineLimit(iterationLimit, deadline);
     }
 
     public GraphPath<V, E> findPathDeadlineLimit(final int iterationLimit, final long deadlineLimit) {
