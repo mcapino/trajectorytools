@@ -115,5 +115,20 @@ public class Polygon implements Region, Serializable{
     	return (sumOverEdges < 0);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Polygon polygon = (Polygon) o;
+
+        if (!Arrays.equals(points, polygon.points)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(points);
+    }
 }
