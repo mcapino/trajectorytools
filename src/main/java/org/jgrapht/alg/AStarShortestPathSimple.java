@@ -12,8 +12,8 @@ import java.util.*;
 
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
-    public interface TerminatingCondition {
-        boolean proceed();
+    public static interface TerminatingCondition<V> {
+        boolean proceed(V value, double heapMinimum);
     }
 
     protected Heap<Double, V> heap;
@@ -69,29 +69,29 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public GraphPath<V, E> findPath(final int iterationLimit) {
-        return findPath(new TerminatingCondition() {
+        return findPath(new TerminatingCondition<V>() {
             private int iteration = 0;
 
             @Override
-            public boolean proceed() {
+            public boolean proceed(V value, double heapMinimum) {
                 return iteration++ < iterationLimit;
             }
         });
     }
 
-    public GraphPath<V, E> findPathRuntimeLimit(final int iterationLimit, final int runtimeLimitMs) {
+    public GraphPath<V, E> findPathRuntimeLimit(int iterationLimit, int runtimeLimitMs) {
         long deadline = System.currentTimeMillis() + runtimeLimitMs;
         return findPathDeadlineLimit(iterationLimit, deadline);
     }
 
     public GraphPath<V, E> findPathDeadlineLimit(final int iterationLimit, final long deadlineLimit) {
-        return findPath(new TerminatingCondition() {
+        return findPath(new TerminatingCondition<V>() {
 
             private long startTime = 0;
             private int iteration = 0;
 
             @Override
-            public boolean proceed() {
+            public boolean proceed(V value, double heapMinimum) {
                 if (startTime == 0) {
                     startTime = System.currentTimeMillis();
                 }
@@ -103,8 +103,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
     public GraphPath<V, E> findPath(TerminatingCondition condition) {
 
-        V foundGoal = null;
-        while (!heap.isEmpty() && condition.proceed()) {
+        while (!heap.isEmpty() && checkProceedCondition(condition)) {
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
@@ -113,7 +112,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
             notifyExpansionListeners(current);
 
             if (goal.isGoal(current)) {
-                foundGoal = current;
+                path = reconstructPath(startVertex, current);
                 break;
             }
 
@@ -149,13 +148,12 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
             }
         }
 
-        if (foundGoal != null) {
-            path = reconstructPath(startVertex, foundGoal);
-        } else {
-            path = null;
-        }
-
         return path;
+    }
+
+    private boolean checkProceedCondition(TerminatingCondition condition) {
+        Heap.Entry<Double, V> minimum = heap.getMinimum();
+        return condition.proceed(minimum.getValue(), minimum.getKey());
     }
 
     private double calculateKey(V vertex) {
