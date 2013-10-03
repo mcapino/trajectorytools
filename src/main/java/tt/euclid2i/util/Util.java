@@ -47,7 +47,7 @@ public class Util {
         return point;
     }
 
-    public static Point sampleFreeSpace(Rectangle bounds, Collection<Region> obstacles, Random random, int maxTrials) {
+    public static Point sampleFreeSpace(Rectangle bounds, Collection<? extends Region> obstacles, Random random, int maxTrials) {
 
         Point point = null;
         int trials = 0;
@@ -138,6 +138,18 @@ public class Util {
             }
         }
         return inflatedRegions;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Collection<Region>[] inflateRegions(Collection<? extends Region> obstacles, int agentBodyRadiuses[]) {
+        int agents = agentBodyRadiuses.length;
+        Collection<Region>[] collections = new Collection[agents];
+
+        for (int i = 0; i < agents; i++) {
+            collections[i] = Util.inflateRegions(obstacles, agentBodyRadiuses[i]);
+        }
+
+        return collections;
     }
 
     public static void exportTrajectory(Trajectory trajectory, PrintWriter writer, int samplingInterval, int maxTime) {
