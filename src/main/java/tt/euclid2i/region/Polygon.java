@@ -75,14 +75,7 @@ public class Polygon implements Region, Serializable{
 
     public Polygon inflate(double inflateBy, int pointsAtCorner) {
 
-        // convert points to 2d
-        tt.euclid2d.Point[] points2d = new tt.euclid2d.Point[points.length];
-        for (int i = 0; i < points.length; i++) {
-            points2d[i] = new tt.euclid2d.Point(points[i].x, points[i].y);
-        }
-
-        // inflate polygon2d
-        tt.euclid2d.region.Polygon polygon2d = new tt.euclid2d.region.Polygon(points2d);
+        tt.euclid2d.region.Polygon polygon2d = new tt.euclid2d.region.Polygon(points);
         tt.euclid2d.region.Polygon inflatedPolygon2d = polygon2d.inflate(inflateBy, pointsAtCorner);
 
         // convert back to 2i
