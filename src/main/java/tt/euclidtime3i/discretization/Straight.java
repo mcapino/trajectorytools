@@ -4,7 +4,6 @@ import tt.euclidtime3i.Point;
 
 
 public class Straight {
-    private static final long serialVersionUID = -2519868162204278196L;
 
     private Point start;
     private Point end;
@@ -33,6 +32,10 @@ public class Straight {
 
         if (time < tStart || tEnd < time)
             throw new RuntimeException("This straight is not defined in time " + time);
+
+        if (tEnd - tStart == 0) {
+            throw new RuntimeException("Segment " + this + " has duration zero, cannot interpolate...");
+        }
 
         double scale = ((double) (time - tStart)) / (tEnd - tStart);
 
