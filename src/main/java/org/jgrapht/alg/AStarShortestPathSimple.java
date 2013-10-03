@@ -24,7 +24,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     protected HeuristicToGoal<V> heuristicToGoal;
     protected Map<V, Heap.Entry<Double, V>> opened;
     protected Set<V> closed;
-    protected int iterationCounter;
+    protected int iterationCounter = 0;
     //
     protected GraphPath<V, E> path;
     protected V current;
