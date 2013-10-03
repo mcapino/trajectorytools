@@ -140,6 +140,18 @@ public class Util {
         return inflatedRegions;
     }
 
+    @SuppressWarnings("unchecked")
+    public static Collection<Region>[] inflateRegions(Collection<? extends Region> obstacles, int agentBodyRadiuses[]) {
+        int agents = agentBodyRadiuses.length;
+        Collection<Region>[] collections = new Collection[agents];
+
+        for (int i = 0; i < agents; i++) {
+            collections[i] = Util.inflateRegions(obstacles, agentBodyRadiuses[i]);
+        }
+
+        return collections;
+    }
+
     public static void exportTrajectory(Trajectory trajectory, PrintWriter writer, int samplingInterval, int maxTime) {
         for (int t = trajectory.getMinTime(); t < trajectory.getMaxTime() && t < maxTime; t += samplingInterval) {
             Point pos = trajectory.get(t);
