@@ -47,7 +47,7 @@ public class Util {
         return point;
     }
 
-    public static Point sampleFreeSpace(Rectangle bounds, Collection<Region> obstacles, Random random, int maxTrials) {
+    public static Point sampleFreeSpace(Rectangle bounds, Collection<? extends Region> obstacles, Random random, int maxTrials) {
 
         Point point = null;
         int trials = 0;
