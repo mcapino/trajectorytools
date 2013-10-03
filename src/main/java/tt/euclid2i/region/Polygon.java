@@ -29,6 +29,10 @@ public class Polygon implements Region, Serializable{
                 return true;
             }
         }
+        int l = points.length-1;
+        if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, points[l].x, points[l].y, points[0].x, points[0].y, true)) {
+            return true;
+        }
 
         return false;
     }
