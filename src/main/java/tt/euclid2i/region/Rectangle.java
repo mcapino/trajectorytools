@@ -69,5 +69,23 @@ public class Rectangle implements Region {
                 new Point(minx, maxy)});
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Rectangle rectangle = (Rectangle) o;
+
+        if (!corner1.equals(rectangle.corner1)) return false;
+        if (!corner2.equals(rectangle.corner2)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = corner1.hashCode();
+        result = 31 * result + corner2.hashCode();
+        return result;
+    }
 }

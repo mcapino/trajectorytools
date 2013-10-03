@@ -34,5 +34,23 @@ public class Circle implements Region {
 	}
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Circle circle = (Circle) o;
+
+        if (radius != circle.radius) return false;
+        if (!center.equals(circle.center)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = center.hashCode();
+        result = 31 * result + radius;
+        return result;
+    }
 }
