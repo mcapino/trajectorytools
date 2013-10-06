@@ -47,7 +47,7 @@ public class RegionsLayer extends AbstractLayer {
             if (region instanceof Rectangle) {
                 Rectangle rect = (Rectangle) region;
 
-                if (!fill) {
+                if (fill) {
                     canvas.setColor(fillColor);
                     canvas.fillRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
                             Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
@@ -78,7 +78,7 @@ public class RegionsLayer extends AbstractLayer {
                     canvas.fillOval(x[0], y[0], 2, 2);
 
                 } else {
-                    if (!fill) {
+                    if (fill) {
                         canvas.setColor(fillColor);
                         canvas.fillPolygon(x, y, n);
                     }
