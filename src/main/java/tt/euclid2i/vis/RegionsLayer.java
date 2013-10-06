@@ -1,15 +1,15 @@
 package tt.euclid2i.vis;
 
-import java.awt.*;
-import java.util.Collection;
-
+import cz.agents.alite.vis.Vis;
+import cz.agents.alite.vis.layer.AbstractLayer;
+import cz.agents.alite.vis.layer.VisLayer;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
-import cz.agents.alite.vis.Vis;
-import cz.agents.alite.vis.layer.AbstractLayer;
-import cz.agents.alite.vis.layer.VisLayer;
+
+import java.awt.*;
+import java.util.Collection;
 
 public class RegionsLayer extends AbstractLayer {
 
@@ -20,14 +20,20 @@ public class RegionsLayer extends AbstractLayer {
     private RegionsProvider regionsProvider;
     private Color edgeColor;
     private Color fillColor;
+    private boolean fill;
 
     RegionsLayer() {
     }
 
-    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor) {
+    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor, boolean fill) {
         this.regionsProvider = regionsProvider;
         this.edgeColor = edgeColor;
         this.fillColor = fillColor;
+        this.fill = fill;
+    }
+
+    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor) {
+        this(regionsProvider, edgeColor, fillColor, true);
     }
 
     @Override
@@ -41,15 +47,20 @@ public class RegionsLayer extends AbstractLayer {
             if (region instanceof Rectangle) {
                 Rectangle rect = (Rectangle) region;
 
-                canvas.setColor(fillColor);
-                canvas.fillRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
-                        Vis.transX(rect.getCorner2().x) -  Vis.transX(rect.getCorner1().x),
-                        Vis.transY(rect.getCorner2().y) -  Vis.transY(rect.getCorner1().y));
-
                 canvas.setColor(edgeColor);
                 canvas.drawRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
-                        Vis.transX(rect.getCorner2().x) -  Vis.transX(rect.getCorner1().x),
-                        Vis.transY(rect.getCorner2().y) -  Vis.transY(rect.getCorner1().y));
+                        Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
+                        Vis.transY(rect.getCorner2().y) - Vis.transY(rect.getCorner1().y));
+
+                if (!fill)
+                    continue;
+
+                canvas.setColor(fillColor);
+                canvas.fillRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
+                        Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
+                        Vis.transY(rect.getCorner2().y) - Vis.transY(rect.getCorner1().y));
+
+
             }
 
             if (region instanceof Polygon) {
@@ -70,11 +81,14 @@ public class RegionsLayer extends AbstractLayer {
                     canvas.fillOval(x[0], y[0], 2, 2);
 
                 } else {
-                    canvas.setColor(fillColor);
-                    canvas.fillPolygon(x, y, n);
-
                     canvas.setColor(edgeColor);
                     canvas.drawPolygon(x, y, n);
+
+                    if (!fill)
+                        continue;
+
+                    canvas.setColor(fillColor);
+                    canvas.fillPolygon(x, y, n);
                 }
             }
         }
