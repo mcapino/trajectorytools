@@ -104,6 +104,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     public GraphPath<V, E> findPath(TerminatingCondition condition) {
 
         while (!heap.isEmpty() && checkProceedCondition(condition)) {
+        	iterationCounter++;
             current = heap.extractMinimum().getValue();
 
             opened.remove(current);
