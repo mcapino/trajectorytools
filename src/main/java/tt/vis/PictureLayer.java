@@ -58,6 +58,10 @@ public class PictureLayer extends ImageLayer {
         return toggle;
     }
 
+    public static VisLayer create(File imageFile, Rectangle bounds, String toggleKey) {
+        return create(loadImage(imageFile), bounds, toggleKey);
+    }
+
     public static VisLayer create(File detailedImage, File image, double zoomThreshold) {
         LodToggleLayer toggleDetailed = LodToggleLayer.create(Double.POSITIVE_INFINITY, zoomThreshold);
         toggleDetailed.addSubLayer(new PictureLayer(loadImage(detailedImage)));
