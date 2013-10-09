@@ -1,5 +1,6 @@
 package tt.euclid2i.util;
 
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
@@ -146,7 +147,17 @@ public class SeparationDetector {
         return false;
     }
 
-    private static boolean hasConflict(Straight sA, Straight sB, int separation) {
+    public static boolean hasConflict(Line sA, Line sB, int separation) {
+        Point a = sA.getStart();
+        Point b = sA.getEnd();
+
+        Point c = sB.getStart();
+        Point d = sB.getEnd();
+
+        return hasConflict(a, b, c, d, separation);
+    }
+
+    public static boolean hasConflict(Straight sA, Straight sB, int separation) {
         Point a = sA.getStart().getPosition();
         Point b = sA.getEnd().getPosition();
 
@@ -156,7 +167,7 @@ public class SeparationDetector {
         return hasConflict(a, b, c, d, separation);
     }
 
-    private static boolean hasConflict(Point As, Point At, Point Bs, Point Bt, int separation) {
+    public static boolean hasConflict(Point As, Point At, Point Bs, Point Bt, int separation) {
         int ux = As.x - Bs.y;
         int uy = As.y - Bs.y;
 
