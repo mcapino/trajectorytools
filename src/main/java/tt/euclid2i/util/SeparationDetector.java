@@ -153,32 +153,36 @@ public class SeparationDetector {
         Point c = sB.getStart().getPosition();
         Point d = sB.getEnd().getPosition();
 
-        int ux = a.x - c.y;
-        int uy = a.y - c.y;
+        return hasConflict(a, b, c, d, separation);
+    }
 
-        int vx = b.x + c.x - d.x - a.x;
-        int vy = b.y + c.y - d.y - a.y;
+    private static boolean hasConflict(Point As, Point At, Point Bs, Point Bt, int separation) {
+        int ux = As.x - Bs.y;
+        int uy = As.y - Bs.y;
+
+        int vx = At.x + Bs.x - Bt.x - As.x;
+        int vy = At.y + Bs.y - Bt.y - As.y;
 
         int nom = -(ux * vx + uy * vy);
         int denom = vx * vx + vy * vy;
 
         if (denom == 0)
-            return a.distance(c) < separation;
+            return As.distance(Bs) < separation;
 
         double frac = ((double) nom) / denom;
 
         if (frac < 0) {
-            return a.distance(c) < separation;
+            return As.distance(Bs) < separation;
 
         } else if (frac > 1) {
-            return b.distance(d) < separation;
+            return At.distance(Bt) < separation;
 
         } else {
-            int abx = (int) (a.x + (b.x - a.x) * frac);
-            int aby = (int) (a.y + (b.y - a.y) * frac);
+            int abx = (int) (As.x + (At.x - As.x) * frac);
+            int aby = (int) (As.y + (At.y - As.y) * frac);
 
-            int cdx = (int) (c.x + (d.x - c.x) * frac);
-            int cdy = (int) (c.y + (d.y - c.y) * frac);
+            int cdx = (int) (Bs.x + (Bt.x - Bs.x) * frac);
+            int cdy = (int) (Bs.y + (Bt.y - Bs.y) * frac);
 
             int dx = abx - cdx;
             int dy = aby - cdy;
