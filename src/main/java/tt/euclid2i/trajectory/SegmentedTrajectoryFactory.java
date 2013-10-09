@@ -1,8 +1,7 @@
 package tt.euclid2i.trajectory;
 
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.Graphs;
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclidtime3i.discretization.Straight;
 
@@ -25,28 +24,25 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(segments, duration, cost);
     }
 
-    public static <V extends Point, E> BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<V, E> graphPath, int startTime, int speed, int duration, double cost) {
-
+    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(List<Line> edgeList, int startTime, int speed, int duration, double cost) {
         List<Straight> segments = new ArrayList<Straight>();
-
-        List<E> edgeList = graphPath.getEdgeList();
-        Graph<V, E> graph = graphPath.getGraph();
-
-        V current = graphPath.getStartVertex();
         double oppositeTime, currentTime = startTime;
 
-        for (E edge : edgeList) {
-            V opposite = Graphs.getOppositeVertex(graph, edge, current);
-            oppositeTime = currentTime + current.distance(opposite) / speed;
+        for (Line edge : edgeList) {
+            Point start = edge.getStart();
+            Point end = edge.getEnd();
 
-            segments.add(new Straight(new tt.euclidtime3i.Point(current, (int) currentTime),
-                    new tt.euclidtime3i.Point(opposite, (int) oppositeTime)));
+            oppositeTime = currentTime + start.distance(end) / speed;
+            segments.add(new Straight(new tt.euclidtime3i.Point(start, (int) currentTime), new tt.euclidtime3i.Point(end, (int) oppositeTime)));
 
-            current = opposite;
             currentTime = oppositeTime;
         }
 
         return new BasicSegmentedTrajectory(segments, duration, cost);
+    }
+
+    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
+        return createConstantSpeedTrajectory(graphPath.getEdgeList(), startTime, speed, duration, cost);
     }
 
 }
