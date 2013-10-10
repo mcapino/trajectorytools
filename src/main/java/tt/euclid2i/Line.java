@@ -18,6 +18,16 @@ public class Line {
         return distance;
     }
 
+    public Point interpolate(double lambda) {
+        if (lambda > 1 || lambda < 0)
+            throw new IllegalArgumentException("Lambda must be between zero and one");
+
+        int x = (int) Math.round(start.x + lambda * (end.x - start.x));
+        int y = (int) Math.round(start.y + lambda * (end.y - start.y));
+
+        return new Point(x, y);
+    }
+
     public Point getStart() {
         return start;
     }
