@@ -16,7 +16,6 @@ public class SeparationDetector {
 
             SegmentedTrajectory otherTrajectory = otherTrajectories[otherTrajId];
 
-            //TODO it would be faster not to copy those sets all the time by using some condition for extendShorterList() in while cycle
             List<Straight> segmentsA = extendList(thisTrajectory);
             List<Straight> segmentsB = extendList(otherTrajectory);
 
@@ -167,33 +166,37 @@ public class SeparationDetector {
         return hasConflict(a, b, c, d, separation);
     }
 
-    public static boolean hasConflict(Point As, Point At, Point Bs, Point Bt, int separation) {
-        int ux = As.x - Bs.y;
-        int uy = As.y - Bs.y;
+    public static boolean hasConflict(Point a, Point b, Point c, Point d, int separation) {
+        int ux = a.x - c.y;
+        int uy = a.y - c.y;
 
-        int vx = At.x + Bs.x - Bt.x - As.x;
-        int vy = At.y + Bs.y - Bt.y - As.y;
+        int vx = b.x + c.x - d.x - a.x;
+        int vy = b.y + c.y - d.y - a.y;
 
         int nom = -(ux * vx + uy * vy);
         int denom = vx * vx + vy * vy;
 
         if (denom == 0)
-            return As.distance(Bs) < separation;
+            return a.distance(c) < separation;
 
         double frac = ((double) nom) / denom;
 
+        //TODO repair this method
+        if (true)
+            throw new RuntimeException("DO NOT USE THIS METHOD UNTIL I FIX IT");
+
         if (frac < 0) {
-            return As.distance(Bs) < separation;
+            return a.distance(c) < separation;
 
         } else if (frac > 1) {
-            return At.distance(Bt) < separation;
+            return b.distance(d) < separation;
 
         } else {
-            int abx = (int) (As.x + (At.x - As.x) * frac);
-            int aby = (int) (As.y + (At.y - As.y) * frac);
+            int abx = (int) (a.x + (b.x - a.x) * frac);
+            int aby = (int) (a.y + (b.y - a.y) * frac);
 
-            int cdx = (int) (Bs.x + (Bt.x - Bs.x) * frac);
-            int cdy = (int) (Bs.y + (Bt.y - Bs.y) * frac);
+            int cdx = (int) (c.x + (d.x - c.x) * frac);
+            int cdy = (int) (c.y + (d.y - c.y) * frac);
 
             int dx = abx - cdx;
             int dy = aby - cdy;
