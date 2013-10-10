@@ -4,7 +4,7 @@ import javax.vecmath.Point2d;
 import javax.vecmath.Point2i;
 import javax.vecmath.Tuple2i;
 
-public class Point extends Point2i {
+public class Point extends Point2i implements Cloneable {
 
 
     public Point() {
@@ -35,4 +35,8 @@ public class Point extends Point2i {
         y = (int) Math.round(y / scalar);
     }
 
+    @Override
+    public Point clone() {
+        return new Point(x, y);
+    }
 }
