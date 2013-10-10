@@ -1,16 +1,17 @@
 package tt.euclidtime3i.discretization;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.EdgeFactory;
-import org.jgrapht.graph.AbstractDirectedGraphWrapper;
-import tt.euclid2i.Line;
-import tt.euclidtime3i.Point;
-import tt.euclidtime3i.Region;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.graph.AbstractDirectedGraphWrapper;
+
+import tt.euclid2i.Line;
+import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Region;
 
 public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Point, Straight> {
 
@@ -31,6 +32,12 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         this.speeds = speeds;
         this.dynamicObstacles = dynamicObstacles;
         this.waitMoveDuration = waitMoveDuration;
+    }
+
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds, int waitMoveDuration) {
+       this(spatialGraph, maxTime, speeds, new LinkedList<Region>(), waitMoveDuration);
     }
 
     public ConstantSpeedTimeExtension(
@@ -109,10 +116,10 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         Set<Straight> edges = new HashSet<Straight>();
 
         if (waitMoveDuration != DISABLE_WAIT_MOVE) {
-        	Point endPoint = new tt.euclidtime3i.Point(vertex.x, vertex.y, vertex.getTime() + waitMoveDuration);
-        	if (isVisible(vertex, endPoint, dynamicObstacles)) {
-        		edges.add(new Straight(vertex, endPoint));
-        	}
+            Point endPoint = new tt.euclidtime3i.Point(vertex.x, vertex.y, vertex.getTime() + waitMoveDuration);
+            if (isVisible(vertex, endPoint, dynamicObstacles)) {
+                edges.add(new Straight(vertex, endPoint));
+            }
         }
 
         for (Point child : children) {
