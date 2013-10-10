@@ -33,6 +33,11 @@ public abstract class PlanningAlgorithm<V, E> implements VizualizableAlgorithm<V
 
     public abstract GraphPath<V, E> findPath(int iterationLimit);
 
+    @Override
+    public Collection<E> getShortestPathTreeEdges() {
+        return shortestPathTreeEdges.values();
+    }
+
     public void addExpansionListener(ExpansionListener<V> listener) {
         listeners.add(listener);
     }

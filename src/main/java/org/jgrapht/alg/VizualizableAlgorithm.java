@@ -11,6 +11,8 @@ public interface VizualizableAlgorithm<V, E> {
 
     public Collection<V> getClosedNodes();
 
+    public Collection<E> getShortestPathTreeEdges();
+
     public V getParent(V vertex);
 
     public double getFValue(V vertex);
