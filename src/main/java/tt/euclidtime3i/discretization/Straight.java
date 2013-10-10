@@ -33,9 +33,11 @@ public class Straight {
         if (time < tStart || tEnd < time)
             throw new RuntimeException("This straight is not defined in time " + time);
 
-        if (tEnd - tStart == 0) {
-            throw new RuntimeException("Segment " + this + " has duration zero, cannot interpolate...");
-        }
+        if (time == tStart)
+            return start;
+
+        if (time == tEnd)
+            return end;
 
         double scale = ((double) (time - tStart)) / (tEnd - tStart);
 
