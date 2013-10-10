@@ -1,9 +1,10 @@
 package tt.euclid2i.trajectory;
 
-import java.util.Arrays;
-
+import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclidtime3i.discretization.Straight;
+
+import java.util.Arrays;
 
 public class LinearTrajectory extends BasicSegmentedTrajectory {
 
@@ -15,4 +16,8 @@ public class LinearTrajectory extends BasicSegmentedTrajectory {
                 cost);
     }
 
+    public LinearTrajectory(int startTime, Line line, int speed, int duration, double cost) {
+
+        this(startTime, line.getStart(), line.getEnd(), speed, duration, cost);
+    }
 }
