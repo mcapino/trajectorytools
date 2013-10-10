@@ -53,7 +53,7 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
         }
 
 
-        return !SeparationDetector.hasAnyPairwiseConflict(thisTraj, otherTrajs, separations, 1);
+        return !SeparationDetector.hasAnyPairwiseConflict(thisTraj, otherTrajs, separations, 10);
         //return !SeparationDetector.hasAnyPairwiseConflictAnalytic((tt.euclid2i.SegmentedTrajectory) thisTraj, segmentedTrajs, separations);
     }
 

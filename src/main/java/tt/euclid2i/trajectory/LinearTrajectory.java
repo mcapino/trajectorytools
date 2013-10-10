@@ -14,5 +14,4 @@ public class LinearTrajectory extends BasicSegmentedTrajectory {
                 duration,
                 cost);
     }
-
 }
