@@ -14,6 +14,8 @@ import org.jgrapht.util.HeuristicToGoal;
 import org.teneighty.heap.FibonacciHeap;
 import org.teneighty.heap.Heap;
 
+import tt.util.Counters;
+
 public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
     public static interface TerminatingCondition<V> {
@@ -125,6 +127,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     public GraphPath<V, E> findPath(TerminatingCondition condition) {
 
         while (!heap.isEmpty() && checkProceedCondition(condition)) {
+            Counters.expandedStatesCounter++;
             iterationCounter++;
             current = heap.extractMinimum().getValue();
 
