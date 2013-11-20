@@ -2,16 +2,16 @@ package tt.euclid2i;
 
 import org.jgrapht.util.HeuristicToGoal;
 
-public class HeuristicToPoint<P extends Point> implements HeuristicToGoal<P> {
+public class HeuristicToPoint implements HeuristicToGoal<Point> {
 
-    private final P target;
+    private final Point target;
 
-    public HeuristicToPoint(P target) {
+    public HeuristicToPoint(Point target) {
         this.target = target;
     }
 
     @Override
-    public double getCostToGoalEstimate(P current) {
+    public double getCostToGoalEstimate(Point current) {
         return current.distance(target);
     }
 }

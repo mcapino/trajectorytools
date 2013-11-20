@@ -5,7 +5,7 @@ import org.jgrapht.util.HeuristicToGoal;
 import org.jgrapht.util.heuristics.PerfectHeuristic;
 import tt.euclid2i.Line;
 
-public class PerfectBasedHeuristic<P extends Point, E> implements HeuristicToGoal<P> {
+public class PerfectBasedHeuristic implements HeuristicToGoal<Point> {
 
     private HeuristicToGoal<tt.euclid2i.Point> heuristics;
 
@@ -14,7 +14,7 @@ public class PerfectBasedHeuristic<P extends Point, E> implements HeuristicToGoa
     }
 
     @Override
-    public double getCostToGoalEstimate(P current) {
+    public double getCostToGoalEstimate(Point current) {
         return heuristics.getCostToGoalEstimate(current.getPosition());
     }
 }
