@@ -1,12 +1,16 @@
 package tt.euclid2i.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
 import tt.euclidtime3i.discretization.Straight;
-
-import java.util.*;
 
 public class SeparationDetector {
 
@@ -100,6 +104,44 @@ public class SeparationDetector {
                             return true;
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasAnyPairwiseConflict(Trajectory[] trajectories, int separations[], int samplingInterval) {
+
+        int minTime = Integer.MAX_VALUE;
+        for (int i=0; i<trajectories.length; i++) {
+            if (trajectories[i].getMinTime() < minTime) {
+                minTime = trajectories[i].getMinTime();
+            }
+        }
+
+        int maxTime = Integer.MIN_VALUE;
+        for (int i=0; i<trajectories.length; i++) {
+            if (trajectories[i].getMaxTime() > maxTime) {
+                maxTime = trajectories[i].getMaxTime();
+            }
+        }
+
+        // iterate over all time points
+        for (int t = minTime; t <= maxTime; t += samplingInterval) {
+            // check all pairs of agents for conflicts at timepoint t
+            for (int j = 0; j < trajectories.length; j++) {
+                for (int k = j + 1; k < trajectories.length; k++) {
+                    // check the distance between j and k
+                    Trajectory a = trajectories[j];
+                    Trajectory b = trajectories[k];
+
+                    if (t >= a.getMinTime() && t <= a.getMaxTime() &&
+                            t >= b.getMinTime() && t <= b.getMaxTime()) {
+                        if (a.get(t).distance(b.get(t)) <= separations[j] + separations[k]) {
+                            return true;
+                        }
+                    }
+
                 }
             }
         }
