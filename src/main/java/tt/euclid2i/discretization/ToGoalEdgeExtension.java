@@ -1,17 +1,16 @@
 package tt.euclid2i.discretization;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
-
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.util.NotImplementedException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Line> {
 
@@ -111,7 +110,7 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
             }
         } else {
             if (graph.containsVertex(vertex)) {
-                 return graph.outgoingEdgesOf(vertex);
+                return graph.outgoingEdgesOf(vertex);
             } else {
                 return new HashSet<Line>();
             }
@@ -119,6 +118,7 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
     }
 
     public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
+        //FIXME if the underlying graph is lazygrid, it may happen that this method causes infinite loop
         DirectedGraph<Point, Line> fullGraph
                 = new DefaultDirectedGraph<Point, Line>(Line.class);
 
