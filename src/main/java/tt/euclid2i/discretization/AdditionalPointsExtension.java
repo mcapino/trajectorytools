@@ -123,8 +123,6 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
         DirectedGraph<Point, Line> fullGraph
                 = new DefaultDirectedGraph<Point, Line>(Line.class);
 
-        //FIXME it can easily happen on lazy grid, that this functions gets stuck in infinite loop
-
         return GraphBuilder.build(this, fullGraph, initialPoint);
     }
 }
