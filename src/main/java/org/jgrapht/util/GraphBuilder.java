@@ -27,20 +27,26 @@ public class GraphBuilder {
 
         int counter = 0;
 
-        while (!open.isEmpty() && counter++ < maxVertices) {
+        whileLoop:
+        while (!open.isEmpty()) {
             V current = open.poll();
             emptyExplicitGraph.addVertex(current);
 
             Set<E> outEdges = implicitGraph.outgoingEdgesOf(current);
             for (E edge : outEdges) {
+
+                if (counter++ > maxVertices)
+                    break whileLoop;
+
                 V target = implicitGraph.getEdgeTarget(edge);
-                emptyExplicitGraph.addVertex(target);
-                emptyExplicitGraph.addEdge(current, target, edge);
 
                 if (!closed.contains(target)) {
+                    emptyExplicitGraph.addVertex(target);
                     closed.add(target);
                     open.offer(target);
                 }
+
+                emptyExplicitGraph.addEdge(current, target, edge);
             }
         }
 
