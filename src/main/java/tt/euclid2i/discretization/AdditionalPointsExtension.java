@@ -1,7 +1,6 @@
 package tt.euclid2i.discretization;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.util.GraphBuilder;
@@ -18,35 +17,35 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
     Set<Point> points;
     int radius;
 
-    HashMap<Point, Set<Line>> newIncomingEdges;
-    HashMap<Point, Set<Line>> newOutgoingEdges;
+    HashMap<Point, Set<Line>> additionalIncomingEdges;
+    HashMap<Point, Set<Line>> additionalOutgoingEdges;
 
     public AdditionalPointsExtension(DirectedGraph<Point, Line> graph, Set<Point> points, int radius) {
         super();
         this.graph = graph;
         this.points = points;
         this.radius = radius;
-        this.newIncomingEdges = new HashMap<Point, Set<Line>>();
-        this.newOutgoingEdges = new HashMap<Point, Set<Line>>();
-        prepareNewEdges();
+        this.additionalIncomingEdges = new HashMap<Point, Set<Line>>();
+        this.additionalOutgoingEdges = new HashMap<Point, Set<Line>>();
+        prepareAdditionalEdges();
     }
 
-    private void prepareNewEdges() {
+    private void prepareAdditionalEdges() {
         Set<Point> vertexSet = graph.vertexSet();
-        for (Point newPoint : points) {
+        for (Point additionalPoint : points) {
             Set<Line> incoming = new HashSet<Line>();
             Set<Line> outgoing = new HashSet<Line>();
 
             for (Point graphPoint : vertexSet) {
-                if (newPoint.distance(graphPoint) > radius)
+                if (additionalPoint.distance(graphPoint) > radius)
                     continue;
 
-                incoming.add(new Line(graphPoint, newPoint));
-                outgoing.add(new Line(newPoint, graphPoint));
+                incoming.add(new Line(graphPoint, additionalPoint));
+                outgoing.add(new Line(additionalPoint, graphPoint));
             }
 
-            newIncomingEdges.put(newPoint, incoming);
-            newOutgoingEdges.put(newPoint, outgoing);
+            additionalIncomingEdges.put(additionalPoint, incoming);
+            additionalOutgoingEdges.put(additionalPoint, outgoing);
         }
     }
 
@@ -61,33 +60,6 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
         edges.addAll(incomingEdgesOf(vertex));
         edges.addAll(outgoingEdgesOf(vertex));
         return edges;
-    }
-
-    @Override
-    public Set<Line> getAllEdges(Point start, Point end) {
-        checkEdgeIsInGraph(start, end);
-
-        Set<Line> edges = new HashSet<Line>();
-        edges.add(new Line(start, end));
-        edges.add(new Line(end, start));
-
-        return edges;
-    }
-
-    @Override
-    public Line getEdge(Point start, Point end) {
-        checkEdgeIsInGraph(start, end);
-        return new Line(start, end);
-    }
-
-    private void checkEdgeIsInGraph(Point start, Point end) {
-        if (!containsVertex(start) || !containsVertex(end))
-            throw new RuntimeException("At least one of the nodes is not present in the graph");
-    }
-
-    @Override
-    public EdgeFactory<Point, Line> getEdgeFactory() {
-        return null;
     }
 
     @Override
@@ -107,11 +79,6 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
 
 
     @Override
-    public int inDegreeOf(Point vertex) {
-        return incomingEdgesOf(vertex).size();
-    }
-
-    @Override
     public Set<Line> incomingEdgesOf(Point vertex) {
         if (graph.containsVertex(vertex)) {
             Set<Line> edges = new HashSet<Line>();
@@ -125,16 +92,11 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
             return edges;
 
         } else if (points.contains(vertex)) {
-            return newIncomingEdges.get(vertex);
+            return additionalIncomingEdges.get(vertex);
 
         } else {
             throw new RuntimeException("Decorated graph and decorator itself do not contain vertex" + vertex);
         }
-    }
-
-    @Override
-    public int outDegreeOf(Point vertex) {
-        return outgoingEdgesOf(vertex).size();
     }
 
     @Override
@@ -150,7 +112,7 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
 
             return edges;
         } else if (points.contains(vertex)) {
-            return newOutgoingEdges.get(vertex);
+            return additionalOutgoingEdges.get(vertex);
 
         } else {
             throw new RuntimeException("Decorated graph and decorator itself do not contain vertex" + vertex);
@@ -160,6 +122,8 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
     public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
         DirectedGraph<Point, Line> fullGraph
                 = new DefaultDirectedGraph<Point, Line>(Line.class);
+
+        //FIXME it can easily happen on lazy grid, that this functions gets stuck in infinite loop
 
         return GraphBuilder.build(this, fullGraph, initialPoint);
     }
