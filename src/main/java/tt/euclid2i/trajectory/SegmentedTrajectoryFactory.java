@@ -41,6 +41,23 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(segments, duration, cost);
     }
 
+    public static BasicSegmentedTrajectory createEdgeDurationTrajectory(List<Line> edgeList, int startTime, double edgeDuration, int duration, double cost) {
+        List<Straight> segments = new ArrayList<Straight>();
+        double oppositeTime, currentTime = startTime;
+
+        for (Line edge : edgeList) {
+            Point start = edge.getStart();
+            Point end = edge.getEnd();
+
+            oppositeTime = currentTime + edgeDuration;
+            segments.add(new Straight(new tt.euclidtime3i.Point(start, (int) currentTime), new tt.euclidtime3i.Point(end, (int) oppositeTime)));
+
+            currentTime = oppositeTime;
+        }
+
+        return new BasicSegmentedTrajectory(segments, duration, cost);
+    }
+
     public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
         return createConstantSpeedTrajectory(graphPath.getEdgeList(), startTime, speed, duration, cost);
     }
