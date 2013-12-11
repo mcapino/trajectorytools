@@ -41,7 +41,7 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(segments, duration, cost);
     }
 
-    public static BasicSegmentedTrajectory createEdgeDurationTrajectory(List<Line> edgeList, int startTime, double edgeDuration, int duration, double cost) {
+    public static BasicSegmentedTrajectory createEdgeDurationTrajectory(List<Line> edgeList, int startTime, double edgeDuration, int duration) {
         List<Straight> segments = new ArrayList<Straight>();
         double oppositeTime, currentTime = startTime;
 
@@ -55,7 +55,7 @@ public class SegmentedTrajectoryFactory {
             currentTime = oppositeTime;
         }
 
-        return new BasicSegmentedTrajectory(segments, duration, cost);
+        return new BasicSegmentedTrajectory(segments, duration, currentTime);
     }
 
     public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
