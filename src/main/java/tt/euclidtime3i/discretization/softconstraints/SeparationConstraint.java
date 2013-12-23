@@ -6,17 +6,20 @@ import tt.euclid2i.Trajectory;
 public class SeparationConstraint implements PairwiseConstraint {
 
     private LinearSeparationPenaltyFunction penaltyFunction;
+    private int minSeparation;
     private int samplingInterval;
 
     public SeparationConstraint(LinearSeparationPenaltyFunction penaltyFunction,
-                                int samplingInterval) {
+                                int samplingInterval,
+                                int minSeparation) {
         super();
         this.penaltyFunction = penaltyFunction;
         this.samplingInterval = samplingInterval;
+        this.minSeparation = minSeparation;
     }
 
     @Override
-    public double getPenalty(Trajectory t1, Trajectory t2, int minSeparation) {
+    public double getPenalty(Trajectory t1, Trajectory t2) {
         return integratePenalty(t1, new Trajectory[]{t2}, penaltyFunction, minSeparation, samplingInterval);
     }
 
