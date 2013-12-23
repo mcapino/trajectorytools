@@ -107,7 +107,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         });
     }
 
-    public GraphPath<V, E> findPathCostAndDeadlineLimit(final double costLimit, final long deadlineLimit) {
+    public GraphPath<V, E> findPathCostAndDeadlineLimit(final double costLimit, final long deadlineLimitMs) {
         return findPath(new TerminatingCondition<V>() {
 
             private long startTime = 0;
@@ -117,7 +117,7 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
                 if (startTime == 0) {
                     startTime = System.currentTimeMillis();
                 }
-                return System.currentTimeMillis() < deadlineLimit
+                return System.currentTimeMillis() < deadlineLimitMs
                         && heapMinimum < costLimit;
             }
         });

@@ -107,7 +107,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         for (Line spatialEdge : spatialEdges) {
             for (int speed : speeds) {
                 Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
-                if (child.getTime() < maxTime && isVisible(vertex, child, dynamicObstacles)) {
+                if (child.getTime() <= maxTime && isVisible(vertex, child, dynamicObstacles)) {
                     children.add(child);
                 }
             }

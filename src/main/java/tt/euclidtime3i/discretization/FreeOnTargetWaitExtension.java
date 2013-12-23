@@ -19,10 +19,6 @@ public class FreeOnTargetWaitExtension extends GraphDelegator<Point, Straight> i
         this.targetVertex = targetVertex;
     }
 
-    public FreeOnTargetWaitExtension(Graph<Point, Straight> g) {
-        super(g);
-    }
-
 	@Override
     public double getEdgeWeight(Straight e) {
         if (e.getStart().getPosition().equals(targetVertex) && e.getEnd().getPosition().equals(targetVertex)) {

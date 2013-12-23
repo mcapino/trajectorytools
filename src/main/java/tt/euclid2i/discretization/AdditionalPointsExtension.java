@@ -21,16 +21,20 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
     HashMap<Point, Set<Line>> additionalOutgoingEdges;
 
     public AdditionalPointsExtension(DirectedGraph<Point, Line> graph, Set<Point> points, int radius) {
+    	this(graph, points, radius, false);
+    }
+
+    public AdditionalPointsExtension(DirectedGraph<Point, Line> graph, Set<Point> points, int radius, boolean addLoop) {
         super();
         this.graph = graph;
         this.points = points;
         this.radius = radius;
         this.additionalIncomingEdges = new HashMap<Point, Set<Line>>();
         this.additionalOutgoingEdges = new HashMap<Point, Set<Line>>();
-        prepareAdditionalEdges();
+        prepareAdditionalEdges(addLoop);
     }
 
-    private void prepareAdditionalEdges() {
+    private void prepareAdditionalEdges(boolean addLoop) {
         Set<Point> vertexSet = graph.vertexSet();
         for (Point additionalPoint : points) {
             Set<Line> incoming = new HashSet<Line>();
@@ -42,6 +46,11 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
 
                 incoming.add(new Line(graphPoint, additionalPoint));
                 outgoing.add(new Line(additionalPoint, graphPoint));
+            }
+
+            if (addLoop) {
+            	incoming.add(new Line(additionalPoint, additionalPoint));
+            	outgoing.add(new Line(additionalPoint, additionalPoint));
             }
 
             additionalIncomingEdges.put(additionalPoint, incoming);
@@ -93,7 +102,6 @@ public class AdditionalPointsExtension extends AbstractDirectedGraphWrapper<Poin
 
         } else if (points.contains(vertex)) {
             return additionalIncomingEdges.get(vertex);
-
         } else {
             throw new RuntimeException("Decorated graph and decorator itself do not contain vertex" + vertex);
         }
