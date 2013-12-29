@@ -101,32 +101,42 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
     @Override
     public Set<Straight> outgoingEdgesOf(Point vertex) {
-        Set<Point> children = new HashSet<Point>();
+	    if (vertex.getTime() < maxTime) {
+	    	Set<Point> children = new HashSet<Point>();
 
-        Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
-        for (Line spatialEdge : spatialEdges) {
-            for (int speed : speeds) {
-                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
-                if (child.getTime() <= maxTime && isVisible(vertex, child, dynamicObstacles)) {
-                    children.add(child);
-                }
-            }
+	        Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
+	        for (Line spatialEdge : spatialEdges) {
+	            for (int speed : speeds) {
+	                Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
+	                if (child.getTime() <= maxTime && isVisible(vertex, child, dynamicObstacles)) {
+	                    children.add(child);
+	                }
+	            }
+	        }
+
+	        Set<Straight> edges = new HashSet<Straight>();
+
+	        if (waitMoveDuration != DISABLE_WAIT_MOVE) {
+	        	int endTime = vertex.getTime() + waitMoveDuration;
+
+	        	if (endTime > maxTime) {
+	        		endTime = maxTime;
+	        	}
+
+	            Point endPoint = new tt.euclidtime3i.Point(vertex.x, vertex.y, endTime);
+	            if (isVisible(vertex, endPoint, dynamicObstacles)) {
+	                edges.add(new Straight(vertex, endPoint));
+	            }
+	        }
+
+	        for (Point child : children) {
+	            edges.add(new Straight(vertex, child));
+	        }
+
+	        return edges;
+        } else {
+        	return new HashSet<Straight>();
         }
-
-        Set<Straight> edges = new HashSet<Straight>();
-
-        if (waitMoveDuration != DISABLE_WAIT_MOVE) {
-            Point endPoint = new tt.euclidtime3i.Point(vertex.x, vertex.y, vertex.getTime() + waitMoveDuration);
-            if (isVisible(vertex, endPoint, dynamicObstacles)) {
-                edges.add(new Straight(vertex, endPoint));
-            }
-        }
-
-        for (Point child : children) {
-            edges.add(new Straight(vertex, child));
-        }
-
-        return edges;
     }
 
     private boolean isVisible(Point start, Point end, Collection<Region> obstacles) {
