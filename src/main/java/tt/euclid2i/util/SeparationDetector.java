@@ -100,7 +100,7 @@ public class SeparationDetector {
                             && t <= otherTrajectories[j].getMaxTime()) {
                         Point otherTrajectoryPos = otherTrajectories[j]
                                 .get(t);
-                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separations[j]) {
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) < separations[j]) {
                             return true;
                         }
                     }

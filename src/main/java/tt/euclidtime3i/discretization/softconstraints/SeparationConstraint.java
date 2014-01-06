@@ -5,11 +5,11 @@ import tt.euclid2i.Trajectory;
 
 public class SeparationConstraint implements PairwiseConstraint {
 
-    private LinearSeparationPenaltyFunction penaltyFunction;
+    private SeparationPenaltyFunction penaltyFunction;
     private int minSeparation;
     private int samplingInterval;
 
-    public SeparationConstraint(LinearSeparationPenaltyFunction penaltyFunction,
+    public SeparationConstraint(SeparationPenaltyFunction penaltyFunction,
                                 int samplingInterval,
                                 int minSeparation) {
         super();
@@ -41,7 +41,7 @@ public class SeparationConstraint implements PairwiseConstraint {
                     if (t >= otherTrajectories[j].getMinTime() && t <= otherTrajectories[j].getMaxTime()) {
 
                         // handle the case when the sample lies near the end of either this trajectory or other trajectory
-                        int segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
+                        double segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
 
                         Point otherPos = otherTrajectories[j].get(t);
                         penaltySum += penaltyFunction.getPenalty(thisPos, otherPos, minSeparation) * segmentLength;
