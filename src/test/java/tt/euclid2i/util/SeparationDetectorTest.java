@@ -4,11 +4,14 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
 import org.jgrapht.util.HeuristicToGoal;
+import org.junit.Test;
+
 import tt.euclid2i.*;
 import tt.euclid2i.discretization.ProbabilisticRoadmap;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.trajectory.BasicSegmentedTrajectory;
 import tt.euclid2i.trajectory.SegmentedTrajectoryFactory;
+import tt.euclidtime3i.trajectory.LinearTrajectory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,4 +82,18 @@ public class SeparationDetectorTest {
             }
         }, startA, endA);
     }
+
+    // Separation detector should regard "touching" trajectories as non-conflicting. I.e if distance = separation, we are okay
+    @Test
+    public void testTouch() throws Exception {
+
+    	Trajectory traj1 = new LinearTrajectory(new tt.euclidtime3i.Point(0,0,0), new tt.euclidtime3i.Point(0,100,100) , 100);
+    	Trajectory traj2 = new LinearTrajectory(new tt.euclidtime3i.Point(50,0,0), new tt.euclidtime3i.Point(50,100,100) , 100);
+
+    	// distance between trajs is 50, separation distance is 51 => this is conflict
+    	assertTrue(SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[] {traj2}, new int[] {51}, 10));
+    	// distance between trajs is 50, separation distance is 50 => this is not a conflict
+    	assertTrue(!SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[] {traj2}, new int[] {50}, 10));
+    }
+
 }

@@ -137,7 +137,7 @@ public class SeparationDetector {
 
                     if (t >= a.getMinTime() && t <= a.getMaxTime() &&
                             t >= b.getMinTime() && t <= b.getMaxTime()) {
-                        if (a.get(t).distance(b.get(t)) <= separations[j] + separations[k]) {
+                        if (a.get(t).distance(b.get(t)) < separations[j] + separations[k]) {
                             return true;
                         }
                     }
@@ -177,7 +177,7 @@ public class SeparationDetector {
 
                     if (t >= a.getMinTime() && t <= a.getMaxTime() &&
                             t >= b.getMinTime() && t <= b.getMaxTime()) {
-                        if (a.get(t).distance(b.get(t)) <= separation) {
+                        if (a.get(t).distance(b.get(t)) < separation) {
                             return true;
                         }
                     }
@@ -265,7 +265,7 @@ public class SeparationDetector {
                 if (otherTrajectories.get(j) != null) {
                     if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
                         Point otherTrajectoryPos = otherTrajectories.get(j).get(t);
-                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) < separation) {
                             conflicts.add(new tt.euclidtime3i.Point(thisTrajectoryPos, t));
                         }
                     }
@@ -309,7 +309,7 @@ public class SeparationDetector {
 
                     if (t >= a.getMinTime() && t <= a.getMaxTime() &&
                             t >= b.getMinTime() && t <= b.getMaxTime()) {
-                        if (a.get(t).distance(b.get(t)) <= separation) {
+                        if (a.get(t).distance(b.get(t)) < separation) {
                             conflicts.add(new tt.euclidtime3i.Point(a.get(t), t));
                             conflicts.add(new tt.euclidtime3i.Point(b.get(t), t));
                         }
@@ -356,7 +356,7 @@ public class SeparationDetector {
 
                     if (t >= a.getMinTime() && t <= a.getMaxTime() &&
                             t >= b.getMinTime() && t <= b.getMaxTime()) {
-                        if (a.get(t).distance(b.get(t)) <= separation) {
+                        if (a.get(t).distance(b.get(t)) < separation) {
                             return new int[]{j, k};
                         }
                     }
@@ -425,7 +425,7 @@ public class SeparationDetector {
                 if (otherTrajectories.get(j) != null) {
                     if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
                         Point otherTrajectoryPos = otherTrajectories.get(j).get(t);
-                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) < separation) {
                             return true;
                         }
                     }
@@ -467,7 +467,7 @@ public class SeparationDetector {
                     if (otherTrajectories.get(j) != null) {
                         if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
                             Point otherTrajectoryPos = otherTrajectories.get(j).get(t);
-                            if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+                            if (thisTrajectoryPos.distance(otherTrajectoryPos) < separation) {
                                 return true;
                             }
                         }
@@ -498,7 +498,7 @@ public class SeparationDetector {
                 if (otherTrajectories.get(j) != null) {
                     if (t >= otherTrajectories.get(j).getMinTime() && t <= otherTrajectories.get(j).getMaxTime()) {
                         Point otherTrajectoryPos = otherTrajectories.get(j).get(t);
-                        if (thisTrajectoryPos.distance(otherTrajectoryPos) <= separation) {
+                        if (thisTrajectoryPos.distance(otherTrajectoryPos) < separation) {
                             count++;
                             continue;
                         }
