@@ -15,6 +15,10 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory((List<Straight>) graphPath.getEdgeList(), duration, cost);
     }
 
+    public static BasicSegmentedTrajectory createStationaryTrajectory(Point point, int startTime, int duration, double cost) {
+        return createSingleLineTrajectory(point, point, startTime, duration, 0, cost);
+    }
+
     public static BasicSegmentedTrajectory createSingleLineTrajectory(Point start, Point end, int startTime, int duration, int speed, double cost) {
         int endTime = startTime + (int) Math.round(start.distance(end) / speed);
 
