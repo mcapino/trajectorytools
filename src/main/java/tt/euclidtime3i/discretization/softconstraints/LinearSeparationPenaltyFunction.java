@@ -1,18 +1,18 @@
 package tt.euclidtime3i.discretization.softconstraints;
 
-import tt.euclid2i.Point;
-
-public class LinearSeparationPenaltyFunction implements SeparationPenaltyFunction {
+public class LinearSeparationPenaltyFunction implements PenaltyFunction {
 
     private double maxPenalty;
+	private double minSeparation;
 
-    public LinearSeparationPenaltyFunction(double maxPenalty) {
+    public LinearSeparationPenaltyFunction(double maxPenalty, double minSeparation) {
         super();
         this.maxPenalty = maxPenalty;
+        this.minSeparation = minSeparation;
     }
 
     @Override
-    public double getPenalty(Point p1, Point p2, int minSeparation) {
-        return Math.max(0, maxPenalty - (maxPenalty * p1.distance(p2)) / minSeparation);
+    public double getPenalty(double dist) {
+        return Math.max(0, maxPenalty - (maxPenalty * dist) / minSeparation);
     }
 }

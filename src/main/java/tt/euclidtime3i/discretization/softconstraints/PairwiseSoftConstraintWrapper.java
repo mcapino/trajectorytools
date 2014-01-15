@@ -19,7 +19,6 @@ public class PairwiseSoftConstraintWrapper<V extends Point, E extends Straight> 
         this.constraints = constraints;
     }
 
-
     @Override
     public double getEdgeWeight(E e) {
         double cost = super.getEdgeWeight(e);

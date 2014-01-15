@@ -5,17 +5,16 @@ import tt.euclid2i.Trajectory;
 
 public class SeparationConstraint implements PairwiseConstraint {
 
-    private SeparationPenaltyFunction penaltyFunction;
+    private PenaltyFunction penaltyFunction;
     private int minSeparation;
     private int samplingInterval;
 
-    public SeparationConstraint(SeparationPenaltyFunction penaltyFunction,
-                                int samplingInterval,
-                                int minSeparation) {
+    public SeparationConstraint(PenaltyFunction penaltyFunction,
+                                int samplingInterval) {
         super();
         this.penaltyFunction = penaltyFunction;
         this.samplingInterval = samplingInterval;
-        this.minSeparation = minSeparation;
+
     }
 
     @Override
@@ -27,7 +26,7 @@ public class SeparationConstraint implements PairwiseConstraint {
     public static double integratePenalty(
             Trajectory thisTrajectory,
             Trajectory[] otherTrajectories,
-            SeparationPenaltyFunction penaltyFunction,
+            PenaltyFunction penaltyFunction,
             int minSeparation,
             int samplingInterval) {
 
@@ -44,7 +43,7 @@ public class SeparationConstraint implements PairwiseConstraint {
                         double segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
 
                         Point otherPos = otherTrajectories[j].get(t);
-                        penaltySum += penaltyFunction.getPenalty(thisPos, otherPos, minSeparation) * segmentLength;
+                        penaltySum += penaltyFunction.getPenalty(thisPos.distance(otherPos)) * segmentLength;
                     }
                 }
             }
