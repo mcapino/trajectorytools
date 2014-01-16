@@ -13,7 +13,7 @@ public class BumpSeparationPenaltyFunction implements PenaltyFunction {
     }
 
     @Override
-    public double getPenalty(double dist) {
+    public double getPenalty(double dist, double t) {
 
     	if (dist <= minSeparation) {
     		double penalty = (maxPenalty/Math.exp(-steepness)) * Math.exp(-(steepness/(1-Math.pow(dist/minSeparation,2.0))));

@@ -43,7 +43,7 @@ public class SeparationConstraint implements PairwiseConstraint {
                         double segmentLength = Math.min(Math.min(samplingInterval, thisTrajectory.getMaxTime() - t), otherTrajectories[j].getMaxTime() - t);
 
                         Point otherPos = otherTrajectories[j].get(t);
-                        penaltySum += penaltyFunction.getPenalty(thisPos.distance(otherPos)) * segmentLength;
+                        penaltySum += penaltyFunction.getPenalty(thisPos.distance(otherPos), t) * segmentLength;
                     }
                 }
             }
