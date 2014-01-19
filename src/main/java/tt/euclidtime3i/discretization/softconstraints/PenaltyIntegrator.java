@@ -4,6 +4,7 @@ import tt.euclid2i.Point;
 import tt.euclid2i.Trajectory;
 
 public class PenaltyIntegrator {
+
     public static double integratePenalty(
             Trajectory thisTrajectory,
             PenaltyFunction[] penaltyFunctions,

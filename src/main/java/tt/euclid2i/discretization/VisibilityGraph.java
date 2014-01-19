@@ -11,6 +11,7 @@ import tt.euclid2i.region.Polygon;
 import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -50,21 +51,20 @@ public class VisibilityGraph {
 			}
         };
 
+        Collection<Point> significantPoints = new LinkedList<Point>();
         for (Region inflatedObstacle : inflatedObstaclesForGraph) {
             Polygon polygon = (Polygon) inflatedObstacle;
-            Point[] points = polygon.getPoints();
-
-            // add points
-            for (int i = 0; i < points.length; i++) {
-            	 if (!conflicting(inflatedObstaclesForCollisionChecking, points[i])) {
-            		 visibilityGraph.addVertex(points[i]);
-                 }
-            }
+            significantPoints.addAll(Arrays.asList(polygon.getPoints()));
         }
 
-        Collection<Point> significantPoints = new LinkedList<Point>();
-        significantPoints.addAll(visibilityGraph.vertexSet());
         significantPoints.addAll(additionalSignificantPoints);
+
+        // add points
+        for (Point signPoint : significantPoints) {
+        	 if (!conflicting(inflatedObstaclesForCollisionChecking, signPoint)) {
+        		 visibilityGraph.addVertex(signPoint);
+             }
+        }
 
         Point[] vertices = visibilityGraph.vertexSet().toArray(new Point[0]);
 
