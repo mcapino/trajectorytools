@@ -2,6 +2,7 @@ package tt.euclidtime3i.discretization;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
     @Override
     public Set<Straight> edgesOf(Point vertex) {
-        Set<Straight> edges = new HashSet<Straight>();
+        Set<Straight> edges = new LinkedHashSet<Straight>();
         //edges.addAll(incomingEdgesOf(vertex));
         edges.addAll(outgoingEdgesOf(vertex));
         return edges;
@@ -62,7 +63,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
     @Override
     public Set<Straight> getAllEdges(Point start, Point end) {
-        Set<Straight> edges = new HashSet<Straight>();
+        Set<Straight> edges = new LinkedHashSet<Straight>();
         edges.add(new Straight(start, end));
         edges.add(new Straight(end, start));
         return edges;

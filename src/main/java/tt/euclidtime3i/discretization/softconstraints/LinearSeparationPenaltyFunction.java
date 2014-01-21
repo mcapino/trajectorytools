@@ -15,4 +15,8 @@ public class LinearSeparationPenaltyFunction implements PenaltyFunction {
     public double getPenalty(double dist, double t) {
         return Math.max(0, maxPenalty - (maxPenalty * dist) / minSeparation);
     }
+
+    public double getMinSeparation() {
+		return minSeparation;
+	}
 }

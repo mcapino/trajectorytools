@@ -6,10 +6,11 @@ public class BumpSeparationPenaltyFunction implements PenaltyFunction {
     private double steepness = 1.0;
 	private double minSeparation;
 
-    public BumpSeparationPenaltyFunction(double maxPenalty, double minSeparation) {
+    public BumpSeparationPenaltyFunction(double maxPenalty, double minSeparation, double steepness) {
         super();
         this.maxPenalty = maxPenalty;
         this.minSeparation = minSeparation;
+        this.steepness = steepness;
     }
 
     @Override
@@ -22,4 +23,8 @@ public class BumpSeparationPenaltyFunction implements PenaltyFunction {
     		return 0;
     	}
     }
+
+    public double getMinSeparation() {
+		return minSeparation;
+	}
 }
