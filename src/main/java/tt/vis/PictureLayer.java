@@ -81,6 +81,10 @@ public class PictureLayer extends ImageLayer {
         return new PictureLayer(image);
     }
 
+    public static VisLayer create(BufferedImage image, Rectangle bounds) {
+        return new PictureLayer(image,bounds);
+    }
+
     public static VisLayer create(File file) {
         return create(loadImage(file));
     }

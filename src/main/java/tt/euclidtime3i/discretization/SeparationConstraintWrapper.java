@@ -2,6 +2,8 @@ package tt.euclidtime3i.discretization;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
@@ -28,7 +30,7 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
     @Override
     public Set<Straight> outgoingEdgesOf(Point vertex) {
         Set<Straight> allEdges = super.outgoingEdgesOf(vertex);
-        Set<Straight> consistentEdges = new HashSet<Straight>();
+        Set<Straight> consistentEdges = new LinkedHashSet<Straight>();
 
         for (Straight edge : allEdges) {
             if (consistent(edge, otherTrajs, separations)) {

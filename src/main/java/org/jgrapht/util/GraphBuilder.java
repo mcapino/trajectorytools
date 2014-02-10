@@ -1,8 +1,13 @@
 package org.jgrapht.util;
 
-import org.jgrapht.DirectedGraph;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
-import java.util.*;
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class provides methods that can build an explicit representation of a graph from its implicit representation.
@@ -35,8 +40,13 @@ public class GraphBuilder {
             Set<E> outEdges = implicitGraph.outgoingEdgesOf(current);
             for (E edge : outEdges) {
 
-                if (counter++ > maxVertices)
+                if (counter++ == maxVertices) {
+                    // For some reason, when the condition was counter++ > maxVertices,
+                    // the code was non-deterministically failing.
+                    // throw new RuntimeException("Exceeded maximum number of vertices");
                     break whileLoop;
+                }
+
 
                 V target = implicitGraph.getEdgeTarget(edge);
 

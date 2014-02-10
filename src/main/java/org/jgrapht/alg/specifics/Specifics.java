@@ -5,6 +5,7 @@ import org.jgrapht.Graphs;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public abstract class Specifics<V, E> {
     public abstract Set<E> incomingEdgesOf(V vertex);
 
     public Set<? extends E> edgesOf(V vertex) {
-        Set<E> edges = new HashSet<E>();
+        Set<E> edges = new LinkedHashSet<E>();
         edges.addAll(outgoingEdgesOf(vertex));
         edges.addAll(incomingEdgesOf(vertex));
         return edges;
