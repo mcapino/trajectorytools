@@ -39,4 +39,8 @@ public class Point extends Point2i implements Cloneable {
     public Point clone() {
         return new Point(x, y);
     }
+
+    public double[] toDoubleArray() {
+        return new double[]{x, y};
+    }
 }

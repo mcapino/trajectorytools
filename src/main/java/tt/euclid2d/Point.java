@@ -31,6 +31,10 @@ public class Point extends Point2d {
         return result;
     }
 
+    public double[] toDoubleArray() {
+        return new double[]{x, y};
+    }
+
 //    @Override
 //    public String toString() {
 //        return String.format("(%.2f, %.2f)", x, y);
