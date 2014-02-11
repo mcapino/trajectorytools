@@ -19,6 +19,10 @@ public class Straight {
         }
     }
 
+    public int duration() {
+        return end.getTime() - start.getTime();
+    }
+
     public Straight cut(int time1, int time2) {
         Point p1 = interpolate(time1);
         Point p2 = interpolate(time2);
