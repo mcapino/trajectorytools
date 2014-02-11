@@ -8,6 +8,10 @@ public class Straight {
     private Point start;
     private Point end;
 
+    public Straight(tt.euclid2i.Point start, int tStart, tt.euclid2i.Point end, int tEnd) {
+        this(new Point(start, tStart), new Point(end, tEnd));
+    }
+
     public Straight(Point start, Point end) {
         super();
         if (start.getTime() < end.getTime()) {
