@@ -1,5 +1,6 @@
 package org.jgrapht.alg;
 
+import com.google.common.collect.Lists;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.Graphs;
@@ -85,16 +86,16 @@ public abstract class PlanningAlgorithm<V, E> implements VizualizableAlgorithm<V
     }
 
     protected List<E> reconstructEdgeList(V startVertex, V endVertex) {
-        LinkedList<E> edgeList = new LinkedList<E>();
+        List<E> edgeList = new ArrayList<E>();
         V current = endVertex;
 
         while (!current.equals(startVertex)) {
             E edge = getShortestPathTreeEdge(current);
-            edgeList.addFirst(edge);
+            edgeList.add(edge);
             current = Graphs.getOppositeVertex(graph, edge, current);
         }
 
-        return edgeList;
+        return Collections.unmodifiableList(Lists.reverse(edgeList));
     }
 
     @Override
