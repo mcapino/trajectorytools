@@ -34,6 +34,11 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
         this.endWayPoint = endTimePoint.getPosition();
     }
 
+    public BasicSegmentedTrajectory(List<Straight> segments, int duration) {
+        this(segments, duration, 0);
+        this.cost = endTime - startTime;
+    }
+
     @Override
     public Point get(int t) {
         if (t < startTime || t > maxTime) {
