@@ -1,11 +1,12 @@
 package tt.euclid2i.trajectory;
 
-import java.util.List;
-
 import tt.euclid2i.EvaluatedTrajectory;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclidtime3i.discretization.Straight;
+
+import java.util.List;
+import java.util.RandomAccess;
 
 public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedTrajectory {
 
@@ -19,6 +20,9 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     public BasicSegmentedTrajectory(List<Straight> segments, int duration, double cost) {
         if (segments.isEmpty())
             throw new RuntimeException("Trajectory can not be created from empty list");
+
+        if (!(segments instanceof RandomAccess))
+            throw new RuntimeException("List of segments must be instance of RandomAccess");
 
         this.startTime = segments.get(0).getStart().getTime();
         this.maxTime = startTime + duration;
@@ -43,6 +47,7 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
         return segment.interpolate(t).getPosition();
     }
 
+    //TODO: using interpolation would decrease complexity from O(log N) to O(log log N)
     private Straight findSegment(int t) {
         int iMin = 0;
         int iMax = segments.size() - 1;
@@ -75,7 +80,6 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     public int getMinTime() {
         return startTime;
     }
-
 
     @Override
     public int getMaxTime() {
@@ -122,7 +126,7 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
             sb.append(" " + segments.get(0).getStart());
         }
 
-        for (Straight maneuver: segments) {
+        for (Straight maneuver : segments) {
             sb.append(" " + maneuver.getEnd());
         }
         sb.append("");
