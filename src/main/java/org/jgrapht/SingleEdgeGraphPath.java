@@ -1,9 +1,9 @@
 package org.jgrapht;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-public class SingleEdgeGraphPath<V,E> implements GraphPath<V, E> {
+public class SingleEdgeGraphPath<V, E> implements GraphPath<V, E> {
     Graph<V, E> graph;
     private V start;
     private V end;
@@ -45,7 +45,7 @@ public class SingleEdgeGraphPath<V,E> implements GraphPath<V, E> {
 
     @Override
     public List<E> getEdgeList() {
-        List<E> list = new LinkedList<E>();
+        List<E> list = new ArrayList<E>();
         list.add(edge);
         return list;
     }
