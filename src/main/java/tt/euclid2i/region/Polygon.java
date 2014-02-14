@@ -1,11 +1,11 @@
 package tt.euclid2i.region;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
-
-import java.io.Serializable;
-import java.util.Arrays;
 
 public class Polygon implements Region, Serializable{
 
@@ -90,26 +90,25 @@ public class Polygon implements Region, Serializable{
 
         return new Polygon(inflatedPoints);
     }
-    
+
     /**
-     * 
      * @return true if the order of points is clockwise
      * in the (inverted) visualization coordinate system
      */
     public boolean isClockwiseDefined(){
-    	
-    	double sumOverEdges = 0;
-    	
-    	for (int i = 0; i < points.length; i++) {
-			if(i < points.length - 1){
-				sumOverEdges += ((points[i + 1].x - points[i].x) * (points[i + 1].y + points[i].y));
-			}
-			else{
-				sumOverEdges += ((points[0].x - points[i].x) * (points[0].y + points[i].y));
-			}
-		}
-    	
-    	return (sumOverEdges < 0);
+
+        double sumOverEdges = 0;
+
+        for (int i = 0; i < points.length; i++) {
+            if(i < points.length - 1){
+                sumOverEdges += ((points[i + 1].x - points[i].x) * (points[i + 1].y + points[i].y));
+            }
+            else{
+                sumOverEdges += ((points[0].x - points[i].x) * (points[0].y + points[i].y));
+            }
+        }
+
+        return (sumOverEdges < 0);
     }
 
     @Override
