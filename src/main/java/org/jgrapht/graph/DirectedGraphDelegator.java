@@ -8,7 +8,7 @@ import java.util.Set;
 
 public abstract class DirectedGraphDelegator<V, E> implements DirectedGraph<V, E> {
 
-    protected DirectedGraph<V, E> graph;
+    private DirectedGraph<V, E> graph;
 
     protected DirectedGraphDelegator(DirectedGraph<V, E> graph) {
         this.graph = graph;
