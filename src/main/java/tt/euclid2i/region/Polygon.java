@@ -9,6 +9,8 @@ import tt.euclid2i.Region;
 
 public class Polygon implements Region, Serializable{
 
+    private static final long serialVersionUID = -8113732712690427548L;
+
     private Point[] points;
 
     public Polygon(Point[] points) {
@@ -48,8 +50,12 @@ public class Polygon implements Region, Serializable{
               result = !result;
              }
           }
-          return result;
 
+          if (isFilledInside()) {
+              return result;
+          } else {
+              return !result;
+          }
     }
 
     public Point[] getPoints() {
@@ -77,6 +83,10 @@ public class Polygon implements Region, Serializable{
         return new Rectangle(new Point(minX,minY),new Point(maxX,maxY));
     }
 
+    public boolean isFilledInside() {
+        return isClockwise(points);
+    }
+
     public Polygon inflate(double inflateBy, int pointsAtCorner) {
 
         tt.euclid2d.region.Polygon polygon2d = new tt.euclid2d.region.Polygon(points);
@@ -92,10 +102,11 @@ public class Polygon implements Region, Serializable{
     }
 
     /**
-     * @return true if the order of points is clockwise
-     * in the (inverted) visualization coordinate system
+     * Determines if the ring of points is defined in a clockwise direction
+     * @param points the array of points constituting the border of the polygon
+     * @return true if the ring is defined clockwise
      */
-    public boolean isClockwiseDefined(){
+    public static boolean isClockwise(Point[] points){
 
         double sumOverEdges = 0;
 
