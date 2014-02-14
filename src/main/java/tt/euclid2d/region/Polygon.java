@@ -86,18 +86,27 @@ public class Polygon {
         Geometry buffered = jtsPolygon.buffer(inflateBy, pointsAtCorner);
 
         Coordinate[] bufferedCoordinates = buffered.getCoordinates();
-        int bufferedSize = bufferedCoordinates.length - 1;
-        Point[] bufferedPoints = new Point[bufferedSize];
 
-        for (int i = 0; i < bufferedSize; i++) {
-            bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+        if (bufferedCoordinates.length > 0) {
+            int bufferedSize = bufferedCoordinates.length - 1;
+            Point[] bufferedPoints = new Point[bufferedSize];
+
+            for (int i = 0; i < bufferedSize; i++) {
+                bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+            }
+
+            if (!(isFilledInside() == isClockwise(bufferedPoints))) {
+                ArrayUtils.reverse(bufferedPoints);
+            }
+
+            return new Polygon(bufferedPoints);
+
+        } else {
+            return new Polygon(new Point[0]);
         }
 
-        if (!(isFilledInside() == isClockwise(bufferedPoints))) {
-            ArrayUtils.reverse(bufferedPoints);
-        }
 
-        return new Polygon(bufferedPoints);
+
     }
 
     public boolean isFilledInside() {
