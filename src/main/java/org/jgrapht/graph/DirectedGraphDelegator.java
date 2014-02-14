@@ -6,11 +6,11 @@ import org.jgrapht.EdgeFactory;
 import java.util.Collection;
 import java.util.Set;
 
-public class DirectedGraphDelegator<V, E> implements DirectedGraph<V, E> {
+public abstract class DirectedGraphDelegator<V, E> implements DirectedGraph<V, E> {
 
     protected DirectedGraph<V, E> graph;
 
-    public DirectedGraphDelegator(DirectedGraph<V, E> graph) {
+    protected DirectedGraphDelegator(DirectedGraph<V, E> graph) {
         this.graph = graph;
     }
 
