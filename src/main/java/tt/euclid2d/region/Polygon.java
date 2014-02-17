@@ -1,6 +1,5 @@
 package tt.euclid2d.region;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,25 +16,25 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class Polygon {
 
-    private Point[] points;
+    private Point[] polygonPointsArray;
 
     public Polygon(Point[] points) {
         super();
-        this.points = points;
+        this.polygonPointsArray = points;
     }
 
     public Polygon(tt.euclid2i.Point[] points) {
         super();
-        this.points = new Point[points.length];
+        this.polygonPointsArray = new Point[points.length];
 
         for (int i = 0; i < points.length; i++) {
-            this.points[i] = new Point(points[i].x, points[i].y);
+            this.polygonPointsArray[i] = new Point(points[i].x, points[i].y);
         }
     }
 
     public boolean intersectsLine(Point p1, Point p2) {
-        for (int i = 0; i < points.length - 1; i++) {
-            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, true)) {
+        for (int i = 0; i < polygonPointsArray.length - 1; i++) {
+            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, polygonPointsArray[i].x, polygonPointsArray[i].y, polygonPointsArray[i + 1].x, polygonPointsArray[i + 1].y, true)) {
                 return true;
             }
         }
@@ -47,9 +46,9 @@ public class Polygon {
         int i;
         int j;
         boolean result = false;
-        for (i = 0, j = points.length - 1; i < points.length; j = i++) {
-            if ((points[i].y > p.y) != (points[j].y > p.y) &&
-                    (p.x < (points[j].x - points[i].x) * (p.y - points[i].y) / (points[j].y - points[i].y) + points[i].x)) {
+        for (i = 0, j = polygonPointsArray.length - 1; i < polygonPointsArray.length; j = i++) {
+            if ((polygonPointsArray[i].y > p.y) != (polygonPointsArray[j].y > p.y) &&
+                    (p.x < (polygonPointsArray[j].x - polygonPointsArray[i].x) * (p.y - polygonPointsArray[i].y) / (polygonPointsArray[j].y - polygonPointsArray[i].y) + polygonPointsArray[i].x)) {
                 result = !result;
             }
         }
@@ -63,26 +62,23 @@ public class Polygon {
     }
 
     public Point[] getPoints() {
-        return points;
+        return polygonPointsArray;
     }
 
     public List<Polygon> inflate(double inflateBy, int pointsAtCorner) {
-        int size = points.length;
+        int size = polygonPointsArray.length;
 
         Coordinate[] coordinates = new Coordinate[size + 1];
         for (int i = 0; i < size; i++) {
-            coordinates[i] = new Coordinate(points[i].getX(), points[i].getY());
+            coordinates[i] = new Coordinate(polygonPointsArray[i].getX(), polygonPointsArray[i].getY());
         }
         coordinates[size] = coordinates[0];
 
         GeometryFactory geometryFactory = new GeometryFactory();
         LinearRing ring = new LinearRing(new CoordinateArraySequence(coordinates), geometryFactory);
 
-        if (isFilledInside()) {
-            // filled inside -- inflate
-            inflateBy = inflateBy;
-        } else {
-            // filled outside -- deflate
+        if (!isFilledInside()) {
+            // filled outside, deflate
             inflateBy = -inflateBy;
         }
 
@@ -90,33 +86,35 @@ public class Polygon {
         Geometry buffered = jtsPolygon.buffer(inflateBy, pointsAtCorner);
 
         Coordinate[] bufferedCoordinates = buffered.getCoordinates();
-
+        // if we have a an ouside filled polygon, then we can get more polygons as a result of inflation
+        // the array will consist of multiple closed rings that need to be split apart
         List<Polygon> polygons = new LinkedList<Polygon>();
 
         if (bufferedCoordinates.length > 0) {
-            int bufferedSize = bufferedCoordinates.length - 1;
-            List<Point> polygon = null;
+            int bufferedSize = bufferedCoordinates.length;
+            List<Point> polygonPoints = null;
             for (int i=0; i < bufferedSize; i++) {
-                if (polygon == null) {
+                if (polygonPoints == null) {
                     // start a new polygon
-                    polygon = new LinkedList<Point>();
-                    polygon.add(new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y));
+                    polygonPoints = new LinkedList<Point>();
+                    polygonPoints.add(new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y));
                 } else {
                     // Add points to current polygon
                     Point currentPoint = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
-                    polygon.add(currentPoint);
-                    if (currentPoint.equals(polygon.get(0))) {
-                        // The polygon got closed
-                        points = polygon.toArray(new Point[polygon.size()]);
-                        if (!(isFilledInside() == isClockwise(points))) {
-                                ArrayUtils.reverse(points);
-                                polygon = new LinkedList<Point>(Arrays.asList(points));
+                    polygonPoints.add(currentPoint);
+                    if (currentPoint.equals(polygonPoints.get(0))) {
+                        // We found the last (closing) point of the polygon -- create a new polygon from the sequence
+                        polygonPointsArray = polygonPoints.toArray(new Point[polygonPoints.size()]);
+                        if (!(isFilledInside() == isClockwise(polygonPointsArray))) {
+                            ArrayUtils.reverse(polygonPointsArray);
                         }
-                        polygons.add(new Polygon(points));
-                        polygon = null;
+                        polygons.add(new Polygon(polygonPointsArray));
+                        polygonPoints = null;
                     }
                 }
             }
+
+
             return polygons;
         } else {
             return new LinkedList<Polygon>();
@@ -127,7 +125,7 @@ public class Polygon {
     }
 
     public boolean isFilledInside() {
-        return isClockwise(points);
+        return isClockwise(polygonPointsArray);
     }
 
     /**
