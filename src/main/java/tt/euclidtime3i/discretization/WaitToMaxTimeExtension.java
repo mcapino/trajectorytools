@@ -27,6 +27,16 @@ public class WaitToMaxTimeExtension extends AbstractDirectedGraphWrapper<Point, 
     }
 
     @Override
+    public Point getEdgeSource(Straight straight) {
+        return straight.getStart();
+    }
+
+    @Override
+    public Point getEdgeTarget(Straight straight) {
+        return straight.getEnd();
+    }
+
+    @Override
     public double getEdgeWeight(Straight straight) {
         Point start = straight.getStart();
         Point end = straight.getEnd();
