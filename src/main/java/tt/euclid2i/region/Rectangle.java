@@ -88,4 +88,11 @@ public class Rectangle implements Region {
         result = 31 * result + corner2.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Rectangle [corner1=" + corner1 + ", corner2=" + corner2 + "]";
+    }
+
+
 }

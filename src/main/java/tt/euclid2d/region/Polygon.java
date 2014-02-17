@@ -1,12 +1,15 @@
 package tt.euclid2d.region;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import tt.euclid2d.Point;
+import tt.euclid2d.util.Intersection;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import tt.euclid2d.Point;
-import tt.euclid2d.util.Intersection;
 
 public class Polygon {
 
@@ -46,7 +49,12 @@ public class Polygon {
                 result = !result;
             }
         }
-        return result;
+
+        if (isFilledInside()) {
+            return result;
+        } else {
+            return !result;
+        }
 
     }
 
@@ -66,18 +74,63 @@ public class Polygon {
         GeometryFactory geometryFactory = new GeometryFactory();
         LinearRing ring = new LinearRing(new CoordinateArraySequence(coordinates), geometryFactory);
 
+        if (isFilledInside()) {
+            // filled inside -- inflate
+            inflateBy = inflateBy;
+        } else {
+            // filled outside -- deflate
+            inflateBy = -inflateBy;
+        }
+
         Geometry jtsPolygon = new com.vividsolutions.jts.geom.Polygon(ring, new LinearRing[]{}, geometryFactory);
         Geometry buffered = jtsPolygon.buffer(inflateBy, pointsAtCorner);
 
-
         Coordinate[] bufferedCoordinates = buffered.getCoordinates();
-        int bufferedSize = bufferedCoordinates.length - 1;
-        Point[] bufferedPoints = new Point[bufferedSize];
 
-        for (int i = 0; i < bufferedSize; i++) {
-            bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+        if (bufferedCoordinates.length > 0) {
+            int bufferedSize = bufferedCoordinates.length - 1;
+            Point[] bufferedPoints = new Point[bufferedSize];
+
+            for (int i = 0; i < bufferedSize; i++) {
+                bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+            }
+
+            if (!(isFilledInside() == isClockwise(bufferedPoints))) {
+                ArrayUtils.reverse(bufferedPoints);
+            }
+
+            return new Polygon(bufferedPoints);
+
+        } else {
+            return new Polygon(new Point[0]);
         }
 
-        return new Polygon(bufferedPoints);
+
+
+    }
+
+    public boolean isFilledInside() {
+        return isClockwise(points);
+    }
+
+    /**
+     * Determines if the ring of points is defined in a clockwise direction
+     * @param points the array of points constituting the border of the polygon
+     * @return true if the ring is defined clockwise
+     */
+    public static boolean isClockwise(Point[] points){
+
+        double sumOverEdges = 0;
+
+        for (int i = 0; i < points.length; i++) {
+            if(i < points.length - 1){
+                sumOverEdges += ((points[i + 1].x - points[i].x) * (points[i + 1].y + points[i].y));
+            }
+            else{
+                sumOverEdges += ((points[0].x - points[i].x) * (points[0].y + points[i].y));
+            }
+        }
+
+        return (sumOverEdges < 0);
     }
 }
