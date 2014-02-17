@@ -1,5 +1,9 @@
 package tt.euclid2d.region;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import tt.euclid2d.Point;
@@ -62,7 +66,7 @@ public class Polygon {
         return points;
     }
 
-    public Polygon inflate(double inflateBy, int pointsAtCorner) {
+    public List<Polygon> inflate(double inflateBy, int pointsAtCorner) {
         int size = points.length;
 
         Coordinate[] coordinates = new Coordinate[size + 1];
@@ -87,22 +91,35 @@ public class Polygon {
 
         Coordinate[] bufferedCoordinates = buffered.getCoordinates();
 
+        List<Polygon> polygons = new LinkedList<Polygon>();
+
         if (bufferedCoordinates.length > 0) {
             int bufferedSize = bufferedCoordinates.length - 1;
-            Point[] bufferedPoints = new Point[bufferedSize];
-
-            for (int i = 0; i < bufferedSize; i++) {
-                bufferedPoints[i] = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+            List<Point> polygon = null;
+            for (int i=0; i < bufferedSize; i++) {
+                if (polygon == null) {
+                    // start a new polygon
+                    polygon = new LinkedList<Point>();
+                    polygon.add(new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y));
+                } else {
+                    // Add points to current polygon
+                    Point currentPoint = new Point(bufferedCoordinates[i].x, bufferedCoordinates[i].y);
+                    polygon.add(currentPoint);
+                    if (currentPoint.equals(polygon.get(0))) {
+                        // The polygon got closed
+                        points = polygon.toArray(new Point[polygon.size()]);
+                        if (!(isFilledInside() == isClockwise(points))) {
+                                ArrayUtils.reverse(points);
+                                polygon = new LinkedList<Point>(Arrays.asList(points));
+                        }
+                        polygons.add(new Polygon(points));
+                        polygon = null;
+                    }
+                }
             }
-
-            if (!(isFilledInside() == isClockwise(bufferedPoints))) {
-                ArrayUtils.reverse(bufferedPoints);
-            }
-
-            return new Polygon(bufferedPoints);
-
+            return polygons;
         } else {
-            return new Polygon(new Point[0]);
+            return new LinkedList<Polygon>();
         }
 
 

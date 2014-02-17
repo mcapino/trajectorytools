@@ -2,6 +2,8 @@ package tt.euclid2i.region;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
@@ -87,18 +89,24 @@ public class Polygon implements Region, Serializable{
         return isClockwise(points);
     }
 
-    public Polygon inflate(double inflateBy, int pointsAtCorner) {
+    public List<Polygon> inflate(double inflateBy, int pointsAtCorner) {
 
-        tt.euclid2d.region.Polygon polygon2d = new tt.euclid2d.region.Polygon(points);
-        tt.euclid2d.region.Polygon inflatedPolygon2d = polygon2d.inflate(inflateBy, pointsAtCorner);
+        tt.euclid2d.region.Polygon inPolygon2d = new tt.euclid2d.region.Polygon(points);
+        List<tt.euclid2d.region.Polygon> inflatedPolygons2d = inPolygon2d.inflate(inflateBy, pointsAtCorner);
 
-        // convert back to 2i
-        Point[] inflatedPoints = new Point[inflatedPolygon2d.getPoints().length];
-        for (int i = 0; i < inflatedPolygon2d.getPoints().length; i++) {
-            inflatedPoints[i] = new Point((int) inflatedPolygon2d.getPoints()[i].x, (int) inflatedPolygon2d.getPoints()[i].y);
+        List<Polygon> inflatedPolygons = new LinkedList<Polygon>();
+
+        for (tt.euclid2d.region.Polygon inflatedPolygon2d : inflatedPolygons2d) {
+            // convert back to 2i
+            Point[] inflatedPoints = new Point[inflatedPolygon2d.getPoints().length];
+            for (int i = 0; i < inflatedPolygon2d.getPoints().length; i++) {
+                inflatedPoints[i] = new Point((int) inflatedPolygon2d.getPoints()[i].x, (int) inflatedPolygon2d.getPoints()[i].y);
+            }
+
+           inflatedPolygons.add(new Polygon(inflatedPoints));
         }
 
-        return new Polygon(inflatedPoints);
+        return inflatedPolygons;
     }
 
     /**
