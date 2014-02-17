@@ -21,7 +21,7 @@ public class Util {
     public static boolean isVisible(Point start, Point end, Collection<? extends Region> obstacles) {
         // check obstacles
         for (Region obstacle : obstacles) {
-            if (obstacle.isInside(start) || obstacle.isInside(end) || obstacle.intersectsLine(start, end)) {
+            if (obstacle.intersectsLine(start, end)) {
                 return false;
             }
         }
