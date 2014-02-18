@@ -3,7 +3,9 @@ package tt.euclidtime3i.discretization;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.AbstractDirectedGraphWrapper;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.Region;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,10 +15,12 @@ public class WaitToMaxTimeExtension extends AbstractDirectedGraphWrapper<Point, 
     private Point goal;
 
     private int maxTime;
+    private Collection<? extends Region> dynamicObstacles;
     private tt.euclid2i.Point spatialGoal;
 
-    public WaitToMaxTimeExtension(DirectedGraph<Point, Straight> graph, tt.euclid2i.Point spatialGoal, int maxTime) {
+    public WaitToMaxTimeExtension(DirectedGraph<Point, Straight> graph, Collection<? extends Region> dynamicObstacles, tt.euclid2i.Point spatialGoal, int maxTime) {
         this.graph = graph;
+        this.dynamicObstacles = dynamicObstacles;
         this.spatialGoal = spatialGoal;
         this.maxTime = maxTime;
         this.goal = new Point(spatialGoal, maxTime);
@@ -67,8 +71,12 @@ public class WaitToMaxTimeExtension extends AbstractDirectedGraphWrapper<Point, 
     }
 
     private Set<Straight> addWaitToMaxTimeEdge(Point vertex, Set<Straight> underlyingEdges) {
+        Straight toMaxTime = new Straight(vertex, goal);
+        if (!isCollisionFree(toMaxTime))
+            return underlyingEdges;
+
         Set<Straight> edges = new HashSet<Straight>(underlyingEdges);
-        edges.add(new Straight(vertex, goal));
+        edges.add(toMaxTime);
         return edges;
     }
 
@@ -85,5 +93,14 @@ public class WaitToMaxTimeExtension extends AbstractDirectedGraphWrapper<Point, 
         return edges;
     }
 
-
+    private boolean isCollisionFree(Straight straight) {
+        for (Region obstacle : dynamicObstacles) {
+            Point start = straight.getStart();
+            Point end = straight.getEnd();
+            if (obstacle.intersectsLine(start, end)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
