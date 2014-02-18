@@ -9,6 +9,8 @@ import java.util.Set;
 
 public abstract class AbstractGraphWrapper<V, E> implements Graph<V, E> {
 
+    //TODO implement all most general functions (remove all XY, etc.)
+
     @Override
     public Set<E> getAllEdges(V sourceVertex, V targetVertex) {
         throw new NotImplementedException();
