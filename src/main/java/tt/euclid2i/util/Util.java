@@ -1,8 +1,14 @@
 package tt.euclid2i.util;
 
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -10,17 +16,12 @@ import tt.euclid2i.Trajectory;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
-import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Random;
-
 public class Util {
 
     public static boolean isVisible(Point start, Point end, Collection<? extends Region> obstacles) {
         // check obstacles
         for (Region obstacle : obstacles) {
-            if (obstacle.isInside(start) || obstacle.isInside(end) || obstacle.intersectsLine(start, end)) {
+            if (obstacle.intersectsLine(start, end)) {
                 return false;
             }
         }
@@ -132,7 +133,7 @@ public class Util {
         Collection<Region> inflatedRegions = new LinkedList<Region>();
         for (Region region : obstacles) {
             if (region instanceof Polygon) {
-                inflatedRegions.add(((Polygon) region).inflate(agentBodyRadius, 3));
+                inflatedRegions.addAll(((Polygon) region).inflate(agentBodyRadius, 3));
             } else {
                 throw new RuntimeException("not supported region type for inflation");
             }
