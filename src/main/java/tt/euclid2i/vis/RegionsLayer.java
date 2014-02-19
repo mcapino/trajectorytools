@@ -141,7 +141,7 @@ public class RegionsLayer extends AbstractLayer {
                         double ny = (dx / len) * 3;
 
                         canvas.setColor(edgeColor.brighter().brighter());
-                        canvas.drawLine(Vis.transX(cx), Vis.transY(cy), Vis.transX(cx + nx), Vis.transY(cy + ny));
+                        canvas.drawLine(Vis.transX(cx), Vis.transY(cy), Vis.transX(cx) + (int) nx , Vis.transY(cy) + (int) ny);
                     }
                 }
             }
