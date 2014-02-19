@@ -125,6 +125,24 @@ public class RegionsLayer extends AbstractLayer {
 
                     canvas.setColor(edgeColor);
                     canvas.drawPolygon(x, y, n);
+
+                    // draw normal vectors to see the inside and outside of a polygon...
+
+                    Point[] polygonPoints = polygon.getPoints();
+                    for (int i=1; i < polygonPoints.length; i++) {
+                        int dx = polygonPoints[i].x - polygonPoints[i-1].x;
+                        int dy = polygonPoints[i].y - polygonPoints[i-1].y;
+
+                        double cx = (polygonPoints[i].x + polygonPoints[i-1].x) / 2.0;
+                        double cy = (polygonPoints[i].y + polygonPoints[i-1].y) / 2.0;
+
+                        double len = Math.sqrt(dx*dx + dy*dy);
+                        double nx = (-dy / len) * 3;
+                        double ny = (dx / len) * 3;
+
+                        canvas.setColor(edgeColor.brighter().brighter());
+                        canvas.drawLine(Vis.transX(cx), Vis.transY(cy), Vis.transX(cx) + (int) nx , Vis.transY(cy) + (int) ny);
+                    }
                 }
             }
         }
