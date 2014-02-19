@@ -14,6 +14,10 @@ public class Line {
         this.distance = start.distance(end);
     }
 
+    public tt.euclid2d.Line toLine2d() {
+        return new tt.euclid2d.Line(this);
+    }
+
     public double getDistance() {
         return distance;
     }
