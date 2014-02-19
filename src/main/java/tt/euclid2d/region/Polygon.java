@@ -16,25 +16,25 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class Polygon {
 
-    private Point[] polygonPointsArray;
+    private Point[] polygonPoints;
 
     public Polygon(Point[] points) {
         super();
-        this.polygonPointsArray = points;
+        this.polygonPoints = points;
     }
 
     public Polygon(tt.euclid2i.Point[] points) {
         super();
-        this.polygonPointsArray = new Point[points.length];
+        this.polygonPoints = new Point[points.length];
 
         for (int i = 0; i < points.length; i++) {
-            this.polygonPointsArray[i] = new Point(points[i].x, points[i].y);
+            this.polygonPoints[i] = new Point(points[i].x, points[i].y);
         }
     }
 
     public boolean intersectsLine(Point p1, Point p2) {
-        for (int i = 0; i < polygonPointsArray.length - 1; i++) {
-            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, polygonPointsArray[i].x, polygonPointsArray[i].y, polygonPointsArray[i + 1].x, polygonPointsArray[i + 1].y, true)) {
+        for (int i = 0; i < polygonPoints.length - 1; i++) {
+            if (Intersection.linesIntersect(p1.x, p1.y, p2.x, p2.y, polygonPoints[i].x, polygonPoints[i].y, polygonPoints[i + 1].x, polygonPoints[i + 1].y, true)) {
                 return true;
             }
         }
@@ -46,9 +46,9 @@ public class Polygon {
         int i;
         int j;
         boolean result = false;
-        for (i = 0, j = polygonPointsArray.length - 1; i < polygonPointsArray.length; j = i++) {
-            if ((polygonPointsArray[i].y > p.y) != (polygonPointsArray[j].y > p.y) &&
-                    (p.x < (polygonPointsArray[j].x - polygonPointsArray[i].x) * (p.y - polygonPointsArray[i].y) / (polygonPointsArray[j].y - polygonPointsArray[i].y) + polygonPointsArray[i].x)) {
+        for (i = 0, j = polygonPoints.length - 1; i < polygonPoints.length; j = i++) {
+            if ((polygonPoints[i].y > p.y) != (polygonPoints[j].y > p.y) &&
+                    (p.x < (polygonPoints[j].x - polygonPoints[i].x) * (p.y - polygonPoints[i].y) / (polygonPoints[j].y - polygonPoints[i].y) + polygonPoints[i].x)) {
                 result = !result;
             }
         }
@@ -62,15 +62,15 @@ public class Polygon {
     }
 
     public Point[] getPoints() {
-        return polygonPointsArray;
+        return polygonPoints;
     }
 
     public List<Polygon> inflate(double inflateBy, int pointsAtCorner) {
-        int size = polygonPointsArray.length;
+        int size = polygonPoints.length;
 
         Coordinate[] coordinates = new Coordinate[size + 1];
         for (int i = 0; i < size; i++) {
-            coordinates[i] = new Coordinate(polygonPointsArray[i].getX(), polygonPointsArray[i].getY());
+            coordinates[i] = new Coordinate(polygonPoints[i].getX(), polygonPoints[i].getY());
         }
         coordinates[size] = coordinates[0];
 
@@ -104,11 +104,11 @@ public class Polygon {
                     polygonPoints.add(currentPoint);
                     if (currentPoint.equals(polygonPoints.get(0))) {
                         // We found the last (closing) point of the polygon -- create a new polygon from the sequence
-                        polygonPointsArray = polygonPoints.toArray(new Point[polygonPoints.size()]);
-                        if (!(isFilledInside() == isClockwise(polygonPointsArray))) {
-                            ArrayUtils.reverse(polygonPointsArray);
+                        Point[] inflatedPolygonPoints = polygonPoints.toArray(new Point[polygonPoints.size()]);
+                        if (!(isFilledInside() == isClockwise(inflatedPolygonPoints))) {
+                            ArrayUtils.reverse(inflatedPolygonPoints);
                         }
-                        polygons.add(new Polygon(polygonPointsArray));
+                        polygons.add(new Polygon(inflatedPolygonPoints));
                         polygonPoints = null;
                     }
                 }
@@ -125,7 +125,7 @@ public class Polygon {
     }
 
     public boolean isFilledInside() {
-        return isClockwise(polygonPointsArray);
+        return isClockwise(polygonPoints);
     }
 
     /**
