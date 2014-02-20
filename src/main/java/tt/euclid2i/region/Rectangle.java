@@ -56,17 +56,17 @@ public class Rectangle implements Region {
 
     public Polygon toPolygon() {
 
-        int minx = Math.min(corner1.x, corner2.x);
-        int maxx = Math.max(corner1.x, corner2.x);
-        int miny = Math.min(corner1.y, corner2.y);
-        int maxy = Math.max(corner1.y, corner2.y);
+        int minX = Math.min(corner1.x, corner2.x);
+        int maxX = Math.max(corner1.x, corner2.x);
+        int minY = Math.min(corner1.y, corner2.y);
+        int maxY = Math.max(corner1.y, corner2.y);
 
 
         return new Polygon(new Point[] {
-                new Point(minx, miny),
-                new Point(maxx, miny),
-                new Point(maxx, maxy),
-                new Point(minx, maxy)});
+                new Point(maxX, minY),
+                new Point(maxX, maxY),
+                new Point(minX, maxY),
+                new Point(minX, minY)});
     }
 
     @Override

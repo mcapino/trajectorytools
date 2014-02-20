@@ -22,6 +22,10 @@ public class Point extends Point2i implements Cloneable {
         super(x, y);
     }
 
+    public tt.euclid2d.Point toPoint2d() {
+        return new tt.euclid2d.Point(this);
+    }
+
     public double distance(Point2i other) {
         return new Point2d(x, y).distance(new Point2d(other.x, other.y));
     }

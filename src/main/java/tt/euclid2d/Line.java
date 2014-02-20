@@ -13,6 +13,16 @@ public class Line {
         this.end = end;
     }
 
+    public Line(tt.euclid2i.Line line) {
+        super();
+        this.start = line.getStart().toPoint2d();
+        this.end = line.getEnd().toPoint2d();
+    }
+
+    public Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
 
     public Point getStart() {
         return start;
@@ -25,8 +35,6 @@ public class Line {
     public double getDistance() {
         return start.distance(end);
     }
-
-
 
     @Override
     public int hashCode() {
