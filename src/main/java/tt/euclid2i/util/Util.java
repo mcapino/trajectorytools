@@ -161,5 +161,18 @@ public class Util {
         writer.flush();
     }
 
+    public static Point[] breakLineToSegments(Line line, double maxLengthOfSegment) {
+        int nPoints = (int) Math.floor(line.getDistance()/maxLengthOfSegment) + 2;
+        double lambdaStep = maxLengthOfSegment/line.getDistance();
+        Point[] points = new Point[nPoints];
+        points[0] = line.getStart();
+        for (int i=1; i<nPoints-1; i++) {
+            points[i] = line.interpolate(lambdaStep * i);
+        }
+        points[nPoints-1] = line.getEnd();
+        return points;
+    }
+
+
 
 }
