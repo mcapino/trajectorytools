@@ -10,4 +10,5 @@ public interface Environment {
     public Collection<Region> getObstacles();
 
     public Rectangle getBounds();
+
 }

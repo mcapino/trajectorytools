@@ -46,7 +46,8 @@ public class ProbabilisticRoadmap extends DirectedWeightedMultigraph<Point, Line
 
     private void generateEdges() {
         for (Point point : vertexSet()) {
-            NearestNeighborIterator<Point> iterator = knnTree.getNearestNeighborIterator(key(point), vertexSet().size(), new SquareEuclideanDistanceFunction());
+            NearestNeighborIterator<Point> iterator
+                = knnTree.getNearestNeighborIterator(key(point), vertexSet().size(), new SquareEuclideanDistanceFunction());
 
             while (iterator.hasNext()) {
                 Point next = iterator.next();

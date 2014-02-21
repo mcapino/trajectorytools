@@ -19,7 +19,6 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private static final long serialVersionUID = 7461735648599585309L;
 
-    private int nVertices;
     private int radius;
     private Point[] customPoints;
     private Rectangle bounds;
@@ -27,17 +26,29 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private KdTree<Point> knnTree;
 
-    public GridBasedRoadmap(int nVertices, int radius, Point[] customPoints, Rectangle bounds, Collection<Region> obstacles) {
+//    public GridBasedRoadmap(int nVertices, int connectionRadius, Point[] customPoints, Rectangle bounds, Collection<Region> obstacles) {
+//        super(new DummyEdgeFactory<Point, Line>());
+//        this.radius = connectionRadius;
+//        this.customPoints = customPoints;
+//        this.bounds = bounds;
+//        this.obstacles = obstacles;
+//
+//        this.knnTree = new KdTree<Point>(2);
+//
+//        generateNVertices(nVertices);
+//        generateEdges();
+//    }
+
+    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Rectangle bounds, Collection<Region> obstacles) {
         super(new DummyEdgeFactory<Point, Line>());
-        this.nVertices = nVertices;
-        this.radius = radius;
+        this.radius = connectionRadius;
         this.customPoints = customPoints;
         this.bounds = bounds;
         this.obstacles = obstacles;
 
         this.knnTree = new KdTree<Point>(2);
 
-        generateVertices();
+        generateVerticesWithDispersion(dispersion);
         generateEdges();
     }
 
@@ -60,7 +71,32 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
         }
     }
 
-    private void generateVertices() {
+    private void generateVerticesWithDispersion(int dispersion) {
+
+        int width  = bounds.getCorner2().x - bounds.getCorner1().x;
+        int height = bounds.getCorner2().y - bounds.getCorner1().y;
+        int cellSize = (int) (dispersion/Math.sqrt(2));
+
+        int columns = width / cellSize + 1;
+        int rows = height / cellSize + 1;
+
+        for (int row=0; row<rows; row++) {
+            for (int col=0; col<columns; col++) {
+                int x = bounds.getCorner1().x + col*cellSize + cellSize/2;
+                int y = bounds.getCorner1().y + row*cellSize + cellSize/2;
+                Point point = new Point(x, y);
+                addVertex(point);
+                knnTree.addPoint(key(point), point);
+            }
+        }
+
+        for (int i = 0; i < customPoints.length; i++) {
+            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
+            addVertex(customPoints[i]);
+        }
+    }
+
+    private void generateNVertices(int nVertices) {
 
         int width  = bounds.getCorner2().x - bounds.getCorner1().x;
         int height = bounds.getCorner2().y - bounds.getCorner1().y;
