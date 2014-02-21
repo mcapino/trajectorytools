@@ -34,6 +34,33 @@ public class Straight {
         return new Straight(p1, p2);
     }
 
+    public tt.euclid2d.Point interpolateFloat(int time) {
+        int tStart = start.getTime();
+        int tEnd = end.getTime();
+
+        if (time < tStart || tEnd < time)
+            throw new RuntimeException("This straight is not defined in time " + time);
+
+        if (time == tStart)
+            return start.getPosition().toPoint2d();
+
+        if (time == tEnd)
+            return end.getPosition().toPoint2d();
+
+        double scale = ((double) (time - tStart)) / (tEnd - tStart);
+
+        int xStart = start.getX();
+        int xEnd = end.getX();
+
+        int yStart = start.getY();
+        int yEnd = end.getY();
+
+        double x = xStart + (xEnd - xStart) * scale;
+        double y = yStart + (yEnd - yStart) * scale;
+
+        return new tt.euclid2d.Point(x, y);
+    }
+
     public Point interpolate(int time) {
         int tStart = start.getTime();
         int tEnd = end.getTime();

@@ -1,73 +1,90 @@
 package tt.euclid2i.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
-import tt.euclid2i.Line;
+import com.google.common.collect.Iterables;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
+import tt.euclidtime3i.Geometry3i;
 import tt.euclidtime3i.discretization.Straight;
+
+import java.util.*;
 
 public class SeparationDetector {
 
+    //TODO parse stuff for SegmentedTrajectory to separate class!
+
     public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int[] separations) {
+        checkNonEmpty(thisTrajectory);
+        Iterable<Straight> segmentsA = extendListFromMinToMaxTime(thisTrajectory);
 
-        for (int otherTrajId = 0; otherTrajId < otherTrajectories.length; otherTrajId++) {
+        for (int i = 0; i < otherTrajectories.length; i++) {
+            SegmentedTrajectory otherTrajectory = otherTrajectories[i];
+            checkNonEmpty(otherTrajectory);
 
-            SegmentedTrajectory otherTrajectory = otherTrajectories[otherTrajId];
+            Iterable<Straight> segmentsB = extendListFromMinToMaxTime(otherTrajectory);
 
-            List<Straight> segmentsA = extendList(thisTrajectory);
-            List<Straight> segmentsB = extendList(otherTrajectory);
+            Iterator<Straight> iteratorA = segmentsA.iterator();
+            Iterator<Straight> iteratorB = segmentsB.iterator();
 
-            ListIterator<Straight> iteratorA = segmentsA.listIterator();
-            ListIterator<Straight> iteratorB = segmentsB.listIterator();
-
-            int i = 0;
-            int j = 0;
-
-            Straight straightA = iteratorA.next();
-            Straight straightB = iteratorB.next();
-
-            while (i < segmentsA.size() && j < segmentsB.size()) {
-
-                int startTimeA = straightA.getStart().getTime();
-                int startTimeB = straightB.getStart().getTime();
-
-                int endTimeA = straightA.getEnd().getTime();
-                int endTimeB = straightB.getEnd().getTime();
-
-                int t1 = Math.max(startTimeA, startTimeB);
-                int t2 = Math.min(endTimeA, endTimeB);
-
-                if (t2 > t1 && hasConflict(straightA.cut(t1, t2), straightB.cut(t1, t2), separations[otherTrajId])) {
-                    return true;
-                }
-
-                if (endTimeA == t2) {
-                    if (iteratorA.hasNext())
-                        straightA = iteratorA.next();
-                    i++;
-                }
-                if (endTimeB == t2) {
-                    if (iteratorB.hasNext())
-                        straightB = iteratorB.next();
-                    j++;
-                }
-            }
+            if (checkSegmentsForCollision(iteratorA, iteratorB, separations[i]))
+                return true;
         }
 
         return false;
     }
 
-    private static List<Straight> extendList(SegmentedTrajectory trajectory) {
-        LinkedList<Straight> segments = new LinkedList<Straight>(trajectory.getSegments());
+    private static boolean checkSegmentsForCollision(Iterator<Straight> iteratorA, Iterator<Straight> iteratorB, int separation) {
+        Straight a = null, b = null;
 
-        tt.euclidtime3i.Point startPoint3i = segments.getFirst().getStart();
-        tt.euclidtime3i.Point endPoint3i = segments.getLast().getEnd();
+        do {
+            if (a == null && b == null || endsAtSameTime(a, b)) {
+                a = iteratorA.next();
+                b = iteratorB.next();
+            } else if (endsEarlier(a, b)) {
+                a = iteratorA.next();
+            } else {
+                b = iteratorB.next();
+            }
+
+            if (collides(a, b, separation))
+                return true;
+        }
+        while (iteratorA.hasNext() || iteratorB.hasNext());
+
+        return false;
+    }
+
+    private static boolean endsAtSameTime(Straight a, Straight b) {
+        return a.getEnd().getTime() == b.getEnd().getTime();
+    }
+
+    private static boolean collides(Straight a, Straight b, int separation) {
+        return Geometry3i.distance(a, b) < separation;
+    }
+
+    private static boolean endsEarlier(Straight a, Straight b) {
+        return a.getEnd().getTime() < b.getEnd().getTime();
+    }
+
+    private static void checkNonEmpty(SegmentedTrajectory segmentedTrajectory) {
+        if (segmentedTrajectory == null)
+            throw new IllegalArgumentException("Null trajectory passed to SeparationDetector");
+
+        List<Straight> segments = segmentedTrajectory.getSegments();
+        if (segments == null || segments.isEmpty())
+            throw new IllegalArgumentException("Empty trajectory");
+    }
+
+    private static Iterable<Straight> extendListFromMinToMaxTime(SegmentedTrajectory trajectory) {
+        //TODO clean up this method
+        List<Straight> segments = trajectory.getSegments();
+        int size = segments.size();
+
+        LinkedList<Collection<Straight>> listsOfSegments = new LinkedList<Collection<Straight>>();
+        listsOfSegments.add(segments);
+
+        tt.euclidtime3i.Point startPoint3i = segments.get(0).getStart();
+        tt.euclidtime3i.Point endPoint3i = segments.get(size - 1).getEnd();
 
         int start = startPoint3i.getTime();
         int end = endPoint3i.getTime();
@@ -78,14 +95,17 @@ public class SeparationDetector {
         Point startPosition = startPoint3i.getPosition();
         Point endPosition = endPoint3i.getPosition();
 
+        if (minTime < start) {
+            Straight waitFromMinTime = new Straight(new tt.euclidtime3i.Point(startPosition, minTime), new tt.euclidtime3i.Point(startPosition, start));
+            listsOfSegments.addFirst(Collections.singletonList(waitFromMinTime));
+        }
 
-        if (minTime < start)
-            segments.addFirst(new Straight(new tt.euclidtime3i.Point(startPosition, minTime), new tt.euclidtime3i.Point(startPosition, start)));
+        if (maxTine > end) {
+            Straight waitToMaxTime = new Straight(new tt.euclidtime3i.Point(endPosition, end), new tt.euclidtime3i.Point(endPosition, maxTine));
+            listsOfSegments.addLast(Collections.singletonList(waitToMaxTime));
+        }
 
-        if (maxTine > end)
-            segments.addLast(new Straight(new tt.euclidtime3i.Point(endPosition, end), new tt.euclidtime3i.Point(endPosition, maxTine)));
-
-        return segments;
+        return Iterables.concat(listsOfSegments);
     }
 
     public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory, Trajectory[] otherTrajectories, int[] separations, int samplingInterval) {
@@ -113,14 +133,14 @@ public class SeparationDetector {
     public static boolean hasAnyPairwiseConflict(Trajectory[] trajectories, int separations[], int samplingInterval) {
 
         int minTime = Integer.MAX_VALUE;
-        for (int i=0; i<trajectories.length; i++) {
+        for (int i = 0; i < trajectories.length; i++) {
             if (trajectories[i].getMinTime() < minTime) {
                 minTime = trajectories[i].getMinTime();
             }
         }
 
         int maxTime = Integer.MIN_VALUE;
-        for (int i=0; i<trajectories.length; i++) {
+        for (int i = 0; i < trajectories.length; i++) {
             if (trajectories[i].getMaxTime() > maxTime) {
                 maxTime = trajectories[i].getMaxTime();
             }
@@ -186,65 +206,6 @@ public class SeparationDetector {
             }
         }
         return false;
-    }
-
-    public static boolean hasConflict(Line sA, Line sB, int separation) {
-        Point a = sA.getStart();
-        Point b = sA.getEnd();
-
-        Point c = sB.getStart();
-        Point d = sB.getEnd();
-
-        return hasConflict(a, b, c, d, separation);
-    }
-
-    public static boolean hasConflict(Straight sA, Straight sB, int separation) {
-        Point a = sA.getStart().getPosition();
-        Point b = sA.getEnd().getPosition();
-
-        Point c = sB.getStart().getPosition();
-        Point d = sB.getEnd().getPosition();
-
-        return hasConflict(a, b, c, d, separation);
-    }
-
-    public static boolean hasConflict(Point a, Point b, Point c, Point d, int separation) {
-        int ux = a.x - c.y;
-        int uy = a.y - c.y;
-
-        int vx = b.x + c.x - d.x - a.x;
-        int vy = b.y + c.y - d.y - a.y;
-
-        int nom = -(ux * vx + uy * vy);
-        int denom = vx * vx + vy * vy;
-
-        if (denom == 0)
-            return a.distance(c) < separation;
-
-        double frac = ((double) nom) / denom;
-
-        //TODO repair this method
-        if (true)
-            throw new RuntimeException("DO NOT USE THIS METHOD UNTIL I FIX IT");
-
-        if (frac < 0) {
-            return a.distance(c) < separation;
-
-        } else if (frac > 1) {
-            return b.distance(d) < separation;
-
-        } else {
-            int abx = (int) (a.x + (b.x - a.x) * frac);
-            int aby = (int) (a.y + (b.y - a.y) * frac);
-
-            int cdx = (int) (c.x + (d.x - c.x) * frac);
-            int cdy = (int) (c.y + (d.y - c.y) * frac);
-
-            int dx = abx - cdx;
-            int dy = aby - cdy;
-
-            return Math.sqrt(dx * dx + dy * dy) < separation;
-        }
     }
 
     /**
