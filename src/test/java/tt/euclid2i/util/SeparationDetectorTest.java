@@ -5,7 +5,6 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
 import org.jgrapht.util.HeuristicToGoal;
 import org.junit.Test;
-
 import tt.euclid2i.*;
 import tt.euclid2i.discretization.ProbabilisticRoadmap;
 import tt.euclid2i.region.Rectangle;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 public class SeparationDetectorTest {
 
-    private static final int TEST_SIZE = 200;
+    private static final int TEST_SIZE = 500;
     private static final int SEED = 119;
     private static final int SPEED = 1;
     private static final int SIZE = 500;
@@ -29,17 +28,15 @@ public class SeparationDetectorTest {
     private static final int NN_RADIUS = 25;
     private static final int SEP_RADIUS = 125;
 
-    //@Test
-    //TODO repair this test
-    public void testHasAnyPairwiseConflict() throws Exception {
+    @Test
+    public void testAnalyticToNumericSolution() throws Exception {
         Random testSeed = new Random(SEED);
 
         Graph<Point, Line> graph = getProbabilisticRoadmap(testSeed.nextInt());
         List<Point> vertices = new ArrayList<Point>(graph.vertexSet());
 
         int different = 0;
-
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < TEST_SIZE; i++) {
             final Point startA = vertices.get(testSeed.nextInt(1000));
             final Point endA = vertices.get(testSeed.nextInt(1000));
 
@@ -66,7 +63,7 @@ public class SeparationDetectorTest {
             }
         }
 
-        // 2% error is allowed due to numeric nonstability
+        // up to 2% error is allowed due to the numeric instability of numeric method
         assertTrue(different < TEST_SIZE / 50);
     }
 
