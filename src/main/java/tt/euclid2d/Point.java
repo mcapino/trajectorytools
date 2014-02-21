@@ -6,6 +6,12 @@ import javax.vecmath.Tuple2d;
 
 public class Point extends Point2d {
 
+    private static final Point zero = new Point(0, 0);
+
+    public static Point zero() {
+        return zero;
+    }
+
     public Point() {
         super();
     }
@@ -35,10 +41,10 @@ public class Point extends Point2d {
         return new double[]{x, y};
     }
 
-//    @Override
-//    public String toString() {
-//        return String.format("(%.2f, %.2f)", x, y);
-//    }
+    @Override
+    public String toString() {
+        return String.format("(%.2f, %.2f)", x, y);
+    }
 
 //    @Override
 //    public int hashCode() {

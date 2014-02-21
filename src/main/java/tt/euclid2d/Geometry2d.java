@@ -6,11 +6,15 @@ public class Geometry2d {
     }
 
     public static double distance(Line l, Point p) {
-        Point x = l.getStart();
-        Point y = l.getEnd();
+        Point a = l.getStart();
+        Point b = l.getEnd();
 
-        Point dpx = sub(p, x);
-        Point dyx = sub(y, x);
+        return distancePointToLie(a, b, p);
+    }
+
+    public static double distancePointToLie(Point a, Point b, Point p) {
+        Point dpx = sub(p, a);
+        Point dyx = sub(b, a);
 
         double nominator = dot(dpx, dyx);
         double denominator = dot(dyx, dyx);
@@ -26,7 +30,7 @@ public class Geometry2d {
         else
             u = 0;
 
-        Point nearest = add(x, scale(dyx, u));
+        Point nearest = add(a, scale(dyx, u));
 
         return nearest.distance(p);
     }
