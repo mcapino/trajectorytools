@@ -1,15 +1,16 @@
 package tt.euclid2i.demo;
 
-import cz.agents.alite.creator.Creator;
-import cz.agents.alite.vis.VisManager;
-import cz.agents.alite.vis.VisManager.SceneParams;
-import cz.agents.alite.vis.layer.common.ColorLayer;
-import cz.agents.alite.vis.layer.common.VisInfoLayer;
+import java.awt.Color;
+import java.util.LinkedList;
+
+import javax.vecmath.Point2d;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.util.HeuristicToGoal;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -20,10 +21,11 @@ import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;
 import tt.vis.GraphPathLayer;
 import tt.vis.GraphPathLayer.PathProvider;
-
-import javax.vecmath.Point2d;
-import java.awt.*;
-import java.util.LinkedList;
+import cz.agents.alite.creator.Creator;
+import cz.agents.alite.vis.VisManager;
+import cz.agents.alite.vis.VisManager.SceneParams;
+import cz.agents.alite.vis.layer.common.ColorLayer;
+import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
 public class PathfindingDemoCreator implements Creator {
@@ -37,14 +39,21 @@ public class PathfindingDemoCreator implements Creator {
     @Override
     public void create() {
 
-        // Create discretization
-        final DirectedGraph<Point, Line> graph = new LazyGrid(new Point(0, 0),
-                new LinkedList<Region>(), new Rectangle(new Point(-50, -50),
-                new Point(50, 50)), LazyGrid.PATTERN_4_WAY, 10);
+        Rectangle bounds = new Rectangle(new Point(-100, -100), new Point(200,200));
 
         // plan the shortest path
-        final Point start = new Point(0, 0);
-        final Point goal = new Point(30, 40);
+        final Point start = new Point(-20, -20);
+        final Point goal = new Point(20, 40);
+
+        // Create discretization
+        final DirectedGraph<Point, Line> graph = new LazyGrid(start,
+                new LinkedList<Region>(), new Rectangle(new Point(-50, -50),
+                        new Point(50, 50)), LazyGrid.PATTERN_4_WAY, 10);
+
+        // or  a Roadmap...
+//        Rectangle obstacle = new Rectangle(new Point(25, 25), new Point(120,50));
+//        Collection<Region> obstacles = Arrays.asList(new Region[] {obstacle});
+//        final DirectedGraph<Point, Line> graph = new ProbabilisticRoadmap(1000, 14, new Point[] {start, goal}, bounds, obstacles , new Random(1));
 
         initVisualization();
 
@@ -53,7 +62,11 @@ public class PathfindingDemoCreator implements Creator {
 
             @Override
             public Graph<Point, Line> getGraph() {
-                return ((LazyGrid) graph).generateFullGraph();
+                if (graph instanceof LazyGrid) {
+                    return ((LazyGrid) graph).generateFullGraph();
+                } else {
+                    return graph;
+                }
             }
         }, new ProjectionTo2d(), Color.GRAY, Color.GRAY, 1, 4));
 

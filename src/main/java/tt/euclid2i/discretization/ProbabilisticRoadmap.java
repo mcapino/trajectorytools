@@ -1,18 +1,19 @@
 package tt.euclid2i.discretization;
 
-import ags.utils.dataStructures.KdTree;
-import ags.utils.dataStructures.NearestNeighborIterator;
-import ags.utils.dataStructures.SquareEuclideanDistanceFunction;
+import java.util.Collection;
+import java.util.Random;
+
 import org.jgrapht.DummyEdgeFactory;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
+
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
-
-import java.util.Collection;
-import java.util.Random;
+import ags.utils.dataStructures.KdTree;
+import ags.utils.dataStructures.NearestNeighborIterator;
+import ags.utils.dataStructures.SquareEuclideanDistanceFunction;
 
 
 public class ProbabilisticRoadmap extends DirectedWeightedMultigraph<Point, Line> {
@@ -45,7 +46,8 @@ public class ProbabilisticRoadmap extends DirectedWeightedMultigraph<Point, Line
 
     private void generateEdges() {
         for (Point point : vertexSet()) {
-            NearestNeighborIterator<Point> iterator = knnTree.getNearestNeighborIterator(key(point), vertexSet().size(), new SquareEuclideanDistanceFunction());
+            NearestNeighborIterator<Point> iterator
+                = knnTree.getNearestNeighborIterator(key(point), vertexSet().size(), new SquareEuclideanDistanceFunction());
 
             while (iterator.hasNext()) {
                 Point next = iterator.next();
@@ -64,8 +66,8 @@ public class ProbabilisticRoadmap extends DirectedWeightedMultigraph<Point, Line
 
     private void generateVertices() {
         for (int i = 0; i < nVertices; i++) {
-            int x = random.nextInt(bounds.getCorner2().x);
-            int y = random.nextInt(bounds.getCorner2().y);
+            int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
+            int y = bounds.getCorner1().y + random.nextInt(bounds.getCorner2().y - bounds.getCorner1().y);
             Point point = new Point(x, y);
             addVertex(point);
             knnTree.addPoint(key(point), point);

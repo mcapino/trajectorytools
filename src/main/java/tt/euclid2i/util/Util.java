@@ -1,8 +1,10 @@
 package tt.euclid2i.util;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.jgrapht.DirectedGraph;
@@ -13,6 +15,7 @@ import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.Trajectory;
+import tt.euclid2i.discretization.GridBasedRoadmap;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
@@ -161,5 +164,51 @@ public class Util {
         writer.flush();
     }
 
+    public static Point[] breakLineToSegments(Line line, double maxLengthOfSegment) {
+        int nPoints = (int) Math.floor(line.getDistance()/maxLengthOfSegment) + 2;
+        double lambdaStep = maxLengthOfSegment/line.getDistance();
+        Point[] points = new Point[nPoints];
+        points[0] = line.getStart();
+        for (int i=1; i<nPoints-1; i++) {
+            points[i] = line.interpolate(lambdaStep * i);
+        }
+        points[nPoints-1] = line.getEnd();
+        return points;
+    }
 
+    public static DirectedGraph<tt.euclid2i.Point, Line> buildGridBasedRoadmap(
+            final Collection<Region> lessInflatedObstacles,
+            final Collection<Region> moreInflatedObstacles,
+            Rectangle bounds, int dispersion,
+            int connectionRadius, Collection<Point> additionalPoints) {
+
+        DirectedGraph<tt.euclid2i.Point, Line> spatialGraph;
+
+        List<Point> customPoints = new LinkedList<Point>();
+        customPoints.addAll(additionalPoints);
+
+        for (Region region : moreInflatedObstacles) {
+            assert region instanceof Polygon;
+            Polygon polygon = (Polygon) region;
+            Point[] points = polygon.getPoints();
+            // break each line segment of the polygon into small segments shorter than connection radius
+            for (int j=0; j<points.length; j++) {
+                Line line;
+                if (j < points.length-1) {
+                    line = new Line(points[j], points[j+1]);
+                } else /* j is the last point, close the polygon */ {
+                    line = new Line(points[j], points[0]);
+                }
+                customPoints.addAll(Arrays.asList(Util.breakLineToSegments(line, connectionRadius-1)));
+            }
+        }
+
+        spatialGraph = new GridBasedRoadmap(
+                dispersion,
+                connectionRadius,
+                customPoints.toArray(new Point[customPoints.size()]),
+                bounds, lessInflatedObstacles);
+
+        return spatialGraph;
+    }
 }
