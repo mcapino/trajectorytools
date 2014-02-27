@@ -1,5 +1,11 @@
 package tt.util;
 
+import com.google.common.collect.Iterables;
+
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Iterator;
+
 public class Common {
 
     public static int[] prefillArray(int length, int value) {
@@ -34,4 +40,32 @@ public class Common {
         return arr;
     }
 
+    public static <E> Collection<E> concatenate(final Collection<? extends Collection<? extends E>> collections) {
+        return new ConcatenatedCollection<E>(collections);
+    }
+
+    private static class ConcatenatedCollection<E> extends AbstractCollection<E> {
+
+        private Iterator<E> iterator;
+        private Collection<? extends Collection<? extends E>> collections;
+
+        private ConcatenatedCollection(Collection<? extends Collection<? extends E>> collections) {
+            this.collections = collections;
+            this.iterator = Iterables.<E>concat(collections).iterator();
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return iterator;
+        }
+
+        @Override
+        public int size() {
+            int size = 0;
+            for (Collection<? extends E> collection : collections) {
+                size += collection.size();
+            }
+            return size;
+        }
+    }
 }
