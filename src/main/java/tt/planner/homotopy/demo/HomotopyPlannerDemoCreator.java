@@ -72,7 +72,7 @@ public class HomotopyPlannerDemoCreator {
         // >>>>>>> 3. select N-1 free space samples, where N is a number of selected obstacles
         qRoots = new ArrayList<Complex>();
         for (int i = 1; i < pRoots.size(); i++) {
-            qRoots.add(projection.complexValue(Util.sampleFreeSpace(problem.getBounds(), problem.getObstacles(), new Random(qRoots.size()))));
+            qRoots.add(projection.complexValue(Util.sampleFreeSpace(problem.getBoundary().getBoundingBox(), problem.getObstacles(), new Random(qRoots.size()))));
         }
 
         // >>>>>>> 4. initialize integrator
@@ -168,7 +168,7 @@ public class HomotopyPlannerDemoCreator {
                     @Override
                     public Collection<Region> getRegions() {
                         LinkedList<Region> list = new LinkedList<Region>();
-                        list.add(problem.getBounds());
+                        list.add(problem.getBoundary());
                         return list;
                     }
                 }, Color.BLACK, Color.WHITE));

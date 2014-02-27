@@ -25,7 +25,7 @@ public class StraightLineDomain implements Domain<Point, Line> {
 
     public StraightLineDomain(ShortestPathProblem problem, int seed, double tryGoalRatio) {
         super();
-        this.bounds = problem.getBounds();
+        this.bounds = problem.getBoundary().getBoundingBox();
         this.obstacles = problem.getObstacles();
         this.target = problem.getTargetRegion();
         this.targetPoint = problem.getTargetPoint();

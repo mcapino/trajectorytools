@@ -37,19 +37,13 @@ public class RandomEnvironment implements Environment {
     public Collection<Region> getObstacles() {
         return obstacles;
     }
-
-    @Override
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
     public int getSeed() {
         return seed;
     }
 
 	@Override
-	public Region getBoundaryRegion() {
-		return getBounds();
+	public Region getBoundary() {
+		return bounds;
 	}
 
 }

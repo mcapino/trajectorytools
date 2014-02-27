@@ -25,11 +25,11 @@ public class ShortestPathProblem {
         Random random = new Random(seed);
 
         do {
-            start = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
+            start = Util.sampleFreeSpace(environment.getBoundary().getBoundingBox(), environment.getObstacles(), random);
         } while (start.getX() > dimX / 4 || start.getY() > dimY / 4);
 
         do {
-            targetPoint = Util.sampleFreeSpace(environment.getBounds(), environment.getObstacles(), random);
+            targetPoint = Util.sampleFreeSpace(environment.getBoundary().getBoundingBox(), environment.getObstacles(), random);
         } while (targetPoint.getX() < dimX * 3 / 4 || targetPoint.getY() < dimY * 3 / 4);
 
         targetRegion = new Rectangle(
@@ -42,6 +42,10 @@ public class ShortestPathProblem {
         return environment.getObstacles();
     }
 
+    public Region getBoundary() {
+    	return environment.getBoundary();
+    }
+
     public Point getStart() {
         return start;
     }
@@ -52,10 +56,6 @@ public class ShortestPathProblem {
 
     public Region getTargetRegion() {
         return targetRegion;
-    }
-
-    public Rectangle getBounds() {
-        return environment.getBounds();
     }
 
     public int getSeed() {
