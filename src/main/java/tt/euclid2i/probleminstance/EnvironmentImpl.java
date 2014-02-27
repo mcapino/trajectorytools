@@ -1,7 +1,6 @@
 package tt.euclid2i.probleminstance;
 
 import tt.euclid2i.Region;
-import tt.euclid2i.region.Rectangle;
 
 import java.util.Collection;
 
@@ -11,11 +10,11 @@ import java.util.Collection;
 public class EnvironmentImpl implements Environment {
 
     private Collection<Region> obstacles;
-    private Rectangle bounds;
+    private Region boundary;
 
-    public EnvironmentImpl(Collection<Region> obstacles, Rectangle bounds) {
+    public EnvironmentImpl(Collection<Region> obstacles, Region boundary) {
         this.obstacles = obstacles;
-        this.bounds = bounds;
+        this.boundary = boundary;
     }
 
     public Collection<Region> getObstacles() {
@@ -26,11 +25,12 @@ public class EnvironmentImpl implements Environment {
         this.obstacles = obstacles;
     }
 
-    public Rectangle getBounds() {
-        return bounds;
+    public void setBoundary(Region boundary) {
+        this.boundary = boundary;
     }
 
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
+    @Override
+    public Region getBoundary() {
+    	return boundary;
     }
 }
