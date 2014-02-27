@@ -21,7 +21,7 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private int radius;
     private Point[] customPoints;
-    private Rectangle bounds;
+    private Region samplingRegion;
     private Collection<Region> obstacles;
 
     private KdTree<Point> knnTree;
@@ -39,13 +39,12 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 //        generateEdges();
 //    }
 
-    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Rectangle bounds, Collection<Region> obstacles) {
+    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Region samplingRegion, Collection<Region> obstacles) {
         super(new DummyEdgeFactory<Point, Line>());
         this.radius = connectionRadius;
         this.customPoints = customPoints;
-        this.bounds = bounds;
+        this.samplingRegion = samplingRegion;
         this.obstacles = obstacles;
-
         this.knnTree = new KdTree<Point>(2);
 
         generateVerticesWithDispersion(dispersion);
@@ -72,7 +71,7 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
     }
 
     private void generateVerticesWithDispersion(int dispersion) {
-
+    	Rectangle bounds = samplingRegion.getBoundingBox();
         int width  = bounds.getCorner2().x - bounds.getCorner1().x;
         int height = bounds.getCorner2().y - bounds.getCorner1().y;
         int cellSize = (int) (dispersion/Math.sqrt(2));
@@ -85,41 +84,47 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
                 int x = bounds.getCorner1().x + col*cellSize + cellSize/2;
                 int y = bounds.getCorner1().y + row*cellSize + cellSize/2;
                 Point point = new Point(x, y);
-                addVertex(point);
-                knnTree.addPoint(key(point), point);
+                if (samplingRegion.isInside(point)) {
+                	if (Util.isInFreeSpace(point, obstacles)) {
+		                addVertex(point);
+		                knnTree.addPoint(key(point), point);
+                	}
+                }
             }
         }
 
         for (int i = 0; i < customPoints.length; i++) {
-            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
-            addVertex(customPoints[i]);
+        	if (bounds.isInside(customPoints[i])) {
+	            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
+	            addVertex(customPoints[i]);
+        	}
         }
     }
 
-    private void generateNVertices(int nVertices) {
-
-        int width  = bounds.getCorner2().x - bounds.getCorner1().x;
-        int height = bounds.getCorner2().y - bounds.getCorner1().y;
-        int cellSize = (int) Math.sqrt(width*height/nVertices);
-
-        int columns = width / cellSize;
-        int rows = height / cellSize;
-
-        for (int row=0; row<rows; row++) {
-            for (int col=0; col<columns; col++) {
-                int x = bounds.getCorner1().x + col*cellSize + cellSize/2;
-                int y = bounds.getCorner1().y + row*cellSize + cellSize/2;
-                Point point = new Point(x, y);
-                addVertex(point);
-                knnTree.addPoint(key(point), point);
-            }
-        }
-
-        for (int i = 0; i < customPoints.length; i++) {
-            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
-            addVertex(customPoints[i]);
-        }
-    }
+//    private void generateNVertices(int nVertices) {
+//
+//        int width  = samplingRegion.getCorner2().x - samplingRegion.getCorner1().x;
+//        int height = samplingRegion.getCorner2().y - samplingRegion.getCorner1().y;
+//        int cellSize = (int) Math.sqrt(width*height/nVertices);
+//
+//        int columns = width / cellSize;
+//        int rows = height / cellSize;
+//
+//        for (int row=0; row<rows; row++) {
+//            for (int col=0; col<columns; col++) {
+//                int x = samplingRegion.getCorner1().x + col*cellSize + cellSize/2;
+//                int y = samplingRegion.getCorner1().y + row*cellSize + cellSize/2;
+//                Point point = new Point(x, y);
+//                addVertex(point);
+//                knnTree.addPoint(key(point), point);
+//            }
+//        }
+//
+//        for (int i = 0; i < customPoints.length; i++) {
+//            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
+//            addVertex(customPoints[i]);
+//        }
+//    }
 
     private static double[] key(Point point) {
         return new double[]{point.getX(), point.getY()};

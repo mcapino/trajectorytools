@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import tt.euclid2d.util.Intersection;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -146,4 +148,22 @@ public class Polygon implements Region, Serializable{
     public int hashCode() {
         return Arrays.hashCode(points);
     }
+
+	public int area() {
+		Point[] pointsArr = Arrays.copyOf(points, points.length);
+
+		if (isClockwise(pointsArr)) {
+			ArrayUtils.reverse(pointsArr);
+		}
+
+		int area = 0;
+		int j = pointsArr.length - 1;
+
+		for (int i = 0; i < pointsArr.length; i++) {
+			area = area + (pointsArr[j].x + pointsArr[i].x)
+					* (pointsArr[j].y - pointsArr[i].y);
+			j = i;
+		}
+		return area / 2;
+	}
 }

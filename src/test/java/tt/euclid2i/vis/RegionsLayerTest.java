@@ -17,7 +17,7 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 
 public class RegionsLayerTest {
 
-    // Visual test -- uncomment the line below and you should see one outside filled polygon and one one inside filled poylgon
+    // Visual test -- uncomment the line below and you should see one outside filled polygon and one one inside filled polygon
     //@Test
     public void test() {
 
@@ -51,7 +51,7 @@ public class RegionsLayerTest {
             public Collection<? extends Region> getRegions() {
                 return regions;
             }
-        }, Color.BLACK, Color.BLACK, true));
+        }, Color.BLACK, Color.BLACK));
 
         try {
             Thread.sleep(60000);

@@ -3,9 +3,11 @@ package tt.euclid2i.util;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
@@ -179,7 +181,7 @@ public class Util {
     public static DirectedGraph<tt.euclid2i.Point, Line> buildGridBasedRoadmap(
             final Collection<Region> lessInflatedObstacles,
             final Collection<Region> moreInflatedObstacles,
-            Rectangle bounds, int dispersion,
+            Region samplingRegion, int dispersion,
             int connectionRadius, Collection<Point> additionalPoints) {
 
         DirectedGraph<tt.euclid2i.Point, Line> spatialGraph;
@@ -207,8 +209,36 @@ public class Util {
                 dispersion,
                 connectionRadius,
                 customPoints.toArray(new Point[customPoints.size()]),
-                bounds, lessInflatedObstacles);
+                samplingRegion, lessInflatedObstacles);
 
         return spatialGraph;
+    }
+
+    public static void addVertexAndConnectToNeighbors(DirectedGraph<Point, Line> graph, Point vertexToAdd, int n, Collection<Region> obstacles) {
+
+        Set<Point> otherVertices = new HashSet<Point>(graph.vertexSet());
+        graph.addVertex(vertexToAdd);
+
+        for (int i=0; i < n; i++) {
+            Point bestVertex = null;
+
+            for (Point vertex : otherVertices) {
+                if (bestVertex == null  ||
+                        (
+                        	bestVertex.distance(vertexToAdd) > vertex.distance(vertexToAdd) &&
+                        	Util.isVisible(vertex, vertexToAdd, obstacles)
+                        )
+
+                   )
+                {
+                    bestVertex = vertex;
+                }
+            }
+
+            graph.addVertex(bestVertex);
+            graph.addEdge(vertexToAdd, bestVertex);
+            graph.addEdge(bestVertex, vertexToAdd);
+            otherVertices.remove(bestVertex);
+        }
     }
 }

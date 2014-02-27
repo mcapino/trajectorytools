@@ -21,25 +21,20 @@ public class RegionsLayer extends AbstractLayer {
     private RegionsProvider regionsProvider;
     private Color edgeColor;
     private Color fillColor;
-    private boolean fill;
 
     RegionsLayer() {
     }
 
-    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor, boolean fill) {
+    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor) {
         this.regionsProvider = regionsProvider;
         this.edgeColor = edgeColor;
         this.fillColor = fillColor;
-        this.fill = fill;
     }
 
     public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor) {
-        this(regionsProvider, edgeColor, edgeColor, false);
+        this(regionsProvider, edgeColor, null);
     }
 
-    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor) {
-        this(regionsProvider, edgeColor, fillColor, true);
-    }
 
     @Override
     public void paint(Graphics2D canvas) {
@@ -52,7 +47,7 @@ public class RegionsLayer extends AbstractLayer {
             if (region instanceof Rectangle) {
                 Rectangle rect = (Rectangle) region;
 
-                if (fill) {
+                if (fillColor != null) {
                     canvas.setColor(fillColor);
                     canvas.fillRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
                             Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
@@ -83,7 +78,7 @@ public class RegionsLayer extends AbstractLayer {
                     canvas.fillOval(x[0], y[0], 2, 2);
 
                 } else {
-                    if (fill) {
+                    if (fillColor != null) {
                         if (polygon.isFilledInside()) {
                             canvas.setColor(fillColor);
                             canvas.fillPolygon(x, y, n);

@@ -66,6 +66,10 @@ public class Polygon {
     }
 
     public List<Polygon> inflate(double inflateBy, int pointsAtCorner) {
+    	return inflate(inflateBy, pointsAtCorner, isFilledInside());
+    }
+
+    public List<Polygon> inflate(double inflateBy, int pointsAtCorner, boolean inflatedFilledInside) {
         int size = polygonPoints.length;
 
         Coordinate[] coordinates = new Coordinate[size + 1];
@@ -105,9 +109,11 @@ public class Polygon {
                     if (currentPoint.equals(polygonPoints.get(0))) {
                         // We found the last (closing) point of the polygon -- create a new polygon from the sequence
                         Point[] inflatedPolygonPoints = polygonPoints.toArray(new Point[polygonPoints.size()]);
-                        if (!(isFilledInside() == isClockwise(inflatedPolygonPoints))) {
-                            ArrayUtils.reverse(inflatedPolygonPoints);
+
+                        if (inflatedFilledInside != isClockwise(inflatedPolygonPoints)) {
+                        	ArrayUtils.reverse(inflatedPolygonPoints);
                         }
+
                         polygons.add(new Polygon(inflatedPolygonPoints));
                         polygonPoints = null;
                     }
@@ -119,9 +125,6 @@ public class Polygon {
         } else {
             return new LinkedList<Polygon>();
         }
-
-
-
     }
 
     public boolean isFilledInside() {

@@ -11,4 +11,5 @@ public interface Environment {
 
     public Rectangle getBounds();
 
+    public Region getBoundaryRegion();
 }

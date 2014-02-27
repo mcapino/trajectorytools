@@ -47,4 +47,9 @@ public class RandomEnvironment implements Environment {
         return seed;
     }
 
+	@Override
+	public Region getBoundaryRegion() {
+		return getBounds();
+	}
+
 }
