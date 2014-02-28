@@ -33,6 +33,21 @@ public class Util {
         return true;
     }
 
+    public static boolean isInFreeSpace(Point point, Region boundary, Collection<? extends Region> obstacles) {
+
+    	if (!boundary.isInside(point)) {
+    		return false;
+    	}
+
+    	for (Region obstacle : obstacles) {
+            if (obstacle.isInside(point)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean isInFreeSpace(Point point, Collection<? extends Region> obstacles) {
         for (Region obstacle : obstacles) {
             if (obstacle.isInside(point)) {
@@ -49,6 +64,16 @@ public class Util {
         do {
             point = sampleSpace(bounds, random);
         } while (!isInFreeSpace(point, obstacles));
+
+        return point;
+    }
+
+    public static Point sampleFreeSpace(Region boundary, Collection<? extends Region> obstacles, Random random) {
+
+        Point point;
+        do {
+            point = sampleSpace(boundary.getBoundingBox(), random);
+        } while (!isInFreeSpace(point, boundary, obstacles));
 
         return point;
     }
