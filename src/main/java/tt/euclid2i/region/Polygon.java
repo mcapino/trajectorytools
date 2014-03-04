@@ -166,4 +166,10 @@ public class Polygon implements Region, Serializable{
 		}
 		return area / 2;
 	}
+
+	@Override
+	public String toString() {
+		return (isFilledInside() ? "(in)" : "(out)") + Arrays.toString(points);
+	}
+
 }

@@ -1,13 +1,20 @@
 package tt.euclid2i.discretization;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 
+import javax.vecmath.Tuple2i;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.jgrapht.DummyEdgeFactory;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.Union;
+import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import ags.utils.dataStructures.KdTree;
@@ -21,29 +28,17 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private int radius;
     private Point[] customPoints;
-    private Region samplingRegion;
+
+    private Collection<Region> boundaryRegions;
     private Collection<Region> obstacles;
 
     private KdTree<Point> knnTree;
 
-//    public GridBasedRoadmap(int nVertices, int connectionRadius, Point[] customPoints, Rectangle bounds, Collection<Region> obstacles) {
-//        super(new DummyEdgeFactory<Point, Line>());
-//        this.radius = connectionRadius;
-//        this.customPoints = customPoints;
-//        this.bounds = bounds;
-//        this.obstacles = obstacles;
-//
-//        this.knnTree = new KdTree<Point>(2);
-//
-//        generateNVertices(nVertices);
-//        generateEdges();
-//    }
-
-    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Region samplingRegion, Collection<Region> obstacles) {
+    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Collection<Region> boundaryRegions, Collection<Region> obstacles) {
         super(new DummyEdgeFactory<Point, Line>());
         this.radius = connectionRadius;
         this.customPoints = customPoints;
-        this.samplingRegion = samplingRegion;
+        this.boundaryRegions = boundaryRegions;
         this.obstacles = obstacles;
         this.knnTree = new KdTree<Point>(2);
 
@@ -64,13 +59,24 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
                 if (point.distance(next) > radius)
                     break;
 
-                if (Util.isVisible(point, next, obstacles))
+                if (Util.isVisible(point, next, obstacles) && Util.isVisible(point, next, boundaryRegions))
                     addEdge(point, next, new Line(point, next));
             }
         }
     }
 
     private void generateVerticesWithDispersion(int dispersion) {
+
+    	Collection<Region> boundaryRegionsFlipped = new LinkedList<Region>();
+        for (Region r : boundaryRegions) {
+        	Polygon p = (Polygon)r;
+        	Point[] points = Arrays.copyOf(p.getPoints(), p.getPoints().length);
+        	if (!Polygon.isClockwise(points))
+        		ArrayUtils.reverse(points);
+			boundaryRegionsFlipped.add(new Polygon(points));
+        }
+
+    	Union samplingRegion = new Union(boundaryRegionsFlipped);
     	Rectangle bounds = samplingRegion.getBoundingBox();
         int width  = bounds.getCorner2().x - bounds.getCorner1().x;
         int height = bounds.getCorner2().y - bounds.getCorner1().y;

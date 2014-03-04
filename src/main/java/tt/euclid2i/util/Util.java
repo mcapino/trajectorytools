@@ -206,7 +206,8 @@ public class Util {
     public static DirectedGraph<tt.euclid2i.Point, Line> buildGridBasedRoadmap(
             final Collection<Region> lessInflatedObstacles,
             final Collection<Region> moreInflatedObstacles,
-            Region samplingRegion, int dispersion,
+            final Collection<Region> boundaryRegions,
+            int dispersion,
             int connectionRadius, Collection<Point> additionalPoints) {
 
         DirectedGraph<tt.euclid2i.Point, Line> spatialGraph;
@@ -234,7 +235,7 @@ public class Util {
                 dispersion,
                 connectionRadius,
                 customPoints.toArray(new Point[customPoints.size()]),
-                samplingRegion, lessInflatedObstacles);
+                boundaryRegions, lessInflatedObstacles);
 
         return spatialGraph;
     }
