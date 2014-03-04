@@ -13,6 +13,12 @@ public class SeparationDetector {
 
     //TODO parse stuff for SegmentedTrajectory to separate class!
 
+    public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int separation) {
+        int[] separations = new int[otherTrajectories.length];
+        Arrays.fill(separations,separation);
+        return hasAnyPairwiseConflictAnalytic(thisTrajectory, otherTrajectories, separations);
+    }
+
     public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int[] separations) {
         checkNonEmpty(thisTrajectory);
         Iterable<Straight> segmentsA = extendListFromMinToMaxTime(thisTrajectory);
@@ -106,6 +112,12 @@ public class SeparationDetector {
         }
 
         return Iterables.concat(listsOfSegments);
+    }
+
+    public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory, Trajectory[] otherTrajectories, int separation, int samplingInterval) {
+        int[] separations = new int[otherTrajectories.length];
+        Arrays.fill(separations,separation);
+        return hasAnyPairwiseConflict(thisTrajectory, otherTrajectories, separations, samplingInterval);
     }
 
     public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory, Trajectory[] otherTrajectories, int[] separations, int samplingInterval) {
