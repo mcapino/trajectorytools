@@ -22,8 +22,12 @@ public class Geometry3i {
         Point c = y.interpolateFloat(tStart);
         Point d = y.interpolateFloat(tEnd);
 
-        Point ac = Geometry2d.sub(a, c);
-        Point bd = Geometry2d.sub(b, d);
+        return distanceOverTimeParameter(a, b, c, d);
+    }
+
+    public static double distanceOverTimeParameter(Point aStart, Point aEnd, Point bStart, Point bEnd) {
+        Point ac = Geometry2d.sub(aStart, bStart);
+        Point bd = Geometry2d.sub(aEnd, bEnd);
 
         return Geometry2d.distancePointToLie(ac, bd, Point.zero());
     }
