@@ -14,6 +14,10 @@ public class DiscretizedEnvironmentImpl extends EnvironmentImpl implements Discr
 
     private final DirectedGraph<Point, Line> graph;
 
+    public DiscretizedEnvironmentImpl(Environment environment, DirectedGraph<Point, Line> graph) {
+        this(environment.getObstacles(), environment.getBoundary(), graph);
+    }
+
     public DiscretizedEnvironmentImpl(Collection<Region> obstacles, Region boundary, DirectedGraph<Point, Line> graph) {
         super(obstacles, boundary);
         this.graph = graph;
