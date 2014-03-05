@@ -25,6 +25,11 @@ public class Geometry3i {
         return distanceOverTimeParameter(a, b, c, d);
     }
 
+
+    /**
+     * Function returns a distance of segments <i>a</i> and <i>b</i> parametrized in such way that both
+     * starts and end in the same time.
+     */
     public static double distanceOverTimeParameter(Point aStart, Point aEnd, Point bStart, Point bEnd) {
         Point ac = Geometry2d.sub(aStart, bStart);
         Point bd = Geometry2d.sub(aEnd, bEnd);
