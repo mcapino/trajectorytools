@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.WeightedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import tt.euclid2i.Line;
@@ -108,7 +110,7 @@ public class VisibilityGraph {
     // These method generate visibility graph by traversing the graph from the start point.
     // It doesnt require region.isInside() function, as it only works with borders of regions.
 
-    public static WeightedGraph<Point, Line> createVisibilityGraph(Point start, Point goal, Collection<Region> obstacles,
+    public static DirectedGraph<Point, Line> createVisibilityGraph(Point start, Point goal, Collection<Region> obstacles,
             int agentRadius) {
 
         Collection<Region> inflatedObstaclesForCollisionChecking = Util.inflateRegions(obstacles, agentRadius);
@@ -117,12 +119,12 @@ public class VisibilityGraph {
         return createVisibilityGraph(start, goal, inflatedObstaclesForCollisionChecking, inflatedObstaclesForGraph);
     }
 
-    public static WeightedGraph<Point, Line> createVisibilityGraph(Point start, Point goal,
+    public static DirectedGraph<Point, Line> createVisibilityGraph(Point start, Point goal,
             Collection<Region> inflatedObstaclesForCollisionChecking,
             Collection<Region> inflatedObstaclesForGraph) {
 
         @SuppressWarnings("serial")
-        WeightedGraph<Point, Line> visibilityGraph = new SimpleWeightedGraph<Point, Line>(
+        DirectedGraph<Point, Line> visibilityGraph = new DirectedMultigraph<Point, Line>(
         new EdgeFactory<Point, Line>() {
 
             @Override
@@ -165,6 +167,7 @@ public class VisibilityGraph {
                     if (!current.equals(point) && Util.isVisible(current, point, inflatedObstaclesForCollisionChecking)) {
                         visibilityGraph.addVertex(point);
                         visibilityGraph.addEdge(current, point);
+                        visibilityGraph.addEdge(point, current);
                         open.add(point);
                     }
                 }
