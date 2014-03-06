@@ -69,6 +69,22 @@ public class Rectangle implements Region {
                 new Point(minX, minY)});
     }
 
+    public Polygon toOutFilledPolygon() {
+
+        int minX = Math.min(corner1.x, corner2.x);
+        int maxX = Math.max(corner1.x, corner2.x);
+        int minY = Math.min(corner1.y, corner2.y);
+        int maxY = Math.max(corner1.y, corner2.y);
+
+
+        return new Polygon(new Point[] {
+                new Point(maxX, minY),
+                new Point(minX, minY),
+                new Point(minX, maxY),
+                new Point(maxX, maxY),
+                });
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
