@@ -6,13 +6,28 @@ import tt.euclid2i.Point;
 import tt.euclidtime3i.discretization.Straight;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SegmentedTrajectoryFactory {
 
     @SuppressWarnings("unchecked")
-    public static <V, E extends Straight> BasicSegmentedTrajectory createTrajectory(GraphPath<V, E> graphPath, int duration, double cost) {
-        return new BasicSegmentedTrajectory((List<Straight>) graphPath.getEdgeList(), duration, cost);
+    public static <V extends tt.euclidtime3i.Point, E extends Straight> BasicSegmentedTrajectory createTrajectory(GraphPath<V, E> graphPath, int duration, double cost) {
+        List<Straight> edgeList = (List<Straight>) graphPath.getEdgeList();
+
+        if (edgeList.isEmpty())
+            edgeList = Collections.singletonList(new Straight(graphPath.getStartVertex(), graphPath.getEndVertex()));
+
+        return new BasicSegmentedTrajectory(edgeList, duration, cost);
+    }
+
+    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
+        List<Line> edgeList = graphPath.getEdgeList();
+
+        if (edgeList.isEmpty())
+            edgeList = Collections.singletonList(new Line(graphPath.getStartVertex(), graphPath.getEndVertex()));
+
+        return createConstantSpeedTrajectory(edgeList, startTime, speed, duration, cost);
     }
 
     public static BasicSegmentedTrajectory createStationaryTrajectory(Point point, int startTime, int duration, double cost) {
@@ -61,9 +76,4 @@ public class SegmentedTrajectoryFactory {
 
         return new BasicSegmentedTrajectory(segments, duration, currentTime);
     }
-
-    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
-        return createConstantSpeedTrajectory(graphPath.getEdgeList(), startTime, speed, duration, cost);
-    }
-
 }

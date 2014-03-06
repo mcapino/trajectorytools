@@ -13,11 +13,16 @@ import org.jgrapht.util.GraphBuilder;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.probleminstance.Environment;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
 import tt.util.NotImplementedException;
 
 public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
+
+    public static LazyGrid zeroOriginGrid(Environment environment,int[][]pattern, int step){
+        return new LazyGrid(new Point(0,0), environment, pattern, step);
+    }
 
     public static int[][] PATTERN_4_WAY = {{0, -1},
             {-1, 0}, {1, 0},
@@ -50,12 +55,17 @@ public class LazyGrid extends AbstractDirectedGraphWrapper<Point, Line> {
         {-1, 2}, {1, 2}};
 
     private Point initialPoint;
-    private Rectangle bounds;
+    private Region bounds;
     private int step;
     private int[][] pattern;
     private Collection<Region> obstacles;
 
-    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Rectangle bounds, int[][] pattern, int step) {
+
+    public LazyGrid(Point initialPoint, Environment environment, int[][] pattern, int step) {
+        this(initialPoint, environment.getObstacles(),environment.getBoundary(), pattern, step);
+    }
+
+    public LazyGrid(Point initialPoint, Collection<Region> obstacles, Region bounds, int[][] pattern, int step) {
         this.initialPoint = initialPoint;
         this.bounds = bounds;
         this.obstacles = obstacles;
