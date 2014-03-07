@@ -44,14 +44,19 @@ public class Common {
         return new ConcatenatedCollection<E>(collections);
     }
 
-    private static class ConcatenatedCollection<E> extends AbstractCollection<E> {
+    private static final class ConcatenatedCollection<E> extends AbstractCollection<E> {
 
-        private Iterator<E> iterator;
-        private Collection<? extends Collection<? extends E>> collections;
+        private final Iterator<E> iterator;
+        private final int size;
 
         private ConcatenatedCollection(Collection<? extends Collection<? extends E>> collections) {
-            this.collections = collections;
+            this.size = overallSize(collections);
             this.iterator = Iterables.<E>concat(collections).iterator();
+        }
+
+        @Override
+        public int size() {
+            return size;
         }
 
         @Override
@@ -59,10 +64,9 @@ public class Common {
             return iterator;
         }
 
-        @Override
-        public int size() {
+        private int overallSize(Collection<? extends Collection> collections) {
             int size = 0;
-            for (Collection<? extends E> collection : collections) {
+            for (Collection collection : collections) {
                 size += collection.size();
             }
             return size;
