@@ -167,6 +167,13 @@ public class Polygon implements Region, Serializable{
 		return area / 2;
 	}
 
+	/** Flips outside-filled polygon to outside-filled polygon and vice versa **/
+	public Polygon flip() {
+		Point[] newPoints = Arrays.copyOf(points, points.length);
+		ArrayUtils.reverse(newPoints);
+		return new Polygon(newPoints);
+	}
+
 	@Override
 	public String toString() {
 		return (isFilledInside() ? "(in)" : "(out)") + Arrays.toString(points);

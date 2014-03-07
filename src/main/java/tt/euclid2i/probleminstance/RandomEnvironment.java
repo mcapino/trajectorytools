@@ -24,7 +24,7 @@ public class RandomEnvironment implements Environment {
 
     private void createObstacles(int n, int maxSize, Random random) {
         for (int i = 0; i < n; i++) {
-            int size = random.nextInt(maxSize);
+            int size = 1+random.nextInt(maxSize-1);
             int x = bounds.getCorner1().x + random.nextInt(bounds.getCorner2().x - bounds.getCorner1().x);
             int y = bounds.getCorner1().y + random.nextInt(bounds.getCorner2().y - bounds.getCorner1().y);
             Rectangle obstacle = new Rectangle(new Point(x, y), new Point(x + size, y + size));

@@ -35,7 +35,13 @@ public class Util {
 
     public static boolean isInFreeSpace(Point point, Region boundary, Collection<? extends Region> obstacles) {
 
-    	if (!boundary.isInside(point)) {
+    	if (boundary instanceof Polygon) {
+    		if ( ((Polygon)boundary).isFilledInside() ) {
+    			throw new RuntimeException("The boundary region cannot be a polygon that is filled inside");
+    		}
+    	}
+
+    	if (boundary.isInside(point)) {
     		return false;
     	}
 
