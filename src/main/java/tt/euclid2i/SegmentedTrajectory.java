@@ -1,4 +1,3 @@
 package tt.euclid2i;
 
-public interface SegmentedTrajectory extends tt.discrete.SegmentedTrajectory<Point> {
-}
+public interface SegmentedTrajectory extends Trajectory, tt.discrete.SegmentedTrajectory<Point> { }
