@@ -43,7 +43,7 @@ public class RandomEnvironment implements Environment {
 
 	@Override
 	public Region getBoundary() {
-		return bounds;
+		return bounds.toOutFilledPolygon();
 	}
 
 }
