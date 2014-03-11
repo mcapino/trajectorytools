@@ -22,15 +22,15 @@ public class Geometry3i {
         Point c = y.interpolateFloat(tStart);
         Point d = y.interpolateFloat(tEnd);
 
-        return distanceOverTimeParameter(a, b, c, d);
+        return distanceInEqualInitAndEndTime(a, b, c, d);
     }
 
 
     /**
      * Function returns a distance of segments <i>a</i> and <i>b</i> parametrized in such way that both
-     * starts and end in the same time.
+     * starts and ends in a same time.
      */
-    public static double distanceOverTimeParameter(Point aStart, Point aEnd, Point bStart, Point bEnd) {
+    public static double distanceInEqualInitAndEndTime(Point aStart, Point aEnd, Point bStart, Point bEnd) {
         Point ac = Geometry2d.sub(aStart, bStart);
         Point bd = Geometry2d.sub(aEnd, bEnd);
 

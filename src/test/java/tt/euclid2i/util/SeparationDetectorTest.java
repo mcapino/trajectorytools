@@ -4,15 +4,21 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
 import org.jgrapht.util.HeuristicToGoal;
+import org.junit.Assert;
 import org.junit.Test;
-import tt.euclid2i.*;
+import tt.euclid2i.Line;
+import tt.euclid2i.Point;
+import tt.euclid2i.Region;
+import tt.euclid2i.Trajectory;
 import tt.euclid2i.discretization.ProbabilisticRoadmap;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.trajectory.BasicSegmentedTrajectory;
 import tt.euclid2i.trajectory.SegmentedTrajectoryFactory;
+import tt.euclidtime3i.discretization.Straight;
 import tt.euclidtime3i.trajectory.LinearTrajectory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +35,31 @@ public class SeparationDetectorTest {
     private static final int SEP_RADIUS = 125;
 
     @Test
-    public void testAnalyticToNumericSolution() throws Exception {
+    public void testPartiallyOverlappingTrajectories() {
+        Point whatever = new Point(0, 0);
+        Straight a = new Straight(whatever, 0, whatever, 1);
+        Straight b = new Straight(whatever, 2, whatever, 3);
+
+        BasicSegmentedTrajectory tA = new BasicSegmentedTrajectory(Collections.singletonList(a), 2);
+        BasicSegmentedTrajectory tB = new BasicSegmentedTrajectory(Collections.singletonList(b), 2);
+
+        Assert.assertTrue(SeparationDetector.hasConflictAnalytic(tA, tB, 1));
+    }
+
+    @Test
+    public void testNonoverlappingTrajectories() {
+        Point whatever = new Point(0, 0);
+        Straight a = new Straight(whatever, 0, whatever, 1);
+        Straight b = new Straight(whatever, 2, whatever, 3);
+
+        BasicSegmentedTrajectory tA = new BasicSegmentedTrajectory(Collections.singletonList(a), 1);
+        BasicSegmentedTrajectory tB = new BasicSegmentedTrajectory(Collections.singletonList(b), 1);
+
+        Assert.assertFalse(SeparationDetector.hasConflictAnalytic(tA, tB, 1));
+    }
+
+    @Test
+    public void testAnalyticToNumericSolution() {
         Random testSeed = new Random(SEED);
 
         Graph<Point, Line> graph = getProbabilisticRoadmap(testSeed.nextInt());
@@ -52,11 +82,8 @@ public class SeparationDetectorTest {
             BasicSegmentedTrajectory trajectoryA = SegmentedTrajectoryFactory.createConstantSpeedTrajectory(pathA, 0, SPEED, 2 * SIZE, pathA.getWeight() / SPEED);
             BasicSegmentedTrajectory trajectoryB = SegmentedTrajectoryFactory.createConstantSpeedTrajectory(pathB, 0, SPEED, 2 * SIZE, pathA.getWeight() / SPEED);
 
-            SegmentedTrajectory[] segmentedTrajectories = new SegmentedTrajectory[]{trajectoryB};
-            Trajectory[] trajectories = new Trajectory[]{trajectoryB};
-
-            boolean colideNumeric = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, trajectories, new int[]{SEP_RADIUS}, 1);
-            boolean colideAnalytic = SeparationDetector.hasAnyPairwiseConflictAnalytic(trajectoryA, segmentedTrajectories, new int[]{SEP_RADIUS});
+            boolean colideNumeric = SeparationDetector.hasAnyPairwiseConflict(trajectoryA, new Trajectory[]{trajectoryB}, new int[]{SEP_RADIUS}, 1);
+            boolean colideAnalytic = SeparationDetector.hasConflictAnalytic(trajectoryA, trajectoryB, SEP_RADIUS);
 
             if (colideNumeric != colideAnalytic) {
                 different++;
@@ -83,14 +110,15 @@ public class SeparationDetectorTest {
     // Separation detector should regard "touching" trajectories as non-conflicting. I.e if distance = separation, we are okay
     @Test
     public void testTouch() throws Exception {
+        BasicSegmentedTrajectory traj1 = new LinearTrajectory(new tt.euclidtime3i.Point(0, 0, 0), new tt.euclidtime3i.Point(0, 100, 100), 100);
+        BasicSegmentedTrajectory traj2 = new LinearTrajectory(new tt.euclidtime3i.Point(50, 0, 0), new tt.euclidtime3i.Point(50, 100, 100), 100);
 
-    	Trajectory traj1 = new LinearTrajectory(new tt.euclidtime3i.Point(0,0,0), new tt.euclidtime3i.Point(0,100,100) , 100);
-    	Trajectory traj2 = new LinearTrajectory(new tt.euclidtime3i.Point(50,0,0), new tt.euclidtime3i.Point(50,100,100) , 100);
-
-    	// distance between trajs is 50, separation distance is 51 => this is conflict
-    	assertTrue(SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[] {traj2}, new int[] {51}, 10));
-    	// distance between trajs is 50, separation distance is 50 => this is not a conflict
-    	assertTrue(!SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[] {traj2}, new int[] {50}, 10));
+        // distance between trajs is 50, separation distance is 51 => this is conflict
+        assertTrue(SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[]{traj2}, new int[]{51}, 10));
+        assertTrue(SeparationDetector.hasConflictAnalytic(traj1, traj2, 51));
+        // distance between trajs is 50, separation distance is 50 => this is not a conflict
+        assertTrue(!SeparationDetector.hasAnyPairwiseConflict(traj1, new Trajectory[]{traj2}, new int[]{50}, 10));
+        assertTrue(!SeparationDetector.hasConflictAnalytic(traj1, traj2, 50));
     }
 
 }

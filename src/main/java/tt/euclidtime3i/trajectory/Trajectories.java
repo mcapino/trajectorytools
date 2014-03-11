@@ -1,9 +1,33 @@
 package tt.euclidtime3i.trajectory;
 
+import tt.discrete.Trajectory;
 import tt.euclidtime3i.EvaluatedTrajectory;
 import tt.euclidtime3i.Point;
+import tt.euclidtime3i.discretization.Straight;
+
+import java.util.List;
 
 public class Trajectories {
+
+    private Trajectories() {
+    }
+
+    public static Point start(List<Straight> straights) {
+        return straights.get(0).getStart();
+    }
+
+    public static Point end(List<Straight> straights) {
+        int size = straights.size();
+        return straights.get(size - 1).getEnd();
+    }
+
+    public static boolean overlapInTime(Trajectory a, Trajectory b) {
+        int start = Math.max(a.getMinTime(), b.getMinTime());
+        int end = Math.min(a.getMaxTime(), b.getMaxTime());
+
+        return start <= end;
+    }
+
     public static EvaluatedTrajectory concatenate(final EvaluatedTrajectory traj1, final EvaluatedTrajectory traj2) {
 
         if (traj1.getMaxTime() != traj2.getMinTime()) {
@@ -13,7 +37,7 @@ public class Trajectories {
         return new ConcatenatedTrajectory(traj1, traj2);
     }
 
-    public static  EvaluatedTrajectory createSinglePointTrajectory(final Point point, final int time, final double cost) {
+    public static EvaluatedTrajectory createSinglePointTrajectory(final Point point, final int time, final double cost) {
         return new SinglePointTrajectory(point, time, cost);
     }
 
