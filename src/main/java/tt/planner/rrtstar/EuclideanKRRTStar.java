@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class EuclideanKRRTStar<S extends tt.euclid2i.Point, E> extends EuclideanRRTStar<S, E> {
+public class EuclideanKRRTStar<S, E> extends EuclideanRRTStar<S, E> {
 
     protected int k;
 
