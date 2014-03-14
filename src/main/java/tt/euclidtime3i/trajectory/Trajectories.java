@@ -1,5 +1,6 @@
 package tt.euclidtime3i.trajectory;
 
+import tt.discrete.SegmentedTrajectory;
 import tt.discrete.Trajectory;
 import tt.euclidtime3i.EvaluatedTrajectory;
 import tt.euclidtime3i.Point;
@@ -10,6 +11,15 @@ import java.util.List;
 public class Trajectories {
 
     private Trajectories() {
+    }
+
+    public static Point start(SegmentedTrajectory trajectory) {
+        return start(trajectory.getSegments());
+    }
+
+    public static Point end(SegmentedTrajectory trajectory) {
+        return end(trajectory.getSegments());
+
     }
 
     public static Point start(List<Straight> straights) {
