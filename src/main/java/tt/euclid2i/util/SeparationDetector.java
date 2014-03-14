@@ -1,6 +1,5 @@
 package tt.euclid2i.util;
 
-import com.google.common.collect.Iterables;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
@@ -12,19 +11,25 @@ import java.util.*;
 
 public class SeparationDetector {
 
+    // ----------------------------------------- ANALYTIC COLLISION CHECKER -------------------------------------------
+
     public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int separation) {
         int[] separations = new int[otherTrajectories.length];
         Arrays.fill(separations, separation);
         return hasAnyPairwiseConflictAnalytic(thisTrajectory, otherTrajectories, separations);
     }
 
+    public static boolean hasConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory otherTrajectory, int separation) {
+        return hasAnyPairwiseConflictAnalytic(thisTrajectory, new SegmentedTrajectory[]{otherTrajectory}, new int[]{separation});
+    }
+
     public static boolean hasAnyPairwiseConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory[] otherTrajectories, int[] separations) {
-        checkNonEmpty(thisTrajectory);
+        Trajectories.checkNonEmpty(thisTrajectory);
         Iterable<Straight> segmentsA = extendListFromMinToMaxTime(thisTrajectory);
 
         for (int i = 0; i < otherTrajectories.length; i++) {
             SegmentedTrajectory otherTrajectory = otherTrajectories[i];
-            checkNonEmpty(otherTrajectory);
+            Trajectories.checkNonEmpty(otherTrajectory);
 
             if (!Trajectories.overlapInTime(thisTrajectory, otherTrajectory))
                 continue;
@@ -37,51 +42,30 @@ public class SeparationDetector {
         return false;
     }
 
-    public static boolean hasConflictAnalytic(SegmentedTrajectory thisTrajectory, SegmentedTrajectory otherTrajectory, int separation) {
-        checkNonEmpty(thisTrajectory);
-        checkNonEmpty(otherTrajectory);
-
-        Iterable<Straight> segmentsA = extendListFromMinToMaxTime(thisTrajectory);
-        Iterable<Straight> segmentsB = extendListFromMinToMaxTime(otherTrajectory);
-
-        if (Trajectories.overlapInTime(thisTrajectory, otherTrajectory))
-            return hasConflictAnalytic(segmentsA, segmentsB, separation);
-        else
-            return false;
-    }
-
     private static boolean hasConflictAnalytic(Iterable<Straight> segmentsA, Iterable<Straight> segmentsB, int separation) {
         Iterator<Straight> iteratorA = segmentsA.iterator();
         Iterator<Straight> iteratorB = segmentsB.iterator();
 
         return hasCollision(iteratorA, iteratorB, separation);
-
     }
 
-    private static Iterable<Straight> extendListFromMinToMaxTime(SegmentedTrajectory traj) {
-        List<Straight> segments = traj.getSegments();
-
-        LinkedList<Collection<Straight>> listsOfSegments = new LinkedList<Collection<Straight>>();
-        listsOfSegments.add(segments);
+    private static Collection<Straight> extendListFromMinToMaxTime(SegmentedTrajectory traj) {
+        LinkedList<Straight> segments = new LinkedList<Straight>(traj.getSegments());
 
         tt.euclidtime3i.Point startPoint3i = Trajectories.start(segments);
         tt.euclidtime3i.Point endPoint3i = Trajectories.end(segments);
 
         if (traj.getMinTime() < startPoint3i.getTime()) {
             tt.euclidtime3i.Point minTimeStart = new tt.euclidtime3i.Point(startPoint3i.getPosition(), traj.getMinTime());
-
-            Straight waitFromMinTime = new Straight(minTimeStart, startPoint3i);
-            listsOfSegments.addFirst(Collections.singletonList(waitFromMinTime));
+            segments.addFirst(new Straight(minTimeStart, startPoint3i));
         }
 
         if (traj.getMaxTime() > endPoint3i.getTime()) {
             tt.euclidtime3i.Point maxTimeEnd = new tt.euclidtime3i.Point(endPoint3i.getPosition(), traj.getMaxTime());
-
-            Straight waitToMaxTime = new Straight(endPoint3i, maxTimeEnd);
-            listsOfSegments.addLast(Collections.singletonList(waitToMaxTime));
+            segments.addLast(new Straight(endPoint3i, maxTimeEnd));
         }
 
-        return Iterables.concat(listsOfSegments);
+        return segments;
     }
 
     private static boolean hasCollision(Iterator<Straight> iteratorA, Iterator<Straight> iteratorB, int separation) {
@@ -97,7 +81,7 @@ public class SeparationDetector {
                 b = iteratorB.next();
             }
 
-            if (haveIntersection(a, b) && collide(a, b, separation))
+            if (haveTimeOverlap(a, b) && collide(a, b, separation))
                 return true;
         }
         while (iteratorA.hasNext() || iteratorB.hasNext());
@@ -106,7 +90,7 @@ public class SeparationDetector {
     }
 
 
-    private static boolean haveIntersection(Straight a, Straight b) {
+    private static boolean haveTimeOverlap(Straight a, Straight b) {
         int intersectionStart = Math.max(a.getStart().getTime(), b.getStart().getTime());
         int intersectionEnd = Math.min(a.getEnd().getTime(), b.getEnd().getTime());
 
@@ -125,14 +109,7 @@ public class SeparationDetector {
         return a.getEnd().getTime() < b.getEnd().getTime();
     }
 
-    private static void checkNonEmpty(SegmentedTrajectory segmentedTrajectory) {
-        if (segmentedTrajectory == null)
-            throw new IllegalArgumentException("Null trajectory passed to SeparationDetector");
-
-        List<Straight> segments = segmentedTrajectory.getSegments();
-        if (segments == null || segments.isEmpty())
-            throw new IllegalArgumentException("Empty trajectory");
-    }
+    // ----------------------------------------- ANALYTIC COLLISION CHECKER -------------------------------------------
 
     public static boolean hasAnyPairwiseConflict(Trajectory thisTrajectory, Trajectory[] otherTrajectories, int separation, int samplingInterval) {
         int[] separations = new int[otherTrajectories.length];

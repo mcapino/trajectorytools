@@ -13,6 +13,15 @@ public class Trajectories {
     private Trajectories() {
     }
 
+    public static void checkNonEmpty(SegmentedTrajectory segmentedTrajectory) {
+        if (segmentedTrajectory == null)
+            throw new IllegalArgumentException("null trajectory");
+
+        List<Straight> segments = segmentedTrajectory.getSegments();
+        if (segments == null || segments.isEmpty())
+            throw new IllegalArgumentException("empty trajectory");
+    }
+
     public static Point start(SegmentedTrajectory trajectory) {
         return start(trajectory.getSegments());
     }
