@@ -16,6 +16,10 @@ public class TimeParameter implements ParameterProvider {
         this.timeStep = timeStep;
     }
 
+    public int getTimeStep() {
+        return timeStep;
+    }
+
     @Override
     public String getName() {
         return "Time";
