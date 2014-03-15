@@ -14,7 +14,7 @@ public class Trajectories {
     private Trajectories() {
     }
 
-    public static double weight(Collection<Straight> straights){
+    public static int weight(Collection<Straight> straights){
         int weight = 0;
         for (Straight straight : straights) {
             weight += straight.duration();
