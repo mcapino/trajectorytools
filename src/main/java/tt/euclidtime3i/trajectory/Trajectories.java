@@ -6,7 +6,6 @@ import tt.euclidtime3i.EvaluatedTrajectory;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.discretization.Straight;
 
-import java.util.Collection;
 import java.util.List;
 
 public class Trajectories {
@@ -14,12 +13,10 @@ public class Trajectories {
     private Trajectories() {
     }
 
-    public static int weight(Collection<Straight> straights){
-        int weight = 0;
-        for (Straight straight : straights) {
-            weight += straight.duration();
-        }
-        return weight;
+    public static int duration(List<Straight> straights) {
+        int start = start(straights).getTime();
+        int end = end(straights).getTime();
+        return end - start;
     }
 
     public static void checkNonEmpty(SegmentedTrajectory segmentedTrajectory) {
