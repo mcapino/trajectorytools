@@ -58,11 +58,15 @@ public class SeparationDetector {
         if (traj.getMinTime() < startPoint3i.getTime()) {
             tt.euclidtime3i.Point minTimeStart = new tt.euclidtime3i.Point(startPoint3i.getPosition(), traj.getMinTime());
             segments.addFirst(new Straight(minTimeStart, startPoint3i));
+        } else if (traj.getMinTime() > startPoint3i.getTime()) {
+            throw new IllegalArgumentException("Trajectory starts before its minTime");
         }
 
         if (traj.getMaxTime() > endPoint3i.getTime()) {
             tt.euclidtime3i.Point maxTimeEnd = new tt.euclidtime3i.Point(endPoint3i.getPosition(), traj.getMaxTime());
             segments.addLast(new Straight(endPoint3i, maxTimeEnd));
+        } else if (traj.getMaxTime() < endPoint3i.getTime()) {
+            throw new IllegalArgumentException("Trajectory ends before its maxTime");
         }
 
         return segments;
@@ -75,10 +79,14 @@ public class SeparationDetector {
             if (a == null && b == null || endsAtSameTime(a, b)) {
                 a = iteratorA.next();
                 b = iteratorB.next();
+
             } else if (endsEarlier(a, b)) {
-                a = iteratorA.next();
+                if (iteratorA.hasNext()) a = iteratorA.next();
+                else break;
+
             } else {
-                b = iteratorB.next();
+                if (iteratorB.hasNext()) b = iteratorB.next();
+                else break;
             }
 
             if (haveTimeOverlap(a, b) && collide(a, b, separation))
