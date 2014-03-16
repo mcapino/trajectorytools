@@ -4,7 +4,9 @@ import tt.euclid2i.EvaluatedTrajectory;
 import tt.euclid2i.Point;
 import tt.euclid2i.SegmentedTrajectory;
 import tt.euclidtime3i.discretization.Straight;
+import tt.euclidtime3i.trajectory.Trajectories;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
 
@@ -18,20 +20,39 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     private List<Straight> segments;
 
     public BasicSegmentedTrajectory(List<Straight> segments, int duration, double cost) {
-        if (segments.isEmpty())
-            throw new RuntimeException("Trajectory can not be created from empty list");
+        checkNonEmpty(segments);
+        this.segments = ensureRandomAccessList(segments);
+        checkContinuity(this.segments);
 
-        if (!(segments instanceof RandomAccess))
-            throw new RuntimeException("List of segments must be instance of RandomAccess");
-
-        this.startTime = segments.get(0).getStart().getTime();
+        this.startTime = Trajectories.start(segments).getTime();
         this.maxTime = startTime + duration;
         this.segments = segments;
         this.cost = cost;
 
-        tt.euclidtime3i.Point endTimePoint = segments.get(segments.size() - 1).getEnd();
+        tt.euclidtime3i.Point endTimePoint = Trajectories.end(segments);
         this.endTime = endTimePoint.getTime();
         this.endWayPoint = endTimePoint.getPosition();
+    }
+
+    private void checkContinuity(List<Straight> segments) {
+        for (int i = 1; i < segments.size(); i++) {
+            Straight a = segments.get(i - 1);
+            Straight b = segments.get(i);
+            if (a.getEnd() != b.getStart())
+                throw new IllegalArgumentException(String.format("The trajectory is not continuous (%s != %s)", a, b));
+        }
+    }
+
+    private List<Straight> ensureRandomAccessList(List<Straight> segments) {
+        if (segments instanceof RandomAccess)
+            return segments;
+        else
+            return new ArrayList<Straight>(segments);
+    }
+
+    private void checkNonEmpty(List<Straight> segments) {
+        if (segments.isEmpty())
+            throw new RuntimeException("Trajectory can not be created from empty list");
     }
 
     public BasicSegmentedTrajectory(List<Straight> segments, int duration) {
