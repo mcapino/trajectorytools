@@ -38,7 +38,7 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
         for (int i = 1; i < segments.size(); i++) {
             Straight a = segments.get(i - 1);
             Straight b = segments.get(i);
-            if (a.getEnd() != b.getStart())
+            if (!a.getEnd().equals(b.getStart()))
                 throw new IllegalArgumentException(String.format("The trajectory is not continuous (%s != %s)", a, b));
         }
     }
