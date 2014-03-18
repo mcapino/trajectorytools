@@ -14,7 +14,7 @@ public class Straight {
 
     public Straight(Point start, Point end) {
         super();
-        if (start.getTime() < end.getTime()) {
+        if (start.getTime() <= end.getTime()) {
             this.start = start;
             this.end = end;
         } else {
