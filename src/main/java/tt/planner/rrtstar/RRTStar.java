@@ -14,26 +14,26 @@ import java.util.*;
 
 public class RRTStar<S, E> implements Graph<S, E> {
 
-    Domain<S, E> domain;
+    protected Domain<S, E> domain;
 
-    List<RRTStarListener<S, E>> listeners;
-    int nSamples;
+    protected List<RRTStarListener<S, E>> listeners;
+    protected int nSamples;
 
+    protected Vertex<S, E> root;
+    protected double initialRadius;
+    protected double minRadius;
+    protected double maxRadius;
+
+    protected Vertex<S, E> bestVertex;
+
+    protected Map<E, S> edgeSources = new HashMap<E, S>();
+    protected Map<E, S> edgeTargets = new HashMap<E, S>();
+    protected Map<S, E> incomingEdges = new HashMap<S, E>();
+
+    // only for debugging/visualisation purposes
     public int ext_counter;
-    Vertex<S, E> root;
-    double initialRadius;
-    double minRadius;
-    double maxRadius;
-
-    Vertex<S, E> bestVertex;
-
-    Map<E, S> edgeSources = new HashMap<E, S>();
-    Map<E, S> edgeTargets = new HashMap<E, S>();
-    Map<S, E> incomingEdges = new HashMap<S, E>();
-
-    // Stores last random sample drawn from the domain -  only for debugging/visualisation purposes
-    S lastSampleDrawn = null;
-    S lastNewSample = null;
+    public S lastSampleDrawn = null;
+    public S lastNewSample = null;
 
     public RRTStar(Domain<S, E> domain, S initialState, double initialRadius) {
         this(domain, initialState, initialRadius, 0, Double.POSITIVE_INFINITY);
