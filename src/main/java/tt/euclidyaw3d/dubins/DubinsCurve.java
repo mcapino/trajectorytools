@@ -341,5 +341,9 @@ public class DubinsCurve {
     	return path.length() * rho;
     }
 
+    public boolean isReverse() {
+    	return path.reverse;
+    }
+
 
 }
