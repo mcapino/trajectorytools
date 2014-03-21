@@ -25,9 +25,8 @@ public class DubinsCurve {
         /** Whether the path should be followed "in reverse" */
         boolean reverse = false;
 
-        DubinsPath()
-        {
-        	this(new DubinsPath.Segment[] {DubinsPath.Segment.LEFT, DubinsPath.Segment.STRAIGHT, DubinsPath.Segment.LEFT },0,Double.MAX_VALUE,0);
+        DubinsPath() {
+        	this(new DubinsPath.Segment[] {DubinsPath.Segment.LEFT, DubinsPath.Segment.STRAIGHT, DubinsPath.Segment.LEFT }, 0, Double.MAX_VALUE,0);
         }
 
         DubinsPath(Segment[] type, double t, double p, double q)
@@ -56,10 +55,32 @@ public class DubinsCurve {
         return angleInRads - (TWOPI * Math.floor(angleInRads / TWOPI));
     }
 
-	// Implementation of
-	// http://gieseanw.wordpress.com/2012/10/21/a-comprehensive-step-by-step-tutorial-to-computing-dubins-paths/
-    public static EvaluatedTrajectory getDubinsCurve(Point start, Point end, double rho, double speed, int samplingInterval) {
-        // Normalize to relative coordinate system, where the origin is at start (0,0)
+	private Point start;
+	private double rho;
+	private DubinsPath path;
+
+	public DubinsCurve(Point start, Point end, double rho) {
+		this(start, end, rho, false);
+	}
+
+    public DubinsCurve(Point start, Point end, double rho, boolean reverseAllowed) {
+        this.start = start;
+        this.rho = rho;
+
+    	this.path = getDubinsPath(start, end, rho);
+
+        if (reverseAllowed) {
+        	  DubinsPath reversedPath = getDubinsPath(end, start, rho);
+              if (reversedPath.length() < path.length())
+              {
+                  reversedPath.reverse = true;
+                  this.path = reversedPath;
+              }
+        }
+    }
+
+	protected DubinsPath getDubinsPath(Point start, Point end, double rho) {
+		// Normalize to relative coordinate system, where the origin is at start (0,0)
     	double dx = end.x - start.x;
         double dy = end.y - start.y;
         double d = Math.sqrt(dx*dx + dy*dy) / rho; // normalize to r_min = 1
@@ -67,13 +88,10 @@ public class DubinsCurve {
         double alpha = mod2pi(start.getYaw() - th);
         double beta = mod2pi(end.getYaw()- th);
 
-        DubinsPath path = dubins(d, alpha, beta);
-        EvaluatedTrajectory traj = dubinsPathToTrajectory(start, end, path, rho, speed, samplingInterval);
-        return traj;
-    }
+        return canonicalDubins(d, alpha, beta);
+	}
 
-    private static EvaluatedTrajectory dubinsPathToTrajectory(Point start, Point end,
-			DubinsPath path, double rho, double speed, int samplingInterval) {
+    public EvaluatedTrajectory getTrajectory(double speed, int samplingInterval) {
 
     	double duration = (path.length() * rho) / speed;
     	int nPoints = (int) Math.floor(duration / samplingInterval);
@@ -81,15 +99,16 @@ public class DubinsCurve {
     	tt.euclid2d.Point points[] = new tt.euclid2d.Point[nPoints];
 
     	for (int i=0; i<nPoints; i++) {
-    		points[i] = interpolate(start, path, (i*samplingInterval) / duration, rho).getPosition();
+    		points[i] = interpolate((i*samplingInterval) / duration).getPosition();
     	}
 
     	PointArrayTrajectory traj = new PointArrayTrajectory(points, samplingInterval, duration);
 
 		return traj;
-	}
+    }
 
-	static private DubinsPath dubins(double d, double alpha, double beta)
+    // Canonical Dubins. Start is assumed to be at (0,0) with orientation 0 rad. Rmin is assimed to be 1. The lengths are in rads.
+	static private DubinsPath canonicalDubins(double d, double alpha, double beta)
     {
         if (d < DUBINS_EPS && Math.abs(alpha-beta) < DUBINS_EPS) {
             return new DubinsPath(new DubinsPath.Segment[] {DubinsPath.Segment.LEFT, DubinsPath.Segment.STRAIGHT, DubinsPath.Segment.LEFT }, 0, d, 0);
@@ -241,13 +260,25 @@ public class DubinsCurve {
         return new DubinsPath();
     }
 
-    static Point interpolate(Point from, DubinsPath path, double t, double rho)
+    public Point[] interpolateBy(double samplingInterval) {
+    	int nPoint = (int) Math.ceil(getLength() / samplingInterval);
+    	Point[] res = new Point[nPoint];
+
+    	for (int i = 0; i < res.length; i++) {
+			res[i] = interpolate(i/(double)res.length);
+		}
+
+    	return res;
+    }
+
+    /** Interpolates position on the path for t from [0,1] **/
+    public Point interpolate(double t)
     {
         double seg = t * path.length();
-        double phi = from.getYaw();
+        double phi = start.getYaw();
         double v;
 
-        Point s = new Point(0, 0, from.getYaw());
+        Point s = new Point(0, 0, start.getYaw());
 
         if (!path.reverse)
         {
@@ -277,13 +308,38 @@ public class DubinsCurve {
                 }
             }
         } else {
-        	throw new NotImplementedException();
+            for (int i=0; i<3 && seg>0; i++)
+            {
+                v = Math.min(seg, path.length[2-i]);
+                phi = s.getYaw();
+                seg -= v;
+
+                switch(path.type[2-i]) {
+                    case LEFT:
+                    	s.x = s.x + Math.sin(phi-v) - Math.sin(phi);
+                    	s.y = s.y - Math.cos(phi-v) + Math.cos(phi);
+                    	s.z = phi - v;
+                        break;
+                    case RIGHT:
+                    	s.x = s.x - Math.sin(phi+v) + Math.sin(phi);
+                    	s.y = s.y + Math.cos(phi+v) - Math.cos(phi);
+                    	s.z = phi + v;
+                        break;
+                    case STRAIGHT:
+                    	s.x = s.x - v * Math.cos(phi);
+                    	s.y = s.y - v * Math.sin(phi);
+                        break;
+                }
+            }
         }
 
-        Point res = new Point(s.x * rho + from.x, s.y * rho + from.y, s.getYaw());
+        Point res = new Point(s.x * rho + start.x, s.y * rho + start.y, s.getYaw());
         return res;
     }
 
+    public double getLength() {
+    	return path.length() * rho;
+    }
 
 
 }

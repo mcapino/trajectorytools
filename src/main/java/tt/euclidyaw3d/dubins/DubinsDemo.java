@@ -33,10 +33,11 @@ public class DubinsDemo implements Creator {
         VisManager.registerLayer(ParameterControlLayer.create(time));
 
         tt.euclidyaw3d.Point start = new tt.euclidyaw3d.Point(0, 0, 0);
-        tt.euclidyaw3d.Point end = new tt.euclidyaw3d.Point(0, 240, 0);
+        tt.euclidyaw3d.Point end = new tt.euclidyaw3d.Point(-400, -300, 0.2);
 
-        final EvaluatedTrajectory traj = DubinsCurve.getDubinsCurve(start, end, 150, 1, 2);
+        DubinsCurve dc = new DubinsCurve(start, end, 150, true);
 
+        final EvaluatedTrajectory traj = dc.getTrajectory(1, 10);
 
         VisManager.registerLayer(TrajectoryLayer.create(new TrajectoryProvider<Point>() {
 
