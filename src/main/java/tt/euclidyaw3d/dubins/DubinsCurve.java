@@ -1,8 +1,12 @@
 package tt.euclidyaw3d.dubins;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import tt.euclid2i.EvaluatedTrajectory;
 import tt.euclid2i.trajectory.PointArrayTrajectory;
 import tt.euclidyaw3d.Point;
+import tt.euclidyaw3d.dubins.DubinsCurve.DubinsPath.Segment;
 import tt.util.NotImplementedException;
 
 /**
@@ -21,7 +25,7 @@ public class DubinsCurve {
         /** Path segment types */
     	Segment[] type;
         /** Path segment lengths */
-        double[] length = new double[3];
+        double[] lengths = new double[3];
         /** Whether the path should be followed "in reverse" */
         boolean reverse = false;
 
@@ -33,16 +37,16 @@ public class DubinsCurve {
         {
         	assert type.length == 3;
             this.type = type;
-        	length[0] = t;
-            length[1] = p;
-            length[2] = q;
+        	lengths[0] = t;
+            lengths[1] = p;
+            lengths[2] = q;
             assert(t >= 0.);
             assert(p >= 0.);
             assert(q >= 0.);
         }
 
         double length() {
-            return length[0] + length[1] + length[2];
+            return lengths[0] + lengths[1] + lengths[2];
         }
     };
 
@@ -107,7 +111,7 @@ public class DubinsCurve {
 		return traj;
     }
 
-    // Canonical Dubins. Start is assumed to be at (0,0) with orientation 0 rad. Rmin is assimed to be 1. The lengths are in rads.
+    // Canonical Dubins. Start is assumed to be at (0,0) with orientation 0 rad. Minimum turn radius is assumed to be 1. Are lengths of all segments are in multiplies of rho.
 	static private DubinsPath canonicalDubins(double d, double alpha, double beta)
     {
         if (d < DUBINS_EPS && Math.abs(alpha-beta) < DUBINS_EPS) {
@@ -228,8 +232,7 @@ public class DubinsCurve {
     {
         double ca = Math.cos(alpha), sa = Math.sin(alpha), cb = Math.cos(beta), sb = Math.sin(beta);
         double tmp = .125 * (6. - d * d  + 2. * (ca*cb + sa*sb + d * (sa - sb)));
-        if (Math.abs(tmp) < 1.)
-        {
+        if (Math.abs(tmp) < 1.) {
             double p = TWOPI - Math.acos(tmp);
             double theta = Math.atan2(ca - cb, d - sa + sb);
             double t = mod2pi(alpha - theta + .5 * p);
@@ -260,16 +263,98 @@ public class DubinsCurve {
         return new DubinsPath();
     }
 
-    public Point[] interpolateBy(double samplingInterval) {
-    	int nPoint = (int) Math.ceil(getLength() / samplingInterval);
-    	Point[] res = new Point[nPoint];
+    public Point[] interpolateAdaptiveBy(double samplingInterval) {
 
-    	for (int i = 0; i < res.length; i++) {
+    	List<Point> points = new LinkedList<Point>();
+
+    	if (!path.reverse) {
+	    	for (int i=0; i<3; i++) {
+	    		points.addAll(interpolateSegment(i, samplingInterval, false));
+	    	}
+    	} else {
+    		for (int i=2; i>=0; i--) {
+	    		points.addAll(interpolateSegment(i, samplingInterval, true));
+	    	}
+    	}
+    	points.add(interpolate(1));
+
+    	return points.toArray(new Point[points.size()]);
+    }
+
+	protected List<Point> interpolateSegment(int i, double samplingInterval, boolean isReverse) {
+		double len = path.length();
+		List<Point> points = new LinkedList<Point>();
+		if (path.type[i] == Segment.LEFT || path.type[i] == Segment.RIGHT) {
+			// C - segment
+			double startLen = 0;
+			double endLen = 0;
+
+			double samplingStep = samplingInterval/getLength();
+			if (!isReverse()) {
+				// foward
+
+				if (i==0) {
+					startLen = 0;
+					endLen = path.lengths[0];
+				} else if (i==1) {
+					startLen = path.lengths[0];
+					endLen = startLen + path.lengths[1];
+				} else if (i==2) {
+					startLen = path.lengths[0] + path.lengths[1];
+					endLen = startLen + path.lengths[2];
+				} else {
+					assert false;
+				}
+			} else {
+				// reverse
+
+				if (i==2) {
+					startLen = 0;
+					endLen = path.lengths[2];
+				} else if (i==1) {
+					startLen = path.lengths[2];
+					endLen = startLen + path.lengths[1];
+				} else if (i==0) {
+					startLen = path.lengths[2] + path.lengths[1];
+					endLen = startLen + path.lengths[0];
+				} else {
+					assert false;
+				}
+			}
+
+			// interpolate on interval [startLen,endLen)
+			for (double alpha = startLen/len; alpha < endLen/len; alpha += samplingStep) {
+				points.add(interpolate(alpha));
+			}
+
+		} else {
+			// S - segment
+			assert i == 1;
+			if (!isReverse()) {
+				// forward
+				points.add(interpolate(path.lengths[0] / len));
+			} else {
+				// reverse
+				points.add(interpolate(path.lengths[2] / len));
+			}
+		}
+
+		return points;
+	}
+
+    public Point[] interpolateUniformBy(double samplingInterval) {
+
+		int nPoint = (int) Math.ceil(getLength() / samplingInterval);
+		Point[] res = new Point[nPoint];
+
+		for (int i = 0; i < res.length; i++) {
 			res[i] = interpolate(i/(double)res.length);
 		}
 
-    	return res;
+		return res;
     }
+
+
 
     /** Interpolates position on the path for t from [0,1] **/
     public Point interpolate(double t)
@@ -284,7 +369,7 @@ public class DubinsCurve {
         {
             for (int i=0; i<3 && seg>0; i++)
             {
-                v = Math.min(seg, path.length[i]);
+                v = Math.min(seg, path.lengths[i]);
                 phi = s.getYaw();
                 seg -= v;
 
@@ -310,7 +395,7 @@ public class DubinsCurve {
         } else {
             for (int i=0; i<3 && seg>0; i++)
             {
-                v = Math.min(seg, path.length[2-i]);
+                v = Math.min(seg, path.lengths[2-i]);
                 phi = s.getYaw();
                 seg -= v;
 

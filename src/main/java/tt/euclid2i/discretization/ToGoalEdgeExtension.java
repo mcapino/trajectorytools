@@ -117,7 +117,16 @@ public class ToGoalEdgeExtension extends AbstractDirectedGraphWrapper<Point, Lin
         }
     }
 
-    public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
+    @Override
+	public Set<Point> vertexSet() {
+		Set<Point> vertexSet = new HashSet<Point>(graph.vertexSet());
+		vertexSet.add(goalPoint);
+		return vertexSet;
+	}
+
+
+
+	public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
         //FIXME if the underlying graph is lazygrid, it may happen that this method causes infinite loop
         DirectedGraph<Point, Line> fullGraph
                 = new DefaultDirectedGraph<Point, Line>(Line.class);
