@@ -66,6 +66,7 @@ public class SeparationDetector {
             tt.euclidtime3i.Point maxTimeEnd = new tt.euclidtime3i.Point(endPoint3i.getPosition(), traj.getMaxTime());
             segments.addLast(new Straight(endPoint3i, maxTimeEnd));
         } else if (traj.getMaxTime() < endPoint3i.getTime()) {
+        	System.out.println(traj.getClass().getName() + traj);
             throw new IllegalArgumentException("Trajectory ends before its maxTime");
         }
 
@@ -76,10 +77,16 @@ public class SeparationDetector {
         Straight a = null, b = null;
 
         do {
-            if (a == null && b == null || endsAtSameTime(a, b)) {
+            if (a == null && b == null) {
                 a = iteratorA.next();
                 b = iteratorB.next();
-
+            } else if (endsAtSameTime(a, b)) {
+            	if (iteratorA.hasNext() && iteratorB.hasNext()) {
+            		 a = iteratorA.next();
+                     b = iteratorB.next();
+            	} else {
+            		return false;
+            	}
             } else if (endsEarlier(a, b)) {
                 if (iteratorA.hasNext()) a = iteratorA.next();
                 else break;
