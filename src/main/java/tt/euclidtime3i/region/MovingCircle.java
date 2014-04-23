@@ -1,8 +1,11 @@
 package tt.euclidtime3i.region;
 
+import tt.euclid2i.SegmentedTrajectory;
 import tt.euclid2i.Trajectory;
+import tt.euclid2i.util.SeparationDetector;
 import tt.euclidtime3i.Point;
 import tt.euclidtime3i.Region;
+import tt.euclidtime3i.trajectory.LinearTrajectory;
 
 
 public class MovingCircle implements Region {
@@ -41,7 +44,15 @@ public class MovingCircle implements Region {
             end = p1;
         }
 
-        int tmin = Math.max(trajectory.getMinTime(), start.getTime());
+        if (trajectory instanceof SegmentedTrajectory) {
+        	return intersectionAnalytic(start, end, (SegmentedTrajectory)trajectory);
+        } else {
+        	return intersectionNumeric(start, end, trajectory);
+        }
+    }
+
+	protected boolean intersectionNumeric(Point start, Point end, Trajectory trajectory) {
+		int tmin = Math.max(trajectory.getMinTime(), start.getTime());
         int tmax = Math.min(trajectory.getMaxTime(), end.getTime());
 
         for (int t = tmin; t <= tmax; t += samplingInterval) {
@@ -70,8 +81,11 @@ public class MovingCircle implements Region {
         }
 
         return false;
+	}
 
-    }
+	protected boolean intersectionAnalytic(Point start, Point end, SegmentedTrajectory trajectory) {
+		return SeparationDetector.hasAnyPairwiseConflictAnalytic(new LinearTrajectory(start, end, 0.0), new SegmentedTrajectory[] {trajectory}, radius);
+	}
 
     @Override
     public boolean isInside(Point p) {
