@@ -28,7 +28,7 @@ import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 
 
-public class PathfindingDemoCreator implements Creator {
+public class PathfindingDemo implements Creator {
 
     @Override
     public void init(String[] args) {
@@ -117,7 +117,7 @@ public class PathfindingDemoCreator implements Creator {
 
 
     public static void main(String[] args) {
-        new PathfindingDemoCreator().create();
+        new PathfindingDemo().create();
     }
 
 }
