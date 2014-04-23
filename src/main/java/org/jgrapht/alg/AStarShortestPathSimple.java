@@ -22,12 +22,17 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         boolean proceed(V value, double heapMinimum);
     }
 
+    public static interface StateDominance<V> {
+    	boolean isDominated(V state, double stateCost);
+    	void addedState(V state, double cost);
+    }
+
     protected Heap<Double, V> heap;
     protected HeuristicToGoal<V> heuristicToGoal;
+    protected StateDominance<V> stateDominance;
     protected Map<V, Heap.Entry<Double, V>> opened;
     protected Set<V> closed;
     protected int iterationCounter;
-    //
     protected GraphPath<V, E> path;
     protected V current;
 
@@ -59,9 +64,24 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
     }
 
     public AStarShortestPathSimple(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal) {
+    	this(graph, heuristic, new StateDominance<V>() {
+
+			@Override
+			public boolean isDominated(V state, double stateCost) {
+				return false;
+			}
+
+			@Override
+			public void addedState(V state, double cost) {}
+
+		}, startVertex, goal);
+    }
+
+    public AStarShortestPathSimple(Graph<V, E> graph, HeuristicToGoal<V> heuristic, StateDominance<V> stateDominance, V startVertex, Goal<V> goal) {
         super(graph, startVertex, goal);
 
         this.heuristicToGoal = heuristic;
+        this.stateDominance = stateDominance;
         this.heap = new FibonacciHeap<Double, V>();
         this.opened = new HashMap<V, Heap.Entry<Double, V>>();
         this.closed = new HashSet<V>();
@@ -159,13 +179,17 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
 
                 Heap.Entry<Double, V> entry = opened.get(child);
                 if (entry == null) {
-                    entry = heap.insert(estOverallDistance, child);
-                    opened.put(child, entry);
+                	if (!stateDominance.isDominated(child, candidateDistance)) {
+	                    entry = heap.insert(estOverallDistance, child);
+	                    opened.put(child, entry);
+	                    stateDominance.addedState(child, candidateDistance);
 
-                    setShortestDistanceTo(child, candidateDistance);
-                    setShortestPathTreeEdge(child, edge);
+	                    setShortestDistanceTo(child, candidateDistance);
+	                    setShortestPathTreeEdge(child, edge);
+                	}
                 } else if (candidateDistance < childDistance) {
                     heap.decreaseKey(entry, estOverallDistance);
+                    stateDominance.addedState(child, candidateDistance);
 
                     setShortestDistanceTo(child, candidateDistance);
                     setShortestPathTreeEdge(child, edge);
