@@ -1,10 +1,7 @@
 package tt.euclid2i.region;
 
-import java.io.NotActiveException;
-
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
-import tt.util.NotImplementedException;
 
 public class Circle implements Region {
 
@@ -19,7 +16,46 @@ public class Circle implements Region {
 
 	@Override
 	public boolean intersectsLine(Point p1, Point p2) {
-		throw new NotImplementedException();
+
+		if (isInside(p1) || isInside(p2)) {
+			return true;
+		}
+
+		int x1 = p1.x - center.x;
+		int x2 = p2.x - center.x;
+
+		int y1 = p1.y - center.y;
+		int y2 = p2.y - center.y;
+
+		double a = x1*x1 + y1*y1 +x2*x2 + y2*y2 - 2*x1*x2 - 2*y1*y2;
+		double b = -2*x2*x2 -2*y2*y2 + 2*x1*x2 + 2*y1*y2;
+		double c = x2*x2 + y2*y2 - radius*radius;
+
+		double discr = b*b - 4*a*c;
+
+		if (discr > 0) {
+			// we have two solutions
+			double t1 = (-b + Math.sqrt(discr)) / (2*a);
+			double t2 = (-b - Math.sqrt(discr)) / (2*a);
+
+			if ( (t1 >= 0 && t1 <= 1.0) || (t2 >= 0 && t2 <= 1.0) ) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (Math.abs(discr) < 0.001) {
+			double t =  (-b) / 2*a;
+			if (t >= 0 && t <= 1.0) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (discr < 0) {
+			// supporting line does not intersect the circle
+			return false;
+		}
+
+		throw new RuntimeException("Discriminant: " + discr);
 	}
 
 	@Override
@@ -33,8 +69,15 @@ public class Circle implements Region {
 							 new Point(center.x + radius, center.y + radius));
 	}
 
+	public Point getCenter() {
+		return center;
+	}
 
-    @Override
+	public int getRadius() {
+		return radius;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
