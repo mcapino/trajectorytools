@@ -17,9 +17,15 @@ public class Circle implements Region {
 	@Override
 	public boolean intersectsLine(Point p1, Point p2) {
 
+		if (p1.equals(p2)) {
+			return isInside(p1);
+		}
+
 		if (isInside(p1) || isInside(p2)) {
 			return true;
 		}
+
+
 
 		int x1 = p1.x - center.x;
 		int x2 = p2.x - center.x;
@@ -96,4 +102,11 @@ public class Circle implements Region {
         result = 31 * result + radius;
         return result;
     }
+
+	@Override
+	public String toString() {
+		return "Circle(" + center + ", r=" + radius + ")";
+	}
+
+
 }

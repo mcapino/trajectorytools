@@ -2,6 +2,7 @@ package tt.euclid2i.demo;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import javax.vecmath.Point2d;
@@ -22,6 +23,8 @@ import tt.euclid2i.discretization.ObstacleWrapper;
 import tt.euclid2i.region.Circle;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.vis.ProjectionTo2d;
+import tt.euclid2i.vis.RegionsLayer;
+import tt.euclid2i.vis.RegionsLayer.RegionsProvider;
 import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;
 import tt.vis.GraphPathLayer;
@@ -38,7 +41,6 @@ public class ObstacleWrapperDemo implements Creator {
     @Override
     public void init(String[] args) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -53,10 +55,10 @@ public class ObstacleWrapperDemo implements Creator {
         // Create discretization
         final DirectedGraph<Point, Line> graph = new LazyGrid(start,
                 new LinkedList<Region>(), new Rectangle(new Point(-50, -50),
-                        new Point(50, 50)), LazyGrid.PATTERN_4_WAY, 5);
+                        new Point(50, 50)), LazyGrid.PATTERN_16_WAY, 5);
 
 
-        Collection<Region> obstacles = new LinkedList<Region>();
+        final Collection<Region> obstacles = new LinkedList<Region>();
         obstacles.add(new Circle(new Point(0,0),20));
 
         // Create discretization
@@ -76,6 +78,16 @@ public class ObstacleWrapperDemo implements Creator {
                 }
             }
         }, new ProjectionTo2d(), Color.GRAY, Color.GRAY, 1, 4));
+
+        // graph
+        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
+
+			@Override
+			public Collection<? extends Region> getRegions() {
+				return obstacles;
+			}
+		}, Color.BLACK));
+
 
         // graph without obstacles
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, Line>() {

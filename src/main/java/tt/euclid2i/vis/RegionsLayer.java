@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
+import tt.euclid2i.region.Circle;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 import cz.agents.alite.vis.Vis;
@@ -58,6 +59,23 @@ public class RegionsLayer extends AbstractLayer {
                 canvas.drawRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
                         Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
                         Vis.transY(rect.getCorner2().y) - Vis.transY(rect.getCorner1().y));
+            }
+
+            if (region instanceof Circle) {
+                Circle circle = (Circle) region;
+
+                if (fillColor != null) {
+                    canvas.setColor(fillColor);
+                    canvas.fillOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
+                    		Vis.transY(circle.getCenter().y - circle.getRadius()),
+                    		Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
+
+                }
+
+                canvas.setColor(edgeColor);
+                canvas.drawOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
+                		Vis.transY(circle.getCenter().y - circle.getRadius()),
+                		Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
             }
 
             if (region instanceof Polygon) {

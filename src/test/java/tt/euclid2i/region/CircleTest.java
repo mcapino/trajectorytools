@@ -18,6 +18,7 @@ public class CircleTest {
 		assertTrue(circle.intersectsLine(new Point(7,7), new Point(8,8)));
 		assertFalse(circle.intersectsLine(new Point(0,22), new Point(20,24)));
 
+		assertTrue(circle.intersectsLine(new Point(7,7), new Point(7,7)));
+		assertFalse(circle.intersectsLine(new Point(21,21), new Point(21,21)));
 	}
-
 }
