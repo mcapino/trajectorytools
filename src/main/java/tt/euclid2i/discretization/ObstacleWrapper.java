@@ -6,9 +6,12 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.GraphDelegator;
+import org.jgrapht.util.GraphBuilder;
 
 import tt.euclid2i.Line;
+import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.util.Util;
 
@@ -36,5 +39,13 @@ public class ObstacleWrapper<V extends tt.euclid2i.Point, E extends Line>
 
 		return conflictFreeEdges;
 	}
+
+	public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
+        //FIXME if the underlying graph is lazygrid, it may happen that this method causes infinite loop
+        DirectedGraph<Point, Line> fullGraph
+                = new DefaultDirectedGraph<Point, Line>(Line.class);
+
+        return GraphBuilder.build((DirectedGraph<Point, Line>)this, fullGraph, initialPoint);
+    }
 
 }

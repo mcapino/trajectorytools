@@ -18,6 +18,7 @@ import tt.euclid2i.Point;
 import tt.euclid2i.Region;
 import tt.euclid2i.Trajectory;
 import tt.euclid2i.discretization.GridBasedRoadmap;
+import tt.euclid2i.region.Circle;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 
@@ -170,6 +171,9 @@ public class Util {
         for (Region region : obstacles) {
             if (region instanceof Polygon) {
                 inflatedRegions.addAll(((Polygon) region).inflate(agentBodyRadius, 3));
+            } else if (region instanceof Circle) {
+            	Circle circle = (Circle) region;
+            	inflatedRegions.add(new Circle(circle.getCenter(), circle.getRadius() + agentBodyRadius));
             } else {
                 throw new RuntimeException("not supported region type for inflation");
             }
