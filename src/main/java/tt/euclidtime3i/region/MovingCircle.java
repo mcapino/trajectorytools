@@ -45,13 +45,13 @@ public class MovingCircle implements Region {
         }
 
         if (trajectory instanceof SegmentedTrajectory) {
-        	return intersectionAnalytic(start, end, (SegmentedTrajectory)trajectory);
+        	return intersectsLineAnalytic(start, end);
         } else {
-        	return intersectionNumeric(start, end, trajectory);
+        	return intersectsLineNumeric(start, end);
         }
     }
-
-	protected boolean intersectionNumeric(Point start, Point end, Trajectory trajectory) {
+    
+	protected boolean intersectsLineNumeric(Point start, Point end) {
 		int tmin = Math.max(trajectory.getMinTime(), start.getTime());
         int tmax = Math.min(trajectory.getMaxTime(), end.getTime());
 
@@ -83,8 +83,10 @@ public class MovingCircle implements Region {
         return false;
 	}
 
-	protected boolean intersectionAnalytic(Point start, Point end, SegmentedTrajectory trajectory) {
-		return SeparationDetector.hasAnyPairwiseConflictAnalytic(new LinearTrajectory(start, end, 0.0), new SegmentedTrajectory[] {trajectory}, radius);
+	protected boolean intersectsLineAnalytic(Point start, Point end) {
+		assert trajectory instanceof SegmentedTrajectory;
+		SegmentedTrajectory segTraj = (SegmentedTrajectory) trajectory;
+		return SeparationDetector.hasAnyPairwiseConflictAnalytic(new LinearTrajectory(start, end, 0.0), new SegmentedTrajectory[] {segTraj}, radius);
 	}
 
     @Override

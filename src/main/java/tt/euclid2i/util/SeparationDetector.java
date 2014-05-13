@@ -420,6 +420,30 @@ public class SeparationDetector {
 
         return false;
     }
+    
+    /**
+     * Determines if thisTrajectory has conflict with the other trajectory. Ignores points that are 
+     */
+    public static boolean hasConflictIgnoreProtectedPoint(Trajectory thisTrajectory, Trajectory otherTrajectory, tt.euclid2i.Point protectedPoint, int separation, int samplingInterval) {
+
+        assert (thisTrajectory != null);
+        assert (otherTrajectory != null);
+
+        for (int t = thisTrajectory.getMinTime(); t < thisTrajectory.getMaxTime(); t += samplingInterval) {
+            Point thisTrajectoryPos = thisTrajectory.get(t);
+            
+            if (!thisTrajectory.get(t).equals(protectedPoint)) {            
+	            if (t >= otherTrajectory.getMinTime() && t <= otherTrajectory.getMaxTime()) {
+	                Point otherTrajectoryPos = otherTrajectory.get(t);
+	                if (thisTrajectoryPos.distance(otherTrajectoryPos) < separation) {
+	                    return true;
+	                }
+	            }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Determines if thisTrajectory has conflict with any of the trajectories from otherTrajectoriesCollection.
