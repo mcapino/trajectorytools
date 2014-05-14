@@ -3,10 +3,12 @@ package tt.euclid2i.discretization;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.vecmath.Tuple2i;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.DummyEdgeFactory;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
@@ -33,7 +35,7 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
     private Collection<Region> obstacles;
 
     private KdTree<Point> knnTree;
-
+    
     public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Collection<Region> boundaryRegions, Collection<Region> obstacles) {
         super(new DummyEdgeFactory<Point, Line>());
         this.radius = connectionRadius;

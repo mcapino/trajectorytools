@@ -212,10 +212,15 @@ public class Util {
         points[nPoints-1] = line.getEnd();
         return points;
     }
-
+    
+    class RoadmapAndDocks{
+    	DirectedGraph<tt.euclid2i.Point, Line> roadmap;
+    	Collection<tt.euclid2i.Point> docks;
+    }
+    
     public static DirectedGraph<tt.euclid2i.Point, Line> buildGridBasedRoadmap(
             final Collection<Region> lessInflatedObstacles,
-            final Collection<Region> moreInflatedObstacles,
+            final Collection<Region> polygonsForGraphBoundary,
             final Collection<Region> boundaryRegions,
             int dispersion,
             int connectionRadius, Collection<Point> additionalPoints) {
@@ -225,7 +230,7 @@ public class Util {
         List<Point> customPoints = new LinkedList<Point>();
         customPoints.addAll(additionalPoints);
 
-        for (Region region : moreInflatedObstacles) {
+        for (Region region : polygonsForGraphBoundary) {
             assert region instanceof Polygon;
             Polygon polygon = (Polygon) region;
             Point[] points = polygon.getPoints();
@@ -248,6 +253,23 @@ public class Util {
                 boundaryRegions, lessInflatedObstacles);
 
         return spatialGraph;
+    }
+    
+    public static Polygon breakPolygonToMaxLenSegments(Polygon polygon, int maxSegmentLength ){
+          Point[] points = polygon.getPoints();
+          LinkedList<Point> newPoints = new LinkedList<Point>();
+          
+          // break each line segment of the polygon into small segments shorter than connection radius
+          for (int j=0; j<points.length; j++) {
+              Line line;
+              if (j < points.length-1) {
+                  line = new Line(points[j], points[j+1]);
+              } else /* j is the last point, close the polygon */ {
+                  line = new Line(points[j], points[0]);
+              }
+              newPoints.addAll(Arrays.asList(Util.breakLineToSegments(line, maxSegmentLength)));
+          }
+          return new Polygon(newPoints.toArray(new Point[newPoints.size()]));
     }
 
     public static void addVertexAndConnectToNeighbors(DirectedGraph<Point, Line> graph, Point vertexToAdd, int n, Collection<Region> obstacles) {
