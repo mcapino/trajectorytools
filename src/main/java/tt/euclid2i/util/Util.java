@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -299,4 +300,30 @@ public class Util {
             otherVertices.remove(bestVertex);
         }
     }
+
+	public static Collection<Point> selectDispersedPoints(List<Point> points, int minDistance) {
+
+		LinkedList<Point> dispersedPoints = new LinkedList<Point>();
+		
+		for (Point point : points) {
+			if (dispersedPoints.isEmpty()) {
+				dispersedPoints.add(point);
+			} else if (distanceToNearestPoint(point, dispersedPoints) >= minDistance) {
+				dispersedPoints.add(point);
+			}
+		}
+		
+		return dispersedPoints;
+	}
+	
+	public static int distanceToNearestPoint(Point point, Collection<Point> otherPoints) {
+		int minDist = Integer.MAX_VALUE;
+		
+		for (Point otherPoint : otherPoints) {
+			if (point.distance(otherPoint) < minDist) {
+				minDist = (int) point.distance(otherPoint);
+			}
+		}
+		return minDist;
+	}
 }
