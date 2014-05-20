@@ -422,7 +422,7 @@ public class SeparationDetector {
     }
     
     /**
-     * Determines if thisTrajectory has conflict with the other trajectory. Ignores points that are 
+     * Determines if thisTrajectory has conflict with the other trajectory. Ignores conflicts that occur at the protected point. 
      */
     public static boolean hasConflictIgnoreProtectedPoint(Trajectory thisTrajectory, Trajectory otherTrajectory, tt.euclid2i.Point protectedPoint, int separation, int samplingInterval) {
 
