@@ -82,6 +82,19 @@ public class MovingCircle implements Region {
 
         return false;
 	}
+	
+	public boolean intersectsPoint(tt.euclid2i.Point point) {
+		int tmin = trajectory.getMinTime();
+        int tmax = trajectory.getMaxTime();
+
+        for (int t = tmin; t <= tmax; t += samplingInterval) {
+            tt.euclid2i.Point trajPoint = trajectory.get(t);
+            if (trajPoint.distance(point) <= radius) {
+                return true;
+            }
+        }
+        return false;
+	}
 
 	protected boolean intersectsLineAnalytic(Point start, Point end) {
 		assert trajectory instanceof SegmentedTrajectory;
