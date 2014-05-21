@@ -305,8 +305,7 @@ public class SeparationDetector {
         }
         return conflicts;
     }
-
-
+    
     /**
      * finds the first conflicts and returns ids of the two agents involved in the conflict
      *
