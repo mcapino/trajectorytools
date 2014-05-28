@@ -1,7 +1,9 @@
 package tt.euclid2i.discretization;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.DummyEdgeFactory;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
+import cz.agents.alite.vis.VisManager;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -19,6 +22,8 @@ import tt.euclid2i.Union;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
+import tt.euclid2i.vis.RegionsLayer;
+import tt.euclid2i.vis.RegionsLayer.RegionsProvider;
 import ags.utils.dataStructures.KdTree;
 import ags.utils.dataStructures.NearestNeighborIterator;
 import ags.utils.dataStructures.SquareEuclideanDistanceFunction;
@@ -69,13 +74,18 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private void generateVerticesWithDispersion(int dispersion) {
 
-    	Collection<Region> boundaryRegionsFlipped = new LinkedList<Region>();
+    	final Collection<Region> boundaryRegionsFlipped = new LinkedList<Region>();
         for (Region r : boundaryRegions) {
         	Polygon p = (Polygon)r;
         	Point[] points = Arrays.copyOf(p.getPoints(), p.getPoints().length);
         	if (!Polygon.isClockwise(points))
         		ArrayUtils.reverse(points);
-			boundaryRegionsFlipped.add(new Polygon(points));
+        	Polygon flippedPoly = new Polygon(points);
+        	if (flippedPoly.isFilledInside()) {
+        		// during the inflation sometimes we get small degenerate polygons, one, two pixels in size, 
+        		// where reversing does not do the job
+        		boundaryRegionsFlipped.add(flippedPoly);
+        	}
         }
 
     	Union samplingRegion = new Union(boundaryRegionsFlipped);
@@ -86,7 +96,15 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
         int columns = width / cellSize + 1;
         int rows = height / cellSize + 1;
-
+        
+        LinkedList<Region> obstaclesCopy = new LinkedList<Region>(obstacles);
+        for (Region obstacle : obstaclesCopy) {
+        	if (!((Polygon) obstacle).isFilledInside()) {
+        		System.out.println("One of the obstacles is outside-filled. Removing!");
+        		obstacles.remove(obstacle);
+        	}
+        }
+        
         for (int row=0; row<rows; row++) {
             for (int col=0; col<columns; col++) {
                 int x = bounds.getCorner1().x + col*cellSize + cellSize/2;

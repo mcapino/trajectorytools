@@ -123,8 +123,7 @@ public class Util {
         DirectedGraph<Point, Line> graph = new DefaultDirectedWeightedGraph<Point, Line>(new EdgeFactory<Point, Line>() {
 
             @Override
-            public Line createEdge(Point start,
-                                   Point end) {
+            public Line createEdge(Point start, Point end) {
                 return new Line(start, end);
             }
         }) {
@@ -301,7 +300,7 @@ public class Util {
         }
     }
 
-	public static Collection<Point> selectDispersedPoints(List<Point> points, int minDistance) {
+	public static Collection<Point> selectDispersedPoints(Collection<Point> points, int minDistance) {
 
 		LinkedList<Point> dispersedPoints = new LinkedList<Point>();
 		
