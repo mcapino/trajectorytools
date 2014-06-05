@@ -9,10 +9,10 @@ public class Geometry2d {
         Point a = l.getStart();
         Point b = l.getEnd();
 
-        return distancePointToLie(a, b, p);
+        return distancePointToLine(a, b, p);
     }
 
-    public static double distancePointToLie(Point a, Point b, Point p) {
+    public static double distancePointToLine(Point a, Point b, Point p) {
         Point dpx = sub(p, a);
         Point dyx = sub(b, a);
 

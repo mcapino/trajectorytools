@@ -6,9 +6,6 @@ import tt.euclidtime3i.discretization.Straight;
 
 public class Geometry3i {
 
-    private Geometry3i() {
-    }
-
     public static double distance(Straight x, Straight y) {
         int tStart = Math.max(x.getStart().getTime(), y.getStart().getTime());
         int tEnd = Math.min(x.getEnd().getTime(), y.getEnd().getTime());
@@ -34,6 +31,6 @@ public class Geometry3i {
         Point ac = Geometry2d.sub(aStart, bStart);
         Point bd = Geometry2d.sub(aEnd, bEnd);
 
-        return Geometry2d.distancePointToLie(ac, bd, Point.zero());
+        return Geometry2d.distancePointToLine(ac, bd, Point.zero());
     }
 }

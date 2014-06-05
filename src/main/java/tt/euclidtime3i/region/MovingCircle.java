@@ -15,6 +15,8 @@ public class MovingCircle implements Region {
     int radius;
 
     private static final int SAMPLES_PER_RADIUS = 4;
+    // FIXME -- analytic collision checking temporarily disabled as it is exhibiting low performance for some reason...
+	private static final boolean ALLOW_ANALYTIC_COLLISION_CHECKING = false;
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
@@ -43,8 +45,10 @@ public class MovingCircle implements Region {
             start = p2;
             end = p1;
         }
+        
 
-        if (trajectory instanceof SegmentedTrajectory) {
+        
+        if (ALLOW_ANALYTIC_COLLISION_CHECKING && trajectory instanceof SegmentedTrajectory) {
         	return intersectsLineAnalytic(start, end);
         } else {
         	return intersectsLineNumeric(start, end);

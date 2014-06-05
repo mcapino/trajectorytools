@@ -517,5 +517,4 @@ public class SeparationDetector {
 
         return count;
     }
-
 }

@@ -25,8 +25,6 @@ public class Circle implements Region {
 			return true;
 		}
 
-
-
 		int x1 = p1.x - center.x;
 		int x2 = p2.x - center.x;
 
