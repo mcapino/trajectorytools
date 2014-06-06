@@ -17,17 +17,29 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
     private Collection<? extends Region> dynamicObstacles;
 
     public final static int DISABLE_WAIT_MOVE = 0;
+    
+    /** If set to true, all edges will end in a time that is a multiple of waitMoveDuration **/ 
+    
+    private boolean enforceRegularTimesteps; 
     private int waitMoveDuration;
 
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration) {
+            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, 
+            boolean enforceRegularTimesteps) {
         super();
         this.spatialGraph = spatialGraph;
         this.maxTime = maxTime;
         this.speeds = speeds;
         this.dynamicObstacles = dynamicObstacles;
         this.waitMoveDuration = waitMoveDuration;
+        this.enforceRegularTimesteps = enforceRegularTimesteps;
+    }
+    
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration) {
+    	this(spatialGraph, maxTime, speeds, dynamicObstacles, waitMoveDuration, false);
     }
 
     public ConstantSpeedTimeExtension(
@@ -103,8 +115,14 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
             Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
             for (Line spatialEdge : spatialEdges) {
                 for (int speed : speeds) {
-                    Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
-                    if (child.getTime() <= maxTime && isVisible(vertex, child, dynamicObstacles)) {
+                	Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
+                    
+                	if (enforceRegularTimesteps) {
+                		int regularizedTime = (int) Math.ceil(child.getTime() / (float) waitMoveDuration) * waitMoveDuration;
+                		child = new Point(child.getPosition(), regularizedTime);
+                	}
+                	
+                	if (child.getTime() <= maxTime && isVisible(vertex, child, dynamicObstacles)) {
                         children.add(child);
                     }
                 }
