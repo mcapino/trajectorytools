@@ -16,30 +16,29 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
     private int[] speeds;
     private Collection<? extends Region> dynamicObstacles;
 
-    public final static int DISABLE_WAIT_MOVE = 0;
+    public final static int DISABLE_WAIT_MOVE = 0;    
     
-    /** If set to true, all edges will end in a time that is a multiple of waitMoveDuration **/ 
+    /** All edges will end in a time that is a multiple of timeStep. Can be disabled by setting to timeStep=1. **/ 
     
-    private boolean enforceRegularTimesteps; 
+    private int timeStep; 
     private int waitMoveDuration;
 
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, 
-            boolean enforceRegularTimesteps) {
+            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, int timeStep) {
         super();
         this.spatialGraph = spatialGraph;
         this.maxTime = maxTime;
         this.speeds = speeds;
         this.dynamicObstacles = dynamicObstacles;
         this.waitMoveDuration = waitMoveDuration;
-        this.enforceRegularTimesteps = enforceRegularTimesteps;
+        this.timeStep = timeStep;
     }
     
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
             int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration) {
-    	this(spatialGraph, maxTime, speeds, dynamicObstacles, waitMoveDuration, false);
+    	this(spatialGraph, maxTime, speeds, dynamicObstacles, waitMoveDuration, 1);
     }
 
     public ConstantSpeedTimeExtension(
@@ -117,8 +116,8 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
                 for (int speed : speeds) {
                 	Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
                     
-                	if (enforceRegularTimesteps) {
-                		int regularizedTime = (int) Math.ceil(child.getTime() / (float) waitMoveDuration) * waitMoveDuration;
+                	if (timeStep != 1) {
+                		int regularizedTime = (int) Math.ceil(child.getTime() / (float) timeStep) * timeStep;
                 		child = new Point(child.getPosition(), regularizedTime);
                 	}
                 	
@@ -132,6 +131,10 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
             if (waitMoveDuration != DISABLE_WAIT_MOVE) {
                 int endTime = vertex.getTime() + waitMoveDuration;
+                
+            	if (timeStep != 1) {
+            		endTime = (int) Math.ceil(endTime / (float) timeStep) * timeStep;
+            	}
 
                 if (endTime > maxTime) {
                     endTime = maxTime;
