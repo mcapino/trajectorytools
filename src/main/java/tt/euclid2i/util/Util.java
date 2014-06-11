@@ -65,6 +65,35 @@ public class Util {
 
         return true;
     }
+    
+    public static boolean isInFreeSpace(Point point, Collection<? extends Region> boundary, Collection<? extends Region> obstacles) {
+
+    	boolean isInsideOneBoundaryRegion =  false;
+    	for (Region boundaryRegion : boundary) {
+    		assert boundaryRegion instanceof Polygon;
+    		Polygon poly = (Polygon) boundaryRegion;
+    		
+    		if (!poly.isFilledInside()) {
+    			Polygon flipped = poly.flip();
+    			if (flipped.isFilledInside() && flipped.isInside(point)) {
+    				// during the inflation sometimes we get small degenerate polygons, one, two pixels in size, 
+            		// where reversing does not do the job -- thus the first condition
+    				isInsideOneBoundaryRegion = true;
+    			}
+    		}
+        }
+    	
+    	if (!isInsideOneBoundaryRegion) {    	
+    		return false;
+    	}
+    	
+    	for (Region obstacle : obstacles) {
+            if (obstacle.isInside(point)) {
+                return false;
+            }
+        }
+    	return true;
+    }
 
     public static Point sampleFreeSpace(Rectangle bounds, Collection<? extends Region> obstacles, Random random) {
 
@@ -299,7 +328,7 @@ public class Util {
             otherVertices.remove(bestVertex);
         }
     }
-
+    
 	public static Collection<Point> selectDispersedPoints(Collection<Point> points, int minDistance) {
 
 		LinkedList<Point> dispersedPoints = new LinkedList<Point>();
