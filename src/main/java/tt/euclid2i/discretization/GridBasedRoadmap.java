@@ -76,15 +76,16 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     	final Collection<Region> boundaryRegionsFlipped = new LinkedList<Region>();
         for (Region r : boundaryRegions) {
-        	Polygon p = (Polygon)r;
-        	Point[] points = Arrays.copyOf(p.getPoints(), p.getPoints().length);
-        	if (!Polygon.isClockwise(points))
-        		ArrayUtils.reverse(points);
-        	Polygon flippedPoly = new Polygon(points);
-        	if (flippedPoly.isFilledInside()) {
+        	Polygon p = (Polygon)r;        	
+        	
+        	if (!p.isFilledInside()) {
+        		p = p.flip();
+        	}
+        	
+        	if (p.isFilledInside()) {
         		// during the inflation sometimes we get small degenerate polygons, one, two pixels in size, 
         		// where reversing does not do the job
-        		boundaryRegionsFlipped.add(flippedPoly);
+        		boundaryRegionsFlipped.add(p);
         	}
         }
 
@@ -110,12 +111,10 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
                 int x = bounds.getCorner1().x + col*cellSize + cellSize/2;
                 int y = bounds.getCorner1().y + row*cellSize + cellSize/2;
                 Point point = new Point(x, y);
-                if (samplingRegion.isInside(point)) {
-                	if (Util.isInFreeSpace(point, obstacles)) {
-		                addVertex(point);
-		                knnTree.addPoint(key(point), point);
-                	}
-                }
+            	if (Util.isInFreeSpace(point, boundaryRegions, obstacles)) {
+	                addVertex(point);
+	                knnTree.addPoint(key(point), point);
+            	}
             }
         }
 
@@ -126,31 +125,6 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
         	}
         }
     }
-
-//    private void generateNVertices(int nVertices) {
-//
-//        int width  = samplingRegion.getCorner2().x - samplingRegion.getCorner1().x;
-//        int height = samplingRegion.getCorner2().y - samplingRegion.getCorner1().y;
-//        int cellSize = (int) Math.sqrt(width*height/nVertices);
-//
-//        int columns = width / cellSize;
-//        int rows = height / cellSize;
-//
-//        for (int row=0; row<rows; row++) {
-//            for (int col=0; col<columns; col++) {
-//                int x = samplingRegion.getCorner1().x + col*cellSize + cellSize/2;
-//                int y = samplingRegion.getCorner1().y + row*cellSize + cellSize/2;
-//                Point point = new Point(x, y);
-//                addVertex(point);
-//                knnTree.addPoint(key(point), point);
-//            }
-//        }
-//
-//        for (int i = 0; i < customPoints.length; i++) {
-//            knnTree.addPoint(key(customPoints[i]), customPoints[i]);
-//            addVertex(customPoints[i]);
-//        }
-//    }
 
     private static double[] key(Point point) {
         return new double[]{point.getX(), point.getY()};
