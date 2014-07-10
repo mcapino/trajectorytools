@@ -279,7 +279,7 @@ public class Util {
                 dispersion,
                 connectionRadius,
                 customPoints.toArray(new Point[customPoints.size()]),
-                boundaryRegions, lessInflatedObstacles);
+                boundaryRegions, lessInflatedObstacles, false);
 
         return spatialGraph;
     }

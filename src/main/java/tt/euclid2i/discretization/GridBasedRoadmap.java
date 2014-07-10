@@ -1,20 +1,15 @@
 package tt.euclid2i.discretization;
 
-import java.awt.Color;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import javax.vecmath.Tuple2i;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.jgrapht.DirectedGraph;
 import org.jgrapht.DummyEdgeFactory;
+import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
-import cz.agents.alite.vis.VisManager;
 import tt.euclid2i.Line;
 import tt.euclid2i.Point;
 import tt.euclid2i.Region;
@@ -22,8 +17,6 @@ import tt.euclid2i.Union;
 import tt.euclid2i.region.Polygon;
 import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.util.Util;
-import tt.euclid2i.vis.RegionsLayer;
-import tt.euclid2i.vis.RegionsLayer.RegionsProvider;
 import ags.utils.dataStructures.KdTree;
 import ags.utils.dataStructures.NearestNeighborIterator;
 import ags.utils.dataStructures.SquareEuclideanDistanceFunction;
@@ -41,7 +34,8 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
     private KdTree<Point> knnTree;
     
-    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, Collection<Region> boundaryRegions, Collection<Region> obstacles) {
+    public GridBasedRoadmap(int dispersion, int connectionRadius, Point[] customPoints, 
+    		Collection<Region> boundaryRegions, Collection<Region> obstacles, boolean keepOnlyLargestComponent) {
         super(new DummyEdgeFactory<Point, Line>());
         this.radius = connectionRadius;
         this.customPoints = customPoints;
@@ -51,9 +45,33 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
 
         generateVerticesWithDispersion(dispersion);
         generateEdges();
+        
+        if (keepOnlyLargestComponent) {
+        	removeDisconnectedComponents();
+        }
     }
 
-    private void generateEdges() {
+    private void removeDisconnectedComponents() {
+    	ConnectivityInspector<Point, Line> connectivityInspector = new ConnectivityInspector<Point, Line>(this);
+    	List<Set<Point>> components = connectivityInspector.connectedSets();
+    	
+    	Set<Point> largestComponent = null;
+    	for (Set<Point> component : components) {
+    		if (largestComponent == null || component.size() > largestComponent.size()) {
+    			largestComponent = component;
+    		}
+    	}
+    	
+    	HashSet<Point> originalVertices = new HashSet<Point>(vertexSet());
+    	for (Point vertex : originalVertices) {
+    		if (!largestComponent.contains(vertex)) {
+    			removeVertex(vertex);
+    		}
+    	}
+    	
+	}
+
+	private void generateEdges() {
         for (Point point : vertexSet()) {
             NearestNeighborIterator<Point> iterator = knnTree.getNearestNeighborIterator(key(point), vertexSet().size(), new SquareEuclideanDistanceFunction());
 
