@@ -32,15 +32,16 @@ public class PointLayer extends TerminalLayer {
 	        canvas.setStroke(new BasicStroke(1));
 	        Dimension dim = Vis.getDrawingDimension();
 
-	        for (Point point : pointProvider.getPoints()) {
-
-	            int x1 = Vis.transX(point.x) - size;
-	            int y1 = Vis.transY(point.y) - size;
-	            int x2 = Vis.transX(point.x) + size;
-	            int y2 = Vis.transY(point.y) + size;
-	            if (x2 > 0 && x1 < dim.width && y2 > 0 && y1 < dim.height) {
-	                canvas.fillOval(x1, y1, size * 2, size * 2);
-	            }
+	        for (Point point : pointProvider.getPoints()) {	        	
+	        	if (point != null) {
+		            int x1 = Vis.transX(point.x) - size;
+		            int y1 = Vis.transY(point.y) - size;
+		            int x2 = Vis.transX(point.x) + size;
+		            int y2 = Vis.transY(point.y) + size;
+		            if (x2 > 0 && x1 < dim.width && y2 > 0 && y1 < dim.height) {
+		                canvas.fillOval(x1, y1, size * 2, size * 2);
+		            }
+	        	}
 	        }
 	    }
 
