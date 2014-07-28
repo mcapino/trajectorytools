@@ -70,7 +70,7 @@ public class RegionsLayer extends AbstractLayer {
                             }
 
                             canvas.setColor(edgeColor);
-                            canvas.fillOval(
+                            canvas.drawOval(
                                     Vis.transX(projectedPoint.x
                                             - movingCirc.getRadius()),
                                     Vis.transY(projectedPoint.y
