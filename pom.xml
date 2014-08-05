@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Alite Trajectory Tools</name>
+    <groupId>cz.agents.alite</groupId>
+    <artifactId>trajectorytools</artifactId>
+    <version>2.0-SNAPSHOT</version>
+
+    <description>
+        Alite trajectory toolkit is a bundle of classes facilitating tasks connected with
+        (multi-agent) trajectory planning in synthetic environments. It contains an A*
+        planner on general graphs and a set of special-purpose graph generators such
+        grid-graphs, space-time grid-graphs, meneuver graphs etc.
+        Further it contains facilities such as trajectory approximators, conflict detectors,
+        visualization components etc.
+
+
+        http://jones.felk.cvut.cz/redmine/projects/alite/wiki/Trajectory_Tools
+        http://agents.felk.cvut.cz/projects#alite
+    </description>
+    <url>http://jones.felk.cvut.cz/redmine/projects/alite/wiki/Trajectory_Tools</url>
+
+    <parent>
+        <groupId>cz.agents</groupId>
+        <artifactId>atgparent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jar-with-dependecies-solver</id>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+    
+
+    <dependencies>
+        <dependency>
+            <groupId>ags.utils.dataStructures</groupId>
+            <artifactId>kdtreerednaxela</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.agents.alite</groupId>
+            <artifactId>alite</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jgrapht-jdk1.6</groupId>
+            <artifactId>jgrapht-jdk1.6</artifactId>
+            <version>0.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>math.javageom</groupId>
+            <artifactId>javaGeom</artifactId>
+            <version>0.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.12</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.teneighty</groupId>
+            <artifactId>heaps</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
+        </dependency>
+    </dependencies>
+
+</project>
+

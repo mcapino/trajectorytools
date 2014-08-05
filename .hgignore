@@ -1,6 +1,9 @@
-
 syntax: regexp
 ^target$
 ^.settings$
-^log/alite.log$
+^.idea$
+^log/*$
 ^.*~$
+
+syntax: glob
+*.iml
