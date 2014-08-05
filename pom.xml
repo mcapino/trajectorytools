@@ -1,31 +1,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <name>Alite Trajectory Tools</name>
     <groupId>cz.agents.alite</groupId>
     <artifactId>trajectorytools</artifactId>
+    <packaging>jar</packaging>
+    <name>Alite Trajectory Tools</name>
+
     <version>2.0-SNAPSHOT</version>
+    
+    <prerequisites>
+	<maven>2.2.1</maven>
+    </prerequisites>
 
     <description>
-        Alite trajectory toolkit is a bundle of classes facilitating tasks connected with
-        (multi-agent) trajectory planning in synthetic environments. It contains an A*
-        planner on general graphs and a set of special-purpose graph generators such
-        grid-graphs, space-time grid-graphs, meneuver graphs etc.
-        Further it contains facilities such as trajectory approximators, conflict detectors,
+        Alite Trajectory Tools is a bundle of Java classes facilitating tasks connected with
+        trajectory planning. For example, it contains:
+        1) A* planner on general graphs and a set of special-purpose graph generators such
+        grid-graphs, space-time grid-graphs, meneuver graphs etc. 
+        2) Implementation of sampling-based trajectory planning algorithm RRT* 
+        3) Facilities such as trajectory approximators, conflict detectors,
         visualization components etc.
-
-
-        http://jones.felk.cvut.cz/redmine/projects/alite/wiki/Trajectory_Tools
-        http://agents.felk.cvut.cz/projects#alite
     </description>
-    <url>http://jones.felk.cvut.cz/redmine/projects/alite/wiki/Trajectory_Tools</url>
+    <url>https://github.com/mcapino/trajectorytools</url>
 
-    <parent>
-        <groupId>cz.agents</groupId>
-        <artifactId>atgparent</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
+    <organization>
+        <name>Agent Technology Center (ATG)</name>
+        <url>http://agents.felk.cvut.cz/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>LGPL 3.0 license</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+  
+	<scm>
+        <url>https://github.com/mcapino/trajectorytools.git</url>
+        <connection>scm:git:git://github.com/mcapino/trajectorytools.git</connection>
+        <developerConnection>scm:git:git@github.com:mcapino/trajectorytools.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,9 +54,39 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <inherited>true</inherited>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <inherited>true</inherited>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -61,8 +107,7 @@
             </plugin>
 
         </plugins>
-    </build>
-    
+    </build>    
 
     <dependencies>
         <dependency>
@@ -130,6 +175,21 @@
             <version>3.1</version>
         </dependency>
     </dependencies>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>atg-repo</id>
+            <name>jones.felk.cvut.cz-snapshots</name>
+            <url>http://jones.felk.cvut.cz/artifactory/pub-snapshot-local</url>
+        </snapshotRepository>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>atg-repo</id>
+            <name>jones.felk.cvut.cz-releases</name>
+            <url>http://jones.felk.cvut.cz/artifactory/pub-release-local</url>
+        </repository>
+    </distributionManagement>
 
 </project>
 
