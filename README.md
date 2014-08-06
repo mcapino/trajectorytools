@@ -11,3 +11,5 @@ A bundle of Java classes facilitating tasks connected with trajectory planning.
  - Line-Polygon intersection detectors 
  - Visualization components 
  - etc.
+
+For more detailed information, go to project wiki: https://github.com/mcapino/trajectorytools/wiki
