@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>ags.utils.dataStructures</groupId>
 			<artifactId>kdtreerednaxela</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<version>3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>cz.agents.alite</groupId>
