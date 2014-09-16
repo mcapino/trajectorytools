@@ -118,7 +118,7 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
         
         LinkedList<Region> obstaclesCopy = new LinkedList<Region>(obstacles);
         for (Region obstacle : obstaclesCopy) {
-        	if (!((Polygon) obstacle).isFilledInside()) {
+        	if (obstacle instanceof Polygon && !((Polygon) obstacle).isFilledInside()) {
         		System.out.println("One of the obstacles is outside-filled. Removing!");
         		obstacles.remove(obstacle);
         	}
