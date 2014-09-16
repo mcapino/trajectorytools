@@ -1,5 +1,6 @@
 package org.jgrapht.util.heuristics;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.util.HeuristicToGoal;
 
@@ -11,7 +12,7 @@ public class MAHeuristic<S, M, E> implements HeuristicToGoal<M> {
     private HeuristicToGoal<S>[] heuristics;
     private int size;
 
-    public MAHeuristic(Graph<S, E> graph, M goal, HeuristicProvider<S, E> heuristicProvider, MAStateProvider<S, M> stateProvider) {
+    public MAHeuristic(DirectedGraph<S, E> graph, M goal, HeuristicProvider<S, E> heuristicProvider, MAStateProvider<S, M> stateProvider) {
         this.heuristicProvider = heuristicProvider;
         this.stateProvider = stateProvider;
 
@@ -21,7 +22,7 @@ public class MAHeuristic<S, M, E> implements HeuristicToGoal<M> {
     }
 
     @SuppressWarnings("unchecked")
-    private HeuristicToGoal<S>[] getIndividualHeuristics(Graph<S, E> graph, S[] goals) {
+    private HeuristicToGoal<S>[] getIndividualHeuristics(DirectedGraph<S, E> graph, S[] goals) {
         HeuristicToGoal<S>[] heuristics = new HeuristicToGoal[size];
 
         for (int i = 0; i < size; i++) {

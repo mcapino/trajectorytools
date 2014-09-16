@@ -32,8 +32,7 @@ public class SynchronizedMovesTimeExtension extends AbstractDirectedGraphWrapper
 
     @Override
     public boolean containsVertex(Point p) {
-        return spatialGraph.containsVertex(p.getPosition()) &&
-                p.getTime() <= maxTime;
+        return spatialGraph.containsVertex(p.getPosition()) && p.getTime() <= maxTime;
     }
 
     @Override
