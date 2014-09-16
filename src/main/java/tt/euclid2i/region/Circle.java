@@ -105,6 +105,18 @@ public class Circle implements Region {
 	public String toString() {
 		return "Circle(" + center + ", r=" + radius + ")";
 	}
+	
+	public Polygon toPolygon(int nCorners) {
+		Point[] points = new Point[nCorners];
+		double angleStep = 2*Math.PI / nCorners;
+		
+		int i=0;
+		for (double angle = 0; angle < 2*Math.PI; angle += angleStep) {
+			points[i++] = new Point(center.x + (int) (radius*Math.cos(angle)), center.y + (int) (radius*Math.sin(angle)));
+		}
+		
+		return new Polygon(points);
+	}
 
 
 }
