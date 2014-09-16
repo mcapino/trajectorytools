@@ -242,6 +242,17 @@ public class Util {
         return points;
     }
     
+    public static Point[] breakLineToEqualSegments(Line line, int nSegments) {
+        double lambdaStep = 1.0/nSegments;
+        Point[] points = new Point[nSegments+1];
+        points[0] = line.getStart();
+        for (int i=1; i<points.length-1; i++) {
+            points[i] = line.interpolate(lambdaStep * i);
+        }
+        points[points.length-1] = line.getEnd();
+        return points;
+    }
+    
     class RoadmapAndDocks{
     	DirectedGraph<tt.euclid2i.Point, Line> roadmap;
     	Collection<tt.euclid2i.Point> docks;
@@ -300,6 +311,8 @@ public class Util {
           }
           return new Polygon(newPoints.toArray(new Point[newPoints.size()]));
     }
+    
+    
 
     public static void addVertexAndConnectToNeighbors(DirectedGraph<Point, Line> graph, Point vertexToAdd, int n, Collection<Region> obstacles) {
 
