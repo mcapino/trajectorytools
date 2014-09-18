@@ -178,5 +178,13 @@ public class Polygon implements Region, Serializable{
 	public String toString() {
 		return (isFilledInside() ? "(in)" : "(out)") + Arrays.toString(points);
 	}
+	
+	public tt.euclid2d.region.Polygon toPolygon2d() {
+		tt.euclid2d.Point[] points2d = new tt.euclid2d.Point[points.length];
+		for (int i = 0; i < points.length; i++) {
+			points2d[i] = new tt.euclid2d.Point(points[i].x, points[i].y);
+		}
+		return new tt.euclid2d.region.Polygon(points2d);
+	}
 
 }

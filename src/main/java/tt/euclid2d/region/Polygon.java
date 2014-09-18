@@ -14,7 +14,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
-public class Polygon {
+public class Polygon implements Region {
 
     private Point[] polygonPoints;
 
