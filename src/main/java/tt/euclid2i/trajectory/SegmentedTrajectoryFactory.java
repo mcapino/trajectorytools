@@ -60,20 +60,4 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(segments, duration, cost);
     }
 
-    public static BasicSegmentedTrajectory createConstantEdgeDurationTrajectory(List<Line> edgeList, int startTime, double edgeDuration, int duration) {
-        List<Straight> segments = new ArrayList<Straight>();
-        double oppositeTime, currentTime = startTime;
-
-        for (Line edge : edgeList) {
-            Point start = edge.getStart();
-            Point end = edge.getEnd();
-
-            oppositeTime = currentTime + edgeDuration;
-            segments.add(new Straight(new tt.euclidtime3i.Point(start, (int) currentTime), new tt.euclidtime3i.Point(end, (int) oppositeTime)));
-
-            currentTime = oppositeTime;
-        }
-
-        return new BasicSegmentedTrajectory(segments, duration, currentTime);
-    }
 }
