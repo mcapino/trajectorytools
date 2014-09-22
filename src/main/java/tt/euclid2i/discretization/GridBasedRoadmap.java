@@ -111,7 +111,7 @@ public class GridBasedRoadmap extends DirectedWeightedMultigraph<Point, Line> {
     	Rectangle bounds = samplingRegion.getBoundingBox();
         int width  = bounds.getCorner2().x - bounds.getCorner1().x;
         int height = bounds.getCorner2().y - bounds.getCorner1().y;
-        int cellSize = (int) (dispersion/Math.sqrt(2));
+        int cellSize = (int) Math.round(dispersion/Math.sqrt(2));
 
         int columns = width / cellSize + 1;
         int rows = height / cellSize + 1;
