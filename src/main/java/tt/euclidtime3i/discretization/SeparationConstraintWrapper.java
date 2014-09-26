@@ -20,11 +20,20 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
 
     private Trajectory[] otherTrajs;
     private int[] separations;
+    
+    final static int DEFAULT_SAMPLING_INTERVAL = 10;
+    final static int USE_ANALYTIC_SAMPLING = (-1);
+	private int samplingInterval; 
+	
+//	public SeparationConstraintWrapper(DirectedGraph<Point, Straight> g, Trajectory[] otherTrajs, int[] separations) {
+//		this(g, otherTrajs, separations, DEFAULT_SAMPLING_INTERVAL);
+//	}
 
-    public SeparationConstraintWrapper(DirectedGraph<Point, Straight> g, Trajectory[] otherTrajs, int[] separations) {
+    public SeparationConstraintWrapper(DirectedGraph<Point, Straight> g, Trajectory[] otherTrajs, int[] separations, int samplingInterval) {
         super(g);
         this.otherTrajs = otherTrajs;
         this.separations = separations;
+        this.samplingInterval = samplingInterval;
     }
 
     @Override
@@ -43,9 +52,7 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
 
 
     private boolean consistent(Straight e, Trajectory otherTrajs[], int[] separations) {
-
         int duration = e.getEnd().getTime() - e.getStart().getTime();
-
         Trajectory thisTraj = new BasicSegmentedTrajectory(Arrays.asList(e), duration, super.getEdgeWeight(e));
 
         SegmentedTrajectory[] segmentedTrajs = new SegmentedTrajectory[otherTrajs.length];
@@ -54,9 +61,11 @@ public class SeparationConstraintWrapper extends GraphDelegator<Point, Straight>
             segmentedTrajs[i] = (SegmentedTrajectory) otherTrajs[i];
         }
 
-
-        return !SeparationDetector.hasAnyPairwiseConflict(thisTraj, otherTrajs, separations, 10);
-        //return !SeparationDetector.hasAnyPairwiseConflictAnalytic((tt.euclid2i.SegmentedTrajectory) thisTraj, segmentedTrajs, separations);
+        if (samplingInterval != USE_ANALYTIC_SAMPLING) {
+        	return !SeparationDetector.hasAnyPairwiseConflict(thisTraj, otherTrajs, separations, samplingInterval);
+        } else {
+        	return !SeparationDetector.hasAnyPairwiseConflictAnalytic((tt.euclid2i.SegmentedTrajectory) thisTraj, segmentedTrajs, separations);
+        }
     }
 
 }
