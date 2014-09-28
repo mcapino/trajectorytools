@@ -93,9 +93,9 @@ public abstract class PlanningAlgorithm<V, E> implements VisualizableAlgorithm<V
             E edge = getShortestPathTreeEdge(current);
             edgeList.add(edge);
             current = Graphs.getOppositeVertex(graph, edge, current);
-        }
+        }	
 
-        return Collections.unmodifiableList(Lists.reverse(edgeList));
+        return new ArrayList<E>(Lists.reverse(edgeList));
     }
 
     @Override
