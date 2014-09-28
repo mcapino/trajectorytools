@@ -4,11 +4,14 @@ public class ConstantSeparationPenaltyFunction implements PenaltyFunction {
 
     private double penalty;
 	private double minSeparation;
+	private int separationSquare;
 
     public ConstantSeparationPenaltyFunction(double penalty, double minSeparation) {
         super();
         this.penalty = penalty;
         this.minSeparation = minSeparation;
+        this.separationSquare = (int) Math.ceil(minSeparation);
+        this.separationSquare *= separationSquare; // ^2
     }
 
     @Override
@@ -23,4 +26,11 @@ public class ConstantSeparationPenaltyFunction implements PenaltyFunction {
     public double getMinSeparation() {
 		return minSeparation;
 	}
+
+	@Override
+	public int getSeparationSquare() {
+		return separationSquare;
+	}
+    
+    
 }

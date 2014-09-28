@@ -5,6 +5,7 @@ public class LinearSeparationPenaltyFunction implements PenaltyFunction {
     private double maxPenalty;
     private double minPenalty;
 	private double minSeparation;
+	private int separationSquare;
 	
     public LinearSeparationPenaltyFunction(double maxPenalty, double minSeparation) {
     	this(maxPenalty, minSeparation, 0);
@@ -15,6 +16,8 @@ public class LinearSeparationPenaltyFunction implements PenaltyFunction {
         this.maxPenalty = maxPenalty;
         this.minPenalty = minPenalty;
         this.minSeparation = minSeparation;
+        this.separationSquare = (int) Math.ceil(minSeparation);
+        this.separationSquare *= separationSquare; // ^2
     }
 
     @Override
@@ -30,4 +33,11 @@ public class LinearSeparationPenaltyFunction implements PenaltyFunction {
     public double getMinSeparation() {
 		return minSeparation;
 	}
+
+	@Override
+	public int getSeparationSquare() {
+		return separationSquare;
+	}
+    
+    
 }
