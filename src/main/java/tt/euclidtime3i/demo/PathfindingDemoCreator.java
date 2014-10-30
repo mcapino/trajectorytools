@@ -77,11 +77,13 @@ public class PathfindingDemoCreator implements Creator {
             }
         }, new TimeParameterProjectionTo2d(time), Color.RED, Color.GRAY));
 
-
+        
+        final int MAXTIME = 50;
+        
         // create spatio-temporal graph, cut out dynamic obstacles
         ConstantSpeedTimeExtension spatioTemporalGraph
             = new ConstantSpeedTimeExtension(spatialGraph,
-                    50, new int[]{1,2}, dynamicObstacles,
+                    MAXTIME, new int[]{1,2}, dynamicObstacles,
                     5);
 
         final tt.euclid2i.Point goal = new tt.euclid2i.Point(0, 0);
@@ -100,7 +102,7 @@ public class PathfindingDemoCreator implements Creator {
                         }
                 );
 
-        final Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory(path, path.getEndVertex().getTime()));
+        final Trajectory trajectory = Trajectories.convertFromEuclid2iTrajectory(new StraightSegmentTrajectory(path, MAXTIME));
 
         // graph
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<tt.euclid2i.Point, tt.euclid2i.Line>() {

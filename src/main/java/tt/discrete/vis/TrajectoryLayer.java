@@ -65,7 +65,7 @@ public class TrajectoryLayer extends CommonLayer {
                         if (pos != null) {
                             Point2d point = projection.project(pos);
 
-                            if (previous != null && point.distance(previous) == 0)
+                            if (previous != null && point != null && point.distance(previous) == 0)
                                 continue;
 
                             previous = point;
