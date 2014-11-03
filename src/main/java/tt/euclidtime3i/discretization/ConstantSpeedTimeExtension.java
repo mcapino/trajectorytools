@@ -13,7 +13,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
     private DirectedGraph<tt.euclid2i.Point, tt.euclid2i.Line> spatialGraph;
     private int maxTime;
-    private int[] speeds;
+    private float[] speeds;
     private Collection<? extends Region> dynamicObstacles;
 
     public final static int DISABLE_WAIT_MOVE = 0;    
@@ -23,9 +23,18 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
     private int timeStep; 
     private int waitMoveDuration;
 
-    public ConstantSpeedTimeExtension(
+
+    private static float[] toFloatArray(int[] intArr) {
+		float[] floatArr = new float[intArr.length];
+		for (int i = 0; i < floatArr.length; i++) {
+			floatArr[i] = (float) intArr[i];
+		}
+    	return floatArr;
+	}
+
+	public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, int timeStep) {
+            float[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, int timeStep) {
         super();
         this.spatialGraph = spatialGraph;
         this.maxTime = maxTime;
@@ -52,6 +61,14 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
             int[] speeds) {
         this(spatialGraph, maxTime, speeds, new LinkedList<Region>(), DISABLE_WAIT_MOVE);
     }
+    
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration, int timeStep) {
+    	this(spatialGraph, maxTime, toFloatArray(speeds),dynamicObstacles, waitMoveDuration, timeStep);    	
+    }
+    
+    
 
     @Override
     public boolean containsVertex(Point p) {
@@ -113,7 +130,7 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
 
             Set<Line> spatialEdges = spatialGraph.outgoingEdgesOf(new tt.euclid2i.Point(vertex.x, vertex.y));
             for (Line spatialEdge : spatialEdges) {
-                for (int speed : speeds) {
+                for (float speed : speeds) {
                 	Point child = new Point(spatialEdge.getEnd().x, spatialEdge.getEnd().y, vertex.getTime() + (int) Math.round(spatialEdge.getDistance() / speed));
                     
                 	if (timeStep != 1) {
