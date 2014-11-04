@@ -9,23 +9,22 @@ import tt.euclidtime3i.trajectory.LinearTrajectory;
 
 
 public class MovingCircle implements Region {
-
-    double samplingInterval;
+	
+	int USE_ANALYTIC_COLLISION_CHECKING = 0;
+    int samplingInterval;
     tt.euclid2i.Trajectory trajectory;
     int radius;
 
-    private static final int SAMPLES_PER_RADIUS = 4;
-    // FIXME -- analytic collision checking temporarily disabled as it is exhibiting low performance for some reason...
-	private static final boolean ALLOW_ANALYTIC_COLLISION_CHECKING = false;
+    private static final int DEFAULT_SAMPLES_PER_RADIUS = 4;
 
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius) {
         super();
         assert(trajectory != null);
         this.trajectory = trajectory;
         this.radius = radius;
-        this.samplingInterval = Math.floor((double)radius/(double)SAMPLES_PER_RADIUS);
+        this.samplingInterval = (int) Math.floor((double)radius/(double)DEFAULT_SAMPLES_PER_RADIUS);
     }
-
+    
     public MovingCircle(tt.euclid2i.Trajectory trajectory, int radius, int samplingInterval) {
         super();
         this.trajectory = trajectory;
@@ -48,7 +47,9 @@ public class MovingCircle implements Region {
         
 
         
-        if (ALLOW_ANALYTIC_COLLISION_CHECKING && trajectory instanceof SegmentedTrajectory) {
+        if (samplingInterval == USE_ANALYTIC_COLLISION_CHECKING) {
+        	if (!(trajectory instanceof SegmentedTrajectory)) 
+        		throw new RuntimeException("Analytic collision checking can be only used on SegmentedTrajectories.");
         	return intersectsLineAnalytic(start, end);
         } else {
         	return intersectsLineNumeric(start, end);
@@ -134,5 +135,9 @@ public class MovingCircle implements Region {
     public String toString() {
         return "MC(" + Integer.toHexString(trajectory.hashCode()) + ", " + radius + ")";
     }
+    
+    public int getSamplingInterval() {
+		return samplingInterval;
+	}
 
 }
