@@ -45,8 +45,6 @@ public class MovingCircle implements Region {
             end = p1;
         }
         
-
-        
         if (samplingInterval == USE_ANALYTIC_COLLISION_CHECKING) {
         	if (!(trajectory instanceof SegmentedTrajectory)) 
         		throw new RuntimeException("Analytic collision checking can be only used on SegmentedTrajectories.");
