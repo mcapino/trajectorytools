@@ -20,13 +20,13 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     private List<Straight> segments;
 
     public BasicSegmentedTrajectory(List<Straight> segments, int duration, double cost) {
+    	segments = ensureRandomAccessList(segments);        
         checkNonEmpty(segments);
-        this.segments = ensureRandomAccessList(segments);
-        checkContinuity(this.segments);
-
+        checkContinuity(segments);
+        
+        this.segments = segments;
         this.startTime = Trajectories.start(segments).getTime();
         this.maxTime = startTime + duration;
-        this.segments = segments;
         this.cost = cost;
 
         tt.euclidtime3i.Point endTimePoint = Trajectories.end(segments);
@@ -44,10 +44,13 @@ public class BasicSegmentedTrajectory implements SegmentedTrajectory, EvaluatedT
     }
 
     private List<Straight> ensureRandomAccessList(List<Straight> segments) {
-        if (segments instanceof RandomAccess)
-            return segments;
-        else
-            return new ArrayList<Straight>(segments);
+        if (segments instanceof RandomAccess) {
+        	return segments;
+        }
+        else {
+            System.out.println("Converting to array list...");
+        	return new ArrayList<Straight>(segments);
+        }
     }
 
     private void checkNonEmpty(List<Straight> segments) {
