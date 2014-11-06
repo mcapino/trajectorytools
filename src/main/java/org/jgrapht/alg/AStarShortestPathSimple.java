@@ -53,6 +53,11 @@ public class AStarShortestPathSimple<V, E> extends PlanningAlgorithm<V, E> {
         AStarShortestPathSimple<V, E> alg = new AStarShortestPathSimple<V, E>(graph, heuristic, startVertex, goal);
         return alg.findPath(iterationLimit);
     }
+    
+    public static <V, E> GraphPath<V, E> findPathBetween(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, Goal<V> goal, int iterationLimit, int runtimeLimitMs) {
+        AStarShortestPathSimple<V, E> alg = new AStarShortestPathSimple<V, E>(graph, heuristic, startVertex, goal);
+        return alg.findPathRuntimeLimit(iterationLimit, runtimeLimitMs);
+    }
 
     public AStarShortestPathSimple(Graph<V, E> graph, HeuristicToGoal<V> heuristic, V startVertex, final V endVertex) {
         this(graph, heuristic, startVertex, new Goal<V>() {
