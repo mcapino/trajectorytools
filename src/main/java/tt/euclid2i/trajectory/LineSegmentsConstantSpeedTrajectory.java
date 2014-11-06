@@ -34,10 +34,9 @@ public class LineSegmentsConstantSpeedTrajectory<V extends Point, E extends Line
     private int startTime;
     private int duration = Integer.MAX_VALUE;
     private double cost;
-    private int speed;
+    private float speed;
 
-
-    public LineSegmentsConstantSpeedTrajectory(int startTime, GraphPath<V,E> graphPath, int speed, int duration) {
+    public LineSegmentsConstantSpeedTrajectory(int startTime, GraphPath<V,E> graphPath, float speed, int duration) {
         this.startWaypoint = graphPath.getStartVertex();
         this.endWaypoint = graphPath.getEndVertex();
         this.maneuvers = graphPath.getEdgeList();
