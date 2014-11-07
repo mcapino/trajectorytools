@@ -10,7 +10,7 @@ import tt.euclidtime3i.trajectory.LinearTrajectory;
 
 public class MovingCircle implements Region {
 	
-	int USE_ANALYTIC_COLLISION_CHECKING = 0;
+	public static final int USE_ANALYTIC_COLLISION_CHECKING = 0;
     int samplingInterval;
     tt.euclid2i.Trajectory trajectory;
     int radius;
@@ -77,8 +77,9 @@ public class MovingCircle implements Region {
                     new tt.euclid2d.Point(end.x, end.y), alpha);
 
             tt.euclid2i.Point trajPoint = trajectory.get(t);
+            tt.euclid2i.Point linePoint = new tt.euclid2i.Point((int) Math.round(pos2d.x), (int) Math.round(pos2d.y));
 
-            if (trajPoint.distance(new tt.euclid2i.Point((int) pos2d.x, (int) pos2d.y)) < radius) {
+            if (trajPoint.distance(linePoint) < radius) {
                 return true;
             }
         }
@@ -92,7 +93,7 @@ public class MovingCircle implements Region {
 
         for (int t = tmin; t <= tmax; t += samplingInterval) {
             tt.euclid2i.Point trajPoint = trajectory.get(t);
-            if (trajPoint.distance(point) <= radius) {
+            if (trajPoint.distance(point) < radius) {
                 return true;
             }
         }
@@ -108,7 +109,7 @@ public class MovingCircle implements Region {
     @Override
     public boolean isInside(Point p) {
         if (p.getTime() >= trajectory.getMinTime() && p.getTime() <= trajectory.getMaxTime()) {
-            return (p.getPosition().distance(trajectory.get(p.getTime())) <= radius);
+            return (p.getPosition().distance(trajectory.get(p.getTime())) < radius);
         } else {
             return false;
         }
