@@ -83,7 +83,7 @@ public class PathfindingDemoCreator implements Creator {
         // create spatio-temporal graph, cut out dynamic obstacles
         ConstantSpeedTimeExtension spatioTemporalGraph
             = new ConstantSpeedTimeExtension(spatialGraph,
-                    MAXTIME, new int[]{1,2}, dynamicObstacles,
+                    MAXTIME, new float[]{1,2}, dynamicObstacles,
                     5);
 
         final tt.euclid2i.Point goal = new tt.euclid2i.Point(0, 0);

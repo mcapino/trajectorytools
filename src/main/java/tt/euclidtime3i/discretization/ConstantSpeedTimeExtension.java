@@ -43,23 +43,35 @@ public class ConstantSpeedTimeExtension extends AbstractDirectedGraphWrapper<Poi
         this.waitMoveDuration = waitMoveDuration;
         this.timeStep = timeStep;
     }
-    
+	
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
             int[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration) {
+    	this(spatialGraph, maxTime, toFloatArray(speeds), dynamicObstacles, waitMoveDuration, 1);
+    }
+    
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            float[] speeds, Collection<? extends Region> dynamicObstacles, int waitMoveDuration) {
     	this(spatialGraph, maxTime, speeds, dynamicObstacles, waitMoveDuration, 1);
     }
 
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds, int waitMoveDuration) {
+            float[] speeds, int waitMoveDuration) {
         this(spatialGraph, maxTime, speeds, new LinkedList<Region>(), waitMoveDuration);
     }
 
     public ConstantSpeedTimeExtension(
             DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
-            int[] speeds) {
+            float[] speeds) {
         this(spatialGraph, maxTime, speeds, new LinkedList<Region>(), DISABLE_WAIT_MOVE);
+    }
+    
+    public ConstantSpeedTimeExtension(
+            DirectedGraph<tt.euclid2i.Point, Line> spatialGraph, int maxTime,
+            int[] speeds) {
+        this(spatialGraph, maxTime, toFloatArray(speeds), new LinkedList<Region>(), DISABLE_WAIT_MOVE);
     }
     
     public ConstantSpeedTimeExtension(

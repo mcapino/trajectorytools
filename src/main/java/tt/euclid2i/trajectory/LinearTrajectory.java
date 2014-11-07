@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 public class LinearTrajectory extends BasicSegmentedTrajectory {
 
-    public LinearTrajectory(int startTime, Point startWaypoint, Point endWaypoint, int speed, int duration, double cost) {
+    public LinearTrajectory(int startTime, Point startWaypoint, Point endWaypoint, float speed, int duration, double cost) {
 
         super(Arrays.asList(new Straight(new tt.euclidtime3i.Point(startWaypoint, startTime),
-                new tt.euclidtime3i.Point(endWaypoint, startTime + (int) startWaypoint.distance(endWaypoint)/speed))),
+                new tt.euclidtime3i.Point(endWaypoint, startTime + (int) (startWaypoint.distance(endWaypoint)/speed)))),
                 duration,
                 cost);
     }

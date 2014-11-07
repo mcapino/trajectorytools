@@ -21,7 +21,7 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(edgeList, duration, cost);
     }
 
-    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, int speed, int duration, double cost) {
+    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(GraphPath<Point, Line> graphPath, int startTime, float speed, int duration, double cost) {
         List<Line> edgeList = graphPath.getEdgeList();
 
         if (edgeList.isEmpty())
@@ -43,7 +43,7 @@ public class SegmentedTrajectoryFactory {
         return new BasicSegmentedTrajectory(segments, duration, cost);
     }
 
-    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(List<Line> edgeList, int startTime, int speed, int duration, double cost) {
+    public static BasicSegmentedTrajectory createConstantSpeedTrajectory(List<Line> edgeList, int startTime, float speed, int duration, double cost) {
         List<Straight> segments = new ArrayList<Straight>();
         double oppositeTime, currentTime = startTime;
 
