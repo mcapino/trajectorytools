@@ -30,7 +30,7 @@ public class SeparationDetectorTest {
 
     private static final int TEST_SIZE = 500;
     private static final int SEED = 119;
-    private static final int SPEED = 1;
+    private static final float SPEED = 1.0f;
     private static final int SIZE = 500;
     private static final int VERTICES = 2500;
     private static final int NN_RADIUS = 25;
