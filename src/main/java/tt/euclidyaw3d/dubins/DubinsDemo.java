@@ -27,7 +27,7 @@ public class DubinsDemo implements Creator {
 
         initVisualization();
 
-        // create time parameter
+        // create time parameter (for visualization)
         final TimeParameter time = new TimeParameter();
 
         VisManager.registerLayer(ParameterControlLayer.create(time));

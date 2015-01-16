@@ -40,7 +40,6 @@ public class ObstacleWrapperDemo implements Creator {
 
     @Override
     public void init(String[] args) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -48,7 +47,6 @@ public class ObstacleWrapperDemo implements Creator {
 
         Rectangle bounds = new Rectangle(new Point(-100, -100), new Point(200,200));
 
-        // plan the shortest path
         final Point start = new Point(-10, -30);
         final Point goal = new Point(0, 40);
 
@@ -61,7 +59,7 @@ public class ObstacleWrapperDemo implements Creator {
         final Collection<Region> obstacles = new LinkedList<Region>();
         obstacles.add(new Circle(new Point(0,0),20));
 
-        // Create discretization
+        // Cut-out obstacles from the graph
         final DirectedGraph<Point, Line> graphWithoutObstacles = new ObstacleWrapper<Point, Line>(graph, obstacles);
 
         initVisualization();
@@ -79,7 +77,7 @@ public class ObstacleWrapperDemo implements Creator {
             }
         }, new ProjectionTo2d(), Color.GRAY, Color.GRAY, 1, 4));
 
-        // graph
+        // visualize obstacles
         VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
 
 			@Override
@@ -89,7 +87,7 @@ public class ObstacleWrapperDemo implements Creator {
 		}, Color.BLACK));
 
 
-        // graph without obstacles
+        // visualize graph without obstacles
         VisManager.registerLayer(GraphLayer.create(new GraphProvider<Point, Line>() {
 
             @Override
@@ -106,7 +104,7 @@ public class ObstacleWrapperDemo implements Creator {
             }
         }, start, goal);
 
-        // draw the shortest path
+        // visualize the shortest path
         VisManager.registerLayer(GraphPathLayer.create(new PathProvider<Point, Line>() {
 
             @Override
