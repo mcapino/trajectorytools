@@ -48,18 +48,26 @@ public class RegionsLayer extends AbstractLayer {
         	if (region != null) {
 	            if (region instanceof Rectangle) {
 	                Rectangle rect = (Rectangle) region;
-	
+	                
+	                int x1 = Vis.transX(rect.getCorner1().x);
+	                int y1 = Vis.transY(rect.getCorner1().y);
+	                
+	                int x2 = Vis.transX(rect.getCorner2().x);
+	                int y2 = Vis.transY(rect.getCorner2().y);
+	                
+	                int leftX = Math.min(x1, x2);
+	                int topY = Math.min(y1, y2);
+	                
+	                int width = Math.abs(x1-x2);
+	                int height = Math.abs(y1-y2);
+	                
 	                if (fillColor != null) {
 	                    canvas.setColor(fillColor);
-	                    canvas.fillRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
-	                            Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
-	                            Vis.transY(rect.getCorner2().y) - Vis.transY(rect.getCorner1().y));
+	                    canvas.fillRect(leftX, topY, width, height);
 	                }
 	
 	                canvas.setColor(edgeColor);
-	                canvas.drawRect(Vis.transX(rect.getCorner1().x), Vis.transY(rect.getCorner1().y),
-	                        Vis.transX(rect.getCorner2().x) - Vis.transX(rect.getCorner1().x),
-	                        Vis.transY(rect.getCorner2().y) - Vis.transY(rect.getCorner1().y));
+	                canvas.drawRect(leftX, topY, width, height);
 	            }
 	
 	            if (region instanceof Circle) {
