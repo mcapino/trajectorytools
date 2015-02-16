@@ -1,9 +1,14 @@
 package tt.euclid2i.region;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Tuple2d;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -185,6 +190,47 @@ public class Polygon implements Region, Serializable{
 			points2d[i] = new tt.euclid2d.Point(points[i].x, points[i].y);
 		}
 		return new tt.euclid2d.region.Polygon(points2d);
+	}
+	
+	public Polygon getRotated(Point anchorPoint, double angleRad) {
+		int size = this.points.length;
+		Point[] rotatedPoints = new Point[size];
+
+	    AffineTransform affineTransform = AffineTransform.getRotateInstance(angleRad, anchorPoint.x, anchorPoint.y);
+	    for (int i = 0; i < size; i++) {
+	    	Point2D rotatedPoint = affineTransform.transform(new Point2D.Double(points[i].x,points[i].y), null);
+	    	rotatedPoints[i] = new Point((int) Math.round(rotatedPoint.getX()), (int) Math.round(rotatedPoint.getY()));
+	    }
+
+	    return new Polygon(rotatedPoints);
+	}
+
+	public Polygon getTranslated(Point translation) {
+		int size = this.points.length;
+		Point[] translatedPoints = new Point[size];
+
+	    AffineTransform affineTransform = AffineTransform.getTranslateInstance(translation.x, translation.y);
+	    for (int i = 0; i < size; i++) {
+	    	Point2D rotatedPoint = affineTransform.transform(new Point2D.Double(points[i].x,points[i].y), null);
+	    	translatedPoints[i] = new Point((int) Math.round(rotatedPoint.getX()), (int) Math.round(rotatedPoint.getY()));
+	    }
+
+	    return new Polygon(translatedPoints);
+	}
+
+	public boolean intersects(Polygon other) {
+        for (int i = 0; i < points.length; i++) {
+        	Point first = points[i];
+        	Point second = i != points.length-1 ? points[i+1] : points[0];
+
+            if (!first.equals(second)){
+            	if (other.intersectsLine(first, second)) {
+            		return true;
+            	}
+            }
+        }
+
+        return false;
 	}
 
 }
