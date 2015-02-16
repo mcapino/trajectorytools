@@ -43,5 +43,9 @@ public class Point extends Point2d {
     public String toString() {
         return String.format("(%.2f, %.2f)", x, y);
     }
-
+    
+    public tt.euclid2i.Point toPoint2i() {
+    	return new tt.euclid2i.Point((int) Math.round(x), (int) Math.round(y));
+    }
+    
 }
