@@ -1,5 +1,6 @@
 package tt.euclidyaw3d.dubins;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class DubinsCurve {
     final static double DUBINS_EPS = 1e-6;
     final static double DUBINS_ZERO = -1e-9;
 
-    static class DubinsPath
+    public static class DubinsPath
     {
     	public static enum Segment {LEFT, STRAIGHT, RIGHT}
         /** Path segment types */
@@ -45,9 +46,17 @@ public class DubinsCurve {
             assert(q >= 0.);
         }
 
-        double length() {
+        public double length() {
             return lengths[0] + lengths[1] + lengths[2];
         }
+        
+        public double[] getSegmentLengths() {
+			return lengths;
+		}
+        
+        public Segment[] getSegmentTypes() {
+			return type;
+		}
     };
 
     static double mod2pi(double angleInRads)
@@ -89,7 +98,7 @@ public class DubinsCurve {
         double dy = end.y - start.y;
         double d = Math.sqrt(dx*dx + dy*dy) / rho; // normalize to r_min = 1
         double th = Math.atan2(dy, dx);
-        double alpha = mod2pi(start.getYaw() - th);
+        double alpha = mod2pi(start.getYaw() - th); 
         double beta = mod2pi(end.getYaw()- th);
 
         return canonicalDubins(d, alpha, beta);
@@ -429,6 +438,10 @@ public class DubinsCurve {
     public boolean isReverse() {
     	return path.reverse;
     }
+    
+    public DubinsPath getCanonicalPath() {
+		return path;
+	}
 
 
 }
