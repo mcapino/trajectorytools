@@ -88,7 +88,7 @@ public class Polygon implements Region {
 
         Geometry jtsPolygon = new com.vividsolutions.jts.geom.Polygon(ring, new LinearRing[]{}, geometryFactory);
         Geometry buffered = jtsPolygon.buffer(inflateBy, pointsAtCorner);
-
+        
         Coordinate[] bufferedCoordinates = buffered.getCoordinates();
         // if we have a an ouside filled polygon, then we can get more polygons as a result of inflation
         // the array will consist of multiple closed rings that need to be split apart

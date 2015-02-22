@@ -7,9 +7,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.vecmath.Point2d;
-import javax.vecmath.Tuple2d;
-
 import org.apache.commons.lang3.ArrayUtils;
 
 import tt.euclid2d.util.Intersection;
