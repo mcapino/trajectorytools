@@ -1,7 +1,9 @@
 package org.jgrapht.util.heuristics;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.AStarShortestPathSimple;
+import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 
@@ -13,9 +15,13 @@ public class PerfectHeuristic<S, E> implements HeuristicToGoal<S> {
     private Map<S, Double> distances;
 
     public PerfectHeuristic(Graph<S, E> graph, S goal) {
-        this.graph = graph;
+        if (graph instanceof DirectedGraph) {
+        	this.graph = new EdgeReversedGraph<S, E>((DirectedGraph<S, E>) graph);
+        } else {
+        	this.graph = graph;
+        }
+        
         this.distances = getDistances(goal);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -32,6 +38,7 @@ public class PerfectHeuristic<S, E> implements HeuristicToGoal<S> {
     private static class DijkstraShortestPath<S, E> extends AStarShortestPathSimple<S, E> {
 
         private static <S, E> Map<S, Double> calculateDistancesToGoal(Graph<S, E> graph, S goal) {
+        	
             DijkstraShortestPath<S, E> alg = new DijkstraShortestPath<S, E>(graph, goal, new Goal<S>() {
                 @Override
                 public boolean isGoal(S current) {
