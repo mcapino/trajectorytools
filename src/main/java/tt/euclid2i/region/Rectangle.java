@@ -110,5 +110,17 @@ public class Rectangle implements Region {
         return "Rectangle [corner1=" + corner1 + ", corner2=" + corner2 + "]";
     }
 
+	public boolean overlap(Rectangle other) {
+
+		if (this.corner2.x < other.corner1.x || 
+			other.corner2.x < this.corner1.x || 
+			this.corner2.y < other.corner1.y ||
+			other.corner2.y < this.corner1.y) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 
 }
