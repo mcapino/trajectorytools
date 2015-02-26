@@ -19,7 +19,7 @@ public class GraphBuilder {
     }
 
     public static <V, E> DirectedGraph<V, E> build(DirectedGraph<V, E> implicitGraph,
-                                                   DirectedGraph<V, E> emptyExplicitGraph,
+                                                   DirectedGraph<V, E> explicitGraph,
                                                    Collection<V> init,
                                                    int maxVertices) {
 
@@ -35,7 +35,7 @@ public class GraphBuilder {
         whileLoop:
         while (!open.isEmpty()) {
             V current = open.poll();
-            emptyExplicitGraph.addVertex(current);
+            explicitGraph.addVertex(current);
 
             Set<E> outEdges = implicitGraph.outgoingEdgesOf(current);
             for (E edge : outEdges) {
@@ -51,15 +51,37 @@ public class GraphBuilder {
                 V target = implicitGraph.getEdgeTarget(edge);
 
                 if (!closed.contains(target)) {
-                    emptyExplicitGraph.addVertex(target);
+                    explicitGraph.addVertex(target);
                     closed.add(target);
                     open.offer(target);
                 }
 
-                emptyExplicitGraph.addEdge(current, target, edge);
+                explicitGraph.addEdge(current, target, edge);
+            }
+            
+            Set<E> inEdges = implicitGraph.incomingEdgesOf(current);
+            for (E edge : inEdges) {
+
+                if (counter++ == maxVertices) {
+                    // For some reason, when the condition was counter++ > maxVertices,
+                    // the code was non-deterministically failing.
+                    // throw new RuntimeException("Exceeded maximum number of vertices");
+                    break whileLoop;
+                }
+
+
+                V source = implicitGraph.getEdgeSource(edge);
+
+                if (!closed.contains(source)) {
+                    explicitGraph.addVertex(source);
+                    closed.add(source);
+                    open.offer(source);
+                }
+
+                explicitGraph.addEdge(source, current, edge);
             }
         }
 
-        return emptyExplicitGraph;
+        return explicitGraph;
     }
 }
