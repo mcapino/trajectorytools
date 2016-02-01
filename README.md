@@ -12,7 +12,7 @@ A Java toolkit facilitating tasks connected with trajectory planning. Currently,
  - Numeric and analytic detector of minimal separation violation between two trajectories
  - Visualization of trajectories and geometric shapes
  - Live simulation of robots moving along given trajectory
- - Dubbins curve generator
+ - Dubins path generator
  - etc.
 
 For more detailed information, go to project wiki: https://github.com/mcapino/trajectorytools/wiki
