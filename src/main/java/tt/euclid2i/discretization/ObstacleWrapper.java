@@ -40,6 +40,20 @@ public class ObstacleWrapper<V extends tt.euclid2i.Point, E extends Line>
 		return conflictFreeEdges;
 	}
 
+	@Override
+	public Set<E> incomingEdgesOf(V arg0) {
+		Set<E> edges = super.incomingEdgesOf(arg0);
+		Set<E> conflictFreeEdges = new HashSet<E>();
+
+		for (E edge : edges) {
+			if (Util.isVisible(edge.getStart(), edge.getEnd(), obstacles)) {
+				conflictFreeEdges.add(edge);
+			}
+		}
+
+		return conflictFreeEdges;
+	}
+
 	public DirectedGraph<Point, Line> generateFullGraph(Point initialPoint) {
         //FIXME if the underlying graph is lazygrid, it may happen that this method causes infinite loop
         DirectedGraph<Point, Line> fullGraph
