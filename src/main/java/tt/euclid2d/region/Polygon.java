@@ -1,8 +1,11 @@
 package tt.euclid2d.region;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import math.geom2d.Point2D;
+import math.geom2d.polygon.Polygon2D;
+import math.geom2d.polygon.convhull.ConvexHull2D;
+import math.geom2d.polygon.convhull.JarvisMarch2D;
 import org.apache.commons.lang3.ArrayUtils;
 
 import tt.euclid2d.Point;
@@ -151,4 +154,31 @@ public class Polygon implements Region {
 
         return (sumOverEdges < 0);
     }
+
+    /**
+     * Computes Minokowski sum of this polygon with given polygon.
+     * Both polygons must be convex.
+     * @param q the other polygon
+     */
+    public Polygon minkowskiSum(Polygon q) {
+        LinkedList<Point2D> resultPoints = new LinkedList<>();
+        for (Point pp: polygonPoints) {
+            for (Point pq: q.getPoints()) {
+                resultPoints.add(new Point2D(pp.x - pq.x, pp.y - pq.y));
+            }
+        }
+
+        JarvisMarch2D ch = new JarvisMarch2D();
+        Polygon2D theirPolygon = ch.convexHull(resultPoints);
+
+        Point[] ourPoints = new Point[theirPolygon.vertexNumber()];
+        for (int i=0; i<theirPolygon.vertexNumber(); i++) {
+            Point2D v = theirPolygon.vertex(i);
+            ourPoints[i] = new Point(v.x(),v.y());
+        }
+
+        return new Polygon(ourPoints);
+    }
+
+
 }

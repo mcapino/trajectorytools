@@ -46,7 +46,7 @@ public class RegionsLayerTest {
 
         // background
         VisManager.registerLayer(ColorLayer.create(Color.WHITE));
-        VisManager.registerLayer(new RegionsLayer(new RegionsLayer.RegionsProvider() {
+        VisManager.registerLayer(RegionsLayer.create(new RegionsLayer.RegionsProvider() {
             @Override
             public Collection<? extends Region> getRegions() {
                 return regions;

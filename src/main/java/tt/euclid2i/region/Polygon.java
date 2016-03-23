@@ -113,6 +113,20 @@ public class Polygon implements Region, Serializable{
         return inflatedPolygons;
     }
 
+    public Polygon minkowskiSum(Polygon q) {
+        tt.euclid2d.region.Polygon inPolygon2d = new tt.euclid2d.region.Polygon(points);
+        tt.euclid2d.region.Polygon qPolygon2d = new tt.euclid2d.region.Polygon(q.getPoints());
+
+        tt.euclid2d.region.Polygon sum = inPolygon2d.minkowskiSum(qPolygon2d);
+
+        Point[] sumPoints = new Point[sum.getPoints().length];
+        for (int i = 0; i < sum.getPoints().length; i++) {
+            sumPoints[i] = new Point((int) sum.getPoints()[i].x, (int) sum.getPoints()[i].y);
+        }
+
+        return new Polygon(sumPoints);
+    }
+
     /**
      * Determines if the ring of points is defined in a clockwise direction
      * @param points the array of points constituting the border of the polygon

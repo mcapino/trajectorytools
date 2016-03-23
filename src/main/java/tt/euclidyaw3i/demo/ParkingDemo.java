@@ -37,30 +37,76 @@ import java.util.List;
 
 public class ParkingDemo implements Creator {
 
+    private final Polygon carFootprint = (new Rectangle(new Point(-1000, -900), new Point(3000, 900))).toPolygon();
+    private final Polygon duckiebotFootprint = (new Rectangle(new Point(-1600, -900), new Point(700, 900))).toPolygon();
+    List<Polygon> obstacles = new LinkedList<>();
+
     @Override
-    public void init(String[] args) {
+    public void init(String[] strings) {}
+
+    public ParkingDemo() {
+        initVisualization();
+
+        obstacles.addAll(createColumns());
+        // create other cars
+        obstacles.add(carFootprint.getRotated(new Point(0,0), 0.1f).getTranslated(new Point(3200, 1500)));
+        obstacles.add(carFootprint.getRotated(new Point(0,0), -0.05f).getTranslated(new Point(2600, 9300)));
+    }
+
+    public void obstaclesDemo() {
+        final Polygon footprint = duckiebotFootprint;
+        VisManager.registerLayer(RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK));
+    }
+
+    public void minkowksiDemo() {
+        List<Polygon> minkowskiObstacles = new LinkedList<>();
+
+        float[] angleHolder = new float[1];
+
+        VisManager.registerLayer(RegionsLayer.create(() -> minkowskiObstacles, Color.LIGHT_GRAY, Color.LIGHT_GRAY));
+        VisManager.registerLayer(RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK));
+
+        VisManager.registerLayer(FootPrintLayer.create(duckiebotFootprint, () ->
+                        Collections.singleton(new tt.euclidyaw3i.Point(0,0,angleHolder[0])),
+                Color.RED, null));
+
+        for (int i=0; i < 1000; i++) {
+
+            float angle = (float) ((((i % 100)-50) / 100.0) * 2 * Math.PI);
+            Polygon footprint = duckiebotFootprint.getRotated(new tt.euclid2i.Point (0,0),angle);
+            angleHolder[0] = angle;
+
+            minkowskiObstacles.clear();
+            for (Polygon obstacle : obstacles) {
+                minkowskiObstacles.add(obstacle.minkowskiSum(footprint));
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void configurationSpaceDemo() {
+        final Polygon footprint = duckiebotFootprint;
+        VisManager.registerLayer(FootPrintLayer.create(footprint, () ->
+                Collections.singleton(new tt.euclidyaw3i.Point(0, 0, 0)),
+                Color.RED, null));
+
+        VisManager.registerLayer(FootPrintLayer.create(footprint, () ->
+                        Collections.singleton(new tt.euclidyaw3i.Point(5000, 3000, (float) Math.PI / 4)),
+                Color.RED, null));
+
+        VisManager.registerLayer(FootPrintLayer.create(footprint, () ->
+                        Collections.singleton(new tt.euclidyaw3i.Point(0, 5000, (float) Math.PI)),
+                Color.RED, null));
     }
 
     @Override
     public void create() {
-
-        initVisualization();
-
-        final Polygon footprint = (new Rectangle(new Point(-1000, -900), new Point(3000, 900))).toPolygon();
-
-        List<Region> obstacles = new LinkedList<>();
-
-        for (int i = 0; i < 6; i++) {
-            int ystart = -4500;
-            int yspacing = 4000;
-            int size = 600;
-
-            obstacles.add(new Rectangle(1500, ystart + i*yspacing - size/2, 1500+size, ystart + i*yspacing + size/2));
-            obstacles.add(new Rectangle(-5000, ystart + i*yspacing - size/2, -5000+size, ystart + i*yspacing + size/2));
-
-
-        }
-
+        final Polygon footprint = duckiebotFootprint;
 
         tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, (float) Math.PI/2);
         tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(4000, 5500, (float) 0);
@@ -158,6 +204,23 @@ public class ParkingDemo implements Creator {
 
     }
 
+
+
+
+    private List<Polygon> createColumns() {
+        List<Polygon> obstacles = new LinkedList<>();
+
+        for (int i = 0; i < 6; i++) {
+            int ystart = -4500;
+            int yspacing = 4000;
+            int size = 600;
+
+            obstacles.add((new Rectangle(1500, ystart + i*yspacing - size/2, 1500+size, ystart + i*yspacing + size/2)).toPolygon());
+            obstacles.add((new Rectangle(-5000, ystart + i*yspacing - size/2, -5000+size, ystart + i*yspacing + size/2)).toPolygon());
+        }
+        return obstacles;
+    }
+
     private void initVisualization() {
         VisManager.setInitParam("Trajectory Tools Vis", 1024, 768, 30000, 30000);
         VisManager.setSceneParam(new SceneParams() {
@@ -187,7 +250,6 @@ public class ParkingDemo implements Creator {
 
 
     public static void main(String[] args) {
-        new ParkingDemo().create();
-    }
+        new ParkingDemo().minkowksiDemo();   }
 
 }

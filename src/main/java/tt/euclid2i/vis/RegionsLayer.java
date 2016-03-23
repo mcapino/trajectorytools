@@ -19,83 +19,6 @@ public class RegionsLayer extends AbstractLayer {
         Collection<? extends Region> getRegions();
     }
 
-    private RegionsProvider regionsProvider;
-    private Color edgeColor;
-    private Color fillColor;
-
-    RegionsLayer() {
-    }
-
-    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor, Color fillColor) {
-        this.regionsProvider = regionsProvider;
-        this.edgeColor = edgeColor;
-        this.fillColor = fillColor;
-    }
-
-    public RegionsLayer(RegionsProvider regionsProvider, Color edgeColor) {
-        this(regionsProvider, edgeColor, null);
-    }
-
-
-    @Override
-    public void paint(Graphics2D canvas) {
-
-        super.paint(canvas);
-
-        Collection<? extends Region> regions = regionsProvider.getRegions();
-
-        for (Region region : regions) {
-        	if (region != null) {
-	            if (region instanceof Rectangle) {
-	                Rectangle rect = (Rectangle) region;
-	                
-	                int x1 = Vis.transX(rect.getCorner1().x);
-	                int y1 = Vis.transY(rect.getCorner1().y);
-	                
-	                int x2 = Vis.transX(rect.getCorner2().x);
-	                int y2 = Vis.transY(rect.getCorner2().y);
-	                
-	                int leftX = Math.min(x1, x2);
-	                int topY = Math.min(y1, y2);
-	                
-	                int width = Math.abs(x1-x2);
-	                int height = Math.abs(y1-y2);
-	                
-	                if (fillColor != null) {
-	                    canvas.setColor(fillColor);
-	                    canvas.fillRect(leftX, topY, width, height);
-	                }
-	
-	                canvas.setColor(edgeColor);
-	                canvas.drawRect(leftX, topY, width, height);
-	            }
-	
-	            if (region instanceof Circle) {
-	                Circle circle = (Circle) region;
-	
-	                if (fillColor != null) {
-	                    canvas.setColor(fillColor);
-	                    canvas.fillOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
-	                    		Vis.transY(circle.getCenter().y - circle.getRadius()),
-	                    		Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
-	
-	                }
-	
-	                canvas.setColor(edgeColor);
-	                canvas.drawOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
-	                		Vis.transY(circle.getCenter().y - circle.getRadius()),
-	                		Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
-	            }
-	
-	            if (region instanceof Polygon) {
-	                Polygon polygon = (Polygon) region;
-	                paintPolygon(polygon, canvas, fillColor, edgeColor, true);
-	            }
-        	}
-        }
-
-    }
-    
     public static void paintPolygon(Polygon polygon, Graphics2D canvas, Color fillColor, Color edgeColor, boolean drawNormals) {
         Point[] points = polygon.getPoints();
     	
@@ -178,10 +101,72 @@ public class RegionsLayer extends AbstractLayer {
     }
 
     public static VisLayer create(final RegionsProvider regionsProvider, final Color edgeColor) {
-        return new RegionsLayer(regionsProvider, edgeColor);
+        return create(regionsProvider, edgeColor, null);
     }
 
     public static VisLayer create(final RegionsProvider regionsProvider, final Color edgeColor, final Color fillColor) {
-        return new RegionsLayer(regionsProvider, edgeColor, fillColor);
+        return create(regionsProvider, edgeColor, fillColor, false);
+    }
+
+    public static VisLayer create(final RegionsProvider regionsProvider, final Color edgeColor, final Color fillColor, final boolean drawNormals) {
+        return new AbstractLayer() {
+            @Override
+            public void paint(Graphics2D canvas) {
+                super.paint(canvas);
+
+                Collection<? extends Region> regions = regionsProvider.getRegions();
+
+                for (Region region : regions) {
+                    if (region != null) {
+                        if (region instanceof Rectangle) {
+                            Rectangle rect = (Rectangle) region;
+
+                            int x1 = Vis.transX(rect.getCorner1().x);
+                            int y1 = Vis.transY(rect.getCorner1().y);
+
+                            int x2 = Vis.transX(rect.getCorner2().x);
+                            int y2 = Vis.transY(rect.getCorner2().y);
+
+                            int leftX = Math.min(x1, x2);
+                            int topY = Math.min(y1, y2);
+
+                            int width = Math.abs(x1-x2);
+                            int height = Math.abs(y1-y2);
+
+                            if (fillColor != null) {
+                                canvas.setColor(fillColor);
+                                canvas.fillRect(leftX, topY, width, height);
+                            }
+
+                            canvas.setColor(edgeColor);
+                            canvas.drawRect(leftX, topY, width, height);
+                        }
+
+                        if (region instanceof Circle) {
+                            Circle circle = (Circle) region;
+
+                            if (fillColor != null) {
+                                canvas.setColor(fillColor);
+                                canvas.fillOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
+                                        Vis.transY(circle.getCenter().y - circle.getRadius()),
+                                        Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
+
+                            }
+
+                            canvas.setColor(edgeColor);
+                            canvas.drawOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
+                                    Vis.transY(circle.getCenter().y - circle.getRadius()),
+                                    Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
+                        }
+
+                        if (region instanceof Polygon) {
+                            Polygon polygon = (Polygon) region;
+                            paintPolygon(polygon, canvas, fillColor, edgeColor, drawNormals);
+                        }
+                    }
+                }
+
+            }
+        };
     }
 }
