@@ -20,15 +20,19 @@ import tt.euclid2i.region.Rectangle;
 import tt.euclid2i.vis.ProjectionTo2d;
 import tt.euclid2i.vis.RegionsLayer;
 import tt.euclid2i.vis.RegionsLayer.RegionsProvider;
+import tt.euclidyaw3i.vis.AxisLayer;
+import tt.euclidyaw3i.vis.FootPrintLayer;
 import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;
 import tt.vis.GraphPathLayer;
 import tt.vis.GraphPathLayer.PathProvider;
 
 import javax.vecmath.Point2d;
-import java.awt.*;
+import java.awt.Color;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class ParkingDemo implements Creator {
@@ -42,31 +46,52 @@ public class ParkingDemo implements Creator {
 
         initVisualization();
 
-        Rectangle box = new Rectangle(new Point(-900, -1000), new Point(900, 2000));
-        final Polygon footprint = box.toPolygon();
+        final Polygon footprint = (new Rectangle(new Point(-1000, -900), new Point(3000, 900))).toPolygon();
 
-        tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, 0);
-        tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(3000, 3000, (float) -Math.PI/2);
+        List<Region> obstacles = new LinkedList<>();
 
-        // Show initial configuration
-        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
-            @Override
-            public Collection<? extends Region> getRegions() {
-                Polygon r = footprint.getTranslated(initConf.getPos());
-                r = r.getRotated(new Point(0,0), initConf.getYawInRads());
-                return Collections.singleton(r);
-            }
-        }, Color.RED, null));
+        for (int i = 0; i < 6; i++) {
+            int ystart = -4500;
+            int yspacing = 4000;
+            int size = 600;
 
-        // Show goal configuration
-        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
-            @Override
-            public Collection<? extends Region> getRegions() {
-                Polygon r = footprint.getRotated(new Point(0,0), goalConf.getYawInRads());
-                r = r.getTranslated(goalConf.getPos());
-                return Collections.singleton(r);
-            }
-        }, Color.BLUE, null));
+            obstacles.add(new Rectangle(1500, ystart + i*yspacing - size/2, 1500+size, ystart + i*yspacing + size/2));
+            obstacles.add(new Rectangle(-5000, ystart + i*yspacing - size/2, -5000+size, ystart + i*yspacing + size/2));
+
+
+        }
+
+
+        tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, (float) Math.PI/2);
+        tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(4000, 5500, (float) 0);
+
+        VisManager.registerLayer(FootPrintLayer.create(footprint, () -> Collections.singleton(initConf),
+                Color.BLACK, Color.RED));
+
+        VisManager.registerLayer(FootPrintLayer.create(footprint, () -> Collections.singleton(goalConf),
+                Color.RED, null));
+
+        VisManager.registerLayer(RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK));
+
+//        // Show initial configuration
+//        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
+//            @Override
+//            public Collection<? extends Region> getRegions() {
+//                Polygon r = footprint.getTranslated(initConf.getPos());
+//                r = r.getRotated(new Point(0,0), initConf.getYawInRads());
+//                return Collections.singleton(r);
+//            }
+//        }, Color.RED, null));
+//
+//        // Show goal configuration
+//        VisManager.registerLayer(RegionsLayer.create(new RegionsProvider() {
+//            @Override
+//            public Collection<? extends Region> getRegions() {
+//                Polygon r = footprint.getRotated(new Point(0,0), goalConf.getYawInRads());
+//                r = r.getTranslated(goalConf.getPos());
+//                return Collections.singleton(r);
+//            }
+//        }, Color.BLUE, null));
 
 //        // plan the shortest path between these two points
 //        final Point start = new Point(-5, -35);
@@ -156,6 +181,8 @@ public class ParkingDemo implements Creator {
 
         // Overlay
         VisManager.registerLayer(VisInfoLayer.create());
+
+        VisManager.registerLayer(AxisLayer.create(1000));
     }
 
 

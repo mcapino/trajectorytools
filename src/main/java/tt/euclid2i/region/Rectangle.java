@@ -9,6 +9,10 @@ public class Rectangle implements Region {
     Point corner1;
     Point corner2;
 
+    public Rectangle(int corner1X, int corner1Y, int corner2X, int corner2Y) {
+        this(new tt.euclid2i.Point(corner1X, corner1Y), new tt.euclid2i.Point(corner2X, corner2Y));
+    }
+
     public Rectangle(Point corner1, Point corner2) {
         super();
         this.corner1 = corner1;
