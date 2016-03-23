@@ -148,14 +148,14 @@ public class RegionsLayer extends AbstractLayer {
                             if (fillColor != null) {
                                 canvas.setColor(fillColor);
                                 canvas.fillOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
-                                        Vis.transY(circle.getCenter().y - circle.getRadius()),
+                                        Vis.transY(circle.getCenter().y) - Vis.transH(circle.getRadius()),
                                         Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
 
                             }
 
                             canvas.setColor(edgeColor);
                             canvas.drawOval(Vis.transX(circle.getCenter().x - circle.getRadius()),
-                                    Vis.transY(circle.getCenter().y - circle.getRadius()),
+                                    Vis.transY(circle.getCenter().y) - Vis.transH(circle.getRadius()),
                                     Vis.transW(2*circle.getRadius()), Vis.transH(2*circle.getRadius()));
                         }
 
