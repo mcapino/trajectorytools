@@ -202,7 +202,11 @@ public class Polygon implements Region, Serializable{
 		}
 		return new tt.euclid2d.region.Polygon(points2d);
 	}
-	
+
+    public Polygon getRotated(double angleRad) {
+        return getRotated(new Point(0,0), angleRad);
+    }
+
 	public Polygon getRotated(Point anchorPoint, double angleRad) {
 		int size = this.points.length;
 		Point[] rotatedPoints = new Point[size];
@@ -240,6 +244,20 @@ public class Polygon implements Region, Serializable{
             	}
             }
         }
+
+        for (int i = 0; i < points.length; i++) {
+            if (other.isInside(points[i])) {
+                return true;
+            }
+        }
+
+        for (int i = 0; i < other.points.length; i++) {
+            if (this.isInside(other.points[i])) {
+                return true;
+            }
+        }
+
+
 
         return false;
 	}

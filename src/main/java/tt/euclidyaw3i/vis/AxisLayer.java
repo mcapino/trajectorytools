@@ -19,7 +19,7 @@ public class AxisLayer extends AbstractLayer {
 			@Override
 			public void paint(Graphics2D canvas) {
 
-                canvas.setColor(Color.LIGHT_GRAY);
+                canvas.setColor(new Color(230,230,230));
 				canvas.drawLine(Vis.transX(0), Vis.transY(-100000), Vis.transX(0), Vis.transY(+100000));
                 canvas.drawLine(Vis.transX(-100000), Vis.transY(0), Vis.transX(+100000), Vis.transY(0));
 
