@@ -9,6 +9,30 @@ import tt.euclidyaw3i.Point;
 import java.util.Collection;
 
 public class SampledRoadmap {
+
+    public static DirectedGraph<Point, PathSegment>
+    buildPRM(Rectangle boundingBox, int n,
+                 Collection<Point> specialPoints, Distance distance, double connectionDistance,
+                 Steering steering, Polygon footprint, Collection<Polygon> obstacles) {
+
+        DirectedWeightedMultigraph<Point, PathSegment> graph = new DirectedWeightedMultigraph<Point, PathSegment>(PathSegment.class) {
+            @Override
+            public double getEdgeWeight(PathSegment pathSegment) {
+                return pathSegment.getLength();
+            }
+        };
+
+        generateUniformSamples(graph, boundingBox, n);
+
+
+        for(Point point : specialPoints) {
+            graph.addVertex(point);
+        }
+        connectVertices(graph, distance, connectionDistance, steering, footprint, obstacles);
+
+        return graph;
+    }
+
     public static DirectedGraph<Point, PathSegment>
     buildLattice(Rectangle boundingBox, int cols, int rows, int angles,
                  Collection<Point> specialPoints, Distance distance, double connectionDistance,
@@ -21,6 +45,34 @@ public class SampledRoadmap {
             }
         };
 
+        generateSukharevGrid(graph, boundingBox, cols, rows, angles);
+
+
+        for(Point point : specialPoints) {
+            graph.addVertex(point);
+        }
+        connectVertices(graph, distance, connectionDistance, steering, footprint, obstacles);
+
+        return graph;
+    }
+
+    private static void connectVertices(DirectedWeightedMultigraph<Point, PathSegment> graph, Distance distance, double connectionDistance, Steering steering, Polygon footprint, Collection<Polygon> obstacles) {
+        // generate edges
+        for (Point vertex : graph.vertexSet()) {
+            for (Point other : graph.vertexSet()) {
+                double d = distance.getDistance(vertex, other);
+                if (d < connectionDistance && !vertex.equals(other)) {
+                    PathSegment path = steering.getSteering(vertex, other);
+                    if (path != null && CollisionCheck.collisionFree(path, footprint, obstacles)) {
+                        graph.addEdge(vertex, other, path);
+                    }
+                }
+            }
+
+        }
+    }
+
+    private static void generateSukharevGrid(DirectedWeightedMultigraph<Point, PathSegment> graph, Rectangle boundingBox, int cols, int rows, int angles) {
         // generate vertices
         double hSpacing = (boundingBox.getCorner2().x - boundingBox.getCorner1().x) / (cols);
         double vSpacing = (boundingBox.getCorner2().y - boundingBox.getCorner1().y) / (rows);
@@ -36,25 +88,14 @@ public class SampledRoadmap {
                 }
             }
         }
+    }
 
-        for(Point point : specialPoints) {
-            graph.addVertex(point);
+    private static void generateUniformSamples(DirectedWeightedMultigraph<Point, PathSegment> graph, Rectangle boundingBox, int n) {
+        for (int i=0; i < n; i++) {
+                int x = boundingBox.getCorner1().x + (int) Math.random() * (boundingBox.getCorner2().x - boundingBox.getCorner1().x);
+                int y = boundingBox.getCorner1().y + (int) Math.random() * (boundingBox.getCorner2().y - boundingBox.getCorner1().y);
+                double angle = -Math.PI + (2 * Math.PI) * Math.random();
+                graph.addVertex(new Point(x, y, (float) angle));
         }
-
-        // generate edges
-        for (Point vertex : graph.vertexSet()) {
-            for (Point other : graph.vertexSet()) {
-                double d = distance.getDistance(vertex, other);
-                if (d < connectionDistance && !vertex.equals(other)) {
-                    PathSegment path = steering.getSteering(vertex, other);
-                    if (path != null && CollisionCheck.collisionFree(path, footprint, obstacles)) {
-                        graph.addEdge(vertex, other, path);
-                    }
-                }
-            }
-
-        }
-
-        return graph;
     }
 }
