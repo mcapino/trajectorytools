@@ -7,11 +7,13 @@ import cz.agents.alite.vis.VisManager.SceneParams;
 import cz.agents.alite.vis.layer.common.ColorLayer;
 import cz.agents.alite.vis.layer.common.VisInfoLayer;
 import cz.agents.alite.vis.layer.toggle.KeyToggleLayer;
+import org.apache.commons.math3.util.MathUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AStarShortestPath;
 import org.jgrapht.alg.AStarShortestPathSimple;
+import org.jgrapht.util.Goal;
 import org.jgrapht.util.HeuristicToGoal;
 import org.jgrapht.util.heuristics.ZeroHeuristic;
 import tt.euclid2i.Line;
@@ -26,13 +28,8 @@ import tt.euclid2i.util.Util;
 import tt.euclid2i.vis.ProjectionTo2d;
 import tt.euclid2i.vis.RegionsLayer;
 import tt.euclid2i.vis.RegionsLayer.RegionsProvider;
-import tt.euclidyaw3i.discretization.ManeuverTree;
-import tt.euclidyaw3i.discretization.PathSegment;
-import tt.euclidyaw3i.discretization.PathSegmentGraphLayer;
-import tt.euclidyaw3i.vis.AxisLayer;
-import tt.euclidyaw3i.vis.FootPrintLayer;
-import tt.euclidyaw3i.vis.PathSegmentLayer;
-import tt.euclidyaw3i.vis.PointLayer;
+import tt.euclidyaw3i.discretization.*;
+import tt.euclidyaw3i.vis.*;
 import tt.vis.GraphLayer;
 import tt.vis.GraphLayer.GraphProvider;
 import tt.vis.GraphPathLayer;
@@ -40,14 +37,12 @@ import tt.vis.GraphPathLayer.PathProvider;
 
 import javax.vecmath.Point2d;
 import java.awt.Color;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ParkingDemo implements Creator {
 
     final static Polygon carFootprint = (new Rectangle(new Point(-1000, -900), new Point(3000, 900))).toPolygon();
+
     final static Polygon duckiebotFootprint = (new Rectangle(new Point(-1600, -900), new Point(700, 900))).toPolygon();
 
     final static Polygon smallDuckiebotFootprint = (new Rectangle(new Point(-160 * 2, -90 * 2), new Point(70 * 2, 90 * 2))).toPolygon();
@@ -175,6 +170,7 @@ public class ParkingDemo implements Creator {
         VisManager.registerLayer(PathSegmentLayer.create(() -> maneuversFromInit, Color.BLUE));
     }
 
+
     public void motionPrimitivesForDuckiebot() {
         Polygon footprint = duckiebotFootprint;
         tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, (float) Math.PI / 2);
@@ -193,41 +189,148 @@ public class ParkingDemo implements Creator {
 
     public void maneuverTree(Polygon footprint) {
         tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, (float) Math.PI/2);
-        tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(4000, 5500, (float) 0);
+        tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(-5600, 9800, (float) 2.8);
 
         //visualize initial configuration
         VisManager.registerLayer(FootPrintLayer.create(footprint, () -> Collections.singleton(initConf), Color.RED, null));
 
-        Collection<PathSegment> maneuvers = ManeuverTree.getConstantCurvatureArcs(new double[]{-0.1/1000.0, -0.05/1000.0, 0, +0.05/1000.0, 0.1/1000.0}, 4000.0f, 1000.0f);
+        //visualize goal configuration
+        VisManager.registerLayer(
+                KeyToggleLayer.create("t", true,
+                FootPrintLayer.create(footprint, () -> Collections.singleton(goalConf), Color.GREEN, null)));
+
+        Collection<PathSegment> maneuvers = ManeuverTree.getConstantCurvatureArcs(new double[]{-0.14/1000.0, -0.07/1000.0, 0, +0.07/1000.0, 0.14/1000.0}, 4000.0f, 1000.0f);
         Collection<PathSegment> maneuversFromInit = ManeuverTree.applyManeuvers(initConf, maneuvers);
 
-        VisManager.registerLayer(PathSegmentLayer.create(() -> maneuversFromInit, Color.BLUE));
+        Rectangle boundingBox = new Rectangle(-10000,-2000, 7000, 18000);
+        VisManager.registerLayer(
+                KeyToggleLayer.create("b", true,
+                RegionsLayer.create(() -> Collections.singleton(boundingBox), new Color(100,220,220))));
 
-        DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph = ManeuverTree.buildTree(initConf, maneuvers, 1000, footprint, obstacles);
 
-        VisManager.registerLayer(PathSegmentGraphLayer.create(graph, false));
+        DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph1 = ManeuverTree.buildTree(initConf, maneuvers, boundingBox, footprint, Collections.EMPTY_LIST);
+        VisManager.registerLayer(
+                KeyToggleLayer.create("s", true, PathSegmentGraphLayer.create(graph1, false, new Color(220,220,220))));
 
-//        VisManager.registerLayer(
-//                KeyToggleLayer.create("g", false,
-//                        GraphLayer.create(
-//                                () -> visGraph
-//                                , new tt.euclid2i.vis.ProjectionTo2d(), Color.LIGHT_GRAY, Color.GRAY, 1,4)
-//                ));
+        DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph2 = ManeuverTree.buildTree(initConf, maneuvers, boundingBox, footprint, obstacles);
+        VisManager.registerLayer(
+                KeyToggleLayer.create("g", true,
+                    PathSegmentGraphLayer.create(graph2, false, Color.BLUE)));
+
+        // visualize obstacles
+        VisManager.registerLayer(
+                KeyToggleLayer.create("o", true,
+                RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK)));
+
+        // find path
+        GraphPath<tt.euclidyaw3i.Point, PathSegment> path = AStarShortestPathSimple.findPathBetween(
+                graph2,
+                p -> 0.0,
+                initConf,
+                new Goal<tt.euclidyaw3i.Point>() {
+                    @Override
+                    public boolean isGoal(tt.euclidyaw3i.Point current) {
+                        return current.getPos().distance(goalConf.getPos()) < 300.0;
+                    }
+                }
+        );
+
+        // visualize path
+        VisManager.registerLayer(
+                KeyToggleLayer.create("p", true,
+                       PathSegmentLayer.create(()->path.getEdgeList(), Color.RED, 3)));
+
+    }
+
+    public void lattice(Polygon footprint) {
+        tt.euclidyaw3i.Point initConf = new tt.euclidyaw3i.Point(0, 0, (float) Math.PI/2);
+        tt.euclidyaw3i.Point goalConf = new tt.euclidyaw3i.Point(-2600, 14200, (float) 1.56);
+
+        //visualize initial configuration
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("k", true,
+                    FootPrintLayer.create(footprint, () -> Collections.singleton(initConf), Color.RED, null)));
+
+        //visualize goal configuration
+        VisManager.registerLayer(
+                KeyToggleLayer.create("t", true,
+                        FootPrintLayer.create(footprint, () -> Collections.singleton(goalConf), Color.GREEN, null)));
+
+        Rectangle boundingBox = new Rectangle(-10000,-2000, 7000, 18000);
+        Collection<tt.euclidyaw3i.Point> specialPoints = Collections.singleton(initConf);
+
+        double connRadius = 9000;
+        int n = 8;
+        int angles = 16;
+        double rho = 6000;
+
+        DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph = SampledRoadmap.buildLattice(boundingBox, n, n, angles,
+                specialPoints,
+                new DubinsDistance(rho),
+                connRadius,
+                new DubinsSteering(rho,500),
+                footprint, obstacles);
+
+        DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph2 = SampledRoadmap.buildLattice(boundingBox, n, n, angles,
+                specialPoints,
+                new DubinsDistance(rho),
+                connRadius,
+                new DubinsSteering(rho,500),
+                footprint, Collections.EMPTY_LIST);
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("b", true,
+                        RegionsLayer.create(() -> Collections.singleton(boundingBox), new Color(100,220,220))));
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("g", true,
+                        PathSegmentGraphLayer.create(graph, false, Color.BLUE)));
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("x", true,
+                        PointsLayer.create(() -> graph.vertexSet(), Color.BLUE)));
+
+        // edges out of single vertex
+
+        tt.euclidyaw3i.Point v = new tt.euclidyaw3i.Point(-437,4250, (float) -Math.PI);
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("f", true,
+                        PathSegmentLayer.create(()->graph2.outgoingEdgesOf(v), Color.GRAY, 1)));
+
+        VisManager.registerLayer(
+                KeyToggleLayer.create("d", true,
+                        PathSegmentLayer.create(()->graph.outgoingEdgesOf(v), Color.BLUE, 1)));
+
 
 
 
         // visualize obstacles
-        VisManager.registerLayer(RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK));
+        VisManager.registerLayer(
+                KeyToggleLayer.create("o", true,
+                        RegionsLayer.create(() -> obstacles, Color.BLACK, Color.BLACK)));
 
         // find path
-        //final GraphPath<Point, Line> path = AStarShortestPathSimple.findPathBetween(visGraph, new ZeroHeuristic(), initConf.getPos(), goalConf.getPos());
+        GraphPath<tt.euclidyaw3i.Point, PathSegment> path = AStarShortestPathSimple.findPathBetween(
+                graph,
+                p -> 0.0,
+                initConf,
+                new Goal<tt.euclidyaw3i.Point>() {
+                    @Override
+                    public boolean isGoal(tt.euclidyaw3i.Point current) {
+                        return current.getPos().distance(goalConf.getPos()) < 500.0
+                                && Math.abs(tt.euclidyaw3i.Util.angleDiff(current.getYawInRads(), goalConf.getYawInRads())) < 0.1;
+                    }
+                }
+        );
+
 
         // visualize path
-//        VisManager.registerLayer(
-//                KeyToggleLayer.create("p", false,
-//                        GraphPathLayer.create(
-//                                () -> path,
-//                                new ProjectionTo2d(), Color.BLUE, Color.BLUE, 2,4)));
+        if (path != null)
+            VisManager.registerLayer(
+                    KeyToggleLayer.create("p", true,
+                            PathSegmentLayer.create(()->path.getEdgeList(), Color.RED, 3)));
 
     }
 
@@ -398,8 +501,10 @@ public class ParkingDemo implements Creator {
         //new ParkingDemo().motionPrimitivesForDuckiebot();
 
         // Maneuver tree demo
-        new ParkingDemo().maneuverTree(ParkingDemo.carFootprint);
+        // new ParkingDemo().maneuverTree(ParkingDemo.carFootprint);
 
+        // Lattice demo
+        new ParkingDemo().lattice(ParkingDemo.carFootprint);
     }
 
 }

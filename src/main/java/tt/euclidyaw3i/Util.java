@@ -12,4 +12,9 @@ public class Util {
 		
 		return new Point(x, y, (int) (yaw * 1000));
 	}
+
+	public static double angleDiff(double alpha, double beta) {
+		double angleDiff = alpha - beta;
+		return ((((angleDiff) % (2*Math.PI)) + (3*Math.PI)) % (2*Math.PI)) - Math.PI;
+	}
 }

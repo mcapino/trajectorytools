@@ -10,7 +10,7 @@ import java.awt.*;
 public class PathSegmentGraphLayer extends AbstractLayer {
 
 	public static <V, E> VisLayer create(
-			final DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph, final boolean drawPathOrientations) {
+			final DirectedGraph<tt.euclidyaw3i.Point, PathSegment> graph, final boolean drawPathOrientations, final Color color) {
 
 		return new AbstractLayer() {
 
@@ -24,7 +24,7 @@ public class PathSegmentGraphLayer extends AbstractLayer {
 					
 					for (int i = 0; i < waypoints.length-1; i++) {
 
-						canvas.setColor(Color.LIGHT_GRAY);
+						canvas.setColor(color);
 						canvas.drawLine(
 								Vis.transX(waypoints[i].getPos().x),
 								Vis.transY(waypoints[i].getPos().y),
@@ -34,10 +34,10 @@ public class PathSegmentGraphLayer extends AbstractLayer {
 
 					if (drawPathOrientations) {
 						for (int i = 0; i < waypoints.length; i++) {
-							canvas.setColor(Color.LIGHT_GRAY);
+							canvas.setColor(color);
 							canvas.drawOval(Vis.transX(waypoints[i].getPos().x) - 1, Vis.transY(waypoints[i].getPos().y) - 1, 2, 2);
 
-							canvas.setColor(Color.LIGHT_GRAY);
+							canvas.setColor(color);
 							float tipLength = 30;
 							canvas.drawLine(
 									Vis.transX(waypoints[i].getPos().x),
@@ -50,7 +50,7 @@ public class PathSegmentGraphLayer extends AbstractLayer {
 				}
 				
 				for (tt.euclidyaw3i.Point vertex : graph.vertexSet()) {
-					canvas.setColor(Color.GRAY);
+					canvas.setColor(color.darker());
 					canvas.fillOval(Vis.transX(vertex.getPos().x)-2, Vis.transY(vertex.getPos().y)-2, 4, 4);
 					
 					float tipLength = 100;
